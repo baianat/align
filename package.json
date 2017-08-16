@@ -1,0 +1,39 @@
+{
+  "name": "eidtor",
+  "version": "0.0.0",
+  "description": "interactive ES6 text editor",
+  "main": "dist/editor.js",
+  "dependencies": {},
+  "devDependencies": {
+    "browser-sync": "^2.18.7",
+    "buble": "^0.15.2",
+    "eslint": "^3.17.0",
+    "eslint-config-airbnb-base": "^11.1.1",
+    "eslint-plugin-import": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-buble": "^0.8.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-rollup": "^2.10.0",
+    "gulp-sourcemaps": "^2.4.0",
+    "gulp-stylus": "^2.6.0",
+    "gulp-svg-sprites": "^4.1.2",
+    "gulp-uglify": "^2.0.1",
+    "rollup": "^0.41.6"
+  },
+  "author": "",
+  "license": "MIT",
+  "keywords": [],
+  "maintainers": [
+    {
+      "name": "baianat",
+      "email": "mobher@gmail.com"
+    },
+    {
+      "name": "Abdelrahman3D",
+      "email": "abdelrahman3d@gmail.com"
+    }
+  ],
+  "optionalDependencies": {}
+}

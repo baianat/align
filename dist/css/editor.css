@@ -1,0 +1,30 @@
+/**
+ * core
+ */
+@font-face {
+  font-weight: 700;
+  font-family: "Poppins";
+  src: url("../font/Poppins-Bold.ttf");
+}
+@font-face {
+  font-weight: 600;
+  font-family: "Poppins";
+  src: url("../font/Poppins-SemiBold.ttf");
+}
+@font-face {
+  font-weight: 500;
+  font-family: "Poppins";
+  src: url("../font/Poppins-Medium.ttf");
+}
+@font-face {
+  font-weight: 400;
+  font-family: "Poppins";
+  src: url("../font/Poppins-Regular.ttf");
+}
+@font-face {
+  font-weight: 300;
+  font-family: "Poppins";
+  src: url("../font/Poppins-Light.ttf");
+}
+
+/*# sourceMappingURL=editor.css.map */
