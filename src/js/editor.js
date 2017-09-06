@@ -48,7 +48,7 @@ class Editor {
       const select = this.styler.size;
       this.excute('fontsize', select[select.selectedIndex].value);
     });
-    this.styler.color.addEventListener('change', () => this.excute('forecolor', this.styler.color.value))
+    this.styler.color.addEventListener('input', () => this.excute('forecolor', this.styler.color.value))
     this.styler.bold.addEventListener('click', () => this.excute('bold'));
     this.styler.italic.addEventListener('click', () => this.excute('italic'));
     this.styler.underline.addEventListener('click', () => this.excute('underline'));

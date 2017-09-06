@@ -86,7 +86,7 @@ Editor.prototype.initStyler = function initStyler () {
       var select$$1 = this$1.styler.size;
       this$1.excute('fontsize', select$$1[select$$1.selectedIndex].value);
     });
-    this.styler.color.addEventListener('change', function () { return this$1.excute('forecolor', this$1.styler.color.value); });
+    this.styler.color.addEventListener('input', function () { return this$1.excute('forecolor', this$1.styler.color.value); });
     this.styler.bold.addEventListener('click', function () { return this$1.excute('bold'); });
     this.styler.italic.addEventListener('click', function () { return this$1.excute('italic'); });
     this.styler.underline.addEventListener('click', function () { return this$1.excute('underline'); });
