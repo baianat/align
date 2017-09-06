@@ -30,6 +30,7 @@ class Editor {
     this.styler = {};
     this.el.insertAdjacentHTML('beforebegin', styler);
     this.styler.wrapper = select('.styler');
+    this.styler.formating = select('#formating');
     this.styler.size = select('#size');
     this.styler.color = select('#color');
     this.styler.bold = select('#bold');
@@ -44,6 +45,10 @@ class Editor {
   }
 
   initStylerActions() {
+    this.styler.formating.addEventListener('change', () => {
+      const select = this.styler.formating;
+      this.excute('formatblock', select[select.selectedIndex].value);
+    });
     this.styler.size.addEventListener('change', () => {
       const select = this.styler.size;
       this.excute('fontsize', select[select.selectedIndex].value);

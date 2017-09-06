@@ -1,6 +1,19 @@
 export let styler = `
   <ul class="styler">
     <li>
+      <select class="styler-select" id="formating">
+        <option selected>- formatting -</option>
+        <option value="h1">Title 1</option>
+        <option value="h2">Title 2</option>
+        <option value="h3">Title 3</option>
+        <option value="h4">Title 4</option>
+        <option value="h5">Title 5</option>
+        <option value="h6">Title 6</option>
+        <option value="p">Paragraph</option>
+        <option value="pre">Preformatted</option>
+      </select>
+    </li>
+    <li>
       <select class="styler-select" id="size">
         <option selected>
           size
