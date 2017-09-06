@@ -1,6 +1,20 @@
 /**
  * core
  */
+.toolbar,
+.toolbar-button,
+.styler,
+.styler-button {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
 @font-face {
   font-weight: 700;
   font-family: "Poppins";
@@ -25,6 +39,107 @@
   font-weight: 300;
   font-family: "Poppins";
   src: url("../font/Poppins-Light.ttf");
+}
+.icon {
+  width: 20px;
+  height: 20px;
+}
+/**
+ * eidtor elements
+ */
+.editor-image {
+  display: block;
+  margin: auto;
+  width: 100%;
+  max-width: 400px;
+}
+.toolbar {
+  background-color: #323c47;
+  padding: 5px;
+  margin: 0;
+  width: auto;
+  list-style: none;
+  border-radius: 20px;
+}
+.toolbar li:not(last-child) {
+  padding-right: 5px;
+}
+.toolbar-button {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  border-radius: 15px;
+  border: 0;
+  outline: none;
+  background-color: #fff;
+  fill: #323c47;
+}
+.toolbar-list {
+  -webkit-appearance: none;
+  padding: 5px 10px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #fff;
+  font-size: 15px;
+  line-height: 15px;
+}
+.toolbar-input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.styler {
+  background-color: #323c47;
+  padding: 5px;
+  margin: 0;
+  width: auto;
+  list-style: none;
+  border-radius: 20px;
+  position: absolute;
+  -webkit-transform: translateX(-50%);
+      -ms-transform: translateX(-50%);
+          transform: translateX(-50%);
+  top: 10px;
+  left: 50vw;
+  display: none;
+}
+.styler li:not(last-child) {
+  padding-right: 5px;
+}
+.styler-button {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  border-radius: 15px;
+  border: 0;
+  outline: none;
+  background-color: #fff;
+  fill: #323c47;
+}
+.styler-list {
+  -webkit-appearance: none;
+  padding: 5px 10px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #fff;
+  font-size: 15px;
+  line-height: 15px;
+}
+.styler-input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.styler.is-visiable {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 /*# sourceMappingURL=editor.css.map */

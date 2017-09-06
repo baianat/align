@@ -1625,7 +1625,7 @@ gulp-rename@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/gulp-rename/-/gulp-rename-1.2.2.tgz#3ad4428763f05e2764dec1c67d868db275687817"
 
-gulp-rollup@^2.10.0:
+gulp-rollup:
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/gulp-rollup/-/gulp-rollup-2.14.0.tgz#0244b4884ed14e957626628b960488cfc5b04b18"
   dependencies:

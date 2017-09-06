@@ -10,7 +10,7 @@ const plumber = require('gulp-plumber');
 const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
 const svgSprite = require("gulp-svg-sprites");
-const rollup = require('rollup');
+const rollup = require('gulp-rollup');
 
 /**
  * browser Sync
@@ -23,24 +23,29 @@ const reload = browserSync.reload;
  * Scripts task
  */
 gulp.task('scripts', () => {
-  return rollup.rollup({
-    entry: "./src/js/editor.js",
-  })
-  .then((bundle) => {
-      bundle.write({
-        format: "umd",
-        moduleName: "Editor",
-        dest: "./dist/js/editor.js",
-        sourceMap: false
-      });
-    })
+    gulp.src('./src/js/**/*.js')
+        .pipe(plumber())
+        .pipe(rollup({
+            rollup: require('rollup'),
+            entry: './src/js/editor.js',
+            format: 'umd',
+            moduleName: 'Editor'
+        }))
+        .pipe(buble())
+        .pipe(rename({
+            basename: "editor",
+            suffix: "",
+            extname: ".js"
+        }))
+        .pipe(gulp.dest('./dist/js'))
+        .pipe(reload({ stream: true }));
 });
 
 /**
  * Styles task
  */
 gulp.task('styles', function () {
-    gulp.src('./src/stylus/editor.styl')
+    gulp.src('./src/stylus/app.styl')
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(stylus())
@@ -52,7 +57,7 @@ gulp.task('styles', function () {
         .pipe(autoprefixer('last 5 version'))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./dist/css'))
-        .pipe(reload({stream: true}));
+        .pipe(reload({ stream: true }));
 });
 
 /**
