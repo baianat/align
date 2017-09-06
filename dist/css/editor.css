@@ -136,6 +136,25 @@
   height: 100%;
   opacity: 0;
 }
+.styler-color {
+  height: 30px;
+  width: 30px;
+  border-radius: 15px;
+  border: 0;
+  padding: 3px;
+  box-sizing: border-box;
+}
+.styler-select {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  height: 30px;
+  border-radius: 15px;
+  padding: 2px 15px;
+  line-height: 26px;
+  background: #fff;
+  text-align: center;
+}
 .styler.is-visiable {
   display: -webkit-flex;
   display: -ms-flexbox;

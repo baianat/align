@@ -30,6 +30,8 @@ class Editor {
     this.styler = {};
     this.el.insertAdjacentHTML('beforebegin', styler);
     this.styler.wrapper = select('.styler');
+    this.styler.size = select('#size');
+    this.styler.color = select('#color');
     this.styler.bold = select('#bold');
     this.styler.italic = select('#italic');
     this.styler.underline = select('#underline');
@@ -37,9 +39,16 @@ class Editor {
     this.styler.alignCenter = select('#alignCenter');
     this.styler.alignRight = select('#alignRight');
     this.styler.addImage = select('#addImage');
+
+
   }
 
   initStylerActions() {
+    this.styler.size.addEventListener('change', () => {
+      const select = this.styler.size;
+      this.excute('fontsize', select[select.selectedIndex].value);
+    });
+    this.styler.color.addEventListener('change', () => this.excute('forecolor', this.styler.color.value))
     this.styler.bold.addEventListener('click', () => this.excute('bold'));
     this.styler.italic.addEventListener('click', () => this.excute('italic'));
     this.styler.underline.addEventListener('click', () => this.excute('underline'));
