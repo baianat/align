@@ -1,20 +1,22 @@
 .styler
-  background-color: $dark
-  padding: 5px
+  position: fixed
+  top: 0
+  right: 0
+  left: 0
+  background-color: $white
+  padding: 20px 0
   margin: 0
   width: auto
   list-style: none
-  border-radius: 20px
-  position: absolute
-  // transform: translateX(-50%)
-  top: 10px
-  left: 50vw
   @extends $flexCenter
-  display: none
   li
     &:not(last-child)
-      padding-right: 5px
+      margin-right: 1px
   
+  &-separator
+    content: '|'
+    padding: 0 10px
+
   &-button
     position: relative
     width: 30px
@@ -27,6 +29,8 @@
     background-color: $white
     fill: $dark
     @extends $flexCenter
+    &.is-active
+      fill: $blue
 
   &-list
     -webkit-appearance: none
@@ -46,19 +50,20 @@
   &-color
     height: 30px
     width: 30px
-    border-radius: 15px
     border: 0
-    padding: 3px
+    padding: 0
     box-sizing: border-box
 
   &-select
     appearance: none
     height: 30px
-    border-radius: 15px
+    border-radius: 0
     padding: 2px 15px
     line-height: 26px
     background: $white
     text-align: center
+    border-width: 1px
+    border-color: $dark
 
    &.is-visiable
     display: flex

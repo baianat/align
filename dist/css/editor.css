@@ -47,6 +47,14 @@
 /**
  * eidtor elements
  */
+.editor {
+  max-height: calc(100vh - 140px);
+  margin: 70px 100px;
+  overflow: auto;
+}
+.editor:focus {
+  outline: none;
+}
 .editor-image {
   display: block;
   margin: auto;
@@ -92,19 +100,22 @@
   opacity: 0;
 }
 .styler {
-  background-color: #323c47;
-  padding: 5px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  background-color: #fff;
+  padding: 20px 0;
   margin: 0;
   width: auto;
   list-style: none;
-  border-radius: 20px;
-  position: absolute;
-  top: 10px;
-  left: 50vw;
-  display: none;
 }
 .styler li:not(last-child) {
-  padding-right: 5px;
+  margin-right: 1px;
+}
+.styler-separator {
+  content: '|';
+  padding: 0 10px;
 }
 .styler-button {
   position: relative;
@@ -117,6 +128,9 @@
   outline: none;
   background-color: #fff;
   fill: #323c47;
+}
+.styler-button.is-active {
+  fill: #4da1ff;
 }
 .styler-list {
   -webkit-appearance: none;
@@ -136,9 +150,8 @@
 .styler-color {
   height: 30px;
   width: 30px;
-  border-radius: 15px;
   border: 0;
-  padding: 3px;
+  padding: 0;
   box-sizing: border-box;
 }
 .styler-select {
@@ -146,11 +159,13 @@
      -moz-appearance: none;
           appearance: none;
   height: 30px;
-  border-radius: 15px;
+  border-radius: 0;
   padding: 2px 15px;
   line-height: 26px;
   background: #fff;
   text-align: center;
+  border-width: 1px;
+  border-color: #323c47;
 }
 .styler.is-visiable {
   display: -webkit-flex;

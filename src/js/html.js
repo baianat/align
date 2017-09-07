@@ -2,7 +2,7 @@ export let styler = `
   <ul class="styler">
     <li>
       <select class="styler-select" id="formating">
-        <option selected>- formatting -</option>
+        <option selected>formatting</option>
         <option value="h1">Title 1</option>
         <option value="h2">Title 2</option>
         <option value="h3">Title 3</option>
@@ -30,6 +30,7 @@ export let styler = `
     <li>
       <input class="styler-color" id="color" type="color"/>
     </li>
+    <li class="styler-separator"></li>
     <li>
       <button class="styler-button" id="bold">
         <svg class="icon">
@@ -51,27 +52,36 @@ export let styler = `
         </svg>
       </button>
     </li>
+    <li class="styler-separator"></li>
     <li>
-      <button class="styler-button" id="alignLeft">
+      <button class="styler-button" id="justifyLeft">
         <svg class="icon">
-          <use xlink:href="dist/svg/symbols.svg#icon-alignLeft"></use>
+          <use xlink:href="dist/svg/symbols.svg#icon-justifyLeft"></use>
         </svg>
       </button>
     </li>
     <li>
-      <button class="styler-button" id="alignCenter">
+      <button class="styler-button" id="justifyCenter">
         <svg class="icon">
-          <use xlink:href="dist/svg/symbols.svg#icon-alignCenter"></use>
+          <use xlink:href="dist/svg/symbols.svg#icon-justifyCenter"></use>
         </svg>
       </button>
     </li>
     <li>
-      <button class="styler-button" id="alignRight">
+      <button class="styler-button" id="justifyRight">
         <svg class="icon">
-          <use xlink:href="dist/svg/symbols.svg#icon-alignRight"></use>
+          <use xlink:href="dist/svg/symbols.svg#icon-justifyRight"></use>
         </svg>
       </button>
     </li>
+    <li>
+      <button class="styler-button" id="justifyFull">
+        <svg class="icon">
+          <use xlink:href="dist/svg/symbols.svg#icon-justifyFull"></use>
+        </svg>
+      </button>
+    </li>
+    <li class="styler-separator"></li>    
     <li>
       <button class="styler-button">
         <input class="styler-input" type="file" id="addImage">

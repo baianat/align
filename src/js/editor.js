@@ -22,7 +22,7 @@ class Editor {
       this.styler.wrapper.classList.add('is-visiable');
     })
     this.el.addEventListener('click', () => {
-      this.updateStylerPositoin();
+      this.updateStylerStates();
     })
   }
 
@@ -36,9 +36,10 @@ class Editor {
     this.styler.bold = select('#bold');
     this.styler.italic = select('#italic');
     this.styler.underline = select('#underline');
-    this.styler.alignLeft = select('#alignLeft');
-    this.styler.alignCenter = select('#alignCenter');
-    this.styler.alignRight = select('#alignRight');
+    this.styler.justifyLeft = select('#justifyLeft');
+    this.styler.justifyCenter = select('#justifyCenter');
+    this.styler.justifyRight = select('#justifyRight');
+    this.styler.justifyFull = select('#justifyFull');
     this.styler.addImage = select('#addImage');
 
 
@@ -57,16 +58,27 @@ class Editor {
     this.styler.bold.addEventListener('click', () => this.excute('bold'));
     this.styler.italic.addEventListener('click', () => this.excute('italic'));
     this.styler.underline.addEventListener('click', () => this.excute('underline'));
-    this.styler.alignLeft.addEventListener('click', () => this.excute('justifyleft'));
-    this.styler.alignCenter.addEventListener('click', () => this.excute('justifycenter'));
-    this.styler.alignRight.addEventListener('click', () => this.excute('justifyright'));
+    this.styler.justifyLeft.addEventListener('click', () => this.excute('justifyLeft'));
+    this.styler.justifyCenter.addEventListener('click', () => this.excute('justifyCenter'));
+    this.styler.justifyRight.addEventListener('click', () => this.excute('justifyRight'));
+    this.styler.justifyFull.addEventListener('click', () => this.excute('justifyFull'));
     this.styler.addImage.addEventListener('change', () => this.insertImage());
   }
 
   excute(cmd, value) {
     document.execCommand(cmd, false, value);
     this.el.focus();
-    this.updateStylerPositoin();
+    this.updateStylerStates();
+  }
+
+  updateStylerStates() {
+    Object.keys(this.styler).forEach((el) => {
+      if (document.queryCommandState(String(el))) {
+        this.styler[el].classList.add('is-active');
+      } else {
+        this.styler[el].classList.remove('is-active');
+      }
+    })
   }
 
   getSelectedPosition() {
