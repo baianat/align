@@ -1,19 +1,6 @@
 export let styler = `
   <ul class="styler">
     <li>
-      <select class="styler-select" id="formating">
-        <option selected>formatting</option>
-        <option value="h1">Title 1</option>
-        <option value="h2">Title 2</option>
-        <option value="h3">Title 3</option>
-        <option value="h4">Title 4</option>
-        <option value="h5">Title 5</option>
-        <option value="h6">Title 6</option>
-        <option value="p">Paragraph</option>
-        <option value="pre">Preformatted</option>
-      </select>
-    </li>
-    <li>
       <select class="styler-select" id="size">
         <option selected>
           size
@@ -30,7 +17,47 @@ export let styler = `
     <li>
       <input class="styler-color" id="color" type="color"/>
     </li>
+
     <li class="styler-separator"></li>
+
+    <li>
+      <button class="styler-button" id="h1">
+        <svg class="icon">
+          <use xlink:href="dist/svg/symbols.svg#icon-h1"></use>
+        </svg>
+      </button>
+    </li>
+    <li>
+      <button class="styler-button" id="h2">
+        <svg class="icon">
+          <use xlink:href="dist/svg/symbols.svg#icon-h2"></use>
+        </svg>
+      </button>
+    </li>
+    <li>
+      <button class="styler-button" id="paragraph">
+        <svg class="icon">
+          <use xlink:href="dist/svg/symbols.svg#icon-paragraph"></use>
+        </svg>
+      </button>
+    </li>
+    <li>
+      <button class="styler-button" id="quote">
+        <svg class="icon">
+          <use xlink:href="dist/svg/symbols.svg#icon-quote"></use>
+        </svg>
+      </button>
+    </li>
+    <li>
+      <button class="styler-button" id="script">
+        <svg class="icon">
+          <use xlink:href="dist/svg/symbols.svg#icon-script"></use>
+        </svg>
+      </button>
+    </li>
+
+    <li class="styler-separator"></li>
+    
     <li>
       <button class="styler-button" id="bold">
         <svg class="icon">

@@ -107,9 +107,14 @@ gulp.task('production:scripts', function () {
             rollup: require('rollup'),
             entry: './src/js/editor.js',
             format: 'umd',
-            moduleName: 'Editor'
+            moduleName: 'Editor',
+            allowRealFiles: true,
+            plugins: [
+                nodeResolve(),
+                commonjs(),
+                buble()
+            ]
         }))
-        .pipe(buble())
         .pipe(rename({
             basename: "editor",
             suffix: ".min",

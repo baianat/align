@@ -52,17 +52,25 @@ class Editor {
     this.styler = {};
     this.el.insertAdjacentHTML('beforebegin', styler);
     this.styler.wrapper = select('.styler');
-    this.styler.formating = select('#formating');
     this.styler.size = select('#size');
     this.styler.color = select('#color');
+
+    this.styler.h1 = select('#h1');
+    this.styler.h2 = select('#h2');
+    this.styler.quote = select('#quote');
+    this.styler.paragraph = select('#paragraph');
+    this.styler.script = select('#script');
+
     this.styler.bold = select('#bold');
     this.styler.italic = select('#italic');
     this.styler.underline = select('#underline');
     this.styler.strikeThrough = select('#strikeThrough');
+
     this.styler.justifyLeft = select('#justifyLeft');
     this.styler.justifyCenter = select('#justifyCenter');
     this.styler.justifyRight = select('#justifyRight');
     this.styler.justifyFull = select('#justifyFull');
+
     this.styler.addImage = select('#addImage');
   }
 
@@ -112,14 +120,17 @@ class Editor {
 
   initStylerActions() {
 
-    this.styler.formating.addEventListener('change', () => {
-      const select = this.styler.formating;
-      this.excute('formatblock', select[select.selectedIndex].value);
-    });
     this.styler.size.addEventListener('change', () => {
       const select = this.styler.size;
       this.excute('fontsize', select[select.selectedIndex].value);
     });
+
+    this.styler.h1.addEventListener('click', () => this.excute('formatblock', 'h1'));
+    this.styler.h2.addEventListener('click', () => this.excute('formatblock', 'h2'));
+    this.styler.quote.addEventListener('click', () => this.excute('formatblock', 'blockquote'));
+    this.styler.paragraph.addEventListener('click', () => this.excute('formatblock', 'p'));
+    this.styler.script.addEventListener('click', () => this.excute('formatblock', 'pre'));
+
     this.styler.color.addEventListener('input', () => this.excute('forecolor', this.styler.color.value))
     this.styler.bold.addEventListener('click', () => this.excute('bold'));
     this.styler.italic.addEventListener('click', () => this.excute('italic'));
