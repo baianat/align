@@ -4,6 +4,8 @@
   "description": "interactive ES6 text editor",
   "main": "dist/editor.js",
   "dependencies": {
+    "gulp-rollup": "^2.14.0",
+    "highlight.js": "^9.12.0"
   },
   "devDependencies": {
     "browser-sync": "^2.18.7",
@@ -20,7 +22,10 @@
     "gulp-sourcemaps": "^2.4.0",
     "gulp-stylus": "^2.6.0",
     "gulp-svg-sprites": "^4.1.2",
-    "gulp-uglify": "^2.0.1"
+    "gulp-uglify": "^2.0.1",
+    "rollup-plugin-buble": "^0.15.0",
+    "rollup-plugin-commonjs": "^8.2.1",
+    "rollup-plugin-node-resolve": "^3.0.0"
   },
   "author": "",
   "license": "MIT",

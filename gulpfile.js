@@ -2,7 +2,6 @@
  * gulp modules
  */
 const gulp = require('gulp');
-const buble = require('gulp-buble');
 const stylus = require('gulp-stylus');
 const rename = require("gulp-rename");
 const uglify = require('gulp-uglify');
@@ -11,6 +10,10 @@ const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
 const svgSprite = require("gulp-svg-sprites");
 const rollup = require('gulp-rollup');
+
+const buble = require('rollup-plugin-buble');
+const commonjs = require('rollup-plugin-commonjs');
+const nodeResolve = require('rollup-plugin-node-resolve');
 
 /**
  * browser Sync
@@ -29,9 +32,14 @@ gulp.task('scripts', () => {
             rollup: require('rollup'),
             entry: './src/js/editor.js',
             format: 'umd',
-            moduleName: 'Editor'
+            moduleName: 'Editor',
+            allowRealFiles: true,
+            plugins: [
+                nodeResolve(),
+                commonjs(),
+                buble()
+            ]
         }))
-        .pipe(buble())
         .pipe(rename({
             basename: "editor",
             suffix: "",
@@ -48,7 +56,12 @@ gulp.task('styles', function () {
     gulp.src('./src/stylus/app.styl')
         .pipe(plumber())
         .pipe(sourcemaps.init())
-        .pipe(stylus())
+        .pipe(stylus({
+            'include css': true,
+            include: [
+                './node_modules/../'
+            ]
+        }))
         .pipe(rename({
             basename: "editor",
             suffix: "",

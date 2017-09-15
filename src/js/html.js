@@ -52,6 +52,13 @@ export let styler = `
         </svg>
       </button>
     </li>
+    <li>
+      <button class="styler-button" id="strikeThrough">
+        <svg class="icon">
+          <use xlink:href="dist/svg/symbols.svg#icon-strikeThrough"></use>
+        </svg>
+      </button>
+    </li>
     <li class="styler-separator"></li>
     <li>
       <button class="styler-button" id="justifyLeft">
