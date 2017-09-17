@@ -11,6 +11,9 @@ class Editor {
     this.init();
   }
 
+  get content() {
+    return document.createTextNode(this.el.innerHTML);
+  }
   init() {
     this.HTML = false;
     this.initStyler();
@@ -148,6 +151,11 @@ class Editor {
     this.styler.justifyRight.addEventListener('click', () => this.execute('justifyRight'));
     this.styler.justifyFull.addEventListener('click', () => this.execute('justifyFull'));
     this.styler.addImage.addEventListener('change', () => this.insertImage());
+
+    this.styler.html.addEventListener('click', () => {
+      this.toggleHTML();
+      this.styler.html.classList.toggle('is-active');
+    });
   }
 
   execute(cmd, value) {
@@ -208,6 +216,25 @@ class Editor {
     img.classList.add('editor-image');
     selectedPosition = this.getSelectedPosition();
     selectedPosition.insertNode(img);
+  }
+
+  toggleHTML() {
+    this.HTML = !this.HTML;
+    if (this.HTML) {
+      const content = document.createTextNode(this.el.innerHTML);
+      const pre = document.createElement("pre");
+
+      this.el.innerHTML = "";
+      this.el.contentEditable = false;
+      pre.id = "content";
+      pre.contentEditable = true;
+      pre.appendChild(content);
+      this.el.appendChild(pre);
+      return;
+    }
+    this.el.innerHTML = this.el.innerText;
+    this.el.contentEditable = true;
+    this.el.focus();
   }
 }
 

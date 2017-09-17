@@ -1015,7 +1015,7 @@ function select(element) {
  * Converts an array-like object to an array.
  */
 
-var styler = "\n  <ul class=\"styler\">\n    <li>\n      <select class=\"styler-select\" id=\"size\">\n        <option selected>\n          size\n        </option>\n        <option value=\"1\">1</option>\n        <option value=\"2\">2</option>\n        <option value=\"3\">3</option>\n        <option value=\"4\">4</option>\n        <option value=\"5\">5</option>\n        <option value=\"6\">6</option>\n        <option value=\"7\">7</option>\n      </select>\n    </li>\n    <li>\n      <input class=\"styler-color\" id=\"color\" type=\"color\"/>\n    </li>\n\n    <li class=\"styler-separator\"></li>\n\n    <li>\n      <button class=\"styler-button\" id=\"h1\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-h1\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"h2\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-h2\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"paragraph\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-paragraph\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"quote\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-quote\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"script\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-script\"></use>\n        </svg>\n      </button>\n    </li>\n\n    <li class=\"styler-separator\"></li>\n    \n    <li>\n      <button class=\"styler-button\" id=\"bold\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-bold\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"italic\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-italic\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"underline\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-underline\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"strikeThrough\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-strikeThrough\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyLeft\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyLeft\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyCenter\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyCenter\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyRight\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyRight\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyFull\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyFull\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>    \n    <li>\n      <button class=\"styler-button\">\n        <input class=\"styler-input\" type=\"file\" id=\"addImage\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-image\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>    \n    <li>\n      <button class=\"styler-button\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-code\"></use>\n        </svg>\n      </button>\n    </li>\n  </ul>\n";
+var styler = "\n  <ul class=\"styler\">\n    <li>\n      <select class=\"styler-select\" id=\"size\">\n        <option selected>\n          size\n        </option>\n        <option value=\"1\">1</option>\n        <option value=\"2\">2</option>\n        <option value=\"3\">3</option>\n        <option value=\"4\">4</option>\n        <option value=\"5\">5</option>\n        <option value=\"6\">6</option>\n        <option value=\"7\">7</option>\n      </select>\n    </li>\n    <li>\n      <input class=\"styler-color\" id=\"color\" type=\"color\"/>\n    </li>\n\n    <li class=\"styler-separator\"></li>\n\n    <li>\n      <button class=\"styler-button\" id=\"h1\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-h1\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"h2\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-h2\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"paragraph\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-paragraph\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"quote\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-quote\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"script\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-script\"></use>\n        </svg>\n      </button>\n    </li>\n\n    <li class=\"styler-separator\"></li>\n    \n    <li>\n      <button class=\"styler-button\" id=\"bold\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-bold\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"italic\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-italic\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"underline\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-underline\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"strikeThrough\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-strikeThrough\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyLeft\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyLeft\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyCenter\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyCenter\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyRight\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyRight\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyFull\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyFull\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>    \n    <li>\n      <button class=\"styler-button\">\n        <input class=\"styler-input\" type=\"file\" id=\"addImage\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-image\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>\n    <li>\n      <button class=\"styler-button\" id=\"html\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-code\"></use>\n        </svg>\n      </button>\n    </li>\n  </ul>\n";
 
 highlight.registerLanguage('javascript', javascript);
 
@@ -1026,6 +1026,11 @@ var Editor = function Editor(selector, options) {
   this.init();
 };
 
+var prototypeAccessors = { content: {} };
+
+prototypeAccessors.content.get = function () {
+  return document.createTextNode(this.el.innerHTML);
+};
 Editor.prototype.init = function init () {
   this.HTML = false;
   this.initStyler();
@@ -1167,6 +1172,11 @@ Editor.prototype.initStylerActions = function initStylerActions () {
   this.styler.justifyRight.addEventListener('click', function () { return this$1.execute('justifyRight'); });
   this.styler.justifyFull.addEventListener('click', function () { return this$1.execute('justifyFull'); });
   this.styler.addImage.addEventListener('change', function () { return this$1.insertImage(); });
+
+  this.styler.html.addEventListener('click', function () {
+    this$1.toggleHTML();
+    this$1.styler.html.classList.toggle('is-active');
+  });
 };
 
 Editor.prototype.execute = function execute (cmd, value) {
@@ -1230,6 +1240,27 @@ Editor.prototype.insertImage = function insertImage () {
   selectedPosition = this.getSelectedPosition();
   selectedPosition.insertNode(img);
 };
+
+Editor.prototype.toggleHTML = function toggleHTML () {
+  this.HTML = !this.HTML;
+  if (this.HTML) {
+    var content = document.createTextNode(this.el.innerHTML);
+    var pre = document.createElement("pre");
+
+    this.el.innerHTML = "";
+    this.el.contentEditable = false;
+    pre.id = "content";
+    pre.contentEditable = true;
+    pre.appendChild(content);
+    this.el.appendChild(pre);
+    return;
+  }
+  this.el.innerHTML = this.el.innerText;
+  this.el.contentEditable = true;
+  this.el.focus();
+};
+
+Object.defineProperties( Editor.prototype, prototypeAccessors );
 
 return Editor;
 

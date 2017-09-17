@@ -124,9 +124,9 @@ export let styler = `
         </svg>
       </button>
     </li>
-    <li class="styler-separator"></li>    
+    <li class="styler-separator"></li>
     <li>
-      <button class="styler-button">
+      <button class="styler-button" id="html">
         <svg class="icon">
           <use xlink:href="dist/svg/symbols.svg#icon-code"></use>
         </svg>
