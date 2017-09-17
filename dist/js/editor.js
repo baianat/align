@@ -1044,6 +1044,10 @@ Editor.prototype.initEditor = function initEditor () {
     this$1.styler.wrapper.classList.add('is-visiable');
     this$1.highlight();
   });
+
+  this.el.addEventListener('click', function () {
+    this$1.updateStylerStates();
+  });
     
   window.addEventListener("keydown", function (event) {
     if (event.defaultPrevented) {
@@ -1052,7 +1056,7 @@ Editor.prototype.initEditor = function initEditor () {
 
     switch (event.key) {
       case "Tab":
-        this$1.excute('indent');
+        this$1.execute('indent');
         break;
       case "Enter":
         this$1.breakLine(event);
@@ -1144,28 +1148,29 @@ Editor.prototype.initStylerActions = function initStylerActions () {
 
   this.styler.size.addEventListener('change', function () {
     var select$$1 = this$1.styler.size;
-    this$1.excute('fontsize', select$$1[select$$1.selectedIndex].value);
+    this$1.execute('fontsize', select$$1[select$$1.selectedIndex].value);
   });
 
-  this.styler.h1.addEventListener('click', function () { return this$1.excute('formatblock', 'h1'); });
-  this.styler.h2.addEventListener('click', function () { return this$1.excute('formatblock', 'h2'); });
-  this.styler.quote.addEventListener('click', function () { return this$1.excute('formatblock', 'blockquote'); });
-  this.styler.paragraph.addEventListener('click', function () { return this$1.excute('formatblock', 'p'); });
-  this.styler.script.addEventListener('click', function () { return this$1.excute('formatblock', 'pre'); });
+  this.styler.h1.addEventListener('click', function () { return this$1.execute('formatblock', 'h1'); });
+  this.styler.h2.addEventListener('click', function () { return this$1.execute('formatblock', 'h2'); });
+  this.styler.quote.addEventListener('click', function () { return this$1.execute('formatblock', 'blockquote'); });
+  this.styler.paragraph.addEventListener('click', function () { return this$1.execute('formatblock', 'p'); });
+  this.styler.script.addEventListener('click', function () { return this$1.execute('formatblock', 'pre'); });
 
-  this.styler.color.addEventListener('input', function () { return this$1.excute('forecolor', this$1.styler.color.value); });
-  this.styler.bold.addEventListener('click', function () { return this$1.excute('bold'); });
-  this.styler.italic.addEventListener('click', function () { return this$1.excute('italic'); });
-  this.styler.underline.addEventListener('click', function () { return this$1.excute('underline'); });
-  this.styler.strikeThrough.addEventListener('click', function () { return this$1.excute('strikeThrough'); });
-  this.styler.justifyLeft.addEventListener('click', function () { return this$1.excute('justifyLeft'); });
-  this.styler.justifyCenter.addEventListener('click', function () { return this$1.excute('justifyCenter'); });
-  this.styler.justifyRight.addEventListener('click', function () { return this$1.excute('justifyRight'); });
-  this.styler.justifyFull.addEventListener('click', function () { return this$1.excute('justifyFull'); });
+  this.styler.color.addEventListener('input', function () { return this$1.execute('forecolor', this$1.styler.color.value); });
+  this.styler.bold.addEventListener('click', function () { return this$1.execute('bold'); });
+  this.styler.italic.addEventListener('click', function () { return this$1.execute('italic'); });
+  this.styler.underline.addEventListener('click', function () { return this$1.execute('underline'); });
+  this.styler.strikeThrough.addEventListener('click', function () { return this$1.execute('strikeThrough'); });
+  this.styler.justifyLeft.addEventListener('click', function () { return this$1.execute('justifyLeft'); });
+  this.styler.justifyCenter.addEventListener('click', function () { return this$1.execute('justifyCenter'); });
+  this.styler.justifyRight.addEventListener('click', function () { return this$1.execute('justifyRight'); });
+  this.styler.justifyFull.addEventListener('click', function () { return this$1.execute('justifyFull'); });
   this.styler.addImage.addEventListener('change', function () { return this$1.insertImage(); });
 };
 
-Editor.prototype.excute = function excute (cmd, value) {
+Editor.prototype.execute = function execute (cmd, value) {
+  if (this.HTML) { return; }
   document.execCommand(cmd, false, value);
   this.el.focus();
   this.updateStylerStates();

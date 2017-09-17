@@ -27,6 +27,10 @@ class Editor {
       this.styler.wrapper.classList.add('is-visiable');
       this.highlight();
     });
+
+    this.el.addEventListener('click', () => {
+      this.updateStylerStates();
+    });
     
     window.addEventListener("keydown", (event) => {
       if (event.defaultPrevented) {
@@ -35,7 +39,7 @@ class Editor {
 
       switch (event.key) {
         case "Tab":
-          this.excute('indent');
+          this.execute('indent');
           break;
         case "Enter":
           this.breakLine(event);
@@ -125,28 +129,29 @@ class Editor {
 
     this.styler.size.addEventListener('change', () => {
       const select = this.styler.size;
-      this.excute('fontsize', select[select.selectedIndex].value);
+      this.execute('fontsize', select[select.selectedIndex].value);
     });
 
-    this.styler.h1.addEventListener('click', () => this.excute('formatblock', 'h1'));
-    this.styler.h2.addEventListener('click', () => this.excute('formatblock', 'h2'));
-    this.styler.quote.addEventListener('click', () => this.excute('formatblock', 'blockquote'));
-    this.styler.paragraph.addEventListener('click', () => this.excute('formatblock', 'p'));
-    this.styler.script.addEventListener('click', () => this.excute('formatblock', 'pre'));
+    this.styler.h1.addEventListener('click', () => this.execute('formatblock', 'h1'));
+    this.styler.h2.addEventListener('click', () => this.execute('formatblock', 'h2'));
+    this.styler.quote.addEventListener('click', () => this.execute('formatblock', 'blockquote'));
+    this.styler.paragraph.addEventListener('click', () => this.execute('formatblock', 'p'));
+    this.styler.script.addEventListener('click', () => this.execute('formatblock', 'pre'));
 
-    this.styler.color.addEventListener('input', () => this.excute('forecolor', this.styler.color.value))
-    this.styler.bold.addEventListener('click', () => this.excute('bold'));
-    this.styler.italic.addEventListener('click', () => this.excute('italic'));
-    this.styler.underline.addEventListener('click', () => this.excute('underline'));
-    this.styler.strikeThrough.addEventListener('click', () => this.excute('strikeThrough'));
-    this.styler.justifyLeft.addEventListener('click', () => this.excute('justifyLeft'));
-    this.styler.justifyCenter.addEventListener('click', () => this.excute('justifyCenter'));
-    this.styler.justifyRight.addEventListener('click', () => this.excute('justifyRight'));
-    this.styler.justifyFull.addEventListener('click', () => this.excute('justifyFull'));
+    this.styler.color.addEventListener('input', () => this.execute('forecolor', this.styler.color.value))
+    this.styler.bold.addEventListener('click', () => this.execute('bold'));
+    this.styler.italic.addEventListener('click', () => this.execute('italic'));
+    this.styler.underline.addEventListener('click', () => this.execute('underline'));
+    this.styler.strikeThrough.addEventListener('click', () => this.execute('strikeThrough'));
+    this.styler.justifyLeft.addEventListener('click', () => this.execute('justifyLeft'));
+    this.styler.justifyCenter.addEventListener('click', () => this.execute('justifyCenter'));
+    this.styler.justifyRight.addEventListener('click', () => this.execute('justifyRight'));
+    this.styler.justifyFull.addEventListener('click', () => this.execute('justifyFull'));
     this.styler.addImage.addEventListener('change', () => this.insertImage());
   }
 
-  excute(cmd, value) {
+  execute(cmd, value) {
+    if (this.HTML) return;
     document.execCommand(cmd, false, value);
     this.el.focus();
     this.updateStylerStates();
