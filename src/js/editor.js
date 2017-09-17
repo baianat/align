@@ -12,6 +12,7 @@ class Editor {
   }
 
   init() {
+    this.HTML = false;
     this.initStyler();
     this.initStylerActions();
     this.initEditor();
@@ -72,6 +73,8 @@ class Editor {
     this.styler.justifyFull = select('#justifyFull');
 
     this.styler.addImage = select('#addImage');
+
+    this.styler.html = select('#html');
   }
 
   breakLine(event) {
