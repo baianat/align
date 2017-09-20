@@ -1,1 +1,1 @@
-.editor{max-height:calc(100vh - 140px);margin:70px 100px;overflow:auto;}.editor:focus{outline:none}.editor-image{display:block;margin:auto;width:100%;max-width:400px}
+.editor{max-height:calc(100vh - 140px);margin:70px 100px;overflow:auto;white-space:normal;}.editor:focus{outline:none}.editor-image{display:block;margin:auto;width:100%;max-width:400px}
