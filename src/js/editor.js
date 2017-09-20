@@ -3,11 +3,12 @@ import javascript from 'highlight.js/lib/languages/javascript';
 hljs.registerLanguage('javascript', javascript);
 
 import { select } from './util';
-import { styler } from './html';
+import styler from './styler';
 
 class Editor {
   constructor(selector, options = {}) {
     this.el = select(selector);
+    this.options = options;
     this.init();
   }
 
@@ -17,22 +18,20 @@ class Editor {
   init() {
     this.HTML = false;
     this.initStyler();
-    this.initStylerActions();
     this.initEditor();
   }
 
   initEditor() {
     this.el.contentEditable = 'true';
     const text = document.createElement('p');
-    text.innerText = 'Type here';
+    text.innerText = 'Type here \n';
     this.el.appendChild(text);
     this.el.addEventListener('focus', () => {
-      this.styler.wrapper.classList.add('is-visiable');
       this.highlight();
     });
 
     this.el.addEventListener('click', () => {
-      this.updateStylerStates();
+      this.styler.updateStylerStates();
     });
     
     window.addEventListener("keydown", (event) => {
@@ -57,31 +56,7 @@ class Editor {
   }
 
   initStyler() {
-    this.styler = {};
-    this.el.insertAdjacentHTML('beforebegin', styler);
-    this.styler.wrapper = select('.styler');
-    this.styler.size = select('#size');
-    this.styler.color = select('#color');
-
-    this.styler.h1 = select('#h1');
-    this.styler.h2 = select('#h2');
-    this.styler.quote = select('#quote');
-    this.styler.paragraph = select('#paragraph');
-    this.styler.script = select('#script');
-
-    this.styler.bold = select('#bold');
-    this.styler.italic = select('#italic');
-    this.styler.underline = select('#underline');
-    this.styler.strikeThrough = select('#strikeThrough');
-
-    this.styler.justifyLeft = select('#justifyLeft');
-    this.styler.justifyCenter = select('#justifyCenter');
-    this.styler.justifyRight = select('#justifyRight');
-    this.styler.justifyFull = select('#justifyFull');
-
-    this.styler.addImage = select('#addImage');
-
-    this.styler.html = select('#html');
+    this.styler = new styler(this.el, this.options.styler.commands);
   }
 
   breakLine(event) {
@@ -128,52 +103,7 @@ class Editor {
     return true;
   }
 
-  initStylerActions() {
-
-    this.styler.size.addEventListener('change', () => {
-      const select = this.styler.size;
-      this.execute('fontsize', select[select.selectedIndex].value);
-    });
-
-    this.styler.h1.addEventListener('click', () => this.execute('formatblock', 'h1'));
-    this.styler.h2.addEventListener('click', () => this.execute('formatblock', 'h2'));
-    this.styler.quote.addEventListener('click', () => this.execute('formatblock', 'blockquote'));
-    this.styler.paragraph.addEventListener('click', () => this.execute('formatblock', 'p'));
-    this.styler.script.addEventListener('click', () => this.execute('formatblock', 'pre'));
-
-    this.styler.color.addEventListener('input', () => this.execute('forecolor', this.styler.color.value))
-    this.styler.bold.addEventListener('click', () => this.execute('bold'));
-    this.styler.italic.addEventListener('click', () => this.execute('italic'));
-    this.styler.underline.addEventListener('click', () => this.execute('underline'));
-    this.styler.strikeThrough.addEventListener('click', () => this.execute('strikeThrough'));
-    this.styler.justifyLeft.addEventListener('click', () => this.execute('justifyLeft'));
-    this.styler.justifyCenter.addEventListener('click', () => this.execute('justifyCenter'));
-    this.styler.justifyRight.addEventListener('click', () => this.execute('justifyRight'));
-    this.styler.justifyFull.addEventListener('click', () => this.execute('justifyFull'));
-    this.styler.addImage.addEventListener('change', () => this.insertImage());
-
-    this.styler.html.addEventListener('click', () => {
-      this.toggleHTML();
-      this.styler.html.classList.toggle('is-active');
-    });
-  }
-
-  execute(cmd, value) {
-    if (this.HTML) return;
-    document.execCommand(cmd, false, value);
-    this.el.focus();
-    this.updateStylerStates();
-  }
-
-  updateStylerStates() {
-    Object.keys(this.styler).forEach((el) => {
-      if (document.queryCommandState(String(el))) {
-        this.styler[el].classList.add('is-active');
-      } else {
-        this.styler[el].classList.remove('is-active');
-      }
-    })
-  }
+  
 
   highlight() {
     const code = Array.from(this.el.querySelectorAll('pre'));

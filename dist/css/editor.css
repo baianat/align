@@ -1,8 +1,6 @@
 /**
  * core
  */
-.toolbar,
-.toolbar-button,
 .styler,
 .styler-button {
   display: -webkit-flex;
@@ -51,6 +49,7 @@
   max-height: calc(100vh - 140px);
   margin: 70px 100px;
   overflow: auto;
+  white-space: normal;
 }
 .editor:focus {
   outline: none;
@@ -60,44 +59,6 @@
   margin: auto;
   width: 100%;
   max-width: 400px;
-}
-.toolbar {
-  background-color: #323c47;
-  padding: 5px;
-  margin: 0;
-  width: auto;
-  list-style: none;
-  border-radius: 20px;
-}
-.toolbar li:not(last-child) {
-  padding-right: 5px;
-}
-.toolbar-button {
-  position: relative;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  margin: 0;
-  border-radius: 15px;
-  border: 0;
-  outline: none;
-  background-color: #fff;
-  fill: #323c47;
-}
-.toolbar-list {
-  -webkit-appearance: none;
-  padding: 5px 10px;
-  height: 30px;
-  border-radius: 15px;
-  background-color: #fff;
-  font-size: 15px;
-  line-height: 15px;
-}
-.toolbar-input {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
 }
 .styler {
   position: fixed;

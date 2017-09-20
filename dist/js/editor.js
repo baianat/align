@@ -1015,7 +1015,198 @@ function select(element) {
  * Converts an array-like object to an array.
  */
 
-var styler = "\n  <ul class=\"styler\">\n    <li>\n      <select class=\"styler-select\" id=\"size\">\n        <option selected>\n          size\n        </option>\n        <option value=\"1\">1</option>\n        <option value=\"2\">2</option>\n        <option value=\"3\">3</option>\n        <option value=\"4\">4</option>\n        <option value=\"5\">5</option>\n        <option value=\"6\">6</option>\n        <option value=\"7\">7</option>\n      </select>\n    </li>\n    <li>\n      <input class=\"styler-color\" id=\"color\" type=\"color\"/>\n    </li>\n\n    <li class=\"styler-separator\"></li>\n\n    <li>\n      <button class=\"styler-button\" id=\"h1\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-h1\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"h2\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-h2\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"paragraph\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-paragraph\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"quote\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-quote\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"script\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-script\"></use>\n        </svg>\n      </button>\n    </li>\n\n    <li class=\"styler-separator\"></li>\n    \n    <li>\n      <button class=\"styler-button\" id=\"bold\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-bold\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"italic\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-italic\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"underline\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-underline\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"strikeThrough\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-strikeThrough\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyLeft\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyLeft\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyCenter\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyCenter\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyRight\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyRight\"></use>\n        </svg>\n      </button>\n    </li>\n    <li>\n      <button class=\"styler-button\" id=\"justifyFull\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-justifyFull\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>    \n    <li>\n      <button class=\"styler-button\">\n        <input class=\"styler-input\" type=\"file\" id=\"addImage\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-image\"></use>\n        </svg>\n      </button>\n    </li>\n    <li class=\"styler-separator\"></li>\n    <li>\n      <button class=\"styler-button\" id=\"html\">\n        <svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-code\"></use>\n        </svg>\n      </button>\n    </li>\n  </ul>\n";
+var formats = {
+  bold: {
+    type: 'button',
+    command: 'bold'
+  },
+
+  italic: {
+    type: 'button',
+    command: 'italic'
+  },
+
+  underline: {
+    type: 'button',
+    command: 'underline'
+  },
+
+  strikeThrough: {
+    type: 'button',
+    command: 'strikeThrough'
+  },
+
+  justifyLeft: {
+    type: 'button',
+    command: 'justifyLeft'
+  },
+
+  justifyCenter: {
+    type: 'button',
+    command: 'justifyCenter'
+  },
+
+  justifyRight: {
+    type: 'button',
+    command: 'justifyRight'
+  },
+
+  justifyFull: {
+    type: 'button',
+    command: 'justifyFull'
+  },
+
+  h1: {
+    type: 'button',
+    command: 'formatblock',
+    value: 'h1'
+  },
+
+  h2: {
+    type: 'button',
+    command: 'formatblock',
+    value: 'h1'
+  },
+
+  quote: {
+    type: 'button',
+    command: 'formatblock',
+    value: 'blockquote'
+  },
+
+  paragraph: {
+    type: 'button',
+    command: 'formatblock',
+    value: 'p'
+  },
+
+  script: {
+    type: 'button',
+    command: 'formatblock',
+    value: 'pre'
+  },
+  
+  size: {
+    type: 'select',
+    command: 'fontsize',
+    options: [
+      { value: 1, text: 1 },
+      { value: 2, text: 2 },
+      { value: 3, text: 3 },
+      { value: 4, text: 4 },
+      { value: 5, text: 5 },
+      { value: 6, text: 6 },
+      { value: 7, text: 7 } ]
+  },
+
+  sperator: {
+    type: 'styling',
+    class: 'styler-separator'
+  }
+};
+
+
+
+
+// initStylerActions() {
+
+
+//   this.styler.color.addEventListener('input', () => this.execute('forecolor', this.styler.color.value))
+
+//   this.styler.addImage.addEventListener('change', () => this.insertImage());
+
+//   this.styler.html.addEventListener('click', () => {
+//     this.toggleHTML();
+//     this.styler.html.classList.toggle('is-active');
+//   });
+// }
+
+var styler = function styler(editor, options) {
+  this.el = editor;
+  this.options = options;
+  this.init();
+};
+
+styler.prototype.init = function init () {
+    var this$1 = this;
+
+  this.container = document.createElement('ul');
+  this.container.classList.add('styler');
+  this.style = {};
+  document.body.insertBefore(this.container, this.el);
+  this.options.forEach(function (format) {
+    var li = document.createElement('li');
+    var current = formats[format];
+    if (!current) { return; }
+
+    if (current.type === 'button') {
+      this$1.style[format] = styler.button(format);
+      this$1.style[format].addEventListener('click', function () {
+        this$1.execute(current.command, current.value);
+      });
+    }
+
+    if (current.type === 'select') {
+      this$1.style[format] = styler.select(format, current.options);
+      this$1.style[format].addEventListener('change', function () {
+        var selection = this$1.style[format];
+        this$1.execute(current.command, selection[selection.selectedIndex].value);
+      });
+    }
+
+    if (current.type === 'styling') {
+      li.classList.add(current.class);
+      this$1.container.appendChild(li);
+      return;
+    }
+
+    li.appendChild(this$1.style[format]);
+    this$1.container.appendChild(li);
+  });
+};
+
+styler.prototype.execute = function execute (cmd, value) {
+  // if (this.HTML) return;
+  document.execCommand(cmd, false, value);
+  this.el.focus();
+  this.updateStylerStates();
+};
+
+styler.prototype.updateStylerStates = function updateStylerStates () {
+    var this$1 = this;
+
+  Object.keys(this.style).forEach(function (styl) {
+    if (document.queryCommandState(String(styl))) {
+      this$1.style[styl].classList.add('is-active');
+    } else {
+      this$1.style[styl].classList.remove('is-active');
+    }
+  });
+};
+
+styler.button = function button (name) {
+  var button = document.createElement('button');
+  button.classList.add('styler-button');
+  button.id = name;
+  button.insertAdjacentHTML('afterbegin', ("\n      <svg class=\"icon\">\n        <use xlink:href=\"dist/svg/symbols.svg#icon-" + name + "\"></use>\n      </svg>\n    "));
+  return button;
+};
+
+styler.select = function select (name, options) {
+  var select = document.createElement('select');
+  var defaultOption = document.createElement('option');
+  select.classList.add('styler-select');
+  select.id = name;
+  select.appendChild(defaultOption);
+  defaultOption.innerText = name;
+  options.forEach(function (option) {
+    var optionElement = document.createElement('option');
+    optionElement.value = option.value;
+    optionElement.innerText = option.text;
+    select.appendChild(optionElement);
+  });
+  return select;
+};
 
 highlight.registerLanguage('javascript', javascript);
 
@@ -1023,6 +1214,7 @@ var Editor = function Editor(selector, options) {
   if ( options === void 0 ) options = {};
 
   this.el = select(selector);
+  this.options = options;
   this.init();
 };
 
@@ -1034,7 +1226,6 @@ prototypeAccessors.content.get = function () {
 Editor.prototype.init = function init () {
   this.HTML = false;
   this.initStyler();
-  this.initStylerActions();
   this.initEditor();
 };
 
@@ -1043,15 +1234,14 @@ Editor.prototype.initEditor = function initEditor () {
 
   this.el.contentEditable = 'true';
   var text = document.createElement('p');
-  text.innerText = 'Type here';
+  text.innerText = 'Type here \n';
   this.el.appendChild(text);
   this.el.addEventListener('focus', function () {
-    this$1.styler.wrapper.classList.add('is-visiable');
     this$1.highlight();
   });
 
   this.el.addEventListener('click', function () {
-    this$1.updateStylerStates();
+    this$1.styler.updateStylerStates();
   });
     
   window.addEventListener("keydown", function (event) {
@@ -1076,31 +1266,7 @@ Editor.prototype.initEditor = function initEditor () {
 };
 
 Editor.prototype.initStyler = function initStyler () {
-  this.styler = {};
-  this.el.insertAdjacentHTML('beforebegin', styler);
-  this.styler.wrapper = select('.styler');
-  this.styler.size = select('#size');
-  this.styler.color = select('#color');
-
-  this.styler.h1 = select('#h1');
-  this.styler.h2 = select('#h2');
-  this.styler.quote = select('#quote');
-  this.styler.paragraph = select('#paragraph');
-  this.styler.script = select('#script');
-
-  this.styler.bold = select('#bold');
-  this.styler.italic = select('#italic');
-  this.styler.underline = select('#underline');
-  this.styler.strikeThrough = select('#strikeThrough');
-
-  this.styler.justifyLeft = select('#justifyLeft');
-  this.styler.justifyCenter = select('#justifyCenter');
-  this.styler.justifyRight = select('#justifyRight');
-  this.styler.justifyFull = select('#justifyFull');
-
-  this.styler.addImage = select('#addImage');
-
-  this.styler.html = select('#html');
+  this.styler = new styler(this.el, this.options.styler.commands);
 };
 
 Editor.prototype.breakLine = function breakLine (event) {
@@ -1147,56 +1313,7 @@ Editor.prototype.breakLine = function breakLine (event) {
   return true;
 };
 
-Editor.prototype.initStylerActions = function initStylerActions () {
-    var this$1 = this;
-
-
-  this.styler.size.addEventListener('change', function () {
-    var select$$1 = this$1.styler.size;
-    this$1.execute('fontsize', select$$1[select$$1.selectedIndex].value);
-  });
-
-  this.styler.h1.addEventListener('click', function () { return this$1.execute('formatblock', 'h1'); });
-  this.styler.h2.addEventListener('click', function () { return this$1.execute('formatblock', 'h2'); });
-  this.styler.quote.addEventListener('click', function () { return this$1.execute('formatblock', 'blockquote'); });
-  this.styler.paragraph.addEventListener('click', function () { return this$1.execute('formatblock', 'p'); });
-  this.styler.script.addEventListener('click', function () { return this$1.execute('formatblock', 'pre'); });
-
-  this.styler.color.addEventListener('input', function () { return this$1.execute('forecolor', this$1.styler.color.value); });
-  this.styler.bold.addEventListener('click', function () { return this$1.execute('bold'); });
-  this.styler.italic.addEventListener('click', function () { return this$1.execute('italic'); });
-  this.styler.underline.addEventListener('click', function () { return this$1.execute('underline'); });
-  this.styler.strikeThrough.addEventListener('click', function () { return this$1.execute('strikeThrough'); });
-  this.styler.justifyLeft.addEventListener('click', function () { return this$1.execute('justifyLeft'); });
-  this.styler.justifyCenter.addEventListener('click', function () { return this$1.execute('justifyCenter'); });
-  this.styler.justifyRight.addEventListener('click', function () { return this$1.execute('justifyRight'); });
-  this.styler.justifyFull.addEventListener('click', function () { return this$1.execute('justifyFull'); });
-  this.styler.addImage.addEventListener('change', function () { return this$1.insertImage(); });
-
-  this.styler.html.addEventListener('click', function () {
-    this$1.toggleHTML();
-    this$1.styler.html.classList.toggle('is-active');
-  });
-};
-
-Editor.prototype.execute = function execute (cmd, value) {
-  if (this.HTML) { return; }
-  document.execCommand(cmd, false, value);
-  this.el.focus();
-  this.updateStylerStates();
-};
-
-Editor.prototype.updateStylerStates = function updateStylerStates () {
-    var this$1 = this;
-
-  Object.keys(this.styler).forEach(function (el) {
-    if (document.queryCommandState(String(el))) {
-      this$1.styler[el].classList.add('is-active');
-    } else {
-      this$1.styler[el].classList.remove('is-active');
-    }
-  });
-};
+  
 
 Editor.prototype.highlight = function highlight$$1 () {
   var code = Array.from(this.el.querySelectorAll('pre'));
