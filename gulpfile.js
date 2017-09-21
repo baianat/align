@@ -77,7 +77,7 @@ gulp.task('styles', function () {
  * fonts task
  */
 gulp.task('font', () => {
-  gulp.src('./src/font/*')
+  gulp.src('./src/font/*/**')
     .pipe(gulp.dest('./dist/font/'));
 });
 

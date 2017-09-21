@@ -1091,7 +1091,7 @@ var formats = {
     func: 'toggleHTML'
   },
   
-  size: {
+  fontSize: {
     element: 'select',
     command: 'fontsize',
     options: [
@@ -1101,7 +1101,19 @@ var formats = {
       { value: 4, text: 4 },
       { value: 5, text: 5 },
       { value: 6, text: 6 },
-      { value: 7, text: 7 } ]
+      { value: 7, text: 7 }
+    ]
+  },
+
+  fontName: {
+    element: 'select',
+    command: 'fontName',
+    options: [
+      { value: 'Raleway', text: 'Raleway' },
+      { value: 'Roboto', text: 'Roboto' },
+      { value: 'Poppins', text: 'Poppins' },
+      { value: 'Cairo', text: 'Cairo' }
+    ]
   },
 
   sperator: {
