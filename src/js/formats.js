@@ -1,76 +1,81 @@
 const formats = {
   bold: {
-    type: 'button',
+    element: 'button',
     command: 'bold'
   },
 
   italic: {
-    type: 'button',
+    element: 'button',
     command: 'italic'
   },
 
   underline: {
-    type: 'button',
+    element: 'button',
     command: 'underline'
   },
 
   strikeThrough: {
-    type: 'button',
+    element: 'button',
     command: 'strikeThrough'
   },
 
   justifyLeft: {
-    type: 'button',
+    element: 'button',
     command: 'justifyLeft'
   },
 
   justifyCenter: {
-    type: 'button',
+    element: 'button',
     command: 'justifyCenter'
   },
 
   justifyRight: {
-    type: 'button',
+    element: 'button',
     command: 'justifyRight'
   },
 
   justifyFull: {
-    type: 'button',
+    element: 'button',
     command: 'justifyFull'
   },
 
   h1: {
-    type: 'button',
+    element: 'button',
     command: 'formatblock',
     value: 'h1'
   },
 
   h2: {
-    type: 'button',
+    element: 'button',
     command: 'formatblock',
     value: 'h1'
   },
 
   quote: {
-    type: 'button',
+    element: 'button',
     command: 'formatblock',
     value: 'blockquote'
   },
 
   paragraph: {
-    type: 'button',
+    element: 'button',
     command: 'formatblock',
     value: 'p'
   },
 
   script: {
-    type: 'button',
+    element: 'button',
     command: 'formatblock',
     value: 'pre'
   },
+
+  html: {
+    element: 'button',
+    func: 'toggleHTML'
+  },
   
   size: {
-    type: 'select',
+    element: 'select',
     command: 'fontsize',
     options: [
       { value: 1, text: 1 },
@@ -84,23 +89,54 @@ const formats = {
   },
 
   sperator: {
-    type: 'styling',
+    element: 'styling',
     class: 'styler-separator'
+  },
+
+  color: {
+    element: 'input',
+    type: 'color',
+    command: 'forecolor'
+  },
+
+  addImage: {
+    element: 'custom',
+    data: {
+      button: document.createElement('button'),
+      input: document.createElement('input'),
+      icon: 
+        `<svg class="icon">
+          <use xlink:href="dist/svg/symbols.svg#icon-image"></use>
+        </svg>`
+    },
+    create() {
+      const button = this.data.button;
+      const input = this.data.input;
+      const icon = this.data.icon;
+      
+      button.classList.add('styler-button');
+      button.appendChild(input);
+      button.insertAdjacentHTML('beforeend', icon);
+      input.classList.add('styler-input');
+      input.type = 'file';
+      input.id = 'addImage';
+      input.addEventListener('input', () => this.action());
+
+      return button;
+    },
+    action() {
+      const file = this.data.input.files[0];
+      if (!file) return;
+      const imageURL = URL.createObjectURL(file);
+      const img = document.createElement('img');
+      let selectedPosition;
+
+      img.src = imageURL;
+      img.classList.add('editor-image');
+      selectedPosition = window.getSelection().getRangeAt(0);
+      selectedPosition.insertNode(img);
+    }
   }
 }
 
 export default formats;
-
-
-// initStylerActions() {
-
-
-//   this.styler.color.addEventListener('input', () => this.execute('forecolor', this.styler.color.value))
-
-//   this.styler.addImage.addEventListener('change', () => this.insertImage());
-
-//   this.styler.html.addEventListener('click', () => {
-//     this.toggleHTML();
-//     this.styler.html.classList.toggle('is-active');
-//   });
-// }

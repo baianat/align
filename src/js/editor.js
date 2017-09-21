@@ -134,38 +134,6 @@ class Editor {
     this.styler.wrapper.style.top = `${dummyRect.top + window.scrollY - 80}px`;
     this.styler.wrapper.style.left = `${dummyRect.left}px`;
   }
-
-  insertImage() {
-    const file = this.styler.addImage.files[0];
-    if (!file) return;
-    const imageURL = URL.createObjectURL(file);
-    const img = document.createElement('img');
-    let selectedPosition;
-
-    img.src = imageURL;
-    img.classList.add('editor-image');
-    selectedPosition = this.getSelectedPosition();
-    selectedPosition.insertNode(img);
-  }
-
-  toggleHTML() {
-    this.HTML = !this.HTML;
-    if (this.HTML) {
-      const content = document.createTextNode(this.el.innerHTML);
-      const pre = document.createElement("pre");
-
-      this.el.innerHTML = "";
-      this.el.contentEditable = false;
-      pre.id = "content";
-      pre.contentEditable = true;
-      pre.appendChild(content);
-      this.el.appendChild(pre);
-      return;
-    }
-    this.el.innerHTML = this.el.innerText;
-    this.el.contentEditable = true;
-    this.el.focus();
-  }
 }
 
 export default Editor;
