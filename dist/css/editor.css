@@ -176,6 +176,13 @@
   display: -ms-flexbox;
   display: flex;
 }
+blockquote {
+  border-left: 5px solid #cedee8;
+  padding: 10px 0 10px 20px;
+}
+/**
+ * external styling
+ */
 /*
 
 Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-license.org/
@@ -260,9 +267,58 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   color: #75715e;
 }
 
-blockquote {
-  border-left: 5px solid #cedee8;
-  padding: 10px 0 10px 20px;
+/**
+ * core
+ */
+.icon {
+  width: 20px;
+  height: 20px;
 }
+/**
+ * eidtor elements
+ */
+.picker {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+.picker-guide {
+  width: 25px;
+  height: 25px;
+  background-color: #fff;
+  border: 1px solid #000;
+  border-radius: 50%;
+}
+.picker-guide:focus {
+  outline: 0;
+}
+.picker-wheel {
+  margin-bottom: 20px;
+}
+.picker-wrapper {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-flex-direction: column-reverse;
+      -ms-flex-direction: column-reverse;
+          flex-direction: column-reverse;
+  padding: 40px 20px;
+  margin: 20px 0;
+  border: 1px solid #000;
+  border-radius: 5px;
+  box-shadow: 0 10px 20px -4px rgba(0,0,0,0.2);
+}
+.picker-wrapper.is-hidden {
+  display: none;
+}
+
+
+
 
 /*# sourceMappingURL=editor.css.map */

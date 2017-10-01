@@ -79,8 +79,8 @@ class styler {
 
       if (current.element === 'input') {
         this.style[el] = styler.input(el, current.type);
-        this.style[el].addEventListener('input', () => {
-          this.execute('forecolor', this.style[el].value)
+        this.style[el].addEventListener('change', () => {
+          this.execute(current.command, this.style[el].value)
         });
         li.appendChild(this.style[el]);
       }
@@ -92,6 +92,10 @@ class styler {
       if (current.element === 'custom') {
         const markup = current.create();
         li.appendChild(markup);
+      }
+
+      if (current.init) {
+        new current.init(this.style[el], current.initConfig);
       }
 
       this.container.appendChild(li);
@@ -107,7 +111,6 @@ class styler {
 
   updateStylerStates() {
     Object.keys(this.style).forEach((styl) => {
-      console.log(document.queryCommandState('formatblock'));
       if (document.queryCommandState(String(styl))) {
         this.style[styl].classList.add('is-active');
       } else {

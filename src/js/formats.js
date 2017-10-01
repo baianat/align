@@ -1,3 +1,7 @@
+import picker from '@baianat/colorpicker';
+
+let SELECTED = null;
+
 const formats = {
   bold: {
     element: 'button',
@@ -106,8 +110,23 @@ const formats = {
 
   color: {
     element: 'input',
-    type: 'color',
-    command: 'forecolor'
+    type: 'text',
+    command: 'foreColor',
+    init: picker,
+    initConfig: {
+      defaultColor: '#000000',
+      mode: 'hex',
+      events: {
+        afterSelect() {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(SELECTED);
+        },
+        afterOpen() {
+          SELECTED = window.getSelection().getRangeAt(0);
+        }
+      }
+    }
   },
 
   addImage: {
