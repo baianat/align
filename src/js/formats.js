@@ -117,7 +117,17 @@ const formats = {
       defaultColor: '#000000',
       mode: 'hex',
       events: {
-
+        beforeSubmit() {
+          if (!SELECTED) return;
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(SELECTED);
+          SELECTED = window.getSelection().getRangeAt(0);
+        },
+        afterOpen() {
+          if (!window.getSelection().getRangeAt(0)) return;
+          SELECTED = window.getSelection().getRangeAt(0);
+        }
       }
     }
   },

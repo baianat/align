@@ -4090,7 +4090,6 @@ Picker.prototype.initEvents = function initEvents () {
 
   Object.keys(this.rgbSliders).forEach(function (key) {
     this$1.rgbSliders[key].addEventListener('change', function (event) {
-      event.preventDefault();
       var color = this$1.getColorFromSliders();
       this$1.selectColor(color);
     });
@@ -4111,10 +4110,10 @@ Picker.prototype.initEvents = function initEvents () {
 
   this.submit.addEventListener('click', function (event) {
     event.preventDefault();
-    this$1.updateRecentColors(this$1.el.value);
+    call(this$1.options.events.beforeSubmit);
+    this$1.selectColor(this$1.el.value);
     this$1.closePicker();
-    this$1.events.forEach(function (evnt) { return this$1.el.dispatchEvent(evnt); });
-    call(this$1.options.events.afterSelect);
+    call(this$1.options.events.afterSubmit);
   });
 };
 
@@ -4264,6 +4263,8 @@ return Picker;
 })));
 });
 
+var SELECTED = null;
+
 var formats = {
   bold: {
     element: 'button',
@@ -4379,7 +4380,17 @@ var formats = {
       defaultColor: '#000000',
       mode: 'hex',
       events: {
-
+        beforeSubmit: function beforeSubmit() {
+          if (!SELECTED) { return; }
+          var selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(SELECTED);
+          SELECTED = window.getSelection().getRangeAt(0);
+        },
+        afterOpen: function afterOpen() {
+          if (!window.getSelection().getRangeAt(0)) { return; }
+          SELECTED = window.getSelection().getRangeAt(0);
+        }
       }
     }
   },
