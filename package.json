@@ -4,7 +4,7 @@
   "description": "interactive ES6 text editor",
   "main": "dist/editor.js",
   "dependencies": {
-    "@baianat/colorpicker": "0.0.3",
+    "@baianat/colorpicker": "0.0.5",
     "highlight.js": "^9.12.0"
   },
   "devDependencies": {

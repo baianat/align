@@ -2,11 +2,16 @@
 # yarn lockfile v1
 
 
-"@baianat/colorpicker@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@baianat/colorpicker/-/colorpicker-0.0.3.tgz#68f8724bf968c4285b77e048c4140dd53ff323c1"
+"@baianat/colorpicker@0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@baianat/colorpicker/-/colorpicker-0.0.5.tgz#2bde2545c68e83cc4e07f72cc360ebdb8dc9fb49"
   dependencies:
+    "@baianat/rangeslider" "0.0.2"
     popper.js "^1.12.5"
+
+"@baianat/rangeslider@0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@baianat/rangeslider/-/rangeslider-0.0.2.tgz#083ceae8578a08b7b23a9960ec2cd158445d4495"
 
 "@gulp-sourcemaps/identity-map@1.X":
   version "1.0.1"

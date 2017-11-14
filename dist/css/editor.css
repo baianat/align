@@ -275,15 +275,142 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   height: 20px;
 }
 /**
+ * core
+ */
+.icon {
+  width: 20px;
+  height: 20px;
+}
+/**
+ * eidtor elements
+ */
+.slider {
+  position: relative;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  margin-bottom: $margin;
+  box-sizing: border-box;
+}
+.slider input {
+  position: relative;
+  display: none;
+  -webkit-appearance: none;
+  border: 1px solid #cedee8;
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 5px 10px;
+  width: 100px;
+  margin-$start-direction: 20px;
+  text-align: center;
+  color: #323c47;
+}
+.slider input:focus {
+  outline: none;
+}
+.slider input[type=number]::-webkit-inner-spin-button,
+.slider input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+          appearance: none;
+  margin: 0;
+}
+.slider.is-editable input {
+  display: block;
+}
+.slider-track {
+  position: relative;
+  -ms-flex: 1;
+      -webkit-flex: 1;
+          flex: 1;
+  margin: 10px;
+  width: auto;
+  height: 5px;
+  background-color: #000;
+}
+.slider-track:hover .slider-label,
+.slider-track.is-dragging .slider-label {
+  opacity: 1;
+  visibility: visible;
+}
+.slider-handle {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  top: 50%;
+  margin-left: -7.5px;
+  margin-top: -7.5px;
+  border: 4px solid #fff;
+  border-radius: 70px;
+  background-color: #000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+}
+.slider-label {
+  position: absolute;
+  top: -40px;
+  text-align: center;
+  background-color: #fff;
+  color: #323c47;
+  border: 1px solid #cedee8;
+  border-radius: 4px;
+  padding: 7px;
+  opacity: 0;
+  box-sizing: border-box;
+  font-size: 10px;
+  z-index: 999;
+  width: 50px;
+  left: -21.5px;
+  visibility: hidden;
+}
+.slider-label:before {
+  position: absolute;
+  display: block;
+  content: '';
+  $start-direction: 0;
+  bottom: -7px;
+  left: 18px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 7px 0 7px;
+  border-color: #cedee8 transparent transparent transparent;
+}
+.slider-label:after {
+  position: absolute;
+  display: block;
+  content: '';
+  $start-direction: 0;
+  bottom: -6px;
+  left: 18px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 7px 0 7px;
+  border-color: #fff transparent transparent transparent;
+}
+.slider-fill {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #cedee8;
+  height: 100%;
+}
+
+
+
+/**
  * eidtor elements
  */
 .picker {
-  display: -webkit-flex;
   display: -ms-flexbox;
+  display: -webkit-flex;
   display: flex;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
+  -ms-flex-pack: center;
+      -webkit-justify-content: center;
           justify-content: center;
+  box-sizing: border-box;
 }
 .picker-guide {
   width: 25px;
@@ -296,26 +423,135 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   outline: 0;
 }
 .picker-wheel {
-  margin-bottom: 20px;
+  margin-right: 20px;
 }
 .picker-wrapper {
-  display: -webkit-flex;
   display: -ms-flexbox;
+  display: -webkit-flex;
   display: flex;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
+  -ms-flex-pack: center;
+      -webkit-justify-content: center;
           justify-content: center;
-  -webkit-flex-direction: column-reverse;
-      -ms-flex-direction: column-reverse;
-          flex-direction: column-reverse;
-  padding: 40px 20px;
+  -ms-flex-align: center;
+      -webkit-align-items: center;
+          align-items: center;
+  padding: 20px;
   margin: 20px 0;
+  background-color: rgba(50,60,71,0.9);
   border: 1px solid #000;
   border-radius: 5px;
   box-shadow: 0 10px 20px -4px rgba(0,0,0,0.2);
 }
 .picker-wrapper.is-hidden {
   display: none;
+}
+.picker-wrapper:focus {
+  outline: none;
+}
+.picker-recent {
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -ms-flex-pack: end;
+      -webkit-justify-content: flex-end;
+          justify-content: flex-end;
+  -ms-flex-align: center;
+      -webkit-align-items: center;
+          align-items: center;
+  width: 100%;
+}
+.picker-color {
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
+  margin: 0 5px;
+  background-color: #000;
+}
+.picker-color:last-child {
+  margin-right: 0;
+}
+.picker-color:first-child {
+  margin-left: 0;
+}
+.picker-value {
+  width: calc(100% - 60px);
+  height: 25px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #fff;
+  color: #fff;
+  background-color: #323c47;
+  margin: 0 0 10px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.picker-submit {
+  width: 50px;
+  height: 25px;
+  padding: 0;
+  margin-left: 10px;
+  float: right;
+  border-radius: 4px;
+  background-color: #fff;
+  border: 1px solid #fff;
+  fill: #323c47;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -ms-flex-pack: center;
+      -webkit-justify-content: center;
+          justify-content: center;
+  -ms-flex-align: center;
+      -webkit-align-items: center;
+          align-items: center;
+}
+.picker-submit:hover {
+  background-color: #323c47;
+  fill: #fff;
+}
+.picker-submit:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+.picker-cursor {
+  position: absolute;
+  top: 115px;
+  left: 115px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  -ms-transform-origin: top left;
+      -webkit-transform-origin: top left;
+          transform-origin: top left;
+}
+.picker-cursor.is-hidden {
+  display: none;
+}
+.slider {
+  -ms-flex-direction: row-reverse;
+      -webkit-flex-direction: row-reverse;
+          flex-direction: row-reverse;
+  margin-bottom: 5px;
+}
+.slider input {
+  width: 50px;
+  margin-left: 10px;
+  box-sizing: border-box;
+  background-color: #323c47;
+  color: #fff;
+}
+.slider-fill {
+  background-color: transparent;
+}
+.slider-track {
+  height: 8px;
+  margin: 8px 10px;
+  border-radius: 4px;
+}
+.slider-handle {
+  border-width: 2px;
 }
 
 

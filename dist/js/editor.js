@@ -1028,7 +1028,7 @@ var picker = createCommonjsModule(function (module, exports) {
 
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.12.5
+ * @version 1.12.7
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -1050,22 +1050,7 @@ var picker = createCommonjsModule(function (module, exports) {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-var nativeHints = ['native code', '[object MutationObserverConstructor]'];
-
-/**
- * Determine if a function is implemented natively (as opposed to a polyfill).
- * @method
- * @memberof Popper.Utils
- * @argument {Function | undefined} fn the function to check
- * @returns {Boolean}
- */
-var isNative = (function (fn) {
-  return nativeHints.some(function (hint) {
-    return (fn || '').toString().indexOf(hint) > -1;
-  });
-});
-
-var isBrowser = typeof window !== 'undefined';
+var isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
 var longerTimeoutBrowsers = ['Edge', 'Trident', 'Firefox'];
 var timeoutDuration = 0;
 for (var i = 0; i < longerTimeoutBrowsers.length; i += 1) {
@@ -1076,26 +1061,16 @@ for (var i = 0; i < longerTimeoutBrowsers.length; i += 1) {
 }
 
 function microtaskDebounce(fn) {
-  var scheduled = false;
-  var i = 0;
-  var elem = document.createElement('span');
-
-  // MutationObserver provides a mechanism for scheduling microtasks, which
-  // are scheduled *before* the next task. This gives us a way to debounce
-  // a function but ensure it's called *before* the next paint.
-  var observer = new MutationObserver(function () {
-    fn();
-    scheduled = false;
-  });
-
-  observer.observe(elem, { attributes: true });
-
+  var called = false;
   return function () {
-    if (!scheduled) {
-      scheduled = true;
-      elem.setAttribute('x-index', i);
-      i = i + 1; // don't use compund (+=) because it doesn't get optimized in V8
+    if (called) {
+      return;
     }
+    called = true;
+    Promise.resolve().then(function () {
+      called = false;
+      fn();
+    });
   };
 }
 
@@ -1112,11 +1087,7 @@ function taskDebounce(fn) {
   };
 }
 
-// It's common for MutationObserver polyfills to be seen in the wild, however
-// these rely on Mutation Events which only occur when an element is connected
-// to the DOM. The algorithm used in this module does not use a connected element,
-// and so we must ensure that a *native* MutationObserver is available.
-var supportsNativeMutationObserver = isBrowser && isNative(window.MutationObserver);
+var supportsMicroTasks = isBrowser && window.Promise;
 
 /**
 * Create a debounced version of a method, that's asynchronously deferred
@@ -1127,7 +1098,7 @@ var supportsNativeMutationObserver = isBrowser && isNative(window.MutationObserv
 * @argument {Function} fn
 * @returns {Function}
 */
-var debounce = supportsNativeMutationObserver ? microtaskDebounce : taskDebounce;
+var debounce = supportsMicroTasks ? microtaskDebounce : taskDebounce;
 
 /**
  * Check if the given variable is a function
@@ -1180,8 +1151,16 @@ function getParentNode(element) {
  */
 function getScrollParent(element) {
   // Return body, `getScroll` will take care to get the correct `scrollTop` from it
-  if (!element || ['HTML', 'BODY', '#document'].indexOf(element.nodeName) !== -1) {
+  if (!element) {
     return window.document.body;
+  }
+
+  switch (element.nodeName) {
+    case 'HTML':
+    case 'BODY':
+      return element.ownerDocument.body;
+    case '#document':
+      return element.body;
   }
 
   // Firefox want us to check `-x` and `-y` variations as well
@@ -1211,6 +1190,10 @@ function getOffsetParent(element) {
   var nodeName = offsetParent && offsetParent.nodeName;
 
   if (!nodeName || nodeName === 'BODY' || nodeName === 'HTML') {
+    if (element) {
+      return element.ownerDocument.documentElement;
+    }
+
     return window.document.documentElement;
   }
 
@@ -1306,8 +1289,8 @@ function getScroll(element) {
   var nodeName = element.nodeName;
 
   if (nodeName === 'BODY' || nodeName === 'HTML') {
-    var html = window.document.documentElement;
-    var scrollingElement = window.document.scrollingElement || html;
+    var html = element.ownerDocument.documentElement;
+    var scrollingElement = element.ownerDocument.scrollingElement || html;
     return scrollingElement[upperSide];
   }
 
@@ -1558,7 +1541,7 @@ function getOffsetRectRelativeToArbitraryNode(children, parent) {
 }
 
 function getViewportOffsetRectRelativeToArtbitraryNode(element) {
-  var html = window.document.documentElement;
+  var html = element.ownerDocument.documentElement;
   var relativeOffset = getOffsetRectRelativeToArbitraryNode(element, html);
   var width = Math.max(html.clientWidth, window.innerWidth || 0);
   var height = Math.max(html.clientHeight, window.innerHeight || 0);
@@ -1617,12 +1600,12 @@ function getBoundaries(popper, reference, padding, boundariesElement) {
     // Handle other cases based on DOM element used as boundaries
     var boundariesNode = void 0;
     if (boundariesElement === 'scrollParent') {
-      boundariesNode = getScrollParent(getParentNode(popper));
+      boundariesNode = getScrollParent(getParentNode(reference));
       if (boundariesNode.nodeName === 'BODY') {
-        boundariesNode = window.document.documentElement;
+        boundariesNode = popper.ownerDocument.documentElement;
       }
     } else if (boundariesElement === 'window') {
-      boundariesNode = window.document.documentElement;
+      boundariesNode = popper.ownerDocument.documentElement;
     } else {
       boundariesNode = boundariesElement;
     }
@@ -1863,10 +1846,11 @@ function runModifiers(modifiers, data, ends) {
   var modifiersToRun = ends === undefined ? modifiers : modifiers.slice(0, findIndex(modifiers, 'name', ends));
 
   modifiersToRun.forEach(function (modifier) {
-    if (modifier.function) {
+    if (modifier['function']) {
+      // eslint-disable-line dot-notation
       console.warn('`modifier.function` is deprecated, use `modifier.fn`!');
     }
-    var fn = modifier.function || modifier.fn;
+    var fn = modifier['function'] || modifier.fn; // eslint-disable-line dot-notation
     if (modifier.enabled && isFunction(fn)) {
       // Add properties to offsets to make them a complete clientRect object
       // we do this before each modifier to make sure the previous one doesn't
@@ -1993,9 +1977,19 @@ function destroy() {
   return this;
 }
 
+/**
+ * Get the window associated with the element
+ * @argument {Element} element
+ * @returns {Window}
+ */
+function getWindow(element) {
+  var ownerDocument = element.ownerDocument;
+  return ownerDocument ? ownerDocument.defaultView : window;
+}
+
 function attachToScrollParents(scrollParent, event, callback, scrollParents) {
   var isBody = scrollParent.nodeName === 'BODY';
-  var target = isBody ? window : scrollParent;
+  var target = isBody ? scrollParent.ownerDocument.defaultView : scrollParent;
   target.addEventListener(event, callback, { passive: true });
 
   if (!isBody) {
@@ -2013,7 +2007,7 @@ function attachToScrollParents(scrollParent, event, callback, scrollParents) {
 function setupEventListeners(reference, options, state, updateBound) {
   // Resize event listener on window
   state.updateBound = updateBound;
-  window.addEventListener('resize', state.updateBound, { passive: true });
+  getWindow(reference).addEventListener('resize', state.updateBound, { passive: true });
 
   // Scroll event listener on scroll parents
   var scrollElement = getScrollParent(reference);
@@ -2044,7 +2038,7 @@ function enableEventListeners() {
  */
 function removeEventListeners(reference, state) {
   // Remove resize event listener on window
-  window.removeEventListener('resize', state.updateBound);
+  getWindow(reference).removeEventListener('resize', state.updateBound);
 
   // Remove scroll event listener on scroll parents
   state.scrollParents.forEach(function (target) {
@@ -3346,8 +3340,8 @@ var Popper = function () {
     };
 
     // get reference and popper elements (allow jQuery wrappers)
-    this.reference = reference.jquery ? reference[0] : reference;
-    this.popper = popper.jquery ? popper[0] : popper;
+    this.reference = reference && reference.jquery ? reference[0] : reference;
+    this.popper = popper && popper.jquery ? popper[0] : popper;
 
     // Deep merge modifiers options
     this.options.modifiers = {};
@@ -3466,6 +3460,21 @@ Popper.Utils = (typeof window !== 'undefined' ? window : commonjsGlobal).PopperU
 Popper.placements = placements;
 Popper.Defaults = Defaults;
 
+var commonjsGlobal$$1 = typeof window !== 'undefined' ? window : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
+
+
+
+
+
+function createCommonjsModule$$1(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var slider$1 = createCommonjsModule$$1(function (module, exports) {
+(function (global, factory) {
+	module.exports = factory();
+}(commonjsGlobal$$1, (function () { 'use strict';
+
 /**
  * Utilities
  */
@@ -3478,11 +3487,11 @@ function select(element) {
 
 
 
-function call(func) {
-  if (typeof func === 'function') {
-    func();
-  }
+function getNumber(number1, number2) {
+  return number1 ? parseInt(number1, 10) : parseInt(number2, 10);
 }
+
+
 
 
 
@@ -3504,64 +3513,520 @@ function wrap(el, wrapper) {
  * Converts an array-like object to an array.
  */
 
+/**
+ * Slider class
+ */
+var Slider = function Slider(selector, ref) {
+  if ( ref === void 0 ) { ref = {}; }
+  var gradient = ref.gradient; if ( gradient === void 0 ) { gradient = null; }
+  var classes = ref.classes; if ( classes === void 0 ) { classes = null; }
+  var colorCode = ref.colorCode; if ( colorCode === void 0 ) { colorCode = false; }
+  var editable = ref.editable; if ( editable === void 0 ) { editable = false; }
+  var label = ref.label; if ( label === void 0 ) { label = true; }
+  var min = ref.min; if ( min === void 0 ) { min = 0; }
+  var max = ref.max; if ( max === void 0 ) { max = 10; }
+  var step = ref.step; if ( step === void 0 ) { step = 1; }
+  var value = ref.value; if ( value === void 0 ) { value = 0; }
+
+  this.el = select(selector);
+  this.settings = {
+    gradient: gradient,
+    classes: classes,
+    colorCode: colorCode,
+    editable: editable,
+    label: label,
+    min: min,
+    max: max,
+    step: step,
+    value: value
+  };
+  this.init();
+};
+
+/**
+ * create new rang slider element
+ * @param {String|HTMLElement} selector
+ * @param {Object}           settings
+ */
+Slider.create = function create (selector, settings) {
+  new Slider(selector, settings);
+};
+
+Slider.prototype.init = function init () {
+  this.initElements();
+
+  this.min = getNumber(this.el.min, this.settings.min);
+  this.max = getNumber(this.el.max, this.settings.max);
+  this.step = getNumber(this.el.step, this.settings.step);
+  this.callbacks = {};
+
+  if (this.settings.gradient) { this.initGradient(); }
+
+  this.updateWidth();
+  this.update(getNumber(this.el.value, this.settings.value));
+  this.initEvents();
+};
+
+Slider.prototype.initElements = function initElements () {
+  this.wrapper = document.createElement('div');
+  this.track = document.createElement('div');
+  this.handle = document.createElement('div');
+  this.fill = document.createElement('div');
+    
+  this.wrapper.classList.add('slider');
+  if (this.settings.editable) {
+    this.wrapper.classList.add('is-editable');
+  }
+  if (this.settings.classes) {
+    this.wrapper.classList.add(this.settings.classes);
+  }
+  this.track.classList.add('slider-track');
+  this.handle.classList.add('slider-handle');
+  this.fill.classList.add('slider-fill');
+    
+  wrap(this.el, this.wrapper);
+  this.track.appendChild(this.fill);
+  this.track.appendChild(this.handle);
+  this.wrapper.appendChild(this.track);
+  if (this.settings.label) {
+    this.label = document.createElement('div');
+    this.label.classList.add('slider-label');
+    this.handle.appendChild(this.label);
+  }
+};
+
+Slider.prototype.initGradient = function initGradient () {
+  if (this.settings.gradient.length > 1) {
+    this.track.style.backgroundImage = "linear-gradient(90deg, " + (this.settings.gradient) + ")";
+    this.gradient = this.settings.gradient;
+    this.colorCode = this.settings.colorCode;
+    return;
+  }
+  this.track.style.backgroundImage = 'none';
+  this.track.style.backgroundColor = this.settings.gradient[0];
+  this.handle.style.backgroundColor = this.settings.gradient[0];
+  this.gradient = null;
+};
+
+Slider.prototype.initEvents = function initEvents () {
+    var this$1 = this;
+
+  this.track.addEventListener('mousedown', this.select.bind(this), false);
+  this.track.addEventListener('touchstart', this.select.bind(this), false);
+  if (this.settings.editable && !this.settings.colorCode) {
+    this.el.addEventListener('change', function (evt) {
+      this$1.update(this$1.el.value);
+    }, false);
+  }
+};
+
+/**
+ * fire select events
+ */
+Slider.prototype.select = function select$$1 (event) {
+  event.preventDefault();
+  this.updateWidth();
+  this.click(event);
+  this.callbacks.tempDrag = this.dragging.bind(this);
+  this.callbacks.tempRelease = this.release.bind(this);
+  document.addEventListener('mousemove', this.callbacks.tempDrag, false);
+  document.addEventListener('touchmove', this.callbacks.tempDrag, false);
+  document.addEventListener('touchend', this.callbacks.tempRelease, false);
+  document.addEventListener('mouseup', this.callbacks.tempRelease, false);
+};
+
+/**
+ * dragging motion
+ */
+Slider.prototype.dragging = function dragging (event) {
+  event.preventDefault();
+  // get drag change value
+  var eventX = event.type === 'mousemove' ? event.clientX : event.touches[0].clientX;
+  var mouseValue = (eventX - this.currentX);
+
+  // check ifleft mouse is clicked
+  if (event.buttons !== 1 && event.type === 'mousemove') { return; }
+  this.track.classList.add('is-dragging');
+  var stepCount = parseInt((mouseValue / this.stepWidth) + 0.5, 10);
+  var stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
+  if (stepValue !== this.currentValue) {
+    this.update(stepValue);
+  }
+};
+
+/**
+ * release handler
+ */
+Slider.prototype.release = function release () {
+  this.track.classList.remove('is-dragging');
+  document.removeEventListener('mousemove', this.callbacks.tempDrag);
+  document.removeEventListener('touchmove', this.callbacks.tempDrag);
+  document.removeEventListener('mouseup', this.callbacks.tempRelease);
+  document.removeEventListener('touchend', this.callbacks.tempRelease);
+};
+
+Slider.prototype.click = function click (event) {
+  event.preventDefault();
+  var eventX = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
+  var mouseValue = (eventX - this.currentX);
+
+  // check ifleft mouse is clicked
+  if (event.buttons !== 1 && event.type === 'mousemove') { return; }
+  var stepCount = parseInt((mouseValue / this.stepWidth) + 0.5, 10);
+  var stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
+  if (stepValue !== this.currentValue) {
+    this.update(stepValue);
+  }
+};
+
+Slider.prototype.updateWidth = function updateWidth () {
+  this.currentX = this.track.getBoundingClientRect().left;
+  this.width = this.track.clientWidth;
+  this.stepWidth = (this.width / (this.max - this.min));
+};
+
+/**
+ * get the filled area percentage
+ * @param{Object} slider
+ * @param{Number} value
+ * @return {Number}
+ */
+Slider.prototype.getFillPercentage = function getFillPercentage (value) {
+  return ((value - this.min) * 100) / (this.max - this.min);
+};
+
+Slider.prototype.normalizeValue = function normalizeValue (value) {
+  if (value >= this.max) {
+    return this.max;
+  }
+  if (value <= this.min) {
+    return this.min;
+  }
+  if (isNaN(Number(value))) {
+    return this.value;
+  }
+  return Number(value);
+};
+
+Slider.prototype.newGradient = function newGradient (newGradient$1) {
+  this.settings.gradient = newGradient$1;
+  this.initGradient();
+  this.update(undefined, true);
+};
+
+/**
+ * get the handle color
+ * @param{Number} fillPercentage
+ * @return {Number}              handle hex color code
+ */
+Slider.prototype.getHandleColor = function getHandleColor (fillPercentage) {
+    var this$1 = this;
+
+  var colorCount = this.gradient.length - 1;
+  var region = fillPercentage / 100;
+  for (var i = 1; i <= colorCount; i++) {
+    // check the current zone
+    if (region >= ((i - 1) / colorCount) && region <= (i / colorCount)) {
+      // get the active color percentage
+      var colorPercentage = (region - ((i - 1) / colorCount)) / (1 / colorCount);
+      // return the mixed color based on the zone boundary colors
+      return Slider.mixColors(this$1.gradient[i - 1],
+        this$1.gradient[i], colorPercentage);
+    }
+  }
+  return '#000000';
+};
+
+/**
+ * update the slider fill, value and color
+ * @param {Number} value
+ */
+Slider.prototype.update = function update (value, mute) {
+    if ( mute === void 0 ) { mute = false; }
+
+  if (Number(value) === this.value) { return; }
+  var normalized = this.normalizeValue(value);
+    
+  var fillPercentage = this.getFillPercentage(normalized);
+    
+  this.handle.style.left = fillPercentage + "%";
+  this.fill.style.left = fillPercentage + "%";
+  
+  this.value = normalized;
+  this.el.value = this.value;
+  if (this.settings.label) {
+    this.label.innerHTML = this.value;
+  }
+  if (this.gradient) {
+    var color = this.getHandleColor(fillPercentage);
+    this.handle.style.backgroundColor = color;
+    if (this.settings.colorCode) {
+      this.el.value = color;
+      this.label.innerHTML = color;
+    }
+  }
+  if (mute) { return; }
+  this.el.dispatchEvent(new Event('change'));
+  this.el.dispatchEvent(new Event('input'));
+};
+
+/**
+ * private functions
+ */
+Slider.hexAverage = function hexAverage (color1, color2, ratio) {
+    if ( ratio === void 0 ) { ratio = 0.5; }
+
+  var average = (parseInt(color1, 16) * (1 - ratio)) + (parseInt(color2, 16) * ratio);
+  return (("00" + (Math.floor(average + 0.5).toString(16)))).slice(-2);
+};
+
+Slider.mixColors = function mixColors (color1, color2, ratio) {
+  color1 = color1.replace('#', '');
+  color2 = color2.replace('#', '');
+  var red = Slider.hexAverage(color1.slice(0, -4), color2.slice(0, -4), ratio);
+  var green = Slider.hexAverage(color1.slice(2, -2), color2.slice(2, -2), ratio);
+  var blue = Slider.hexAverage(color1.slice(-2), color2.slice(-2), ratio);
+  return ("#" + ((red + green + blue).toUpperCase()));
+};
+
+return Slider;
+
+})));
+});
+
+function polyfill() {
+  if (!Element.prototype.matches) {
+    Element.prototype.matches = Element.prototype.msMatchesSelector ||
+    Element.prototype.webkitMatchesSelector;
+  }
+
+  if (!Element.prototype.closest) {
+    Element.prototype.closest = function (s) {
+      var el = this;
+      if (!document.documentElement.contains(el)) { return null; }
+      do {
+        if (el.matches(s)) { return el; }
+        el = el.parentElement;
+      } while (el !== null);
+      return null;
+    };
+  }
+}
+
+/**
+ * Utilities
+ */
+function select(element) {
+  if (typeof element === 'string') {
+    return document.querySelector(element);
+  }
+  return element;
+}
+
+
+
+function call(func) {
+  if (typeof func === 'function') {
+    func();
+  }
+}
+
+
+
+function getArray(length, value) {
+  var array = [];
+  for (var i = 0; i < length; i++) {
+    var temp = typeof value === 'function' ? value() : value;
+    array.push(temp);
+  }
+  return array;
+}
+
+
+
+
+
+
+
+/**
+ * Converts an array-like object to an array.
+ */
+
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function normalizeColorValue(value) {
+  if (value > 255) {
+    return 255;
+  }
+  if (value < 0) {
+    return 0;
+  }
+  return value;
+}
+
+function getHexValue(value) {
+  if (isNaN(Number(value))) {
+    return '00';
+  }
+  return ('0' + Number(value).toString(16)).slice(-2);
+}
+
+function getDecimalValue(value) {
+  if (isNaN(parseInt(value, 16))) {
+    return '0';
+  }
+  return parseInt(value, 16);
+}
+
+function getRandomColor() {
+  return ("rgb(" + (getRandomInt(0, 255)) + ", " + (getRandomInt(0, 255)) + ", " + (getRandomInt(0, 255)) + ")")
+}
+
+function rgb2hex(rgb) {
+  rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+  return (rgb && rgb.length === 4) ? '#' +
+    ('0' + parseInt(normalizeColorValue(rgb[1]), 10).toString(16)).slice(-2) +
+    ('0' + parseInt(normalizeColorValue(rgb[2]), 10).toString(16)).slice(-2) +
+    ('0' + parseInt(normalizeColorValue(rgb[3]), 10).toString(16)).slice(-2) : '';
+}
+
+function rgb2hsl(rgb) {
+  rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+  if (!rgb || rgb.length !== 4) { return; }
+
+  // Convert the RGB values to the range 0-1
+  var red = rgb[1] / 255;
+  var green = rgb[2] / 255;
+  var blue = rgb[3] / 255;
+  var Hue = 0;
+  var Sat = 0;
+  var Lum = 0;
+
+  //Find the minimum and maximum values of R, G and B.
+  var min = Math.min(red, green, blue);
+  var max = Math.max(red, green, blue);
+
+  //Calculate the Luminace value
+  Lum = (min + max) / 2;
+
+  //Calculate the Saturation.
+  if (min !== max) {
+    Sat = Lum > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min);
+  }
+
+  //calculate the Hue
+  if (red >= max && min !== max) {
+    Hue = 60 * ((green - blue) / (max - min));
+  }
+  if (green >= max && min !== max) {
+    Hue = 60 * (2.0 + (blue - red) / (max - min));
+  }
+  if (blue >= max && min !== max) {
+    Hue = 60 * (4.0 + (red - green) / (max - min));
+  }
+
+  // normalize values 
+  Hue = Hue < 0 ? parseInt(Hue + 360) : parseInt(Hue);
+  Sat = parseInt(Sat * 100);
+  Lum = parseInt(Lum * 100);
+
+  return ("hsl(" + Hue + ", " + Sat + "%, " + Lum + "%)");
+}
+
+function getCartesianCoords(r, θ) {
+  return { x: r * Math.cos(θ * Math.PI * 2), y: r * Math.sin(θ * Math.PI * 2) }
+}
+
 var Picker = function Picker(selector, ref) {
   if ( ref === void 0 ) { ref = {}; }
-  var defaultColor = ref.defaultColor; if ( defaultColor === void 0 ) { defaultColor = '#FFFFFF'; }
+  var defaultColor = ref.defaultColor; if ( defaultColor === void 0 ) { defaultColor = getRandomColor(); }
   var radius = ref.radius; if ( radius === void 0 ) { radius = 200; }
   var mode = ref.mode; if ( mode === void 0 ) { mode = 'rgb'; }
   var events = ref.events; if ( events === void 0 ) { events = {}; }
+  var recentColors = ref.recentColors; if ( recentColors === void 0 ) { recentColors = getArray(6, getRandomColor); }
 
   this.el = select(selector);
   this.options = {
     defaultColor: defaultColor,
     radius: radius,
     mode: mode,
-    events: events
+    events: events,
+    recentColors: recentColors
   };
   this.init();
 };
 
 Picker.prototype.init = function init () {
+  this.recentColors = this.options.recentColors;
+  polyfill();
   this.initElements();
   this.initWheel();
   this.initEvents();
   this.updateWheelColors();
   this.popper = new Popper(this.guide, this.wrapper, { placement: 'bottom-center' });
+  this.selectColor(this.options.defaultColor, true);
 };
   
 Picker.prototype.initElements = function initElements () {
-  // creat elements and config them
-  this.picker = document.createElement('div');
-  this.wrapper = document.createElement('div');
-  this.guide = document.createElement('button');
-  this.range = document.createElement('input');
+    var this$1 = this;
 
+  // create elements and config them
+  this.picker = document.createElement('div');
+  this.picker.insertAdjacentHTML('afterbegin', "\n      <button class=\"picker-guide\"></button>\n      <div class=\"picker-wrapper is-hidden\" tabindex=\"-1\">\n        <div class=\"picker-circle\">\n          <canvas class=\"picker-wheel\"></canvas>\n          <input class=\"picker-saturation\" type=\"number\" min=\"0\" max=\"100\" value=\"100\">\n          <div class=\"picker-cursor\"></div>\n        </div>\n        <div class=\"picker-controller\">\n          <input id=\"red\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <input id=\"green\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <input id=\"blue\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <button class=\"picker-submit\">\n            <svg class=\"icon\" viewBox=\"0 0 24 24\">\n              <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n            </svg>\n          </button>\n          <div class=\"picker-recent\"></div>\n        </div>\n      </div>\n    ");
+    
+  this.wrapper = this.picker.querySelector('.picker-wrapper');
+  this.recent = this.picker.querySelector('.picker-recent');
+  this.guide = this.picker.querySelector('.picker-guide');
+  this.canvas = this.picker.querySelector('.picker-wheel');
+  this.submit = this.picker.querySelector('.picker-submit');
+  this.cursor = this.picker.querySelector('.picker-cursor');
+  this.saturation = this.picker.querySelector('.picker-saturation');
+  this.rgbSliders = {
+    red: this.picker.querySelector('#red'),
+    green: this.picker.querySelector('#green'),
+    blue: this.picker.querySelector('#blue')
+  };
+    
+  this.el.parentNode.insertBefore(this.picker, this.el);
+  this.el.classList.add('picker-value');
   this.picker.classList.add('picker');
-  this.wrapper.classList.add('picker-wrapper', 'is-hidden');
-  this.guide.classList.add('picker-guide');
+  this.submit.parentNode.insertBefore(this.el, this.submit);
   this.guide.style.backgroundColor = this.options.defaultColor;
-  this.range.type = 'range';
-  this.range.min = 0;
-  this.range.max = 100;
-  this.range.value = 0;
-  this.el.style.display = 'none';
     
-  // append elements to DOM
-  wrap(this.el, this.picker);
-  this.picker.appendChild(this.guide);
-  this.picker.appendChild(this.wrapper);
-  this.wrapper.appendChild(this.range);
-    
+  this.sliders = {};
+  this.sliders.saturation = new slider$1(this.saturation, {
+    gradient: ['#FFFFFF', '#000000'],
+    label: false
+  });
+  Object.keys(this.rgbSliders).forEach(function (key) {
+    this$1.sliders[key] = new slider$1(this$1.rgbSliders[key], {
+      gradient: ['#000000', '#FFFFFF'],
+      label: false,
+      editable: true
+    });
+  });
+
+  this.recentColors.forEach(function (color) {
+    var recentColor = document.createElement('a');
+    recentColor.classList.add('picker-color');
+    recentColor.style.backgroundColor = color;
+    this$1.recent.appendChild(recentColor);
+    recentColor.addEventListener('click', function () { return this$1.selectColor(color); });
+  });
 };
 
 Picker.prototype.initWheel = function initWheel () {
-  // create canvas and inseart into DOM
-  this.canvas = document.createElement('canvas');
-  this.canvas.classList.add('picker-wheel');
+  // setup canvas
   this.canvas.width = this.options.radius;
   this.canvas.height = this.options.radius;
   this.context = this.canvas.getContext('2d');
-  this.wrapper.appendChild(this.canvas);
+  this.cursor.style.top = ((this.options.radius / 2) + 15) + "px";
+  this.cursor.style.left = ((this.options.radius / 2) + 15) + "px";
 
   // draw wheel circle path
   this.circle = {
@@ -3585,29 +4050,71 @@ Picker.prototype.initEvents = function initEvents () {
     var this$1 = this;
 
   this.events = [new Event('input'), new Event('change')];
+    
   this.guide.addEventListener('click', function () {
     call(this$1.options.events.beforerOpen);
-    this$1.wrapper.classList.toggle('is-hidden');
-    this$1.popper.update();
-    call(this$1.options.events.afterOpen);
+    this$1.openPiker();
   });
 
-  this.canvas.addEventListener('click', function (evnt) {
-    call(this$1.options.events.beforeSelect);
-    this$1.updateMouseCords(evnt);
-    if (!this$1.context.isPointInPath(this$1.circle.path, this$1.mouse.x, this$1.mouse.y)) {
-      return;
-    }
-    var color = this$1.getColor();
-    this$1.wrapper.classList.toggle('is-hidden');
-    this$1.el.value = color;
-    this$1.guide.style.backgroundColor = color;
-    call(this$1.options.events.afterSelect);
-    this$1.events.forEach(function (event) { return this$1.el.dispatchEvent(event); });
+  this.canvas.addEventListener('mousedown', function (event) {
+    event.preventDefault();
+    var updateColor = function (evnt) {
+      // check if mouse outside the wheel
+      var mouse = this$1.getMouseCords(evnt);
+      if (this$1.context.isPointInPath(this$1.circle.path, mouse.x, mouse.y)) {
+        var color = this$1.getColorFromWheel(mouse);
+        this$1.selectColor(color, false);
+          
+        return color;
+      }
+      return this$1.el.value;
+    };
+      
+    var mouseupHandler = function (evnt) {
+      var color = updateColor(evnt);
+      if (color !== this$1.el.value) {
+        this$1.updateRecentColors(color);
+        this$1.selectColor(color);
+      }
+
+      document.removeEventListener('mousemove', updateColor);
+      document.removeEventListener('mouseup', mouseupHandler);
+    };
+    document.addEventListener('mousemove', updateColor);
+    document.addEventListener('mouseup', mouseupHandler);
   });
-    
-  this.range.addEventListener('input', function () {
+
+  this.saturation.addEventListener('change', function () {
     this$1.updateWheelColors();
+  });
+
+  Object.keys(this.rgbSliders).forEach(function (key) {
+    this$1.rgbSliders[key].addEventListener('change', function (event) {
+      event.preventDefault();
+      var color = this$1.getColorFromSliders();
+      this$1.selectColor(color);
+    });
+  });
+
+  this.el.addEventListener('focus', function (event) {
+    event.preventDefault();
+    var edit = function () {
+      this$1.selectColor(this$1.el.value, true);
+    };
+    var release = function () {
+      this$1.el.removeEventListener('change', edit);
+      this$1.el.removeEventListener('blur', release);
+    };
+    this$1.el.addEventListener('change', edit);
+    this$1.el.addEventListener('blur', release);
+  });
+
+  this.submit.addEventListener('click', function (event) {
+    event.preventDefault();
+    this$1.updateRecentColors(this$1.el.value);
+    this$1.closePicker();
+    this$1.events.forEach(function (evnt) { return this$1.el.dispatchEvent(evnt); });
+    call(this$1.options.events.afterSelect);
   });
 };
 
@@ -3619,55 +4126,143 @@ Picker.prototype.updateWheelColors = function updateWheelColors () {
   var radius = this.circle.radius - 1;
   this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-  for (var angle = 0; angle <= 360; angle += 1) {
+  for (var angle = 0; angle < 360; angle += 1) {
     var gradient = this$1.context.createRadialGradient(x, y, 0, x, y, radius);
-    var startAngle = (angle - 2) * Math.PI / 180;
-    var endAngle = angle * Math.PI / 180;
+    var startAngle = (angle - 1) * Math.PI / 180;
+    var endAngle = (angle + 1) * Math.PI / 180;
 
     this$1.context.beginPath();
     this$1.context.moveTo(x, y);
     this$1.context.arc(x, y, radius, startAngle, endAngle);
     this$1.context.closePath();
-    gradient.addColorStop(0, ("hsl(" + angle + ", 100%, 100%)"));
-    gradient.addColorStop(1, ("hsl(" + angle + ", 100%, 50%)"));
+    gradient.addColorStop(0, ("hsl(" + angle + ", " + (this$1.saturation.value) + "%, 100%)"));
+    gradient.addColorStop(0.5, ("hsl(" + angle + ", " + (this$1.saturation.value) + "%, 50%)"));
+    gradient.addColorStop(1, ("hsl(" + angle + ", " + (this$1.saturation.value) + "%, 0%)"));
     this$1.context.fillStyle = gradient;
     this$1.context.fill();
   }
-  this.context.fillStyle = "rgba(0, 0, 0, " + (this.range.value / 100) + ")";
-  this.context.fill(this.circle.path);
 };
 
-Picker.prototype.getColor = function getColor () {
-  var imageData = this.context.getImageData(this.mouse.x, this.mouse.y, 1, 1).data;
-  var selectedColor = "rgb(" + (imageData[0]) + ", " + (imageData[1]) + ", " + (imageData[2]) + ")"; 
-  if (this.options.mode === 'hex') {
-    selectedColor = this.rgb2hex(selectedColor);
+Picker.prototype.updateRecentColors = function updateRecentColors (newColor) {
+    var this$1 = this;
+
+  // update recent color array
+  if (this.recentColors.length >= 6) {
+    this.recentColors.shift();
   }
-  return selectedColor;
+  if (newColor) {
+    this.recentColors.push(newColor);
+  }
+
+  // update recent colors buttons
+  if (this.recent.childNodes.length >= 6) {
+    this.recent.removeChild(this.recent.firstChild);
+  }
+  var recentColor = document.createElement('a');
+  recentColor.classList.add('picker-color');
+  recentColor.style.backgroundColor = newColor;
+  this.recent.appendChild(recentColor);
+  recentColor.addEventListener('click', function (event) {
+    event.preventDefault();
+    this$1.selectColor(newColor);
+  });
 };
 
-Picker.prototype.updateMouseCords = function updateMouseCords (evnt) {
-  // correct mouse position
-  this.mouse = {};
-  this.rect = this.canvas.getBoundingClientRect();
-  this.mouse.x = evnt.clientX - this.rect.left;
-  this.mouse.y = evnt.clientY - this.rect.top;
+Picker.prototype.updateslidersInputs = function updateslidersInputs (slider) {
+  var red = getHexValue(this.rgbSliders.red.value);
+  var green = getHexValue(this.rgbSliders.green.value);
+  var blue = getHexValue(this.rgbSliders.blue.value);
+  this.sliders.red.newGradient([("#00" + green + blue), ("#ff" + green + blue)]);
+  this.sliders.green.newGradient([("#" + red + "00" + blue), ("#" + red + "ff" + blue)]);
+  this.sliders.blue.newGradient([("#" + red + green + "00"), ("#" + red + green + "ff")]);
 };
 
-Picker.prototype.rgb2hex = function rgb2hex (rgb) {
-  rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-  return (rgb && rgb.length === 4) ? "#" +
-    ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-    ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-    ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+Picker.prototype.updateCursor = function updateCursor () {
+  var rgbColor = this.getColorFromSliders();
+  var hexColor = rgb2hex(rgbColor);
+  var hslColor = rgb2hsl(rgbColor);
+  var hsl = hslColor.match(/^hsl?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)\%[\s+]?,[\s+]?(\d+)\%[\s+]?/i);
+  this.sliders.saturation.update(hsl[2]);
+  this.sliders.saturation.newGradient(['#FFFFFF', hexColor]);
+  var r = (100 - hsl[3]) * (this.options.radius / 200);
+  var coords = getCartesianCoords(r, hsl[1] / 360);
+  this.cursor.style.transform = "translate(" + (coords.x) + "px, " + (coords.y) + "px)";
+  this.cursor.style.backgroundColor = hslColor;
+};
+
+Picker.prototype.selectColor = function selectColor (color, mute) {
+    var this$1 = this;
+    if ( mute === void 0 ) { mute = false; }
+
+  if (color.slice(0, 1) !== '#' &&
+      color.slice(0, 3).toUpperCase() !== 'RGB'&&
+      color.slice(0, 3).toUpperCase() !== 'HSL') { return; }
+  call(this.options.events.beforeSelect);
+  var hexColor = color.slice(0, 1) === '#' ? color : rgb2hex(color);
+  var hslColor = rgb2hsl(color);
+  this.el.value =
+    this.options.mode === 'hex' ? hexColor :
+    this.options.mode === 'hsl' ? hslColor :
+    color;
+  this.guide.style.backgroundColor = color;
+  this.sliders.red.update(getDecimalValue(hexColor.slice(1, 3)), true);
+  this.sliders.green.update(getDecimalValue(hexColor.slice(3, 5)), true);
+  this.sliders.blue.update(getDecimalValue(hexColor.slice(5, 7)), true);
+  this.updateslidersInputs();
+  this.updateCursor();
+  call(this.options.events.afterSelect);
+  if (mute) { return; }
+  this.events.forEach(function (event) { return this$1.el.dispatchEvent(event); });
+};
+
+Picker.prototype.getColorFromSliders = function getColorFromSliders () {
+  var red = this.rgbSliders.red.value;
+  var green = this.rgbSliders.green.value;
+  var blue = this.rgbSliders.blue.value;
+  return ("rgb(" + red + ", " + green + ", " + blue + ")");
+};
+
+Picker.prototype.getColorFromWheel = function getColorFromWheel (mouse) {
+  var imageData = this.context.getImageData(mouse.x, mouse.y, 1, 1).data;
+  return ("rgb(" + (imageData[0]) + ", " + (imageData[1]) + ", " + (imageData[2]) + ")"); 
+};
+
+Picker.prototype.getMouseCords = function getMouseCords (evnt) {
+  var rect = this.canvas.getBoundingClientRect();
+  var mouse = {
+    x: evnt.clientX - rect.left,
+    y: evnt.clientY - rect.top
+  };
+  this.mouse = mouse;
+  return mouse;
+};
+
+Picker.prototype.closePicker = function closePicker () {
+  this.wrapper.classList.add('is-hidden');
+  document.onclick = '';
+};
+
+Picker.prototype.openPiker = function openPiker () {
+    var this$1 = this;
+
+  this.wrapper.classList.remove('is-hidden');
+  this.popper.update();
+  setTimeout(function () {
+    document.onclick = function (evnt) {
+      if (!evnt.target.closest('.picker-wrapper') && evnt.target !== this$1.guide) {
+        this$1.closePicker();
+        return;
+      }
+      call(this$1.options.events.clicked);
+    };
+  }, 16);
+  call(this.options.events.afterOpen);
 };
 
 return Picker;
 
 })));
 });
-
-var SELECTED = null;
 
 var formats = {
   bold: {
@@ -3784,14 +4379,7 @@ var formats = {
       defaultColor: '#000000',
       mode: 'hex',
       events: {
-        afterSelect: function afterSelect() {
-          var selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(SELECTED);
-        },
-        afterOpen: function afterOpen() {
-          SELECTED = window.getSelection().getRangeAt(0);
-        }
+
       }
     }
   },
@@ -3912,6 +4500,7 @@ styler.prototype.init = function init () {
     if (current.element === 'input') {
       this$1.style[el] = styler.input(el, current.type);
       this$1.style[el].addEventListener('change', function () {
+        this$1.el.focus();
         this$1.execute(current.command, this$1.style[el].value);
       });
       li.appendChild(this$1.style[el]);

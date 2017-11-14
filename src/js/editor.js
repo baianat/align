@@ -5,6 +5,7 @@ hljs.registerLanguage('javascript', javascript);
 import { select } from './util';
 import styler from './styler';
 
+
 class Editor {
   constructor(selector, options = {}) {
     this.el = select(selector);

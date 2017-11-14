@@ -117,14 +117,7 @@ const formats = {
       defaultColor: '#000000',
       mode: 'hex',
       events: {
-        afterSelect() {
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(SELECTED);
-        },
-        afterOpen() {
-          SELECTED = window.getSelection().getRangeAt(0);
-        }
+
       }
     }
   },

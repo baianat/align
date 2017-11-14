@@ -80,7 +80,8 @@ class styler {
       if (current.element === 'input') {
         this.style[el] = styler.input(el, current.type);
         this.style[el].addEventListener('change', () => {
-          this.execute(current.command, this.style[el].value)
+          this.el.focus();
+          this.execute(current.command, this.style[el].value);
         });
         li.appendChild(this.style[el]);
       }
