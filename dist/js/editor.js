@@ -4286,6 +4286,11 @@ var formats = {
     command: 'strikeThrough'
   },
 
+  removeFormat: {
+    element: 'button',
+    command: 'removeFormat'
+  },
+
   justifyLeft: {
     element: 'button',
     command: 'justifyLeft'
@@ -4616,10 +4621,6 @@ Editor.prototype.initEditor = function initEditor () {
     switch (event.key) {
       case "Tab":
         this$1.execute('indent');
-        break;
-      case "Enter":
-        this$1.breakLine(event);
-        break;  
       default:
         return; // Quit when this doesn't handle the key event.
     }

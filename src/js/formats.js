@@ -23,6 +23,11 @@ const formats = {
     command: 'strikeThrough'
   },
 
+  removeFormat: {
+    element: 'button',
+    command: 'removeFormat'
+  },
+
   justifyLeft: {
     element: 'button',
     command: 'justifyLeft'

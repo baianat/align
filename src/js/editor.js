@@ -44,9 +44,6 @@ class Editor {
         case "Tab":
           this.execute('indent');
           break;
-        case "Enter":
-          this.breakLine(event);
-          break;  
         default:
           return; // Quit when this doesn't handle the key event.
       }

@@ -168,8 +168,9 @@
   line-height: 26px;
   background: #fff;
   text-align: center;
-  border-width: 1px;
+  border-width: 0;
   border-color: #323c47;
+  font-size: 14px;
 }
 .styler.is-visiable {
   display: -webkit-flex;
