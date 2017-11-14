@@ -7,15 +7,22 @@ import styler from './styler';
 
 
 class Editor {
-  constructor(selector, options = {}) {
+  constructor(selector, {
+    defaultText = 'Type here',
+    styler = null,
+  } = {}) {
     this.el = select(selector);
-    this.options = options;
+    this.options = {
+      defaultText,
+      styler
+    };
     this.init();
   }
 
   get content() {
     return document.createTextNode(this.el.innerHTML);
   }
+
   init() {
     this.HTML = false;
     this.initStyler();
@@ -25,7 +32,7 @@ class Editor {
   initEditor() {
     this.el.contentEditable = 'true';
     const text = document.createElement('p');
-    text.innerText = 'Type here \n';
+    text.innerText = this.options.defaultText + '\n';
     this.el.appendChild(text);
     this.el.addEventListener('focus', () => {
       this.highlight();
@@ -54,54 +61,8 @@ class Editor {
   }
 
   initStyler() {
-    this.styler = new styler(this.el, this.options.styler.commands);
+    this.styler = new styler(this.el, this.options.styler);
   }
-
-  breakLine(event) {
-    let doxExec = false;
-
-    try {
-      doxExec = document.execCommand('insertBrOnReturn', false, true);
-    }
-    catch (error) {
-      // IE throws an error if it does not recognize the command...
-    }
-
-    if (doxExec) return true;
-    
-    // Standard
-    if (window.getSelection) {
-      event.stopPropagation();
-
-      const selection = window.getSelection();
-      const range = selection.getRangeAt(0);
-      const br = document.createElement('br');
-      
-      range.deleteContents();
-      range.insertNode(br);
-      range.setStartAfter(br);
-      range.setEndAfter(br);
-      range.collapse(false);
-      selection.removeAllRanges();
-      selection.addRange(range);
-
-      return false;
-    }
-
-    // IE
-    else if ($.browser.msie) {
-      event.preventDefault();
-
-      let range = document.selection.createRange();
-      range.pasteHTML('<BR><SPAN class="--IE-BR-HACK"></SPAN>');
-      range.moveStart('character', 1);
-      return false;
-    }
-
-    return true;
-  }
-
-  
 
   highlight() {
     const code = Array.from(this.el.querySelectorAll('pre'));
@@ -109,28 +70,6 @@ class Editor {
     code.forEach((block) => {
       hljs.highlightBlock(block);
     })
-  }
-
-  getSelectedPosition() {
-    return window.getSelection().getRangeAt(0);
-  }
-
-
-  updateCursorPosition(range) {
-    this.selection.removeAllRanges();
-    this.selection.addRange(range);
-  }
-
-  updateStylerPositoin() {
-    const selectedPosition = this.getSelectedPosition();
-    const dummy = document.createElement('sapn');
-    let dummyRect;
-
-    selectedPosition.insertNode(dummy);
-    dummyRect = dummy.getBoundingClientRect();
-    dummy.parentNode.removeChild(dummy);
-    this.styler.wrapper.style.top = `${dummyRect.top + window.scrollY - 80}px`;
-    this.styler.wrapper.style.left = `${dummyRect.left}px`;
   }
 }
 

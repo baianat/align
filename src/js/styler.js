@@ -2,9 +2,13 @@ import formats from './formats';
 
 class styler {
 
-  constructor(editor, options) {
+  constructor(editor, {
+    commands = ['bold', 'italic', 'underline']
+  } = {}) {
     this.el = editor;
-    this.options = options;
+    this.options = {
+      commands
+    };
     this.init();
   }
 
@@ -51,7 +55,7 @@ class styler {
     this.HTML = false;
     document.body.insertBefore(this.container, this.el);
 
-    this.options.forEach((el) => {
+    this.options.commands.forEach((el) => {
       const li = document.createElement('li');
       const current = formats[el];
       if (!current) {

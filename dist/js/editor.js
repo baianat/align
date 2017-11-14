@@ -4440,9 +4440,14 @@ var formats = {
   }
 };
 
-var styler = function styler(editor, options) {
+var styler = function styler(editor, ref) {
+  if ( ref === void 0 ) ref = {};
+  var commands = ref.commands; if ( commands === void 0 ) commands = ['bold', 'italic', 'underline'];
+
   this.el = editor;
-  this.options = options;
+  this.options = {
+    commands: commands
+  };
   this.init();
 };
 
@@ -4487,7 +4492,7 @@ styler.prototype.init = function init () {
   this.HTML = false;
   document.body.insertBefore(this.container, this.el);
 
-  this.options.forEach(function (el) {
+  this.options.commands.forEach(function (el) {
     var li = document.createElement('li');
     var current = formats[el];
     if (!current) {
@@ -4579,11 +4584,16 @@ styler.prototype.toggleHTML = function toggleHTML () {
 
 highlight.registerLanguage('javascript', javascript);
 
-var Editor = function Editor(selector, options) {
-  if ( options === void 0 ) options = {};
+var Editor = function Editor(selector, ref) {
+  if ( ref === void 0 ) ref = {};
+  var defaultText = ref.defaultText; if ( defaultText === void 0 ) defaultText = 'Type here';
+  var styler$$1 = ref.styler; if ( styler$$1 === void 0 ) styler$$1 = null;
 
   this.el = select(selector);
-  this.options = options;
+  this.options = {
+    defaultText: defaultText,
+    styler: styler$$1
+  };
   this.init();
 };
 
@@ -4592,6 +4602,7 @@ var prototypeAccessors = { content: {} };
 prototypeAccessors.content.get = function () {
   return document.createTextNode(this.el.innerHTML);
 };
+
 Editor.prototype.init = function init () {
   this.HTML = false;
   this.initStyler();
@@ -4603,7 +4614,7 @@ Editor.prototype.initEditor = function initEditor () {
 
   this.el.contentEditable = 'true';
   var text = document.createElement('p');
-  text.innerText = 'Type here \n';
+  text.innerText = this.options.defaultText + '\n';
   this.el.appendChild(text);
   this.el.addEventListener('focus', function () {
     this$1.highlight();
@@ -4621,6 +4632,7 @@ Editor.prototype.initEditor = function initEditor () {
     switch (event.key) {
       case "Tab":
         this$1.execute('indent');
+        break;
       default:
         return; // Quit when this doesn't handle the key event.
     }
@@ -4631,54 +4643,8 @@ Editor.prototype.initEditor = function initEditor () {
 };
 
 Editor.prototype.initStyler = function initStyler () {
-  this.styler = new styler(this.el, this.options.styler.commands);
+  this.styler = new styler(this.el, this.options.styler);
 };
-
-Editor.prototype.breakLine = function breakLine (event) {
-  var doxExec = false;
-
-  try {
-    doxExec = document.execCommand('insertBrOnReturn', false, true);
-  }
-  catch (error) {
-    // IE throws an error if it does not recognize the command...
-  }
-
-  if (doxExec) { return true; }
-    
-  // Standard
-  if (window.getSelection) {
-    event.stopPropagation();
-
-    var selection = window.getSelection();
-    var range = selection.getRangeAt(0);
-    var br = document.createElement('br');
-      
-    range.deleteContents();
-    range.insertNode(br);
-    range.setStartAfter(br);
-    range.setEndAfter(br);
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    return false;
-  }
-
-  // IE
-  else if ($.browser.msie) {
-    event.preventDefault();
-
-    var range$1 = document.selection.createRange();
-    range$1.pasteHTML('<BR><SPAN class="--IE-BR-HACK"></SPAN>');
-    range$1.moveStart('character', 1);
-    return false;
-  }
-
-  return true;
-};
-
-  
 
 Editor.prototype.highlight = function highlight$$1 () {
   var code = Array.from(this.el.querySelectorAll('pre'));
@@ -4686,28 +4652,6 @@ Editor.prototype.highlight = function highlight$$1 () {
   code.forEach(function (block) {
     highlight.highlightBlock(block);
   });
-};
-
-Editor.prototype.getSelectedPosition = function getSelectedPosition () {
-  return window.getSelection().getRangeAt(0);
-};
-
-
-Editor.prototype.updateCursorPosition = function updateCursorPosition (range) {
-  this.selection.removeAllRanges();
-  this.selection.addRange(range);
-};
-
-Editor.prototype.updateStylerPositoin = function updateStylerPositoin () {
-  var selectedPosition = this.getSelectedPosition();
-  var dummy = document.createElement('sapn');
-  var dummyRect;
-
-  selectedPosition.insertNode(dummy);
-  dummyRect = dummy.getBoundingClientRect();
-  dummy.parentNode.removeChild(dummy);
-  this.styler.wrapper.style.top = (dummyRect.top + window.scrollY - 80) + "px";
-  this.styler.wrapper.style.left = (dummyRect.left) + "px";
 };
 
 Object.defineProperties( Editor.prototype, prototypeAccessors );
