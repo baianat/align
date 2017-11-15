@@ -5,13 +5,17 @@ class styler {
   constructor(editor, {
     commands = ['bold', 'italic', 'underline']
   } = {}) {
-    this.el = editor;
+    this.editor = editor;
     this.options = {
       commands
     };
     this.init();
   }
 
+  /**
+   * Create button HTML element
+   * @param {String} name 
+   */
   static button(name) {
     const button = document.createElement('button');
     button.classList.add('styler-button');
@@ -24,6 +28,11 @@ class styler {
     return button;
   }
 
+  /**
+   * Create select options HTML element
+   * @param {String} name 
+   * @param {Object} options 
+   */
   static select(name, options) {
     const select = document.createElement('select');
     const defaultOption = document.createElement('option');
@@ -40,6 +49,11 @@ class styler {
     return select;
   }
 
+  /**
+   * Create input HTML element
+   * @param {String} name 
+   * @param {String} type 
+   */
   static input(name, type) {
     const input = document.createElement('input');
     input.classList.add(`styler-${name}`);
@@ -48,12 +62,14 @@ class styler {
     return input;
   }
 
+  /**
+   * Create the styler toolbar
+   */
   init() {
     this.container = document.createElement('ul');
     this.container.classList.add('styler');
     this.style = {};
-    this.HTML = false;
-    document.body.insertBefore(this.container, this.el);
+    document.body.insertBefore(this.container, this.editor.el);
 
     this.options.commands.forEach((el) => {
       const li = document.createElement('li');
@@ -63,40 +79,53 @@ class styler {
         return;
       }
 
-      if (current.element === 'button') {
-        this.style[el] = styler.button(el);
-        const callBack = current.command ? this.execute : this[current.func];
-        this.style[el].addEventListener('click', () => {
-          callBack.call(this, current.command, current.value);
-        });
-        li.appendChild(this.style[el]);
-      }
+      switch (current.element) {
+        case 'button':
+          this.style[el] = styler.button(el);
+          // some buttons doesn't have commands
+          // instead it use functions form editor
+          // here we detecte which callback should use
+          const callBack =
+            current.command ?
+            this.execute.bind(this) :
+            this.editor[current.func].bind(this.editor);
+          
+          this.style[el].addEventListener('click', () => {
+            callBack(current.command, current.value);
+          });
+          li.appendChild(this.style[el]);
+          break;
 
-      if (current.element === 'select') {
-        this.style[el] = styler.select(el, current.options);
-        this.style[el].addEventListener('change', () => {
-          const selection = this.style[el];
-          this.execute(current.command, selection[selection.selectedIndex].value);
-        });
-        li.appendChild(this.style[el]);
-      }
+        case 'select':
+          this.style[el] = styler.select(el, current.options);
+          this.style[el].addEventListener('change', () => {
+            const selection = this.style[el];
+            this.execute(current.command, selection[selection.selectedIndex].value);
+          });
+          li.appendChild(this.style[el]);
+          break;
+        
+        case 'input': 
+          this.style[el] = styler.input(el, current.type);
+          this.style[el].addEventListener('change', () => {
+            this.editor.el.focus();
+            this.execute(current.command, this.style[el].value);
+          });
+          li.appendChild(this.style[el]);
+          break;
+          
+        case 'styling': 
+          li.classList.add(current.class);
+          break;
 
-      if (current.element === 'input') {
-        this.style[el] = styler.input(el, current.type);
-        this.style[el].addEventListener('change', () => {
-          this.el.focus();
-          this.execute(current.command, this.style[el].value);
-        });
-        li.appendChild(this.style[el]);
-      }
+        case 'custom':
+          const markup = current.create();
+          li.appendChild(markup);
+          break;
 
-      if (current.element === 'styling') {
-        li.classList.add(current.class);
-      }
-
-      if (current.element === 'custom') {
-        const markup = current.create();
-        li.appendChild(markup);
+        default:
+          console.warn(el + ' is not found');
+          return; 
       }
 
       if (current.init) {
@@ -107,13 +136,21 @@ class styler {
     })
   }
 
+  /**
+   * Execute command for the selected button
+   * @param {String} cmd 
+   * @param {String|Number} value 
+   */
   execute(cmd, value) {
-    if (this.HTML) return;
+    if (this.editor.HTML) return;
     document.execCommand(cmd, false, value);
-    this.el.focus();
+    this.editor.el.focus();
     this.updateStylerStates();
   }
 
+  /**
+   * Update the state of the active style
+   */
   updateStylerStates() {
     Object.keys(this.style).forEach((styl) => {
       if (document.queryCommandState(String(styl))) {
@@ -122,25 +159,6 @@ class styler {
         this.style[styl].classList.remove('is-active');
       }
     })
-  }
-
-  toggleHTML() {
-    this.HTML = !this.HTML;
-    if (this.HTML) {
-      const content = document.createTextNode(this.el.innerHTML);
-      const pre = document.createElement("pre");
-
-      this.el.innerHTML = "";
-      this.el.contentEditable = false;
-      pre.id = "content";
-      pre.contentEditable = false;
-      pre.appendChild(content);
-      this.el.appendChild(pre);
-      return;
-    }
-    this.el.innerHTML = this.el.innerText;
-    this.el.contentEditable = true;
-    this.el.focus();
   }
 }
 

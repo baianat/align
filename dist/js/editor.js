@@ -4444,13 +4444,17 @@ var styler = function styler(editor, ref) {
   if ( ref === void 0 ) ref = {};
   var commands = ref.commands; if ( commands === void 0 ) commands = ['bold', 'italic', 'underline'];
 
-  this.el = editor;
+  this.editor = editor;
   this.options = {
     commands: commands
   };
   this.init();
 };
 
+/**
+ * Create button HTML element
+ * @param {String} name 
+ */
 styler.button = function button (name) {
   var button = document.createElement('button');
   button.classList.add('styler-button');
@@ -4459,6 +4463,11 @@ styler.button = function button (name) {
   return button;
 };
 
+/**
+ * Create select options HTML element
+ * @param {String} name 
+ * @param {Object} options 
+ */
 styler.select = function select (name, options) {
   var select = document.createElement('select');
   var defaultOption = document.createElement('option');
@@ -4475,6 +4484,11 @@ styler.select = function select (name, options) {
   return select;
 };
 
+/**
+ * Create input HTML element
+ * @param {String} name 
+ * @param {String} type 
+ */
 styler.input = function input (name, type) {
   var input = document.createElement('input');
   input.classList.add(("styler-" + name));
@@ -4483,14 +4497,16 @@ styler.input = function input (name, type) {
   return input;
 };
 
+/**
+ * Create the styler toolbar
+ */
 styler.prototype.init = function init () {
     var this$1 = this;
 
   this.container = document.createElement('ul');
   this.container.classList.add('styler');
   this.style = {};
-  this.HTML = false;
-  document.body.insertBefore(this.container, this.el);
+  document.body.insertBefore(this.container, this.editor.el);
 
   this.options.commands.forEach(function (el) {
     var li = document.createElement('li');
@@ -4500,40 +4516,53 @@ styler.prototype.init = function init () {
       return;
     }
 
-    if (current.element === 'button') {
-      this$1.style[el] = styler.button(el);
-      var callBack = current.command ? this$1.execute : this$1[current.func];
-      this$1.style[el].addEventListener('click', function () {
-        callBack.call(this$1, current.command, current.value);
-      });
-      li.appendChild(this$1.style[el]);
-    }
+    switch (current.element) {
+      case 'button':
+        this$1.style[el] = styler.button(el);
+        // some buttons doesn't have commands
+        // instead it use functions form editor
+        // here we detecte which callback should use
+        var callBack =
+          current.command ?
+          this$1.execute.bind(this$1) :
+          this$1.editor[current.func].bind(this$1.editor);
+          
+        this$1.style[el].addEventListener('click', function () {
+          callBack(current.command, current.value);
+        });
+        li.appendChild(this$1.style[el]);
+        break;
 
-    if (current.element === 'select') {
-      this$1.style[el] = styler.select(el, current.options);
-      this$1.style[el].addEventListener('change', function () {
-        var selection = this$1.style[el];
-        this$1.execute(current.command, selection[selection.selectedIndex].value);
-      });
-      li.appendChild(this$1.style[el]);
-    }
+      case 'select':
+        this$1.style[el] = styler.select(el, current.options);
+        this$1.style[el].addEventListener('change', function () {
+          var selection = this$1.style[el];
+          this$1.execute(current.command, selection[selection.selectedIndex].value);
+        });
+        li.appendChild(this$1.style[el]);
+        break;
+        
+      case 'input': 
+        this$1.style[el] = styler.input(el, current.type);
+        this$1.style[el].addEventListener('change', function () {
+          this$1.editor.el.focus();
+          this$1.execute(current.command, this$1.style[el].value);
+        });
+        li.appendChild(this$1.style[el]);
+        break;
+          
+      case 'styling': 
+        li.classList.add(current.class);
+        break;
 
-    if (current.element === 'input') {
-      this$1.style[el] = styler.input(el, current.type);
-      this$1.style[el].addEventListener('change', function () {
-        this$1.el.focus();
-        this$1.execute(current.command, this$1.style[el].value);
-      });
-      li.appendChild(this$1.style[el]);
-    }
+      case 'custom':
+        var markup = current.create();
+        li.appendChild(markup);
+        break;
 
-    if (current.element === 'styling') {
-      li.classList.add(current.class);
-    }
-
-    if (current.element === 'custom') {
-      var markup = current.create();
-      li.appendChild(markup);
+      default:
+        console.warn(el + ' is not found');
+        return; 
     }
 
     if (current.init) {
@@ -4544,13 +4573,21 @@ styler.prototype.init = function init () {
   });
 };
 
+/**
+ * Execute command for the selected button
+ * @param {String} cmd 
+ * @param {String|Number} value 
+ */
 styler.prototype.execute = function execute (cmd, value) {
-  if (this.HTML) { return; }
+  if (this.editor.HTML) { return; }
   document.execCommand(cmd, false, value);
-  this.el.focus();
+  this.editor.el.focus();
   this.updateStylerStates();
 };
 
+/**
+ * Update the state of the active style
+ */
 styler.prototype.updateStylerStates = function updateStylerStates () {
     var this$1 = this;
 
@@ -4561,25 +4598,6 @@ styler.prototype.updateStylerStates = function updateStylerStates () {
       this$1.style[styl].classList.remove('is-active');
     }
   });
-};
-
-styler.prototype.toggleHTML = function toggleHTML () {
-  this.HTML = !this.HTML;
-  if (this.HTML) {
-    var content = document.createTextNode(this.el.innerHTML);
-    var pre = document.createElement("pre");
-
-    this.el.innerHTML = "";
-    this.el.contentEditable = false;
-    pre.id = "content";
-    pre.contentEditable = false;
-    pre.appendChild(content);
-    this.el.appendChild(pre);
-    return;
-  }
-  this.el.innerHTML = this.el.innerText;
-  this.el.contentEditable = true;
-  this.el.focus();
 };
 
 highlight.registerLanguage('javascript', javascript);
@@ -4599,23 +4617,39 @@ var Editor = function Editor(selector, ref) {
 
 var prototypeAccessors = { content: {} };
 
+/**
+ * Get editor's content
+ */
 prototypeAccessors.content.get = function () {
   return document.createTextNode(this.el.innerHTML);
 };
 
+/**
+ * Create all editor elements
+ */
 Editor.prototype.init = function init () {
   this.HTML = false;
-  this.initStyler();
+  this.styler = new styler(this, this.options.styler);
   this.initEditor();
+  this.initEvents();
 };
 
+/**
+ * Create the editor
+ */
 Editor.prototype.initEditor = function initEditor () {
-    var this$1 = this;
-
   this.el.contentEditable = 'true';
   var text = document.createElement('p');
   text.innerText = this.options.defaultText + '\n';
   this.el.appendChild(text);
+};
+
+/**
+ * Add all events listeners
+ */
+Editor.prototype.initEvents = function initEvents () {
+    var this$1 = this;
+
   this.el.addEventListener('focus', function () {
     this$1.highlight();
   });
@@ -4623,18 +4657,20 @@ Editor.prototype.initEditor = function initEditor () {
   this.el.addEventListener('click', function () {
     this$1.styler.updateStylerStates();
   });
-    
+
   window.addEventListener("keydown", function (event) {
+    // Do nothing if the event was already processed
     if (event.defaultPrevented) {
-      return; // Do nothing if the event was already processed
+      return;
     }
 
     switch (event.key) {
-      case "Tab":
+      case 'Tab':
         this$1.execute('indent');
         break;
+
       default:
-        return; // Quit when this doesn't handle the key event.
+        return;
     }
 
     // Cancel the default action to avoid it being handled twice
@@ -4642,16 +4678,38 @@ Editor.prototype.initEditor = function initEditor () {
   }, true);
 };
 
-Editor.prototype.initStyler = function initStyler () {
-  this.styler = new styler(this.el, this.options.styler);
-};
-
+/**
+ * Hightlight code text
+ */
 Editor.prototype.highlight = function highlight$$1 () {
   var code = Array.from(this.el.querySelectorAll('pre'));
 
   code.forEach(function (block) {
     highlight.highlightBlock(block);
   });
+};
+
+/**
+ * Toggle on/off HTML represntation
+ */
+Editor.prototype.toggleHTML = function toggleHTML () {
+  console.log('d');
+  this.HTML = !this.HTML;
+  if (this.HTML) {
+    var content = document.createTextNode(this.el.innerHTML);
+    var pre = document.createElement("pre");
+
+    this.el.innerHTML = "";
+    this.el.contentEditable = false;
+    pre.id = "content";
+    pre.contentEditable = false;
+    pre.appendChild(content);
+    this.el.appendChild(pre);
+    return;
+  }
+  this.el.innerHTML = this.el.innerText;
+  this.el.contentEditable = true;
+  this.el.focus();
 };
 
 Object.defineProperties( Editor.prototype, prototypeAccessors );
