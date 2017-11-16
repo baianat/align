@@ -1017,6 +1017,8 @@ function select(element) {
 
 
 
+
+
 /**
  * Converts an array-like object to an array.
  */
@@ -4348,8 +4350,9 @@ var formats = {
   
   fontSize: {
     element: 'select',
-    command: 'fontsize',
+    command: 'fontSize',
     options: [
+      { value: '', text: 'Font size' },
       { value: 1, text: 1 },
       { value: 2, text: 2 },
       { value: 3, text: 3 },
@@ -4364,6 +4367,7 @@ var formats = {
     element: 'select',
     command: 'fontName',
     options: [
+      { value: 'Times', text: 'Font name' },
       { value: 'Raleway', text: 'Raleway' },
       { value: 'Roboto', text: 'Roboto' },
       { value: 'Poppins', text: 'Poppins' },
@@ -4470,11 +4474,8 @@ styler.button = function button (name) {
  */
 styler.select = function select (name, options) {
   var select = document.createElement('select');
-  var defaultOption = document.createElement('option');
   select.classList.add('styler-select');
   select.id = name;
-  select.appendChild(defaultOption);
-  defaultOption.innerText = name;
   options.forEach(function (option) {
     var optionElement = document.createElement('option');
     optionElement.value = option.value;
@@ -4506,7 +4507,7 @@ styler.prototype.init = function init () {
   this.container = document.createElement('ul');
   this.container.classList.add('styler');
   this.style = {};
-  this.init = {};
+  this.inits = {};
   document.body.insertBefore(this.container, this.editor.el);
 
   this.options.commands.forEach(function (el) {
@@ -4520,9 +4521,9 @@ styler.prototype.init = function init () {
     switch (current.element) {
       case 'button':
         this$1.style[el] = styler.button(el);
-        // some buttons doesn't have commands
-        // instead it use functions form editor
-        // here we detecte which callback should use
+        // some buttons don't have commands
+        // instead it use functions form editor class
+        // here we detecte which callback should be use
         var callBack =
           current.command ?
           this$1.execute.bind(this$1) :
@@ -4567,7 +4568,7 @@ styler.prototype.init = function init () {
     }
 
     if (current.init) {
-      this$1.init[el] = new current.init(this$1.style[el], current.initConfig);
+      this$1.inits[el] = new current.init(this$1.style[el], current.initConfig);
     }
 
     this$1.container.appendChild(li);
@@ -4606,7 +4607,7 @@ styler.prototype.updateStylerStates = function updateStylerStates () {
       return;
     }
     if (styl === 'color') {
-      this$1.init[styl].selectColor(document.queryCommandValue('foreColor'), true);
+      this$1.inits[styl].selectColor(document.queryCommandValue('foreColor'), true);
       return;
     }
     this$1.style[styl].classList.remove('is-active');
@@ -4706,7 +4707,6 @@ Editor.prototype.highlight = function highlight$$1 () {
  * Toggle on/off HTML represntation
  */
 Editor.prototype.toggleHTML = function toggleHTML () {
-  console.log('d');
   this.HTML = !this.HTML;
   if (this.HTML) {
     var content = document.createTextNode(this.el.innerHTML);

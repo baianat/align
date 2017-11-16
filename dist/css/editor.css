@@ -93,7 +93,6 @@
   margin: 70px 100px;
   overflow: auto;
   white-space: normal;
-  font-family: 'Poppins';
 }
 .editor:focus {
   outline: none;
@@ -165,13 +164,21 @@
           appearance: none;
   height: 30px;
   border-radius: 0;
-  padding: 2px 15px;
+  padding: 2px 5px;
+  margin: 0 7px;
   line-height: 26px;
   background: #fff;
   text-align: center;
   border-width: 0;
   border-color: #323c47;
   font-size: 14px;
+  border-bottom: 1px solid #000;
+}
+.styler-select:hover {
+  border-bottom-color: #4da1ff;
+}
+.styler-select:focus {
+  outline: none;
 }
 .styler.is-visiable {
   display: -webkit-flex;

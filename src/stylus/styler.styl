@@ -58,13 +58,19 @@
     appearance: none
     height: 30px
     border-radius: 0
-    padding: 2px 15px
+    padding: 2px 5px
+    margin: 0 7px
     line-height: 26px
     background: $white
     text-align: center
     border-width: 0
     border-color: $dark
     font-size: 14px
+    border-bottom: 1px solid $black
+    &:hover
+      border-bottom-color: $blue
+    &:focus
+      outline: none
 
   &.is-visiable
     display: flex

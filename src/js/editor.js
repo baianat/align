@@ -93,7 +93,6 @@ class Editor {
    * Toggle on/off HTML represntation
    */
   toggleHTML() {
-    console.log('d');
     this.HTML = !this.HTML;
     if (this.HTML) {
       const content = document.createTextNode(this.el.innerHTML);

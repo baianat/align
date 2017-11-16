@@ -35,11 +35,8 @@ class styler {
    */
   static select(name, options) {
     const select = document.createElement('select');
-    const defaultOption = document.createElement('option');
     select.classList.add('styler-select');
     select.id = name;
-    select.appendChild(defaultOption);
-    defaultOption.innerText = name;
     options.forEach((option) => {
       const optionElement = document.createElement('option');
       optionElement.value = option.value;
@@ -69,7 +66,7 @@ class styler {
     this.container = document.createElement('ul');
     this.container.classList.add('styler');
     this.style = {};
-    this.init = {};
+    this.inits = {};
     document.body.insertBefore(this.container, this.editor.el);
 
     this.options.commands.forEach((el) => {
@@ -83,9 +80,9 @@ class styler {
       switch (current.element) {
         case 'button':
           this.style[el] = styler.button(el);
-          // some buttons doesn't have commands
-          // instead it use functions form editor
-          // here we detecte which callback should use
+          // some buttons don't have commands
+          // instead it use functions form editor class
+          // here we detecte which callback should be use
           const callBack =
             current.command ?
             this.execute.bind(this) :
@@ -130,7 +127,7 @@ class styler {
       }
 
       if (current.init) {
-        this.init[el] = new current.init(this.style[el], current.initConfig);
+        this.inits[el] = new current.init(this.style[el], current.initConfig);
       }
 
       this.container.appendChild(li);
@@ -167,7 +164,7 @@ class styler {
         return;
       }
       if (styl === 'color') {
-        this.init[styl].selectColor(document.queryCommandValue('foreColor'), true);
+        this.inits[styl].selectColor(document.queryCommandValue('foreColor'), true);
         return;
       }
       this.style[styl].classList.remove('is-active');
