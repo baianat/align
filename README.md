@@ -64,13 +64,13 @@ list of all available commands
 |justifyCenter| Centers the selection or insertion point |
 |justifyRight | Right-justifies the selection or the insertion point |
 |justifyFull  | Justifies the selection or insertion point |
-|h1           | Adds an HTML h1 tag around the line containing the current selection
-|h2           | Adds an HTML h2 tag around the line containing the current selection
-|quote        | Adds an HTML blockquote tag around the line containing the current selection
-|paragraph    | Adds an HTML p tag around the line containing the current selection
-|script       | Adds an HTML block-style tag around the line containing the current selection and highlight it's script
-|addImage     | Upload image add inseart it
-|html         | Toggles HTML on/off for all text
+|h1           | Adds an HTML h1 tag around the line containing the current selection |
+|h2           | Adds an HTML h2 tag around the line containing the current selection |
+|blockquote   | Adds an HTML blockquote tag around the line containing the current selection |
+|p            | Adds an HTML p tag around the line containing the current selection |
+|pre          | Adds an HTML pre tag around the line containing the current selection and highlight it's script |
+|addImage     | Upload image add inseart it |
+|html         | Toggles HTML on/off for all text |
 |sperator     | Use for decorate to sperate commands |
 
 finally to get editor's content you can use `content` propertie
