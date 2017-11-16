@@ -1,5 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0" style="position:absolute">
 	
+		<symbol id="icon-blockquote" viewBox="0 0 24 24">
+			<path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"></path>
+		</symbol>
+	
 		<symbol id="icon-bold" viewBox="0 0 24 24">
 			<path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"></path>
 		</symbol>
@@ -48,20 +52,16 @@
 			<path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"></path>
 		</symbol>
 	
-		<symbol id="icon-paragraph" viewBox="0 0 24 24">
+		<symbol id="icon-p" viewBox="0 0 24 24">
 			<path d="M12.4 2.5c2.1 0 3.9.3 5.1 1.2 1.2.9 2 2.2 2 4.2 0 3.8-2.9 5.7-5.8 6-.5.1-1.1.1-1.4 0l-2.3-.6v4.5c0 2.5.3 2.7 3 2.9v.8H4.6v-.8c2.4-.2 2.6-.4 2.6-2.9V6.3c0-2.6-.3-2.7-2.5-2.9v-.9h7.7zM10 12.3c.4.1 1.2.4 2.1.4 1.9 0 4.2-1 4.2-4.7 0-3.2-2-4.5-4.4-4.5-.8 0-1.4.2-1.6.4-.2.1-.3.5-.3 1.3v7.1z"></path>
 		</symbol>
 	
-		<symbol id="icon-quote" viewBox="0 0 24 24">
-			<path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"></path>
+		<symbol id="icon-pre" viewBox="0 0 24 24">
+			<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path>
 		</symbol>
 	
 		<symbol id="icon-removeFormat" viewBox="0 0 24 24">
 			<path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zM14 5h-3l-1-1H6L5 5H2v2h12z"></path>
-		</symbol>
-	
-		<symbol id="icon-script" viewBox="0 0 24 24">
-			<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path>
 		</symbol>
 	
 		<symbol id="icon-strikeThrough" viewBox="0 0 24 24">

@@ -93,6 +93,7 @@
   margin: 70px 100px;
   overflow: auto;
   white-space: normal;
+  font-family: 'Poppins';
 }
 .editor:focus {
   outline: none;

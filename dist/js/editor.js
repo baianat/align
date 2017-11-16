@@ -4320,22 +4320,22 @@ var formats = {
   h2: {
     element: 'button',
     command: 'formatblock',
-    value: 'h1'
+    value: 'h2'
   },
 
-  quote: {
+  blockquote: {
     element: 'button',
     command: 'formatblock',
     value: 'blockquote'
   },
 
-  paragraph: {
+  p: {
     element: 'button',
     command: 'formatblock',
     value: 'p'
   },
 
-  script: {
+  pre: {
     element: 'button',
     command: 'formatblock',
     value: 'pre'
@@ -4592,11 +4592,20 @@ styler.prototype.updateStylerStates = function updateStylerStates () {
     var this$1 = this;
 
   Object.keys(this.style).forEach(function (styl) {
-    if (document.queryCommandState(String(styl))) {
+    var option = String(styl);
+    if (document.queryCommandState(option)) {
       this$1.style[styl].classList.add('is-active');
-    } else {
-      this$1.style[styl].classList.remove('is-active');
+      return;
     }
+    if (document.queryCommandValue('formatBlock') === option) {
+      this$1.style[styl].classList.add('is-active');
+      return;
+    }
+    if (document.queryCommandValue(option) && document.queryCommandValue(option) !== 'false') {
+      this$1.style[styl].value = document.queryCommandValue(option);
+      return;
+    }
+    this$1.style[styl].classList.remove('is-active');
   });
 };
 

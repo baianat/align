@@ -153,11 +153,20 @@ class styler {
    */
   updateStylerStates() {
     Object.keys(this.style).forEach((styl) => {
-      if (document.queryCommandState(String(styl))) {
+      const option = String(styl);
+      if (document.queryCommandState(option)) {
         this.style[styl].classList.add('is-active');
-      } else {
-        this.style[styl].classList.remove('is-active');
+        return;
       }
+      if (document.queryCommandValue('formatBlock') === option) {
+        this.style[styl].classList.add('is-active');
+        return;
+      }
+      if (document.queryCommandValue(option) && document.queryCommandValue(option) !== 'false') {
+        this.style[styl].value = document.queryCommandValue(option);
+        return;
+      }
+      this.style[styl].classList.remove('is-active');
     })
   }
 }

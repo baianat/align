@@ -57,22 +57,22 @@ const formats = {
   h2: {
     element: 'button',
     command: 'formatblock',
-    value: 'h1'
+    value: 'h2'
   },
 
-  quote: {
+  blockquote: {
     element: 'button',
     command: 'formatblock',
     value: 'blockquote'
   },
 
-  paragraph: {
+  p: {
     element: 'button',
     command: 'formatblock',
     value: 'p'
   },
 
-  script: {
+  pre: {
     element: 'button',
     command: 'formatblock',
     value: 'pre'
