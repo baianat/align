@@ -4506,6 +4506,7 @@ styler.prototype.init = function init () {
   this.container = document.createElement('ul');
   this.container.classList.add('styler');
   this.style = {};
+  this.init = {};
   document.body.insertBefore(this.container, this.editor.el);
 
   this.options.commands.forEach(function (el) {
@@ -4566,7 +4567,7 @@ styler.prototype.init = function init () {
     }
 
     if (current.init) {
-      new current.init(this$1.style[el], current.initConfig);
+      this$1.init[el] = new current.init(this$1.style[el], current.initConfig);
     }
 
     this$1.container.appendChild(li);
@@ -4592,17 +4593,20 @@ styler.prototype.updateStylerStates = function updateStylerStates () {
     var this$1 = this;
 
   Object.keys(this.style).forEach(function (styl) {
-    var option = String(styl);
-    if (document.queryCommandState(option)) {
+    if (document.queryCommandState(styl)) {
       this$1.style[styl].classList.add('is-active');
       return;
     }
-    if (document.queryCommandValue('formatBlock') === option) {
+    if (document.queryCommandValue('formatBlock') === styl) {
       this$1.style[styl].classList.add('is-active');
       return;
     }
-    if (document.queryCommandValue(option) && document.queryCommandValue(option) !== 'false') {
-      this$1.style[styl].value = document.queryCommandValue(option);
+    if (document.queryCommandValue(styl) && document.queryCommandValue(styl) !== 'false') {
+      this$1.style[styl].value = document.queryCommandValue(styl);
+      return;
+    }
+    if (styl === 'color') {
+      this$1.init[styl].selectColor(document.queryCommandValue('foreColor'), true);
       return;
     }
     this$1.style[styl].classList.remove('is-active');

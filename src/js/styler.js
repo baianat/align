@@ -69,6 +69,7 @@ class styler {
     this.container = document.createElement('ul');
     this.container.classList.add('styler');
     this.style = {};
+    this.init = {};
     document.body.insertBefore(this.container, this.editor.el);
 
     this.options.commands.forEach((el) => {
@@ -129,7 +130,7 @@ class styler {
       }
 
       if (current.init) {
-        new current.init(this.style[el], current.initConfig);
+        this.init[el] = new current.init(this.style[el], current.initConfig);
       }
 
       this.container.appendChild(li);
@@ -153,17 +154,20 @@ class styler {
    */
   updateStylerStates() {
     Object.keys(this.style).forEach((styl) => {
-      const option = String(styl);
-      if (document.queryCommandState(option)) {
+      if (document.queryCommandState(styl)) {
         this.style[styl].classList.add('is-active');
         return;
       }
-      if (document.queryCommandValue('formatBlock') === option) {
+      if (document.queryCommandValue('formatBlock') === styl) {
         this.style[styl].classList.add('is-active');
         return;
       }
-      if (document.queryCommandValue(option) && document.queryCommandValue(option) !== 'false') {
-        this.style[styl].value = document.queryCommandValue(option);
+      if (document.queryCommandValue(styl) && document.queryCommandValue(styl) !== 'false') {
+        this.style[styl].value = document.queryCommandValue(styl);
+        return;
+      }
+      if (styl === 'color') {
+        this.init[styl].selectColor(document.queryCommandValue('foreColor'), true);
         return;
       }
       this.style[styl].classList.remove('is-active');
