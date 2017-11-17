@@ -160,7 +160,7 @@ const formats = {
       input.classList.add('styler-input');
       input.type = 'file';
       input.id = 'addImage';
-      input.addEventListener('input', () => this.action());
+      input.addEventListener('change', this.action.bind(this));
 
       return button;
     },
@@ -173,8 +173,10 @@ const formats = {
 
       img.src = imageURL;
       img.classList.add('editor-image');
+      if (!window.getSelection().rangeCount) return;
       selectedPosition = window.getSelection().getRangeAt(0);
       selectedPosition.insertNode(img);
+      this.data.input.value = null;
     }
   }
 }

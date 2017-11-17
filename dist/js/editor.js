@@ -4413,8 +4413,6 @@ var formats = {
         "<svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-image\"></use>\n        </svg>"
     },
     create: function create() {
-      var this$1 = this;
-
       var button = this.data.button;
       var input = this.data.input;
       var icon = this.data.icon;
@@ -4425,7 +4423,7 @@ var formats = {
       input.classList.add('styler-input');
       input.type = 'file';
       input.id = 'addImage';
-      input.addEventListener('input', function () { return this$1.action(); });
+      input.addEventListener('change', this.action.bind(this));
 
       return button;
     },
@@ -4438,8 +4436,10 @@ var formats = {
 
       img.src = imageURL;
       img.classList.add('editor-image');
+      if (!window.getSelection().rangeCount) { return; }
       selectedPosition = window.getSelection().getRangeAt(0);
       selectedPosition.insertNode(img);
+      this.data.input.value = null;
     }
   }
 };
