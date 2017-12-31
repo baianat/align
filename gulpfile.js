@@ -107,27 +107,27 @@ gulp.task('default', ['styles', 'scripts', 'browser-sync', 'watch']);
  * Scripts task
  */
 gulp.task('scripts', () => {
-    gulp.src('./src/js/**/*.js')
-        .pipe(plumber())
-        .pipe(rollup({
-            rollup: require('rollup'),
-            entry: './src/js/editor.js',
-            format: 'umd',
-            moduleName: 'Editor',
-            allowRealFiles: true,
-            plugins: [
-                nodeResolve(),
-                commonjs(),
-                buble()
-            ]
-        }))
-        .pipe(rename({
-            basename: "editor",
-            suffix: "",
-            extname: ".js"
-        }))
-        .pipe(gulp.dest('./dist/js'))
-        .pipe(reload({ stream: true }));
+  gulp.src('./src/js/**/*.js')
+    .pipe(plumber())
+    .pipe(rollup({
+      rollup: require('rollup'),
+      entry: './src/js/editor.js',
+      format: 'umd',
+      moduleName: 'Editor',
+      allowRealFiles: true,
+      plugins: [
+        nodeResolve(),
+        commonjs(),
+        buble()
+      ]
+    }))
+    .pipe(rename({
+      basename: "editor",
+      suffix: "",
+      extname: ".js"
+    }))
+    .pipe(gulp.dest('./dist/js'))
+    .pipe(reload({ stream: true }));
 });
 
 /**
@@ -158,12 +158,12 @@ gulp.task('sprites', () => {
  * Watch task
  */
 gulp.task('watch', () => {
-    gulp.watch('./src/js/**/*.js', ['scripts']);
-    gulp.watch('./src/stylus/**/*.styl', ['styles']);
-    gulp.watch('./src/svg/**/*.svg', ['sprites']);
-    gulp.watch('./**/*.html', () => {
-        gulp.src('./**/*.html').pipe(reload({stream: true}));
-    });
+  gulp.watch('./src/js/**/*.js', ['scripts']);
+  gulp.watch('./src/stylus/**/*.styl', ['styles']);
+  gulp.watch('./src/svg/**/*.svg', ['sprites']);
+  gulp.watch('./**/*.html', () => {
+    gulp.src('./**/*.html').pipe(reload({ stream: true }));
+  });
 });
 
 /**

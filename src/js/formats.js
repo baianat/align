@@ -1,6 +1,6 @@
 import Colorpicker from '@baianat/colorpicker';
 
-let SELECTED = null;
+let SELECTION = null;
 
 const formats = {
   bold: {
@@ -110,7 +110,7 @@ const formats = {
     ]
   },
 
-  sperator: {
+  separator: {
     element: 'styling',
     class: 'styler-separator'
   },
@@ -125,15 +125,14 @@ const formats = {
       mode: 'hex',
       events: {
         beforeSubmit() {
-          if (!SELECTED) return;
+          if (!SELECTION) return;
           const selection = window.getSelection();
           selection.removeAllRanges();
-          selection.addRange(SELECTED);
-          SELECTED = window.getSelection().getRangeAt(0);
+          selection.addRange(SELECTION);
         },
         afterOpen() {
-          if (!window.getSelection().getRangeAt(0)) return;
-          SELECTED = window.getSelection().getRangeAt(0);
+          if (!window.getSelection().rangeCount) return;
+          SELECTION = window.getSelection().getRangeAt(0);
         }
       }
     }

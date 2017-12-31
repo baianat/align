@@ -4048,7 +4048,8 @@ Colorpicker.prototype._initElements = function _initElements () {
     recentColor.classList.add('picker-color');
     recentColor.style.backgroundColor = color;
     this$1.recent.appendChild(recentColor);
-    recentColor.addEventListener('click', function () { return this$1.selectColor(color); });
+    recentColor.addEventListener('mousedown', function (event) { return event.preventDefault(); });
+    recentColor.addEventListener('click', function (event) { return this$1.selectColor(color); });
   });
 };
 
@@ -4084,7 +4085,7 @@ Colorpicker.prototype._initEvents = function _initEvents () {
 
   this.guide.addEventListener('click', function () {
     call(this$1.options.events.beforerOpen);
-    this$1.togglePikcer();
+    this$1.togglePicker();
   });
 
   this.menu.addEventListener('mousedown', function (event) {
@@ -4252,7 +4253,7 @@ Colorpicker.prototype.selectColor = function selectColor (color, mute, mouse) {
     if ( mute === void 0 ) { mute = false; }
 
   if (color.slice(0, 1) !== '#' &&
-      color.slice(0, 3).toUpperCase() !== 'RGB'&&
+      color.slice(0, 3).toUpperCase() !== 'RGB' &&
       color.slice(0, 3).toUpperCase() !== 'HSL') { return; }
   call(this.options.events.beforeSelect);
   var hexColor = color.slice(0, 1) === '#' ? color : rgb2hex(color);
@@ -4294,7 +4295,7 @@ Colorpicker.prototype.getMouseCords = function getMouseCords (evnt) {
   return mouse;
 };
 
-Colorpicker.prototype.togglePikcer = function togglePikcer () {
+Colorpicker.prototype.togglePicker = function togglePicker () {
   if (this.isMenuActive) {
     this.closePicker();
     return;
@@ -4328,7 +4329,7 @@ return Colorpicker;
 })));
 });
 
-var SELECTED = null;
+var SELECTION = null;
 
 var formats = {
   bold: {
@@ -4438,7 +4439,7 @@ var formats = {
     ]
   },
 
-  sperator: {
+  separator: {
     element: 'styling',
     class: 'styler-separator'
   },
@@ -4453,15 +4454,14 @@ var formats = {
       mode: 'hex',
       events: {
         beforeSubmit: function beforeSubmit() {
-          if (!SELECTED) { return; }
+          if (!SELECTION) { return; }
           var selection = window.getSelection();
           selection.removeAllRanges();
-          selection.addRange(SELECTED);
-          SELECTED = window.getSelection().getRangeAt(0);
+          selection.addRange(SELECTION);
         },
         afterOpen: function afterOpen() {
-          if (!window.getSelection().getRangeAt(0)) { return; }
-          SELECTED = window.getSelection().getRangeAt(0);
+          if (!window.getSelection().rangeCount) { return; }
+          SELECTION = window.getSelection().getRangeAt(0);
         }
       }
     }
@@ -4705,7 +4705,7 @@ styler.prototype.updateStylerCommands = function updateStylerCommands () {
       this$1.style[styl].value = document.queryCommandValue(styl);
       return;
     }
-    if (styl === 'color') {
+    if (styl === 'color' && !this$1.inits[styl].isMenuActive) {
       this$1.inits[styl].selectColor(document.queryCommandValue('foreColor'), true);
       return;
     }
@@ -4772,7 +4772,7 @@ Editor.prototype.initEvents = function initEvents () {
     this$1.highlight();
   });
 
-  this.text.addEventListener('mouseup', function () {
+  this.text.addEventListener('mousedown', function (event) {
     this$1.styler.updateStylerStates();
   });
 

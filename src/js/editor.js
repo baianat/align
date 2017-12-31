@@ -59,7 +59,7 @@ class Editor {
       this.highlight();
     });
 
-    this.text.addEventListener('mouseup', () => {
+    this.text.addEventListener('mousedown', (event) => {
       this.styler.updateStylerStates();
     });
 

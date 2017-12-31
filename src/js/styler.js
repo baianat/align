@@ -200,7 +200,7 @@ class styler {
         this.style[styl].value = document.queryCommandValue(styl);
         return;
       }
-      if (styl === 'color') {
+      if (styl === 'color' && !this.inits[styl].isMenuActive) {
         this.inits[styl].selectColor(document.queryCommandValue('foreColor'), true);
         return;
       }
