@@ -1,12 +1,15 @@
+import Popper from 'popper.js';
 import formats from './formats';
 
 class styler {
 
   constructor(editor, {
+    mode = 'default',
     commands = ['bold', 'italic', 'underline']
   } = {}) {
     this.editor = editor;
-    this.options = {
+    this.settings = {
+      mode,
       commands
     };
     this.init();
@@ -63,13 +66,13 @@ class styler {
    * Create the styler toolbar
    */
   init() {
-    this.container = document.createElement('ul');
-    this.container.classList.add('styler');
+    this.styler = document.createElement('ul');
+    this.styler.classList.add('styler', `is-${this.settings.mode}`);
     this.style = {};
     this.inits = {};
-    document.body.insertBefore(this.container, this.editor.el);
+    this.editor.el.appendChild(this.styler);
 
-    this.options.commands.forEach((el) => {
+    this.settings.commands.forEach((el) => {
       const li = document.createElement('li');
       const current = formats[el];
       if (!current) {
@@ -82,7 +85,7 @@ class styler {
           this.style[el] = styler.button(el);
           // some buttons don't have commands
           // instead it use functions form editor class
-          // here we detecte which callback should be use
+          // here we detect which callback should be use
           const callBack =
             current.command ?
             this.execute.bind(this) :
@@ -130,10 +133,19 @@ class styler {
         this.inits[el] = new current.init(this.style[el], current.initConfig);
       }
 
-      this.container.appendChild(li);
+      this.styler.appendChild(li);
     })
+
+    if (this.settings.mode === 'bubble') this.initBubble();
   }
 
+  initBubble() {
+    this.styler.classList.add('is-hidden');
+    this.reference = document.createElement('sapn');
+    this.popper = new Popper(this.reference, this.styler, {
+      placement: 'top'
+    });
+  }
   /**
    * Execute command for the selected button
    * @param {String} cmd 
@@ -146,10 +158,35 @@ class styler {
     this.updateStylerStates();
   }
 
+  showStyler() {
+    this.styler.classList.add('is-visible');
+    this.styler.classList.remove('is-hidden');
+    this.selection.insertNode(this.reference);
+    this.popper.update();
+  }
+
+  hideStyler() {
+    this.styler.classList.remove('is-visible');
+    this.styler.classList.add('is-hidden');
+  }
+
+  updateStylerStates() {
+    this.updateStylerCommands();
+    if (this.settings.mode !== 'bubble') return;
+
+    this.selection = window.getSelection().getRangeAt(0); 
+    console.log(this.selection)
+    if (this.selection.collapsed) {
+      this.hideStyler();
+      return;
+    }
+    this.showStyler();
+  };
+
   /**
    * Update the state of the active style
    */
-  updateStylerStates() {
+  updateStylerCommands() {
     Object.keys(this.style).forEach((styl) => {
       if (document.queryCommandState(styl)) {
         this.style[styl].classList.add('is-active');

@@ -1023,14 +1023,9 @@ function select(element) {
  * Converts an array-like object to an array.
  */
 
-var picker = createCommonjsModule(function (module, exports) {
-(function (global, factory) {
-	module.exports = factory();
-}(commonjsGlobal, (function () { 'use strict';
-
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.12.7
+ * @version 1.12.9
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -1052,7 +1047,7 @@ var picker = createCommonjsModule(function (module, exports) {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-var isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
 var longerTimeoutBrowsers = ['Edge', 'Trident', 'Firefox'];
 var timeoutDuration = 0;
 for (var i = 0; i < longerTimeoutBrowsers.length; i += 1) {
@@ -1069,7 +1064,7 @@ function microtaskDebounce(fn) {
       return;
     }
     called = true;
-    Promise.resolve().then(function () {
+    window.Promise.resolve().then(function () {
       called = false;
       fn();
     });
@@ -1100,7 +1095,7 @@ var supportsMicroTasks = isBrowser && window.Promise;
 * @argument {Function} fn
 * @returns {Function}
 */
-var debounce = supportsMicroTasks ? microtaskDebounce : taskDebounce;
+var debounce$1 = supportsMicroTasks ? microtaskDebounce : taskDebounce;
 
 /**
  * Check if the given variable is a function
@@ -1126,7 +1121,7 @@ function getStyleComputedProperty(element, property) {
     return [];
   }
   // NOTE: 1 DOM access here
-  var css = window.getComputedStyle(element, null);
+  var css = getComputedStyle(element, null);
   return property ? css[property] : css;
 }
 
@@ -1154,7 +1149,7 @@ function getParentNode(element) {
 function getScrollParent(element) {
   // Return body, `getScroll` will take care to get the correct `scrollTop` from it
   if (!element) {
-    return window.document.body;
+    return document.body;
   }
 
   switch (element.nodeName) {
@@ -1196,7 +1191,7 @@ function getOffsetParent(element) {
       return element.ownerDocument.documentElement;
     }
 
-    return window.document.documentElement;
+    return document.documentElement;
   }
 
   // .offsetParent will return the closest TD or TABLE in case
@@ -1243,7 +1238,7 @@ function getRoot(node) {
 function findCommonOffsetParent(element1, element2) {
   // This check is needed to avoid errors in case one of the elements isn't defined for any reason
   if (!element1 || !element1.nodeType || !element2 || !element2.nodeType) {
-    return window.document.documentElement;
+    return document.documentElement;
   }
 
   // Here we make sure to give as "start" the element that comes first in the DOM
@@ -1335,7 +1330,7 @@ function getBordersSize(styles, axis) {
   var sideA = axis === 'x' ? 'Left' : 'Top';
   var sideB = sideA === 'Left' ? 'Right' : 'Bottom';
 
-  return +styles['border' + sideA + 'Width'].split('px')[0] + +styles['border' + sideB + 'Width'].split('px')[0];
+  return parseFloat(styles['border' + sideA + 'Width'], 10) + parseFloat(styles['border' + sideB + 'Width'], 10);
 }
 
 /**
@@ -1358,9 +1353,9 @@ function getSize(axis, body, html, computedStyle) {
 }
 
 function getWindowSizes() {
-  var body = window.document.body;
-  var html = window.document.documentElement;
-  var computedStyle = isIE10$1() && window.getComputedStyle(html);
+  var body = document.body;
+  var html = document.documentElement;
+  var computedStyle = isIE10$1() && getComputedStyle(html);
 
   return {
     height: getSize('Height', body, html, computedStyle),
@@ -1505,8 +1500,8 @@ function getOffsetRectRelativeToArbitraryNode(children, parent) {
   var scrollParent = getScrollParent(children);
 
   var styles = getStyleComputedProperty(parent);
-  var borderTopWidth = +styles.borderTopWidth.split('px')[0];
-  var borderLeftWidth = +styles.borderLeftWidth.split('px')[0];
+  var borderTopWidth = parseFloat(styles.borderTopWidth, 10);
+  var borderLeftWidth = parseFloat(styles.borderLeftWidth, 10);
 
   var offsets = getClientRect({
     top: childrenRect.top - parentRect.top - borderTopWidth,
@@ -1522,8 +1517,8 @@ function getOffsetRectRelativeToArbitraryNode(children, parent) {
   // differently when margins are applied to it. The margins are included in
   // the box of the documentElement, in the other cases not.
   if (!isIE10 && isHTML) {
-    var marginTop = +styles.marginTop.split('px')[0];
-    var marginLeft = +styles.marginLeft.split('px')[0];
+    var marginTop = parseFloat(styles.marginTop, 10);
+    var marginLeft = parseFloat(styles.marginLeft, 10);
 
     offsets.top -= borderTopWidth - marginTop;
     offsets.bottom -= borderTopWidth - marginTop;
@@ -1728,7 +1723,7 @@ function getReferenceOffsets(state, popper, reference) {
  * @returns {Object} object containing width and height properties
  */
 function getOuterSizes(element) {
-  var styles = window.getComputedStyle(element);
+  var styles = getComputedStyle(element);
   var x = parseFloat(styles.marginTop) + parseFloat(styles.marginBottom);
   var y = parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
   var result = {
@@ -1945,7 +1940,7 @@ function getSupportedPropertyName(property) {
   for (var i = 0; i < prefixes.length - 1; i++) {
     var prefix = prefixes[i];
     var toCheck = prefix ? '' + prefix + upperProp : property;
-    if (typeof window.document.body.style[toCheck] !== 'undefined') {
+    if (typeof document.body.style[toCheck] !== 'undefined') {
       return toCheck;
     }
   }
@@ -2064,7 +2059,7 @@ function removeEventListeners(reference, state) {
  */
 function disableEventListeners() {
   if (this.state.eventsEnabled) {
-    window.cancelAnimationFrame(this.scheduleUpdate);
+    cancelAnimationFrame(this.scheduleUpdate);
     this.state = removeEventListeners(this.reference, this.state);
   }
 }
@@ -2304,6 +2299,8 @@ function isModifierRequired(modifiers, requestingName, requestedName) {
  * @returns {Object} The data object, properly modified
  */
 function arrow(data, options) {
+  var _data$offsets$arrow;
+
   // arrow depends on keepTogether in order to work
   if (!isModifierRequired(data.instance.modifiers, 'arrow', 'keepTogether')) {
     return data;
@@ -2355,22 +2352,23 @@ function arrow(data, options) {
   if (reference[side] + arrowElementSize > popper[opSide]) {
     data.offsets.popper[side] += reference[side] + arrowElementSize - popper[opSide];
   }
+  data.offsets.popper = getClientRect(data.offsets.popper);
 
   // compute center of the popper
   var center = reference[side] + reference[len] / 2 - arrowElementSize / 2;
 
   // Compute the sideValue using the updated popper offsets
   // take popper margin in account because we don't have this info available
-  var popperMarginSide = getStyleComputedProperty(data.instance.popper, 'margin' + sideCapitalized).replace('px', '');
-  var sideValue = center - getClientRect(data.offsets.popper)[side] - popperMarginSide;
+  var css = getStyleComputedProperty(data.instance.popper);
+  var popperMarginSide = parseFloat(css['margin' + sideCapitalized], 10);
+  var popperBorderSide = parseFloat(css['border' + sideCapitalized + 'Width'], 10);
+  var sideValue = center - data.offsets.popper[side] - popperMarginSide - popperBorderSide;
 
   // prevent arrowElement from being placed not contiguously to its popper
   sideValue = Math.max(Math.min(popper[len] - arrowElementSize, sideValue), 0);
 
   data.arrowElement = arrowElement;
-  data.offsets.arrow = {};
-  data.offsets.arrow[side] = Math.round(sideValue);
-  data.offsets.arrow[altSide] = ''; // make sure to unset any eventual altSide value from the DOM node
+  data.offsets.arrow = (_data$offsets$arrow = {}, defineProperty(_data$offsets$arrow, side, Math.round(sideValue)), defineProperty(_data$offsets$arrow, altSide, ''), _data$offsets$arrow);
 
   return data;
 }
@@ -3329,7 +3327,7 @@ var Popper = function () {
     };
 
     // make update() debounced, so that it only runs at most once-per-tick
-    this.update = debounce(this.update.bind(this));
+    this.update = debounce$1(this.update.bind(this));
 
     // with {} we create a new object with the options inside it
     this.options = _extends({}, Popper.Defaults, options);
@@ -3458,9 +3456,14 @@ var Popper = function () {
  */
 
 
-Popper.Utils = (typeof window !== 'undefined' ? window : commonjsGlobal).PopperUtils;
+Popper.Utils = (typeof window !== 'undefined' ? window : global).PopperUtils;
 Popper.placements = placements;
 Popper.Defaults = Defaults;
+
+var colorpicker = createCommonjsModule(function (module, exports) {
+(function (global, factory) {
+	module.exports = factory();
+}(commonjsGlobal, (function () { 'use strict';
 
 var commonjsGlobal$$1 = typeof window !== 'undefined' ? window : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
 
@@ -3489,15 +3492,23 @@ function select(element) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function getNumber(number1, number2) {
   return number1 ? parseInt(number1, 10) : parseInt(number2, 10);
 }
-
-
-
-
-
-
 
 
 
@@ -3524,6 +3535,7 @@ var Slider = function Slider(selector, ref) {
   var classes = ref.classes; if ( classes === void 0 ) { classes = null; }
   var colorCode = ref.colorCode; if ( colorCode === void 0 ) { colorCode = false; }
   var editable = ref.editable; if ( editable === void 0 ) { editable = false; }
+  var reverse = ref.reverse; if ( reverse === void 0 ) { reverse = false; }
   var label = ref.label; if ( label === void 0 ) { label = true; }
   var min = ref.min; if ( min === void 0 ) { min = 0; }
   var max = ref.max; if ( max === void 0 ) { max = 10; }
@@ -3536,6 +3548,7 @@ var Slider = function Slider(selector, ref) {
     classes: classes,
     colorCode: colorCode,
     editable: editable,
+    reverse: reverse,
     label: label,
     min: min,
     max: max,
@@ -3551,7 +3564,7 @@ var Slider = function Slider(selector, ref) {
  * @param {Object}           settings
  */
 Slider.create = function create (selector, settings) {
-  new Slider(selector, settings);
+  Slider(selector, settings);
 };
 
 Slider.prototype.init = function init () {
@@ -3574,10 +3587,13 @@ Slider.prototype.initElements = function initElements () {
   this.track = document.createElement('div');
   this.handle = document.createElement('div');
   this.fill = document.createElement('div');
-    
+
   this.wrapper.classList.add('slider');
   if (this.settings.editable) {
     this.wrapper.classList.add('is-editable');
+  }
+  if (this.settings.reverse) {
+    this.wrapper.classList.add('is-reverse');
   }
   if (this.settings.classes) {
     this.wrapper.classList.add(this.settings.classes);
@@ -3585,7 +3601,8 @@ Slider.prototype.initElements = function initElements () {
   this.track.classList.add('slider-track');
   this.handle.classList.add('slider-handle');
   this.fill.classList.add('slider-fill');
-    
+  this.el.classList.add('input', 'is-tiny');
+
   wrap(this.el, this.wrapper);
   this.track.appendChild(this.fill);
   this.track.appendChild(this.handle);
@@ -3748,12 +3765,12 @@ Slider.prototype.update = function update (value, mute) {
 
   if (Number(value) === this.value) { return; }
   var normalized = this.normalizeValue(value);
-    
+
   var fillPercentage = this.getFillPercentage(normalized);
-    
+
   this.handle.style.left = fillPercentage + "%";
   this.fill.style.left = fillPercentage + "%";
-  
+
   this.value = normalized;
   this.el.value = this.value;
   if (this.settings.label) {
@@ -3827,11 +3844,19 @@ function select(element) {
 
 
 
+
+
 function call(func) {
   if (typeof func === 'function') {
     func();
   }
 }
+
+
+
+
+
+
 
 
 
@@ -3843,6 +3868,8 @@ function getArray(length, value) {
   }
   return array;
 }
+
+
 
 
 
@@ -3944,7 +3971,7 @@ function getCartesianCoords(r, θ) {
   return { x: r * Math.cos(θ * Math.PI * 2), y: r * Math.sin(θ * Math.PI * 2) }
 }
 
-var Picker = function Picker(selector, ref) {
+var Colorpicker = function Colorpicker(selector, ref) {
   if ( ref === void 0 ) { ref = {}; }
   var defaultColor = ref.defaultColor; if ( defaultColor === void 0 ) { defaultColor = getRandomColor(); }
   var radius = ref.radius; if ( radius === void 0 ) { radius = 200; }
@@ -3963,28 +3990,30 @@ var Picker = function Picker(selector, ref) {
   this.init();
 };
 
-Picker.prototype.init = function init () {
+Colorpicker.prototype.init = function init () {
   this.recentColors = this.options.recentColors;
+  this.lastMove = { x: 0, y: 0 };
+  this.isMenuActive = false;
   polyfill();
-  this.initElements();
-  this.initWheel();
-  this.initEvents();
-  this.updateWheelColors();
-  this.popper = new Popper(this.guide, this.wrapper, { placement: 'bottom-center' });
+  this._initElements();
+  this._initWheel();
+  this._initEvents();
   this.selectColor(this.options.defaultColor, true);
 };
-  
-Picker.prototype.initElements = function initElements () {
+
+Colorpicker.prototype._initElements = function _initElements () {
     var this$1 = this;
 
   // create elements and config them
   this.picker = document.createElement('div');
-  this.picker.insertAdjacentHTML('afterbegin', "\n      <button class=\"picker-guide\"></button>\n      <div class=\"picker-wrapper is-hidden\" tabindex=\"-1\">\n        <div class=\"picker-circle\">\n          <canvas class=\"picker-wheel\"></canvas>\n          <input class=\"picker-saturation\" type=\"number\" min=\"0\" max=\"100\" value=\"100\">\n          <div class=\"picker-cursor\"></div>\n        </div>\n        <div class=\"picker-controller\">\n          <input id=\"red\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <input id=\"green\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <input id=\"blue\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <button class=\"picker-submit\">\n            <svg class=\"icon\" viewBox=\"0 0 24 24\">\n              <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n            </svg>\n          </button>\n          <div class=\"picker-recent\"></div>\n        </div>\n      </div>\n    ");
-    
-  this.wrapper = this.picker.querySelector('.picker-wrapper');
+  this.picker.insertAdjacentHTML('afterbegin', "\n      <button class=\"picker-guide\"></button>\n      <div class=\"modal is-inverse picker-menu is-hidden\" tabindex=\"-1\">\n        <div class=\"modal-body\">\n          <div class=\"picker-wheel\">\n            <canvas class=\"picker-canvas\"></canvas>\n            <div class=\"picker-cursor\"></div>\n          </div>\n          <input class=\"picker-saturation\" type=\"number\" min=\"0\" max=\"100\" value=\"100\">\n\n          <input id=\"red\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <input id=\"green\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <input id=\"blue\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <div class=\"form has-itemAfter is-tiny\">\n            <button class=\"button picker-submit\">\n              <svg class=\"icon\" viewBox=\"0 0 24 24\">\n                <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n              </svg>\n            </button>\n          </div>\n          <div class=\"picker-recent\"></div>\n        </div>\n      </div>\n    ");
+
+  this.menu = this.picker.querySelector('.picker-menu');
+  this.body = this.picker.querySelector('.modal-body');
   this.recent = this.picker.querySelector('.picker-recent');
   this.guide = this.picker.querySelector('.picker-guide');
-  this.canvas = this.picker.querySelector('.picker-wheel');
+  this.canvas = this.picker.querySelector('.picker-canvas');
+  this.wheel = this.picker.querySelector('.picker-wheel');
   this.submit = this.picker.querySelector('.picker-submit');
   this.cursor = this.picker.querySelector('.picker-cursor');
   this.saturation = this.picker.querySelector('.picker-saturation');
@@ -3993,13 +4022,13 @@ Picker.prototype.initElements = function initElements () {
     green: this.picker.querySelector('#green'),
     blue: this.picker.querySelector('#blue')
   };
-    
+
   this.el.parentNode.insertBefore(this.picker, this.el);
-  this.el.classList.add('picker-value');
+  this.el.classList.add('picker-value', 'input');
   this.picker.classList.add('picker');
   this.submit.parentNode.insertBefore(this.el, this.submit);
   this.guide.style.backgroundColor = this.options.defaultColor;
-    
+
   this.sliders = {};
   this.sliders.saturation = new slider$1(this.saturation, {
     gradient: ['#FFFFFF', '#000000'],
@@ -4009,7 +4038,8 @@ Picker.prototype.initElements = function initElements () {
     this$1.sliders[key] = new slider$1(this$1.rgbSliders[key], {
       gradient: ['#000000', '#FFFFFF'],
       label: false,
-      editable: true
+      editable: true,
+      reverse: true
     });
   });
 
@@ -4022,13 +4052,11 @@ Picker.prototype.initElements = function initElements () {
   });
 };
 
-Picker.prototype.initWheel = function initWheel () {
+Colorpicker.prototype._initWheel = function _initWheel () {
   // setup canvas
   this.canvas.width = this.options.radius;
   this.canvas.height = this.options.radius;
   this.context = this.canvas.getContext('2d');
-  this.cursor.style.top = ((this.options.radius / 2) + 15) + "px";
-  this.cursor.style.left = ((this.options.radius / 2) + 15) + "px";
 
   // draw wheel circle path
   this.circle = {
@@ -4046,39 +4074,64 @@ Picker.prototype.initWheel = function initWheel () {
     360
   );
   this.circle.path.closePath();
+  this.updateWheelColors();
 };
 
-Picker.prototype.initEvents = function initEvents () {
+Colorpicker.prototype._initEvents = function _initEvents () {
     var this$1 = this;
 
   this.events = [new Event('input'), new Event('change')];
-    
+
   this.guide.addEventListener('click', function () {
     call(this$1.options.events.beforerOpen);
-    this$1.openPiker();
+    this$1.togglePikcer();
   });
 
-  this.canvas.addEventListener('mousedown', function (event) {
+  this.menu.addEventListener('mousedown', function (event) {
+    if (event.target !== this$1.body || event.button !== 0) { return; }
+    var startPosition = {};
+    var endPosition = {};
+    var delta = {};
+
+    event.preventDefault();
+    startPosition.x = event.clientX;
+    startPosition.y = event.clientY;
+
+    var mousemoveHandler = function (evnt) {
+      endPosition.x = evnt.clientX;
+      endPosition.y = evnt.clientY;
+      delta.x = this$1.lastMove.x + endPosition.x - startPosition.x;
+      delta.y = this$1.lastMove.y + endPosition.y - startPosition.y;
+      this$1.menu.style.transform = "translate(" + (delta.x) + "px, " + (delta.y) + "px)";
+    };
+    var mouseupHandler = function () {
+      this$1.lastMove = delta;
+      document.removeEventListener('mousemove', mousemoveHandler);
+      document.removeEventListener('mouseup', mouseupHandler);
+    };
+    document.addEventListener('mousemove', mousemoveHandler);
+    document.addEventListener('mouseup', mouseupHandler);
+  });
+
+  this.wheel.addEventListener('mousedown', function (event) {
     event.preventDefault();
     var updateColor = function (evnt) {
       // check if mouse outside the wheel
       var mouse = this$1.getMouseCords(evnt);
       if (this$1.context.isPointInPath(this$1.circle.path, mouse.x, mouse.y)) {
         var color = this$1.getColorFromWheel(mouse);
-        this$1.selectColor(color, false);
-          
+        this$1.selectColor(color, false, mouse);
+
         return color;
       }
       return this$1.el.value;
     };
-      
     var mouseupHandler = function (evnt) {
       var color = updateColor(evnt);
       if (color !== this$1.el.value) {
         this$1.updateRecentColors(color);
-        this$1.selectColor(color);
+        this$1.selectColor(color, false, this$1.mouse);
       }
-
       document.removeEventListener('mousemove', updateColor);
       document.removeEventListener('mouseup', mouseupHandler);
     };
@@ -4098,7 +4151,6 @@ Picker.prototype.initEvents = function initEvents () {
   });
 
   this.el.addEventListener('focus', function (event) {
-    event.preventDefault();
     var edit = function () {
       this$1.selectColor(this$1.el.value, true);
     };
@@ -4111,7 +4163,6 @@ Picker.prototype.initEvents = function initEvents () {
   });
 
   this.submit.addEventListener('click', function (event) {
-    event.preventDefault();
     call(this$1.options.events.beforeSubmit);
     this$1.selectColor(this$1.el.value);
     this$1.closePicker();
@@ -4119,18 +4170,18 @@ Picker.prototype.initEvents = function initEvents () {
   });
 };
 
-Picker.prototype.updateWheelColors = function updateWheelColors () {
+Colorpicker.prototype.updateWheelColors = function updateWheelColors () {
     var this$1 = this;
 
   var x = this.circle.xCords;
   var y = this.circle.yCords;
-  var radius = this.circle.radius - 1;
+  var radius = this.circle.radius;
   this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
   for (var angle = 0; angle < 360; angle += 1) {
     var gradient = this$1.context.createRadialGradient(x, y, 0, x, y, radius);
-    var startAngle = (angle - 1) * Math.PI / 180;
-    var endAngle = (angle + 1) * Math.PI / 180;
+    var startAngle = (angle - 2) * Math.PI / 180;
+    var endAngle = (angle + 2) * Math.PI / 180;
 
     this$1.context.beginPath();
     this$1.context.moveTo(x, y);
@@ -4144,7 +4195,7 @@ Picker.prototype.updateWheelColors = function updateWheelColors () {
   }
 };
 
-Picker.prototype.updateRecentColors = function updateRecentColors (newColor) {
+Colorpicker.prototype.updateRecentColors = function updateRecentColors (newColor) {
     var this$1 = this;
 
   // update recent color array
@@ -4169,7 +4220,7 @@ Picker.prototype.updateRecentColors = function updateRecentColors (newColor) {
   });
 };
 
-Picker.prototype.updateslidersInputs = function updateslidersInputs (slider) {
+Colorpicker.prototype.updateSlidersInputs = function updateSlidersInputs (slider) {
   var red = getHexValue(this.rgbSliders.red.value);
   var green = getHexValue(this.rgbSliders.green.value);
   var blue = getHexValue(this.rgbSliders.blue.value);
@@ -4178,20 +4229,25 @@ Picker.prototype.updateslidersInputs = function updateslidersInputs (slider) {
   this.sliders.blue.newGradient([("#" + red + green + "00"), ("#" + red + green + "ff")]);
 };
 
-Picker.prototype.updateCursor = function updateCursor () {
+Colorpicker.prototype.updateCursor = function updateCursor (mouse) {
   var rgbColor = this.getColorFromSliders();
   var hexColor = rgb2hex(rgbColor);
   var hslColor = rgb2hsl(rgbColor);
   var hsl = hslColor.match(/^hsl?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)\%[\s+]?,[\s+]?(\d+)\%[\s+]?/i);
-  this.sliders.saturation.update(hsl[2]);
-  this.sliders.saturation.newGradient(['#FFFFFF', hexColor]);
   var r = (100 - hsl[3]) * (this.options.radius / 200);
   var coords = getCartesianCoords(r, hsl[1] / 360);
-  this.cursor.style.transform = "translate(" + (coords.x) + "px, " + (coords.y) + "px)";
+  var ratio = this.options.radius / 2;
+  this.sliders.saturation.update(hsl[2]);
+  this.sliders.saturation.newGradient(['#FFFFFF', hexColor]);
   this.cursor.style.backgroundColor = hslColor;
+  if (mouse) {
+    this.cursor.style.transform = "translate(" + (mouse.x) + "px, " + (mouse.y) + "px)";
+    return;
+  }
+  this.cursor.style.transform = "translate(" + (coords.x + ratio) + "px, " + (coords.y + ratio) + "px)";
 };
 
-Picker.prototype.selectColor = function selectColor (color, mute) {
+Colorpicker.prototype.selectColor = function selectColor (color, mute, mouse) {
     var this$1 = this;
     if ( mute === void 0 ) { mute = false; }
 
@@ -4202,33 +4258,33 @@ Picker.prototype.selectColor = function selectColor (color, mute) {
   var hexColor = color.slice(0, 1) === '#' ? color : rgb2hex(color);
   var hslColor = rgb2hsl(color);
   this.el.value =
-    this.options.mode === 'hex' ? hexColor :
-    this.options.mode === 'hsl' ? hslColor :
-    color;
+    this.options.mode === 'hex' ? hexColor
+      : this.options.mode === 'hsl' ? hslColor
+        : color;
   this.guide.style.backgroundColor = color;
   this.sliders.red.update(getDecimalValue(hexColor.slice(1, 3)), true);
   this.sliders.green.update(getDecimalValue(hexColor.slice(3, 5)), true);
   this.sliders.blue.update(getDecimalValue(hexColor.slice(5, 7)), true);
-  this.updateslidersInputs();
-  this.updateCursor();
+  this.updateSlidersInputs();
+  this.updateCursor(mouse);
   call(this.options.events.afterSelect);
   if (mute) { return; }
   this.events.forEach(function (event) { return this$1.el.dispatchEvent(event); });
 };
 
-Picker.prototype.getColorFromSliders = function getColorFromSliders () {
+Colorpicker.prototype.getColorFromSliders = function getColorFromSliders () {
   var red = this.rgbSliders.red.value;
   var green = this.rgbSliders.green.value;
   var blue = this.rgbSliders.blue.value;
   return ("rgb(" + red + ", " + green + ", " + blue + ")");
 };
 
-Picker.prototype.getColorFromWheel = function getColorFromWheel (mouse) {
+Colorpicker.prototype.getColorFromWheel = function getColorFromWheel (mouse) {
   var imageData = this.context.getImageData(mouse.x, mouse.y, 1, 1).data;
   return ("rgb(" + (imageData[0]) + ", " + (imageData[1]) + ", " + (imageData[2]) + ")"); 
 };
 
-Picker.prototype.getMouseCords = function getMouseCords (evnt) {
+Colorpicker.prototype.getMouseCords = function getMouseCords (evnt) {
   var rect = this.canvas.getBoundingClientRect();
   var mouse = {
     x: evnt.clientX - rect.left,
@@ -4238,29 +4294,36 @@ Picker.prototype.getMouseCords = function getMouseCords (evnt) {
   return mouse;
 };
 
-Picker.prototype.closePicker = function closePicker () {
-  this.wrapper.classList.add('is-hidden');
+Colorpicker.prototype.togglePikcer = function togglePikcer () {
+  if (this.isMenuActive) {
+    this.closePicker();
+    return;
+  }
+  this.openPiker();
+};
+
+Colorpicker.prototype.closePicker = function closePicker () {
+  this.menu.classList.add('is-hidden');
+  this.isMenuActive = false;
   document.onclick = '';
 };
 
-Picker.prototype.openPiker = function openPiker () {
+Colorpicker.prototype.openPiker = function openPiker () {
     var this$1 = this;
 
-  this.wrapper.classList.remove('is-hidden');
-  this.popper.update();
-  setTimeout(function () {
-    document.onclick = function (evnt) {
-      if (!evnt.target.closest('.picker-wrapper') && evnt.target !== this$1.guide) {
-        this$1.closePicker();
-        return;
-      }
-      call(this$1.options.events.clicked);
-    };
-  }, 16);
+  this.menu.classList.remove('is-hidden');
+  this.isMenuActive = true;
+  document.onclick = function (evnt) {
+    if (!evnt.target.closest('.picker-menu') && evnt.target !== this$1.guide) {
+      this$1.closePicker();
+      return;
+    }
+    call(this$1.options.events.clicked);
+  };
   call(this.options.events.afterOpen);
 };
 
-return Picker;
+return Colorpicker;
 
 })));
 });
@@ -4384,7 +4447,7 @@ var formats = {
     element: 'input',
     type: 'text',
     command: 'foreColor',
-    init: picker,
+    init: colorpicker,
     initConfig: {
       defaultColor: '#000000',
       mode: 'hex',
@@ -4446,10 +4509,12 @@ var formats = {
 
 var styler = function styler(editor, ref) {
   if ( ref === void 0 ) ref = {};
+  var mode = ref.mode; if ( mode === void 0 ) mode = 'default';
   var commands = ref.commands; if ( commands === void 0 ) commands = ['bold', 'italic', 'underline'];
 
   this.editor = editor;
-  this.options = {
+  this.settings = {
+    mode: mode,
     commands: commands
   };
   this.init();
@@ -4504,13 +4569,13 @@ styler.input = function input (name, type) {
 styler.prototype.init = function init () {
     var this$1 = this;
 
-  this.container = document.createElement('ul');
-  this.container.classList.add('styler');
+  this.styler = document.createElement('ul');
+  this.styler.classList.add('styler', ("is-" + (this.settings.mode)));
   this.style = {};
   this.inits = {};
-  document.body.insertBefore(this.container, this.editor.el);
+  this.editor.el.appendChild(this.styler);
 
-  this.options.commands.forEach(function (el) {
+  this.settings.commands.forEach(function (el) {
     var li = document.createElement('li');
     var current = formats[el];
     if (!current) {
@@ -4523,7 +4588,7 @@ styler.prototype.init = function init () {
         this$1.style[el] = styler.button(el);
         // some buttons don't have commands
         // instead it use functions form editor class
-        // here we detecte which callback should be use
+        // here we detect which callback should be use
         var callBack =
           current.command ?
           this$1.execute.bind(this$1) :
@@ -4571,10 +4636,19 @@ styler.prototype.init = function init () {
       this$1.inits[el] = new current.init(this$1.style[el], current.initConfig);
     }
 
-    this$1.container.appendChild(li);
+    this$1.styler.appendChild(li);
   });
+
+  if (this.settings.mode === 'bubble') { this.initBubble(); }
 };
 
+styler.prototype.initBubble = function initBubble () {
+  this.styler.classList.add('is-hidden');
+  this.reference = document.createElement('sapn');
+  this.popper = new Popper(this.reference, this.styler, {
+    placement: 'top'
+  });
+};
 /**
  * Execute command for the selected button
  * @param {String} cmd 
@@ -4587,10 +4661,35 @@ styler.prototype.execute = function execute (cmd, value) {
   this.updateStylerStates();
 };
 
+styler.prototype.showStyler = function showStyler () {
+  this.styler.classList.add('is-visible');
+  this.styler.classList.remove('is-hidden');
+  this.selection.insertNode(this.reference);
+  this.popper.update();
+};
+
+styler.prototype.hideStyler = function hideStyler () {
+  this.styler.classList.remove('is-visible');
+  this.styler.classList.add('is-hidden');
+};
+
+styler.prototype.updateStylerStates = function updateStylerStates () {
+  this.updateStylerCommands();
+  if (this.settings.mode !== 'bubble') { return; }
+
+  this.selection = window.getSelection().getRangeAt(0); 
+  console.log(this.selection);
+  if (this.selection.collapsed) {
+    this.hideStyler();
+    return;
+  }
+  this.showStyler();
+};
+
 /**
  * Update the state of the active style
  */
-styler.prototype.updateStylerStates = function updateStylerStates () {
+styler.prototype.updateStylerCommands = function updateStylerCommands () {
     var this$1 = this;
 
   Object.keys(this.style).forEach(function (styl) {
@@ -4635,7 +4734,7 @@ var prototypeAccessors = { content: {} };
  * Get editor's content
  */
 prototypeAccessors.content.get = function () {
-  return document.createTextNode(this.el.innerHTML);
+  return document.createTextNode(this.text.innerHTML);
 };
 
 /**
@@ -4652,10 +4751,15 @@ Editor.prototype.init = function init () {
  * Create the editor
  */
 Editor.prototype.initEditor = function initEditor () {
-  this.el.contentEditable = 'true';
-  var text = document.createElement('p');
-  text.innerText = this.options.defaultText + '\n';
-  this.el.appendChild(text);
+  this.text = document.createElement('div');
+  this.paragraph = document.createElement('p');
+
+  this.text.contentEditable = 'true';
+  this.text.classList.add('editor-text');
+  this.paragraph.innerText = this.options.defaultText + '\n';
+
+  this.el.appendChild(this.text);
+  this.text.appendChild(this.paragraph);
 };
 
 /**
@@ -4664,11 +4768,11 @@ Editor.prototype.initEditor = function initEditor () {
 Editor.prototype.initEvents = function initEvents () {
     var this$1 = this;
 
-  this.el.addEventListener('focus', function () {
+  this.text.addEventListener('focus', function () {
     this$1.highlight();
   });
 
-  this.el.addEventListener('click', function () {
+  this.text.addEventListener('mouseup', function () {
     this$1.styler.updateStylerStates();
   });
 
@@ -4696,7 +4800,7 @@ Editor.prototype.initEvents = function initEvents () {
  * Hightlight code text
  */
 Editor.prototype.highlight = function highlight$$1 () {
-  var code = Array.from(this.el.querySelectorAll('pre'));
+  var code = Array.from(this.text.querySelectorAll('pre'));
 
   code.forEach(function (block) {
     highlight.highlightBlock(block);
@@ -4709,20 +4813,20 @@ Editor.prototype.highlight = function highlight$$1 () {
 Editor.prototype.toggleHTML = function toggleHTML () {
   this.HTML = !this.HTML;
   if (this.HTML) {
-    var content = document.createTextNode(this.el.innerHTML);
+    var content = document.createTextNode(this.text.innerHTML);
     var pre = document.createElement("pre");
 
-    this.el.innerHTML = "";
-    this.el.contentEditable = false;
+    this.text.innerHTML = "";
+    this.text.contentEditable = false;
     pre.id = "content";
     pre.contentEditable = false;
     pre.appendChild(content);
-    this.el.appendChild(pre);
+    this.text.appendChild(pre);
     return;
   }
-  this.el.innerHTML = this.el.innerText;
-  this.el.contentEditable = true;
-  this.el.focus();
+  this.text.innerHTML = this.text.innerText;
+  this.text.contentEditable = true;
+  this.text.focus();
 };
 
 Object.defineProperties( Editor.prototype, prototypeAccessors );

@@ -11,14 +11,14 @@
 
 
   <div class="editor"></div>
-  
 
   <script src="dist/js/editor.js"></script>
   <script>
     let myEditor = new Editor('.editor', {
       defaultText: 'Hello there I\'m Baianat\'s editor!',
       styler: {
-        commands: ['color', 'fontName', 'fontSize', 'sperator', 'bold', 'italic', 'underline', 'strikeThrough', 'removeFormat', 'sperator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'sperator', 'h1', 'h2', 'blockquote', 'p', 'pre', 'sperator', 'addImage', 'html']
+        mode: 'bubble',
+        commands: ['color', 'sperator', 'bold', 'italic', 'underline', 'strikeThrough', 'sperator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'sperator', 'h1', 'h2', 'blockquote', 'p', 'sperator', 'addImage']
       }
     });
   </script>

@@ -23,7 +23,7 @@ class Editor {
    * Get editor's content
    */
   get content() {
-    return document.createTextNode(this.el.innerHTML);
+    return document.createTextNode(this.text.innerHTML);
   }
 
   /**
@@ -40,21 +40,26 @@ class Editor {
    * Create the editor
    */
   initEditor() {
-    this.el.contentEditable = 'true';
-    const text = document.createElement('p');
-    text.innerText = this.options.defaultText + '\n';
-    this.el.appendChild(text);
+    this.text = document.createElement('div');
+    this.paragraph = document.createElement('p');
+
+    this.text.contentEditable = 'true';
+    this.text.classList.add('editor-text');
+    this.paragraph.innerText = this.options.defaultText + '\n';
+
+    this.el.appendChild(this.text);
+    this.text.appendChild(this.paragraph);
   }
 
   /**
    * Add all events listeners
    */
   initEvents() {
-    this.el.addEventListener('focus', () => {
+    this.text.addEventListener('focus', () => {
       this.highlight();
     });
 
-    this.el.addEventListener('click', () => {
+    this.text.addEventListener('mouseup', () => {
       this.styler.updateStylerStates();
     });
 
@@ -82,7 +87,7 @@ class Editor {
    * Hightlight code text
    */
   highlight() {
-    const code = Array.from(this.el.querySelectorAll('pre'));
+    const code = Array.from(this.text.querySelectorAll('pre'));
 
     code.forEach((block) => {
       hljs.highlightBlock(block);
@@ -95,20 +100,20 @@ class Editor {
   toggleHTML() {
     this.HTML = !this.HTML;
     if (this.HTML) {
-      const content = document.createTextNode(this.el.innerHTML);
+      const content = document.createTextNode(this.text.innerHTML);
       const pre = document.createElement("pre");
 
-      this.el.innerHTML = "";
-      this.el.contentEditable = false;
+      this.text.innerHTML = "";
+      this.text.contentEditable = false;
       pre.id = "content";
       pre.contentEditable = false;
       pre.appendChild(content);
-      this.el.appendChild(pre);
+      this.text.appendChild(pre);
       return;
     }
-    this.el.innerHTML = this.el.innerText;
-    this.el.contentEditable = true;
-    this.el.focus();
+    this.text.innerHTML = this.text.innerText;
+    this.text.contentEditable = true;
+    this.text.focus();
   }
 }
 

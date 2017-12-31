@@ -1,4 +1,4 @@
-import picker from '@baianat/colorpicker';
+import Colorpicker from '@baianat/colorpicker';
 
 let SELECTED = null;
 
@@ -119,7 +119,7 @@ const formats = {
     element: 'input',
     type: 'text',
     command: 'foreColor',
-    init: picker,
+    init: Colorpicker,
     initConfig: {
       defaultColor: '#000000',
       mode: 'hex',
