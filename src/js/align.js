@@ -6,7 +6,7 @@ import { select } from './util';
 import styler from './styler';
 
 
-class Editor {
+class Align {
   constructor(selector, {
     defaultText = 'Type here',
     styler = null,
@@ -117,4 +117,4 @@ class Editor {
   }
 }
 
-export default Editor;
+export default Align;

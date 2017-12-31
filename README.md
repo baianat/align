@@ -1,4 +1,4 @@
-# Text Editor
+# Align
 
 ES6 Text editor
 
@@ -16,11 +16,11 @@ ES6 Text editor
 
 ``` html
 <head>
-  <link rel="stylesheet" href="dist/css/editor.css">
+  <link rel="stylesheet" href="dist/css/align.css">
 </head>
 <body>
     ...
-    <script type="text/javascript" src="dist/js/editor.js"></script>
+    <script type="text/javascript" src="dist/js/align.js"></script>
 </body>
 ```
 
@@ -32,7 +32,7 @@ you need an div to render editor in it.
 <div class="editor"></div>
 
 <script>
-  let myEditor = new Editor('.editor', {
+  let myEditor = new Align('.editor', {
     defaultText: 'Hello there I\'m Baianat\'s editor!'
   });
 </script>
@@ -41,8 +41,9 @@ you need an div to render editor in it.
 to customize editor's styler commands, you can pass to commands key as array of commands as value.
 
 ```js
-let myEditor = new Editor('.editor', {
+let myEditor = new Align('.editor', {
   styler: {
+    mode: 'default', // default or bubble
     commands: ['color', 'sperator', 'fontName', 'fontSize']
   }
 });

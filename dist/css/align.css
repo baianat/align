@@ -579,14 +579,11 @@ template {
 .button {
   position: relative;
   display: -ms-inline-flexbox;
-  display: -webkit-inline-flex;
   display: inline-flex;
   -ms-flex-align: center;
-      -webkit-align-items: center;
-          align-items: center;
+      align-items: center;
   -ms-flex-pack: center;
-      -webkit-justify-content: center;
-          justify-content: center;
+      justify-content: center;
   margin-bottom: 10px;
   padding: 0.75em 1.125em;
   outline-width: 2px;
@@ -848,11 +845,9 @@ template {
 }
 .form {
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   -ms-flex-align: start;
-      -webkit-align-items: flex-start;
-          align-items: flex-start;
+      align-items: flex-start;
   margin-bottom: 10px;
 }
 .form >* {
@@ -860,7 +855,6 @@ template {
 }
 .form-addon {
   display: -ms-inline-flexbox;
-  display: -webkit-inline-flex;
   display: inline-flex;
   padding: 0.75em 1.125em;
   border: 2px solid #000;
@@ -914,17 +908,13 @@ template {
   position: relative;
   z-index: 999;
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   -ms-flex-direction: column;
-  -webkit-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
   -ms-flex-pack: center;
-      -webkit-justify-content: center;
-          justify-content: center;
+      justify-content: center;
   -ms-flex-align: stretch;
-      -webkit-align-items: stretch;
-          align-items: stretch;
+      align-items: stretch;
   margin: 10px 0;
   width: 100%;
   border: 0;
@@ -949,14 +939,11 @@ template {
 }
 .modal-footer {
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   -ms-flex-direction: row-reverse;
-  -webkit-flex-direction: row-reverse;
-          flex-direction: row-reverse;
+  flex-direction: row-reverse;
   -ms-flex-pack: justify;
-      -webkit-justify-content: space-between;
-          justify-content: space-between;
+      justify-content: space-between;
   padding: 20px;
 }
 .modal-dismiss {
@@ -1020,7 +1007,6 @@ template {
 }
 .modal.is-visable {
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
 }
 .modal-container {
@@ -1029,14 +1015,11 @@ template {
   right: 0;
   left: 0;
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   -ms-flex-pack: center;
-      -webkit-justify-content: center;
-          justify-content: center;
+      justify-content: center;
   -ms-flex-align: center;
-      -webkit-align-items: center;
-          align-items: center;
+      align-items: center;
   width: 100%;
   height: 100vh;
   background-color: rgba(0,0,0,0.05);
@@ -1046,17 +1029,14 @@ template {
 }
 .modal-container.is-visable {
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
 }
 .slider {
   position: relative;
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   -ms-flex-align: center;
-      -webkit-align-items: center;
-          align-items: center;
+      align-items: center;
   box-sizing: border-box;
   margin-bottom: 10px;
 }
@@ -1070,8 +1050,7 @@ template {
 .slider-track {
   position: relative;
   -ms-flex: 1;
-      -webkit-flex: 1;
-          flex: 1;
+      flex: 1;
   margin: 10px;
   width: auto;
   height: 5px;
@@ -1104,8 +1083,7 @@ template {
   font-size: 12px;
   line-height: 1em;
   opacity: 0;
-  -webkit-transform: translate3d(-50%, 0, 0);
-          transform: translate3d(-50%, 0, 0);
+  transform: translate3d(-50%, 0, 0);
 }
 .slider-label:before {
   position: absolute;
@@ -1118,8 +1096,7 @@ template {
   border-style: solid;
   border-color: #000 transparent transparent transparent;
   content: '';
-  -webkit-transform: translate3d(-50%, 0, 0);
-          transform: translate3d(-50%, 0, 0);
+  transform: translate3d(-50%, 0, 0);
 }
 .slider-label:after {
   position: absolute;
@@ -1132,8 +1109,7 @@ template {
   border-style: solid;
   border-color: #fff transparent transparent transparent;
   content: '';
-  -webkit-transform: translate3d(-50%, 0, 0);
-          transform: translate3d(-50%, 0, 0);
+  transform: translate3d(-50%, 0, 0);
 }
 .slider-fill {
   position: absolute;
@@ -1154,17 +1130,14 @@ template {
 }
 .slider.is-reverse {
   -ms-flex-direction: row-reverse;
-  -webkit-flex-direction: row-reverse;
-          flex-direction: row-reverse;
+  flex-direction: row-reverse;
 }
 .picker {
   position: relative;
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   -ms-flex-pack: center;
-      -webkit-justify-content: center;
-          justify-content: center;
+      justify-content: center;
   box-sizing: border-box;
 }
 .picker-guide {
@@ -1198,28 +1171,21 @@ template {
 }
 .picker-menu >div {
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   -ms-flex-pack: center;
-      -webkit-justify-content: center;
-          justify-content: center;
+      justify-content: center;
   -ms-flex-align: stretch;
-      -webkit-align-items: stretch;
-          align-items: stretch;
+      align-items: stretch;
   -ms-flex-direction: column;
-  -webkit-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
 }
 .picker-recent {
   display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
   -ms-flex-pack: end;
-      -webkit-justify-content: flex-end;
-          justify-content: flex-end;
+      justify-content: flex-end;
   -ms-flex-align: center;
-      -webkit-align-items: center;
-          align-items: center;
+      align-items: center;
   width: 100%;
 }
 .picker-color {
@@ -1337,19 +1303,19 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 /**
  * eidtor elements
  */
-.editor {
+.align {
   max-height: 100vh;
 }
-.editor-text {
+.align-text {
   padding: 20px 100px;
   overflow: auto;
   white-space: normal;
   margin-top: 70px;
 }
-.editor-text:focus {
+.align-text:focus {
   outline: none;
 }
-.editor-image {
+.align-image {
   display: block;
   margin: auto;
   width: 100%;
@@ -1360,15 +1326,12 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   margin: 0;
   width: auto;
   list-style: none;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
 }
 .styler.is-default {
   position: fixed;
@@ -1451,7 +1414,6 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   outline: none;
 }
 .styler.is-visiable {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }

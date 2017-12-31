@@ -32,7 +32,7 @@ function isProduction() {
  */
 gulp.task('browser-sync', () => {
   browserSync.init({
-    proxy: 'editor.dev'
+    proxy: 'align.dev'
   });
 })
 
@@ -40,7 +40,7 @@ gulp.task('browser-sync', () => {
  * styles task
  */
 gulp.task('styles', () => {
-  return gulp.src('./src/stylus/app.styl')
+  return gulp.src('src/stylus/app.styl')
     .pipe(plumber())
     .pipe(stylus({
       'include css': true,
@@ -48,11 +48,11 @@ gulp.task('styles', () => {
     }))
     .pipe(autoprefixer('last 5 version'))
     .pipe(rename({
-      basename: 'editor',
+      basename: 'align',
       suffix: isProduction() ? '.min' : '',
       extname: '.css'
     }))
-    .pipe(gulp.dest('./dist/css'))
+    .pipe(gulp.dest('dist/css'))
     .pipe(reload({ stream: true }));
 });
 
@@ -60,14 +60,13 @@ gulp.task('styles', () => {
  * Scripts task
  */
 gulp.task('scripts', () => {
-  return gulp.src('./src/js/**/*.js')
+  return gulp.src('src/js/**/*.js')
     .pipe(plumber())
     .pipe(rollup({
-      input: './src/js/editor.js',
+      input: 'src/js/Align.js',
       format: 'umd',
-      name: 'editor',
+      name: 'Align',
       allowRealFiles: true,
-      globals: ['Colorpicker'],
       plugins: [
         nodeResolve(),
         commonjs(),
@@ -75,12 +74,12 @@ gulp.task('scripts', () => {
       ]
     }))
     .pipe(rename({
-      basename: 'editor',
+      basename: 'align',
       suffix: isProduction() ? '.min' : '',
       extname: '.js'
     }))
     .pipe(gulpif(isProduction, uglify()))
-    .pipe(gulp.dest(`./dist/js`))
+    .pipe(gulp.dest('dist/js'))
     .pipe(reload({ stream: true }));
 });
 
@@ -88,7 +87,7 @@ gulp.task('scripts', () => {
  * Clean task
  * remove dist folders from all projects
  */
-gulp.task('clean', () => del('/dist'));
+gulp.task('clean', () => del('dist'));
 
 gulp.task('changeEnv', () => { env = 'production' });
 
@@ -98,43 +97,12 @@ gulp.task('production', sequence(
   'changeEnv',
   ['styles', 'scripts']
 ));
-/**
- * Default task
- */
-gulp.task('default', ['styles', 'scripts', 'browser-sync', 'watch']);
-
-/**
- * Scripts task
- */
-gulp.task('scripts', () => {
-  gulp.src('./src/js/**/*.js')
-    .pipe(plumber())
-    .pipe(rollup({
-      rollup: require('rollup'),
-      entry: './src/js/editor.js',
-      format: 'umd',
-      moduleName: 'Editor',
-      allowRealFiles: true,
-      plugins: [
-        nodeResolve(),
-        commonjs(),
-        buble()
-      ]
-    }))
-    .pipe(rename({
-      basename: "editor",
-      suffix: "",
-      extname: ".js"
-    }))
-    .pipe(gulp.dest('./dist/js'))
-    .pipe(reload({ stream: true }));
-});
 
 /**
  * fonts task
  */
 gulp.task('font', () => {
-  gulp.src('./src/font/*/**')
+  gulp.src('src/font/*/**')
     .pipe(gulp.dest('./dist/font/'));
 });
 

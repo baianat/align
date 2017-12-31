@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global.Editor = factory());
+	(global.Align = factory());
 }(this, (function () { 'use strict';
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -23,11 +23,6 @@ https://highlightjs.org/
 (function(factory) {
 
   // Find the global object for export to both the browser and web workers.
-  var globalObject = typeof window === 'object' && window ||
-                     typeof self === 'object' && self;
-
-  // Setup highlight.js for different environments. First is Node.js or
-  // CommonJS.
   {
     factory(exports);
   }
@@ -844,7 +839,6 @@ var javascript = function(hljs) {
       'module console window document Symbol Set Map WeakSet WeakMap Proxy Reflect ' +
       'Promise'
   };
-  var EXPRESSIONS;
   var NUMBER = {
     className: 'number',
     variants: [
@@ -4715,7 +4709,7 @@ styler.prototype.updateStylerCommands = function updateStylerCommands () {
 
 highlight.registerLanguage('javascript', javascript);
 
-var Editor = function Editor(selector, ref) {
+var Align = function Align(selector, ref) {
   if ( ref === void 0 ) ref = {};
   var defaultText = ref.defaultText; if ( defaultText === void 0 ) defaultText = 'Type here';
   var styler$$1 = ref.styler; if ( styler$$1 === void 0 ) styler$$1 = null;
@@ -4728,7 +4722,7 @@ var Editor = function Editor(selector, ref) {
   this.init();
 };
 
-var prototypeAccessors = { content: {} };
+var prototypeAccessors = { content: { configurable: true } };
 
 /**
  * Get editor's content
@@ -4740,7 +4734,7 @@ prototypeAccessors.content.get = function () {
 /**
  * Create all editor elements
  */
-Editor.prototype.init = function init () {
+Align.prototype.init = function init () {
   this.HTML = false;
   this.styler = new styler(this, this.options.styler);
   this.initEditor();
@@ -4750,7 +4744,7 @@ Editor.prototype.init = function init () {
 /**
  * Create the editor
  */
-Editor.prototype.initEditor = function initEditor () {
+Align.prototype.initEditor = function initEditor () {
   this.text = document.createElement('div');
   this.paragraph = document.createElement('p');
 
@@ -4765,7 +4759,7 @@ Editor.prototype.initEditor = function initEditor () {
 /**
  * Add all events listeners
  */
-Editor.prototype.initEvents = function initEvents () {
+Align.prototype.initEvents = function initEvents () {
     var this$1 = this;
 
   this.text.addEventListener('focus', function () {
@@ -4799,7 +4793,7 @@ Editor.prototype.initEvents = function initEvents () {
 /**
  * Hightlight code text
  */
-Editor.prototype.highlight = function highlight$$1 () {
+Align.prototype.highlight = function highlight$$1 () {
   var code = Array.from(this.text.querySelectorAll('pre'));
 
   code.forEach(function (block) {
@@ -4810,7 +4804,7 @@ Editor.prototype.highlight = function highlight$$1 () {
 /**
  * Toggle on/off HTML represntation
  */
-Editor.prototype.toggleHTML = function toggleHTML () {
+Align.prototype.toggleHTML = function toggleHTML () {
   this.HTML = !this.HTML;
   if (this.HTML) {
     var content = document.createTextNode(this.text.innerHTML);
@@ -4829,8 +4823,8 @@ Editor.prototype.toggleHTML = function toggleHTML () {
   this.text.focus();
 };
 
-Object.defineProperties( Editor.prototype, prototypeAccessors );
+Object.defineProperties( Align.prototype, prototypeAccessors );
 
-return Editor;
+return Align;
 
 })));
