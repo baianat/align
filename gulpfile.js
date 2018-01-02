@@ -16,7 +16,7 @@ const commonjs = require('rollup-plugin-commonjs');
 const nodeResolve = require('rollup-plugin-node-resolve');
 
 const del = require('del');
-const svgSprite = require('gulp-svg-sprite');
+const svgSprite = require('gulp-svg-sprites');
 
 const browserSync = require('browser-sync');
 const reload = browserSync.reload;
@@ -63,7 +63,7 @@ gulp.task('scripts', () => {
   return gulp.src('src/js/**/*.js')
     .pipe(plumber())
     .pipe(rollup({
-      input: 'src/js/Align.js',
+      input: 'src/js/align.js',
       format: 'umd',
       name: 'Align',
       allowRealFiles: true,
@@ -109,17 +109,17 @@ gulp.task('font', () => {
 /**
  * sprites task
  */
-gulp.task('sprites', () => {
+gulp.task('sprites', function () {
   return gulp.src('src/svg/*.svg')
     .pipe(svgSprite({
       preview: false,
-      mode: "symbols",
-      svgId: "icon-%f",
+      mode: 'symbols',
+      svgId: 'icon-%f',
       svg: {
-        sprite: "icons.svg"
+        sprite: 'icons.svg'
       }
     }))
-    .pipe(gulp.dest("dist"));
+    .pipe(gulp.dest('dist'));
 });
 
 /**

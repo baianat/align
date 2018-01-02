@@ -4501,12 +4501,12 @@ var formats = {
   }
 };
 
-var styler = function styler(editor, ref) {
+var styler = function styler(align, ref) {
   if ( ref === void 0 ) ref = {};
   var mode = ref.mode; if ( mode === void 0 ) mode = 'default';
   var commands = ref.commands; if ( commands === void 0 ) commands = ['bold', 'italic', 'underline'];
 
-  this.editor = editor;
+  this.align = align;
   this.settings = {
     mode: mode,
     commands: commands
@@ -4567,7 +4567,7 @@ styler.prototype.init = function init () {
   this.styler.classList.add('styler', ("is-" + (this.settings.mode)));
   this.style = {};
   this.inits = {};
-  this.editor.el.appendChild(this.styler);
+  this.align.el.appendChild(this.styler);
 
   this.settings.commands.forEach(function (el) {
     var li = document.createElement('li');
@@ -4581,12 +4581,12 @@ styler.prototype.init = function init () {
       case 'button':
         this$1.style[el] = styler.button(el);
         // some buttons don't have commands
-        // instead it use functions form editor class
+        // instead it use functions form align class
         // here we detect which callback should be use
         var callBack =
           current.command ?
           this$1.execute.bind(this$1) :
-          this$1.editor[current.func].bind(this$1.editor);
+          this$1.align[current.func].bind(this$1.align);
           
         this$1.style[el].addEventListener('click', function () {
           callBack(current.command, current.value);
@@ -4606,7 +4606,7 @@ styler.prototype.init = function init () {
       case 'input': 
         this$1.style[el] = styler.input(el, current.type);
         this$1.style[el].addEventListener('change', function () {
-          this$1.editor.el.focus();
+          this$1.align.el.focus();
           this$1.execute(current.command, this$1.style[el].value);
         });
         li.appendChild(this$1.style[el]);
@@ -4649,9 +4649,9 @@ styler.prototype.initBubble = function initBubble () {
  * @param {String|Number} value 
  */
 styler.prototype.execute = function execute (cmd, value) {
-  if (this.editor.HTML) { return; }
+  if (this.align.HTML) { return; }
   document.execCommand(cmd, false, value);
-  this.editor.el.focus();
+  this.align.el.focus();
   this.updateStylerStates();
 };
 
@@ -4671,8 +4671,7 @@ styler.prototype.updateStylerStates = function updateStylerStates () {
   this.updateStylerCommands();
   if (this.settings.mode !== 'bubble') { return; }
 
-  this.selection = window.getSelection().getRangeAt(0); 
-  console.log(this.selection);
+  this.selection = window.getSelection().getRangeAt(0);
   if (this.selection.collapsed) {
     this.hideStyler();
     return;
@@ -4749,7 +4748,7 @@ Align.prototype.initEditor = function initEditor () {
   this.paragraph = document.createElement('p');
 
   this.text.contentEditable = 'true';
-  this.text.classList.add('editor-text');
+  this.text.classList.add('align-text');
   this.paragraph.innerText = this.options.defaultText + '\n';
 
   this.el.appendChild(this.text);
@@ -4766,7 +4765,7 @@ Align.prototype.initEvents = function initEvents () {
     this$1.highlight();
   });
 
-  this.text.addEventListener('mousedown', function (event) {
+  this.text.addEventListener('mouseup', function (event) {
     this$1.styler.updateStylerStates();
   });
 
@@ -4777,6 +4776,18 @@ Align.prototype.initEvents = function initEvents () {
     }
 
     switch (event.key) {
+      case "ArrowDown":
+        // Do something for "down arrow" key press.
+        break;
+      case "ArrowUp":
+        // Do something for "up arrow" key press.
+        break;
+      case "ArrowLeft":
+        this$1.styler.updateStylerStates();
+        break;
+      case "ArrowRight":
+        this$1.styler.updateStylerStates();
+        break;
       case 'Tab':
         this$1.execute('indent');
         break;
@@ -4786,7 +4797,7 @@ Align.prototype.initEvents = function initEvents () {
     }
 
     // Cancel the default action to avoid it being handled twice
-    event.preventDefault();
+    // event.preventDefault();
   }, true);
 };
 

@@ -3,11 +3,11 @@ import formats from './formats';
 
 class styler {
 
-  constructor(editor, {
+  constructor(align, {
     mode = 'default',
     commands = ['bold', 'italic', 'underline']
   } = {}) {
-    this.editor = editor;
+    this.align = align;
     this.settings = {
       mode,
       commands
@@ -70,7 +70,7 @@ class styler {
     this.styler.classList.add('styler', `is-${this.settings.mode}`);
     this.style = {};
     this.inits = {};
-    this.editor.el.appendChild(this.styler);
+    this.align.el.appendChild(this.styler);
 
     this.settings.commands.forEach((el) => {
       const li = document.createElement('li');
@@ -84,12 +84,12 @@ class styler {
         case 'button':
           this.style[el] = styler.button(el);
           // some buttons don't have commands
-          // instead it use functions form editor class
+          // instead it use functions form align class
           // here we detect which callback should be use
           const callBack =
             current.command ?
             this.execute.bind(this) :
-            this.editor[current.func].bind(this.editor);
+            this.align[current.func].bind(this.align);
           
           this.style[el].addEventListener('click', () => {
             callBack(current.command, current.value);
@@ -109,7 +109,7 @@ class styler {
         case 'input': 
           this.style[el] = styler.input(el, current.type);
           this.style[el].addEventListener('change', () => {
-            this.editor.el.focus();
+            this.align.el.focus();
             this.execute(current.command, this.style[el].value);
           });
           li.appendChild(this.style[el]);
@@ -152,9 +152,9 @@ class styler {
    * @param {String|Number} value 
    */
   execute(cmd, value) {
-    if (this.editor.HTML) return;
+    if (this.align.HTML) return;
     document.execCommand(cmd, false, value);
-    this.editor.el.focus();
+    this.align.el.focus();
     this.updateStylerStates();
   }
 
@@ -174,8 +174,7 @@ class styler {
     this.updateStylerCommands();
     if (this.settings.mode !== 'bubble') return;
 
-    this.selection = window.getSelection().getRangeAt(0); 
-    console.log(this.selection)
+    this.selection = window.getSelection().getRangeAt(0);
     if (this.selection.collapsed) {
       this.hideStyler();
       return;

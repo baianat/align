@@ -44,7 +44,7 @@ class Align {
     this.paragraph = document.createElement('p');
 
     this.text.contentEditable = 'true';
-    this.text.classList.add('editor-text');
+    this.text.classList.add('align-text');
     this.paragraph.innerText = this.options.defaultText + '\n';
 
     this.el.appendChild(this.text);
@@ -59,7 +59,7 @@ class Align {
       this.highlight();
     });
 
-    this.text.addEventListener('mousedown', (event) => {
+    this.text.addEventListener('mouseup', (event) => {
       this.styler.updateStylerStates();
     });
 
@@ -70,6 +70,18 @@ class Align {
       }
 
       switch (event.key) {
+        case "ArrowDown":
+          // Do something for "down arrow" key press.
+          break;
+        case "ArrowUp":
+          // Do something for "up arrow" key press.
+          break;
+        case "ArrowLeft":
+          this.styler.updateStylerStates();
+          break;
+        case "ArrowRight":
+          this.styler.updateStylerStates();
+          break;
         case 'Tab':
           this.execute('indent');
           break;
@@ -79,7 +91,7 @@ class Align {
       }
 
       // Cancel the default action to avoid it being handled twice
-      event.preventDefault();
+      // event.preventDefault();
     }, true);
   }
 
