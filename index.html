@@ -14,11 +14,55 @@
 
   <script src="dist/js/align.js"></script>
   <script>
+    Align.extend('addImage', {
+      element: 'custom',
+      data() {
+        return {
+          button: document.createElement('button'),
+          input: document.createElement('input'),
+          icon:
+            `<svg class="icon" viewBox="0 0 24 24">
+              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>
+            </svg>`
+        }
+      },
+      create() {
+        this.$data = this.data;
+        this.data = this.$data();
+        const button = this.data.button;
+        const input = this.data.input;
+        const icon = this.data.icon;
+
+        button.classList.add('styler-button');
+        button.appendChild(input);
+        button.insertAdjacentHTML('beforeend', icon);
+        input.classList.add('styler-input');
+        input.type = 'file';
+        input.id = 'addImage';
+        input.addEventListener('change', this.action.bind(this));
+
+        return button;
+      },
+      action() {
+        const file = this.data.input.files[0];
+        if (!file) return;
+        const imageURL = URL.createObjectURL(file);
+        const img = document.createElement('img');
+        let selectedPosition;
+
+        img.src = imageURL;
+        img.classList.add('align-image');
+        if (!window.getSelection().rangeCount) return;
+        selectedPosition = window.getSelection().getRangeAt(0);
+        selectedPosition.insertNode(img);
+        this.data.input.value = null;
+      }
+    })
     let myEditor = new Align('.align', {
       defaultText: 'Hello there I\'m Baianat\'s editor!',
       styler: {
-        mode: 'default',
-        commands: ['color', 'separator', 'bold', 'italic', 'underline', 'strikeThrough', 'separator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'separator', 'h1', 'h2', 'blockquote', 'p', 'separator', 'addImage']
+        mode: 'bubble',
+        commands: ['addImage', 'separator', 'bold', 'italic', 'underline', 'strikeThrough', 'separator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'separator', 'h1', 'h2', 'blockquote', 'p', 'separator', 'color'],
       }
     });
   </script>

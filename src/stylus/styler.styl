@@ -1,3 +1,4 @@
+$magenta = #eb008b
 .styler
   background-color: $black
   margin: 0
@@ -14,6 +15,7 @@
     padding: 20px 0
     
   &.is-bubble
+    position: absolute
     border-radius: 40px
     padding: 10px
     margin-bottom: 50px
@@ -43,8 +45,10 @@
     outline: none
     background-color: $black
     fill: $white
+    .icon
+      fill: inherit
     &.is-active
-      fill: $blue
+      fill: $magenta
 
   &-list
     -webkit-appearance: none
@@ -73,9 +77,9 @@
     border-width: 0
     border-color: $dark
     font-size: 14px
-    border-bottom: 1px solid $black
+    border-bottom: 1px solid $white
     &:hover
-      border-bottom-color: $blue
+      border-bottom-color: $magenta
     &:focus
       outline: none
 

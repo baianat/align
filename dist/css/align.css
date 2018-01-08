@@ -1314,6 +1314,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   padding: 20px 0;
 }
 .styler.is-bubble {
+  position: absolute;
   border-radius: 40px;
   padding: 10px;
   margin-bottom: 50px;
@@ -1345,8 +1346,11 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   background-color: #000;
   fill: #fff;
 }
+.styler-button .icon {
+  fill: inherit;
+}
 .styler-button.is-active {
-  fill: #1700ff;
+  fill: #eb008b;
 }
 .styler-list {
   -webkit-appearance: none;
@@ -1377,10 +1381,10 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   border-width: 0;
   border-color: $dark;
   font-size: 14px;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid #fff;
 }
 .styler-select:hover {
-  border-bottom-color: #1700ff;
+  border-bottom-color: #eb008b;
 }
 .styler-select:focus {
   outline: none;
@@ -1392,6 +1396,9 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 blockquote {
   border-left: 5px solid #aaa;
   padding: 10px 0 10px 20px;
+}
+.picker-guide {
+  border-color: #fff;
 }
 /**
  * external styling

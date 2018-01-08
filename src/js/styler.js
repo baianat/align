@@ -1,19 +1,22 @@
-import Popper from 'popper.js';
 import formats from './formats';
 import icons from './icons';
 
-class styler {
+class Styler {
 
   constructor(align, {
     mode = 'default',
-    commands = ['bold', 'italic', 'underline']
+    commands = ['bold', 'italic', 'underline'],
   } = {}) {
     this.align = align;
     this.settings = {
       mode,
-      commands
+      commands,
     };
     this.init();
+  }
+
+  static extend (name, extention) {
+    formats[name] = extention;
   }
 
   /**
@@ -83,7 +86,7 @@ class styler {
 
       switch (current.element) {
         case 'button':
-          this.style[el] = styler.button(el);
+          this.style[el] = Styler.button(el);
           // some buttons don't have commands
           // instead it use functions form align class
           // here we detect which callback should be use
@@ -99,7 +102,7 @@ class styler {
           break;
 
         case 'select':
-          this.style[el] = styler.select(el, current.options);
+          this.style[el] = Styler.select(el, current.options);
           this.style[el].addEventListener('change', () => {
             const selection = this.style[el];
             this.execute(current.command, selection[selection.selectedIndex].value);
@@ -108,7 +111,7 @@ class styler {
           break;
         
         case 'input': 
-          this.style[el] = styler.input(el, current.type);
+          this.style[el] = Styler.input(el, current.type);
           this.style[el].addEventListener('change', () => {
             this.align.el.focus();
             this.execute(current.command, this.style[el].value);
@@ -143,9 +146,6 @@ class styler {
   initBubble() {
     this.styler.classList.add('is-hidden');
     this.reference = document.createElement('sapn');
-    this.popper = new Popper(this.reference, this.styler, {
-      placement: 'top'
-    });
   }
   /**
    * Execute command for the selected button
@@ -159,11 +159,18 @@ class styler {
     this.updateStylerStates();
   }
 
+  updateBubblePosition() {
+    const position = this.selection.getBoundingClientRect();
+    const deltaY = position.y - 70;
+    const deltaX = position.x + (position.width / 2) - (this.styler.offsetWidth / 2)
+    this.styler.style.top = `${deltaY > 0 ? deltaY : 0}px`
+    this.styler.style.left = `${deltaX > 50 ? deltaX : 50}px`
+    
+  }
   showStyler() {
     this.styler.classList.add('is-visible');
     this.styler.classList.remove('is-hidden');
-    this.selection.insertNode(this.reference);
-    this.popper.update();
+    this.updateBubblePosition();
   }
 
   hideStyler() {
@@ -210,4 +217,4 @@ class styler {
   }
 }
 
-export default styler;
+export default Styler;

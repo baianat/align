@@ -3,7 +3,7 @@ import javascript from 'highlight.js/lib/languages/javascript';
 hljs.registerLanguage('javascript', javascript);
 
 import { select } from './util';
-import styler from './styler';
+import Styler from './styler';
 
 
 class Align {
@@ -26,12 +26,16 @@ class Align {
     return document.createTextNode(this.text.innerHTML);
   }
 
+  static extend(name, extension) {
+    Styler.extend(name, extension)
+  }
+
   /**
    * Create all editor elements
    */
   init() {
     this.HTML = false;
-    this.styler = new styler(this, this.options.styler);
+    this.styler = new Styler(this, this.options.styler);
     this.initEditor();
     this.initEvents();
   }
@@ -63,7 +67,7 @@ class Align {
       this.styler.updateStylerStates();
     });
 
-    window.addEventListener("keydown", (event) => {
+    window.addEventListener("keyup", (event) => {
       // Do nothing if the event was already processed
       if (event.defaultPrevented) {
         return;

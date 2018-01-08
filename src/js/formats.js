@@ -136,47 +136,6 @@ const formats = {
         }
       }
     }
-  },
-
-  addImage: {
-    element: 'custom',
-    data: {
-      button() { return document.createElement('button') },
-      input() { return document.createElement('input') },
-      icon: 
-        `<svg class="icon">
-          <use xlink:href="dist/svg/symbols.svg#icon-image"></use>
-        </svg>`
-    },
-    create() {
-      const button = this.data.button();
-      const input = this.data.input();
-      const icon = this.data.icon;
-      
-      button.classList.add('styler-button');
-      button.appendChild(input);
-      button.insertAdjacentHTML('beforeend', icon);
-      input.classList.add('styler-input');
-      input.type = 'file';
-      input.id = 'addImage';
-      input.addEventListener('change', this.action.bind(this));
-
-      return button;
-    },
-    action() {
-      const file = this.data.input.files[0];
-      if (!file) return;
-      const imageURL = URL.createObjectURL(file);
-      const img = document.createElement('img');
-      let selectedPosition;
-
-      img.src = imageURL;
-      img.classList.add('editor-image');
-      if (!window.getSelection().rangeCount) return;
-      selectedPosition = window.getSelection().getRangeAt(0);
-      selectedPosition.insertNode(img);
-      this.data.input.value = null;
-    }
   }
 }
 
