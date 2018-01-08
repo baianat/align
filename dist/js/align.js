@@ -4464,14 +4464,14 @@ var formats = {
   addImage: {
     element: 'custom',
     data: {
-      button: document.createElement('button'),
-      input: document.createElement('input'),
+      button: function button() { return document.createElement('button') },
+      input: function input() { return document.createElement('input') },
       icon: 
         "<svg class=\"icon\">\n          <use xlink:href=\"dist/svg/symbols.svg#icon-image\"></use>\n        </svg>"
     },
     create: function create() {
-      var button = this.data.button;
-      var input = this.data.input;
+      var button = this.data.button();
+      var input = this.data.input();
       var icon = this.data.icon;
       
       button.classList.add('styler-button');

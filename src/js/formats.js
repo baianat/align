@@ -141,16 +141,16 @@ const formats = {
   addImage: {
     element: 'custom',
     data: {
-      button: document.createElement('button'),
-      input: document.createElement('input'),
+      button() { return document.createElement('button') },
+      input() { return document.createElement('input') },
       icon: 
         `<svg class="icon">
           <use xlink:href="dist/svg/symbols.svg#icon-image"></use>
         </svg>`
     },
     create() {
-      const button = this.data.button;
-      const input = this.data.input;
+      const button = this.data.button();
+      const input = this.data.input();
       const icon = this.data.icon;
       
       button.classList.add('styler-button');
