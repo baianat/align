@@ -37,6 +37,19 @@ you need an div to render editor in it.
   });
 </script>
 ```
+You can also pass the element directly to the constructor
+
+``` html
+<div class="editor"></div>
+
+<script>
+  const div = document.querySelector('.editor');
+  let myEditor = new Align(div, {
+    defaultText: 'Hello there I\'m Baianat\'s editor!'
+  });
+</script>
+```
+
 
 to customize editor's styler commands, you can pass to commands key as array of commands as value.
 
