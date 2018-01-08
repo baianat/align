@@ -1,13 +1,17 @@
 {
   "name": "@baianat/align",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "ES6 text editor",
-  "main": "dist/align.js",
+  "main": "dist/js/align.js",
   "dependencies": {
     "@baianat/colorpicker": "0.0.7",
     "highlight.js": "^9.12.0",
     "popper.js": "^1.12.9"
   },
+  "files": [
+    "dist/js/*.js",
+    "dist/css/*.css"
+  ],
   "devDependencies": {
     "browser-sync": "^2.18.7",
     "buble": "^0.15.2",
