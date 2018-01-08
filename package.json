@@ -1,8 +1,8 @@
 {
   "name": "@baianat/align",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "ES6 text editor",
-  "main": "dist/align.js",
+  "main": "dist/js/align.js",
   "dependencies": {
     "@baianat/colorpicker": "0.0.7",
     "highlight.js": "^9.12.0",
