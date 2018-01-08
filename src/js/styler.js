@@ -1,5 +1,6 @@
 import Popper from 'popper.js';
 import formats from './formats';
+import icons from './icons';
 
 class styler {
 
@@ -24,8 +25,8 @@ class styler {
     button.classList.add('styler-button');
     button.id = name;
     button.insertAdjacentHTML('afterbegin', `
-      <svg class="icon">
-        <use xlink:href="dist/svg/symbols.svg#icon-${name}"></use>
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="${icons[name]}"/>
       </svg>
     `);
     return button;
@@ -199,7 +200,8 @@ class styler {
         this.style[styl].value = document.queryCommandValue(styl);
         return;
       }
-      if (styl === 'color' && !this.inits[styl].isMenuActive) {
+      if (this.inits[styl]) {
+        // if (this.inits[styl].isMenuActive) return;
         this.inits[styl].selectColor(document.queryCommandValue('foreColor'), true);
         return;
       }
