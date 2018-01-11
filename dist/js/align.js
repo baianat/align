@@ -1158,7 +1158,7 @@ Slider.prototype.initElements = function initElements () {
   this.track.classList.add('slider-track');
   this.handle.classList.add('slider-handle');
   this.fill.classList.add('slider-fill');
-  this.el.classList.add('input', 'is-tiny');
+  this.el.classList.add('slider-input');
 
   wrap(this.el, this.wrapper);
   this.track.appendChild(this.fill);
@@ -1563,10 +1563,9 @@ Colorpicker.prototype._initElements = function _initElements () {
 
   // create elements and config them
   this.picker = document.createElement('div');
-  this.picker.insertAdjacentHTML('afterbegin', "\n      <button class=\"picker-guide\"></button>\n      <div class=\"modal is-inverse picker-menu is-hidden\" tabindex=\"-1\">\n        <div class=\"modal-body\">\n          <div class=\"picker-wheel\">\n            <canvas class=\"picker-canvas\"></canvas>\n            <div class=\"picker-cursor\"></div>\n          </div>\n          <input class=\"picker-saturation\" type=\"number\" min=\"0\" max=\"100\" value=\"100\">\n\n          <input id=\"red\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <input id=\"green\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <input id=\"blue\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n          <div class=\"form has-itemAfter is-tiny\">\n            <button class=\"button picker-submit\">\n              <svg class=\"icon\" viewBox=\"0 0 24 24\">\n                <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n              </svg>\n            </button>\n          </div>\n          <div class=\"picker-recent\"></div>\n        </div>\n      </div>\n    ");
+  this.picker.insertAdjacentHTML('afterbegin', "\n      <button class=\"picker-guide\"></button>\n      <div class=\"picker-menu is-hidden\" tabindex=\"-1\">\n        <div class=\"picker-wheel\">\n          <canvas class=\"picker-canvas\"></canvas>\n          <div class=\"picker-cursor\"></div>\n        </div>\n        <input class=\"picker-saturation\" type=\"number\" min=\"0\" max=\"100\" value=\"100\">\n\n        <input id=\"red\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <input id=\"green\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <input id=\"blue\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <div class=\"picker-input\">\n          <button class=\"picker-submit\">\n            <svg class=\"icon\" viewBox=\"0 0 24 24\">\n              <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n            </svg>\n          </button>\n        </div>\n        <div class=\"picker-recent\"></div>\n      </div>\n    ");
 
   this.menu = this.picker.querySelector('.picker-menu');
-  this.body = this.picker.querySelector('.modal-body');
   this.recent = this.picker.querySelector('.picker-recent');
   this.guide = this.picker.querySelector('.picker-guide');
   this.canvas = this.picker.querySelector('.picker-canvas');
@@ -1581,7 +1580,7 @@ Colorpicker.prototype._initElements = function _initElements () {
   };
 
   this.el.parentNode.insertBefore(this.picker, this.el);
-  this.el.classList.add('picker-value', 'input');
+  this.el.classList.add('picker-value');
   this.picker.classList.add('picker');
   this.submit.parentNode.insertBefore(this.el, this.submit);
   this.guide.style.backgroundColor = this.options.defaultColor;
@@ -1646,7 +1645,7 @@ Colorpicker.prototype._initEvents = function _initEvents () {
   });
 
   this.menu.addEventListener('mousedown', function (event) {
-    if (event.target !== this$1.body || event.button !== 0) { return; }
+    if (event.target !== this$1.menu || event.button !== 0) { return; }
     var startPosition = {};
     var endPosition = {};
     var delta = {};

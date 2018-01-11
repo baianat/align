@@ -16,7 +16,6 @@ const commonjs = require('rollup-plugin-commonjs');
 const nodeResolve = require('rollup-plugin-node-resolve');
 
 const del = require('del');
-const svgSprite = require('gulp-svg-sprites');
 
 const browserSync = require('browser-sync');
 const reload = browserSync.reload;
@@ -106,21 +105,6 @@ gulp.task('font', () => {
     .pipe(gulp.dest('./dist/font/'));
 });
 
-/**
- * sprites task
- */
-gulp.task('sprites', function () {
-  return gulp.src('src/svg/*.svg')
-    .pipe(svgSprite({
-      preview: false,
-      mode: 'symbols',
-      svgId: 'icon-%f',
-      svg: {
-        sprite: 'icons.svg'
-      }
-    }))
-    .pipe(gulp.dest('dist'));
-});
 
 /**
  * Watch task
@@ -128,7 +112,6 @@ gulp.task('sprites', function () {
 gulp.task('watch', () => {
   gulp.watch('./src/js/**/*.js', ['scripts']);
   gulp.watch('./src/stylus/**/*.styl', ['styles']);
-  gulp.watch('./src/svg/**/*.svg', ['sprites']);
   gulp.watch('./**/*.html', () => {
     gulp.src('./**/*.html').pipe(reload({ stream: true }));
   });
@@ -137,7 +120,7 @@ gulp.task('watch', () => {
 /**
  * Default task
  */
-gulp.task('default', ['styles', 'scripts', 'font', 'browser-sync', 'sprites', 'watch']);
+gulp.task('default', ['styles', 'scripts', 'font', 'browser-sync', 'watch']);
 
 
 
