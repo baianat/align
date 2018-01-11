@@ -1,15 +1,14 @@
 import hljs from 'highlight.js/lib/highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
-hljs.registerLanguage('javascript', javascript);
-
 import { select } from './util';
 import Styler from './styler';
 
+hljs.registerLanguage('javascript', javascript);
 
 class Align {
   constructor(selector, {
     defaultText = 'Type here',
-    styler = null,
+    styler = null
   } = {}) {
     this.el = select(selector);
     this.options = {
@@ -67,23 +66,23 @@ class Align {
       this.styler.updateStylerStates();
     });
 
-    window.addEventListener("keyup", (event) => {
+    window.addEventListener('keyup', (event) => {
       // Do nothing if the event was already processed
       if (event.defaultPrevented) {
         return;
       }
 
       switch (event.key) {
-        case "ArrowDown":
-          // Do something for "down arrow" key press.
-          break;
-        case "ArrowUp":
-          // Do something for "up arrow" key press.
-          break;
-        case "ArrowLeft":
+        case 'ArrowDown':
           this.styler.updateStylerStates();
           break;
-        case "ArrowRight":
+        case 'ArrowUp':
+          this.styler.updateStylerStates();
+          break;
+        case 'ArrowLeft':
+          this.styler.updateStylerStates();
+          break;
+        case 'ArrowRight':
           this.styler.updateStylerStates();
           break;
         case 'Tab':
@@ -91,16 +90,15 @@ class Align {
           break;
 
         default:
-          return;
       }
 
       // Cancel the default action to avoid it being handled twice
-      // event.preventDefault();
+      event.preventDefault();
     }, true);
   }
 
   /**
-   * Hightlight code text
+   * Hight light code text
    */
   highlight() {
     const code = Array.from(this.text.querySelectorAll('pre'));
@@ -111,17 +109,17 @@ class Align {
   }
 
   /**
-   * Toggle on/off HTML represntation
+   * Toggle on/off HTML
    */
   toggleHTML() {
     this.HTML = !this.HTML;
     if (this.HTML) {
       const content = document.createTextNode(this.text.innerHTML);
-      const pre = document.createElement("pre");
+      const pre = document.createElement('pre');
 
-      this.text.innerHTML = "";
+      this.text.innerHTML = '';
       this.text.contentEditable = false;
-      pre.id = "content";
+      pre.id = 'content';
       pre.contentEditable = false;
       pre.appendChild(content);
       this.text.appendChild(pre);

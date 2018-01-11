@@ -82,7 +82,7 @@ const formats = {
     element: 'button',
     func: 'toggleHTML'
   },
-  
+
   fontSize: {
     element: 'select',
     command: 'fontSize',

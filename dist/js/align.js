@@ -1967,7 +1967,7 @@ var formats = {
     element: 'button',
     func: 'toggleHTML'
   },
-  
+
   fontSize: {
     element: 'select',
     command: 'fontSize',
@@ -2054,18 +2054,18 @@ var Styler = function Styler(align, ref) {
   this.align = align;
   this.settings = {
     mode: mode,
-    commands: commands,
+    commands: commands
   };
   this.init();
 };
 
-Styler.extend = function extend (name, extention) {
-  formats[name] = extention;
+Styler.extend = function extend (name, extension) {
+  formats[name] = extension;
 };
 
 /**
  * Create button HTML element
- * @param {String} name 
+ * @param {String} name
  */
 Styler.button = function button (name) {
   var button = document.createElement('button');
@@ -2077,8 +2077,8 @@ Styler.button = function button (name) {
 
 /**
  * Create select options HTML element
- * @param {String} name 
- * @param {Object} options 
+ * @param {String} name
+ * @param {Object} options
  */
 Styler.select = function select (name, options) {
   var select = document.createElement('select');
@@ -2095,8 +2095,8 @@ Styler.select = function select (name, options) {
 
 /**
  * Create input HTML element
- * @param {String} name 
- * @param {String} type 
+ * @param {String} name
+ * @param {String} type
  */
 Styler.input = function input (name, type) {
   var input = document.createElement('input');
@@ -2133,10 +2133,10 @@ Styler.prototype.init = function init () {
         // instead it use functions form align class
         // here we detect which callback should be use
         var callBack =
-          current.command ?
-          this$1.execute.bind(this$1) :
-          this$1.align[current.func].bind(this$1.align);
-          
+          current.command
+            ? this$1.execute.bind(this$1)
+            : this$1.align[current.func].bind(this$1.align);
+
         this$1.style[el].addEventListener('click', function () {
           callBack(current.command, current.value);
         });
@@ -2151,8 +2151,7 @@ Styler.prototype.init = function init () {
         });
         li.appendChild(this$1.style[el]);
         break;
-        
-      case 'input': 
+      case 'input':
         this$1.style[el] = Styler.input(el, current.type);
         this$1.style[el].addEventListener('change', function () {
           this$1.align.el.focus();
@@ -2160,8 +2159,8 @@ Styler.prototype.init = function init () {
         });
         li.appendChild(this$1.style[el]);
         break;
-          
-      case 'styling': 
+
+      case 'styling':
         li.classList.add(current.class);
         break;
 
@@ -2172,7 +2171,6 @@ Styler.prototype.init = function init () {
 
       default:
         console.warn(el + ' is not found');
-        return; 
     }
 
     if (current.init) {
@@ -2191,8 +2189,8 @@ Styler.prototype.initBubble = function initBubble () {
 };
 /**
  * Execute command for the selected button
- * @param {String} cmd 
- * @param {String|Number} value 
+ * @param {String} cmd
+ * @param {String|Number} value
  */
 Styler.prototype.execute = function execute (cmd, value) {
   if (this.align.HTML) { return; }
@@ -2207,8 +2205,8 @@ Styler.prototype.updateBubblePosition = function updateBubblePosition () {
   var deltaX = position.x + (position.width / 2) - (this.styler.offsetWidth / 2);
   this.styler.style.top = (deltaY > 0 ? deltaY : 0) + "px";
   this.styler.style.left = (deltaX > 50 ? deltaX : 50) + "px";
-    
 };
+
 Styler.prototype.showStyler = function showStyler () {
   this.styler.classList.add('is-visible');
   this.styler.classList.remove('is-hidden');
@@ -2327,23 +2325,23 @@ Align.prototype.initEvents = function initEvents () {
     this$1.styler.updateStylerStates();
   });
 
-  window.addEventListener("keyup", function (event) {
+  window.addEventListener('keyup', function (event) {
     // Do nothing if the event was already processed
     if (event.defaultPrevented) {
       return;
     }
 
     switch (event.key) {
-      case "ArrowDown":
-        // Do something for "down arrow" key press.
-        break;
-      case "ArrowUp":
-        // Do something for "up arrow" key press.
-        break;
-      case "ArrowLeft":
+      case 'ArrowDown':
         this$1.styler.updateStylerStates();
         break;
-      case "ArrowRight":
+      case 'ArrowUp':
+        this$1.styler.updateStylerStates();
+        break;
+      case 'ArrowLeft':
+        this$1.styler.updateStylerStates();
+        break;
+      case 'ArrowRight':
         this$1.styler.updateStylerStates();
         break;
       case 'Tab':
@@ -2351,16 +2349,15 @@ Align.prototype.initEvents = function initEvents () {
         break;
 
       default:
-        return;
     }
 
     // Cancel the default action to avoid it being handled twice
-    // event.preventDefault();
+    event.preventDefault();
   }, true);
 };
 
 /**
- * Hightlight code text
+ * Hight light code text
  */
 Align.prototype.highlight = function highlight$$1 () {
   var code = Array.from(this.text.querySelectorAll('pre'));
@@ -2371,17 +2368,17 @@ Align.prototype.highlight = function highlight$$1 () {
 };
 
 /**
- * Toggle on/off HTML represntation
+ * Toggle on/off HTML
  */
 Align.prototype.toggleHTML = function toggleHTML () {
   this.HTML = !this.HTML;
   if (this.HTML) {
     var content = document.createTextNode(this.text.innerHTML);
-    var pre = document.createElement("pre");
+    var pre = document.createElement('pre');
 
-    this.text.innerHTML = "";
+    this.text.innerHTML = '';
     this.text.contentEditable = false;
-    pre.id = "content";
+    pre.id = 'content';
     pre.contentEditable = false;
     pre.appendChild(content);
     this.text.appendChild(pre);

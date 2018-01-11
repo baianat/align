@@ -2,26 +2,25 @@ import formats from './formats';
 import icons from './icons';
 
 class Styler {
-
   constructor(align, {
     mode = 'default',
-    commands = ['bold', 'italic', 'underline'],
+    commands = ['bold', 'italic', 'underline']
   } = {}) {
     this.align = align;
     this.settings = {
       mode,
-      commands,
+      commands
     };
     this.init();
   }
 
-  static extend (name, extention) {
-    formats[name] = extention;
+  static extend (name, extension) {
+    formats[name] = extension;
   }
 
   /**
    * Create button HTML element
-   * @param {String} name 
+   * @param {String} name
    */
   static button(name) {
     const button = document.createElement('button');
@@ -37,8 +36,8 @@ class Styler {
 
   /**
    * Create select options HTML element
-   * @param {String} name 
-   * @param {Object} options 
+   * @param {String} name
+   * @param {Object} options
    */
   static select(name, options) {
     const select = document.createElement('select');
@@ -55,8 +54,8 @@ class Styler {
 
   /**
    * Create input HTML element
-   * @param {String} name 
-   * @param {String} type 
+   * @param {String} name
+   * @param {String} type
    */
   static input(name, type) {
     const input = document.createElement('input');
@@ -91,10 +90,10 @@ class Styler {
           // instead it use functions form align class
           // here we detect which callback should be use
           const callBack =
-            current.command ?
-            this.execute.bind(this) :
-            this.align[current.func].bind(this.align);
-          
+            current.command
+              ? this.execute.bind(this)
+              : this.align[current.func].bind(this.align);
+
           this.style[el].addEventListener('click', () => {
             callBack(current.command, current.value);
           });
@@ -109,8 +108,7 @@ class Styler {
           });
           li.appendChild(this.style[el]);
           break;
-        
-        case 'input': 
+        case 'input':
           this.style[el] = Styler.input(el, current.type);
           this.style[el].addEventListener('change', () => {
             this.align.el.focus();
@@ -118,8 +116,8 @@ class Styler {
           });
           li.appendChild(this.style[el]);
           break;
-          
-        case 'styling': 
+
+        case 'styling':
           li.classList.add(current.class);
           break;
 
@@ -130,7 +128,6 @@ class Styler {
 
         default:
           console.warn(el + ' is not found');
-          return; 
       }
 
       if (current.init) {
@@ -149,8 +146,8 @@ class Styler {
   }
   /**
    * Execute command for the selected button
-   * @param {String} cmd 
-   * @param {String|Number} value 
+   * @param {String} cmd
+   * @param {String|Number} value
    */
   execute(cmd, value) {
     if (this.align.HTML) return;
@@ -165,8 +162,8 @@ class Styler {
     const deltaX = position.x + (position.width / 2) - (this.styler.offsetWidth / 2)
     this.styler.style.top = `${deltaY > 0 ? deltaY : 0}px`
     this.styler.style.left = `${deltaX > 50 ? deltaX : 50}px`
-    
   }
+
   showStyler() {
     this.styler.classList.add('is-visible');
     this.styler.classList.remove('is-hidden');
