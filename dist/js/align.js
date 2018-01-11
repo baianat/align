@@ -1007,7 +1007,22 @@ function select(element) {
 
 
 
+function debounce(callback, immediate) {
+  if ( immediate === void 0 ) immediate = false;
 
+  var timeout;
+  return function () {
+    var arguments$1 = arguments;
+
+    var later = function () {
+      timeout = null;
+      if (!immediate) { callback.apply(void 0, arguments$1); }
+    };
+    var callNow = immediate && !timeout;
+    timeout = requestAnimationFrame(later);
+    if (callNow) { callback.apply(void 0, arguments); }
+  };
+}
 
 
 
@@ -1016,6 +1031,11 @@ function select(element) {
 /**
  * Converts an array-like object to an array.
  */
+
+
+function normalizeNumber(number, min, max) {
+  return Math.round(Math.max(Math.min(Number(number), max), min));
+}
 
 var colorpicker = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
@@ -2080,17 +2100,17 @@ Styler.button = function button (name) {
  * @param {String} name
  * @param {Object} options
  */
-Styler.select = function select (name, options) {
-  var select = document.createElement('select');
-  select.classList.add('styler-select');
-  select.id = name;
+Styler.select = function select$$1 (name, options) {
+  var select$$1 = document.createElement('select');
+  select$$1.classList.add('styler-select');
+  select$$1.id = name;
   options.forEach(function (option) {
     var optionElement = document.createElement('option');
     optionElement.value = option.value;
     optionElement.innerText = option.text;
-    select.appendChild(optionElement);
+    select$$1.appendChild(optionElement);
   });
-  return select;
+  return select$$1;
 };
 
 /**
@@ -2186,6 +2206,8 @@ Styler.prototype.init = function init () {
 Styler.prototype.initBubble = function initBubble () {
   this.styler.classList.add('is-hidden');
   this.reference = document.createElement('sapn');
+  this.selection = '';
+  window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
 };
 /**
  * Execute command for the selected button
@@ -2200,11 +2222,18 @@ Styler.prototype.execute = function execute (cmd, value) {
 };
 
 Styler.prototype.updateBubblePosition = function updateBubblePosition () {
-  var position = this.selection.getBoundingClientRect();
-  var deltaY = position.y - 70;
-  var deltaX = position.x + (position.width / 2) - (this.styler.offsetWidth / 2);
-  this.styler.style.top = (deltaY > 0 ? deltaY : 0) + "px";
-  this.styler.style.left = (deltaX > 50 ? deltaX : 50) + "px";
+  if (!this.selection) { return; }
+  var selectionRect = this.selection.getBoundingClientRect();
+  console.log(selectionRect);
+  var editorRect = this.align.el.getBoundingClientRect();
+  var stylerRect = this.styler.getBoundingClientRect();
+  var scrolled = window.scrollY;
+  var deltaY = selectionRect.y + scrolled + ((selectionRect.height - stylerRect.height) / 2);
+  var deltaX = selectionRect.x + ((selectionRect.width - stylerRect.width) / 2);
+
+  this.styler.style.top = deltaY + "px";
+  this.styler.style.transform = "translate3d(0, " + (deltaY - 70 < scrolled ? 70 : -70) + "px, 0)";
+  this.styler.style.left = (normalizeNumber(deltaX, editorRect.x, editorRect.width - stylerRect.width)) + "px";
 };
 
 Styler.prototype.showStyler = function showStyler () {

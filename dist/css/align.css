@@ -342,13 +342,12 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
  * eidtor elements
  */
 .align {
-  max-height: 100vh;
+  position: relative;
 }
 .align-text {
-  padding: 20px 100px;
+  padding: 50px 100px;
   overflow: auto;
   white-space: normal;
-  margin-top: 70px;
 }
 .align-text:focus {
   outline: none;
@@ -370,19 +369,17 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
       justify-content: center;
   -ms-flex-align: center;
       align-items: center;
+  padding: 10px;
 }
 .styler.is-default {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   left: 0;
-  padding: 20px 0;
 }
 .styler.is-bubble {
-  position: absolute;
+  position: fixed;
   border-radius: 40px;
-  padding: 10px;
-  margin-bottom: 50px;
 }
 .styler li:not(last-child) {
   margin-right: 1px;
@@ -471,4 +468,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
  */
 .picker-guide {
   border-color: #fff;
+}
+.picker-menu {
+  background-color: rgba(255,255,255,0.9);
 }

@@ -1,5 +1,6 @@
 import formats from './formats';
 import icons from './icons';
+import { normalizeNumber, debounce } from './util';
 
 class Styler {
   constructor(align, {
@@ -143,6 +144,8 @@ class Styler {
   initBubble() {
     this.styler.classList.add('is-hidden');
     this.reference = document.createElement('sapn');
+    this.selection = '';
+    window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)))
   }
   /**
    * Execute command for the selected button
@@ -157,11 +160,18 @@ class Styler {
   }
 
   updateBubblePosition() {
-    const position = this.selection.getBoundingClientRect();
-    const deltaY = position.y - 70;
-    const deltaX = position.x + (position.width / 2) - (this.styler.offsetWidth / 2)
-    this.styler.style.top = `${deltaY > 0 ? deltaY : 0}px`
-    this.styler.style.left = `${deltaX > 50 ? deltaX : 50}px`
+    if (!this.selection) return;
+    const selectionRect = this.selection.getBoundingClientRect();
+    console.log(selectionRect)
+    const editorRect = this.align.el.getBoundingClientRect();
+    const stylerRect = this.styler.getBoundingClientRect();
+    const scrolled = window.scrollY;
+    const deltaY = selectionRect.y + scrolled + ((selectionRect.height - stylerRect.height) / 2);
+    const deltaX = selectionRect.x + ((selectionRect.width - stylerRect.width) / 2)
+
+    this.styler.style.top = `${deltaY}px`;
+    this.styler.style.transform = `translate3d(0, ${deltaY - 70 < scrolled ? 70 : -70}px, 0)`;
+    this.styler.style.left = `${normalizeNumber(deltaX, editorRect.x, editorRect.width - stylerRect.width)}px`
   }
 
   showStyler() {

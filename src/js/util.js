@@ -43,7 +43,6 @@ export function debounce(callback, immediate = false) {
       if (!immediate) callback(...arguments);
     };
     let callNow = immediate && !timeout;
-    cancelAnimationFrame(timeout);
     timeout = requestAnimationFrame(later);
     if (callNow) callback(...arguments);
   };
@@ -88,3 +87,6 @@ export function toArray(arrayLike, mappingFn) {
   return array;
 }
 
+export function normalizeNumber(number, min, max) {
+  return Math.round(Math.max(Math.min(Number(number), max), min));
+}
