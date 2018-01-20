@@ -1,4 +1,4 @@
-import formats from './formats';
+import commands from './commands';
 import icons from './icons';
 import { normalizeNumber, debounce } from './util';
 
@@ -16,7 +16,7 @@ class Styler {
   }
 
   static extend (name, extension) {
-    formats[name] = extension;
+    commands[name] = extension;
   }
 
   /**
@@ -78,7 +78,7 @@ class Styler {
 
     this.settings.commands.forEach((el) => {
       const li = document.createElement('li');
-      const current = formats[el];
+      const current = commands[el];
       if (!current) {
         console.warn(el + ' is not found');
         return;

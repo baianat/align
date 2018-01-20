@@ -1907,7 +1907,7 @@ return Colorpicker;
 
 var SELECTION = null;
 
-var formats = {
+var commands = {
   bold: {
     element: 'button',
     command: 'bold'
@@ -2069,18 +2069,18 @@ var icons = {
 var Styler = function Styler(align, ref) {
   if ( ref === void 0 ) ref = {};
   var mode = ref.mode; if ( mode === void 0 ) mode = 'default';
-  var commands = ref.commands; if ( commands === void 0 ) commands = ['bold', 'italic', 'underline'];
+  var commands$$1 = ref.commands; if ( commands$$1 === void 0 ) commands$$1 = ['bold', 'italic', 'underline'];
 
   this.align = align;
   this.settings = {
     mode: mode,
-    commands: commands
+    commands: commands$$1
   };
   this.init();
 };
 
 Styler.extend = function extend (name, extension) {
-  formats[name] = extension;
+  commands[name] = extension;
 };
 
 /**
@@ -2140,7 +2140,7 @@ Styler.prototype.init = function init () {
 
   this.settings.commands.forEach(function (el) {
     var li = document.createElement('li');
-    var current = formats[el];
+    var current = commands[el];
     if (!current) {
       console.warn(el + ' is not found');
       return;

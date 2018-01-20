@@ -353,8 +353,6 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   outline: none;
 }
 .align-image {
-  display: block;
-  margin: auto;
   width: 100%;
   max-width: 400px;
 }

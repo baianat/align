@@ -2,7 +2,7 @@ import Colorpicker from '@baianat/colorpicker';
 
 let SELECTION = null;
 
-const formats = {
+const commands = {
   bold: {
     element: 'button',
     command: 'bold'
@@ -139,4 +139,4 @@ const formats = {
   }
 }
 
-export default formats;
+export default commands;

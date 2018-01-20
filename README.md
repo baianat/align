@@ -1,18 +1,19 @@
 # Align
 
-ES6 Text editor
+A simple text editor with expandable commands.
 
 ## key features
 
-* Build using ES6 classes
-* Customizing using arry of settings
-* Built-in colorpicker to change font color
+* Built using vanilla ES6
+* Customizable using an array of settings
+* Built-in, fully-integrated colorpicker
+* The ability to add more custom commands
 
 [example](https://baianat.github.io/editor/)
 
 ## How to use
 
-### include necessary files
+### Include necessary files
 
 ``` html
 <head>
@@ -24,37 +25,39 @@ ES6 Text editor
 </body>
 ```
 
-### HTML markup
+### HTML Layout
 
-you need an div to render editor in it.
+You need a div to render `Align` in it.
 
 ``` html
-<div class="editor"></div>
+<div class="align"></div>
 
 <script>
-  let myEditor = new Align('.editor', {
-    defaultText: 'Hello there I\'m Baianat\'s editor!'
+  new Align('.align', {
+    //settings
   });
 </script>
 ```
+
 You can also pass the element directly to the constructor
 
 ``` html
-<div class="editor"></div>
+<div class="align"></div>
 
 <script>
-  const div = document.querySelector('.editor');
-  let myEditor = new Align(div, {
-    defaultText: 'Hello there I\'m Baianat\'s editor!'
+  const myAlign = document.querySelector('.align');
+  new Align(myAlign, {
+    //settings
   });
 </script>
 ```
 
+### Customizing Align
 
-to customize editor's styler commands, you can pass to commands key as array of commands as value.
+To customize editor's styler, through `styler` key in the settings object.
 
 ```js
-let myEditor = new Align('.editor', {
+new Align('.editor', {
   styler: {
     mode: 'default', // default or bubble
     commands: ['color', 'sperator', 'fontName', 'fontSize']
@@ -62,9 +65,9 @@ let myEditor = new Align('.editor', {
 });
 ```
 
-list of all available commands
+List of all available commands
 
-| Command     | Discription |
+| COMMAND     | DESCRIPTION |
 |-------------|-------------|
 |color        | Changes a font color for the selection or at the insertion point |
 |fontName     | Changes the font name for the selection or at the insertion point |
@@ -82,12 +85,85 @@ list of all available commands
 |h2           | Adds an HTML h2 tag around the line containing the current selection |
 |blockquote   | Adds an HTML blockquote tag around the line containing the current selection |
 |p            | Adds an HTML p tag around the line containing the current selection |
-|pre          | Adds an HTML pre tag around the line containing the current selection and highlight it's script |
-|addImage     | Upload image add inseart it |
+|pre          | Adds an HTML pre tag around the line containing the current selection and highlight its script |
 |html         | Toggles HTML on/off for all text |
-|sperator     | Use for decorate to sperate commands |
+|sperator     | Used for decoration to separate commands |
 
-finally to get editor's content you can use `content` propertie
+### Adding your new custom commands
+
+To add a new command you use `Align.extend()`
+
+```javaScript
+Align.extend('commandName', {
+  element: 'custom',
+  data() {
+    // a function to store a reference to command elements
+  },
+  create() {
+    // a function to render the command on execution
+  },
+  action() {
+    // a function to define command actions
+  }
+})
+```
+
+A full working example on how to add a custom image input command
+
+```javaScript
+Align.extend('addImage', {
+  element: 'custom',
+  data() {
+    return {
+      button: document.createElement('button'),
+      input: document.createElement('input'),
+      icon:
+        `<svg class="icon" viewBox="0 0 24 24">
+          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>
+        </svg>`
+    }
+  },
+  create() {
+    this.$data = this.data;
+    this.data = this.$data();
+    const button = this.data.button;
+    const input = this.data.input;
+    const icon = this.data.icon;
+
+    button.classList.add('styler-button');
+    button.appendChild(input);
+    button.insertAdjacentHTML('beforeend', icon);
+    input.classList.add('styler-input');
+    input.type = 'file';
+    input.id = 'addImage';
+    input.addEventListener('change', this.action.bind(this));
+
+    return button;
+  },
+  action() {
+    const file = this.data.input.files[0];
+    if (!file) return;
+    const imageURL = URL.createObjectURL(file);
+    const img = document.createElement('img');
+    const p = document.createElement('p');
+    let selectedPosition;
+
+    img.src = imageURL;
+    img.classList.add('align-image');
+    if (!window.getSelection().rangeCount) return;
+    selectedPosition = window.getSelection().getRangeAt(0);
+    p.appendChild(img);
+    selectedPosition.insertNode(p);
+    this.data.input.value = null;
+
+    // add your logic to save image in database
+  }
+});
+```
+
+### Getting the content
+
+Finally, to get `Align`'s content you can use `content` property
 
 ```js
 saveToDatabase(myEditor.content);
