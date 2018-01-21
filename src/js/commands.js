@@ -123,6 +123,7 @@ const commands = {
     initConfig: {
       defaultColor: '#000000',
       mode: 'hex',
+      disableLum: true,
       events: {
         beforeSubmit() {
           if (!SELECTION) return;

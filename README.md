@@ -13,6 +13,17 @@ A simple text editor with expandable commands.
 
 ## How to use
 
+### Installation
+
+First step is to install it using `yarn` or `npm`:
+
+```bash
+npm install vuse
+
+# or use yarn
+yarn add vuse
+```
+
 ### Include necessary files
 
 ``` html
