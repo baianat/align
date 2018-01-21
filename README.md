@@ -18,10 +18,10 @@ A simple text editor with expandable commands.
 First step is to install it using `yarn` or `npm`:
 
 ```bash
-npm install vuse
+npm install @baianat/align
 
 # or use yarn
-yarn add vuse
+yarn add @baianat/align
 ```
 
 ### Include necessary files
