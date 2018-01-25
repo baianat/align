@@ -1,6 +1,6 @@
+import { normalizeNumber, debounce } from './util';
 import commands from './commands';
 import icons from './icons';
-import { normalizeNumber, debounce } from './util';
 
 class Styler {
   constructor(align, {
@@ -15,15 +15,11 @@ class Styler {
     this.init();
   }
 
-  static extend (name, extension) {
-    commands[name] = extension;
-  }
-
   /**
    * Create button HTML element
    * @param {String} name
    */
-  static button(name) {
+  button(name) {
     const button = document.createElement('button');
     button.classList.add('styler-button');
     button.id = name;
@@ -40,7 +36,7 @@ class Styler {
    * @param {String} name
    * @param {Object} options
    */
-  static select(name, options) {
+  select(name, options) {
     const select = document.createElement('select');
     select.classList.add('styler-select');
     select.id = name;
@@ -58,7 +54,7 @@ class Styler {
    * @param {String} name
    * @param {String} type
    */
-  static input(name, type) {
+  input(name, type) {
     const input = document.createElement('input');
     input.classList.add(`styler-${name}`);
     input.id = name;
@@ -86,7 +82,7 @@ class Styler {
 
       switch (current.element) {
         case 'button':
-          this.style[el] = Styler.button(el);
+          this.style[el] = this.button(el);
           // some buttons don't have commands
           // instead it use functions form align class
           // here we detect which callback should be use
@@ -102,7 +98,7 @@ class Styler {
           break;
 
         case 'select':
-          this.style[el] = Styler.select(el, current.options);
+          this.style[el] = this.select(el, current.options);
           this.style[el].addEventListener('change', () => {
             const selection = this.style[el];
             this.execute(current.command, selection[selection.selectedIndex].value);
@@ -110,9 +106,8 @@ class Styler {
           li.appendChild(this.style[el]);
           break;
         case 'input':
-          this.style[el] = Styler.input(el, current.type);
+          this.style[el] = this.input(el, current.type);
           this.style[el].addEventListener('change', () => {
-            this.align.el.focus();
             this.execute(current.command, this.style[el].value);
           });
           li.appendChild(this.style[el]);
@@ -162,7 +157,7 @@ class Styler {
   updateBubblePosition() {
     if (!this.selection) return;
     const selectionRect = this.selection.getBoundingClientRect();
-    console.log(selectionRect)
+
     const editorRect = this.align.el.getBoundingClientRect();
     const stylerRect = this.styler.getBoundingClientRect();
     const scrolled = window.scrollY;
@@ -214,11 +209,7 @@ class Styler {
         this.style[styl].value = document.queryCommandValue(styl);
         return;
       }
-      if (this.inits[styl]) {
-        // if (this.inits[styl].isMenuActive) return;
-        this.inits[styl].selectColor(document.queryCommandValue('foreColor'), true);
-        return;
-      }
+
       this.style[styl].classList.remove('is-active');
     })
   }

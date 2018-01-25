@@ -125,15 +125,23 @@ const commands = {
       mode: 'hex',
       disableLum: true,
       events: {
+        click() {
+
+        },
         beforeSubmit() {
-          if (!SELECTION) return;
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(SELECTION);
+          console.log(SELECTION)
+          if (SELECTION) {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(SELECTION);
+          }
         },
         afterOpen() {
-          if (!window.getSelection().rangeCount) return;
-          SELECTION = window.getSelection().getRangeAt(0);
+          const sel = window.getSelection();
+          if (sel.getRangeAt && sel.rangeCount) {
+            SELECTION = sel.getRangeAt(0);
+            console.log(typeof SELECTION);
+          }
         }
       }
     }

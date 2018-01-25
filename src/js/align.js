@@ -1,9 +1,8 @@
-import hljs from 'highlight.js/lib/highlight.js';
-import javascript from 'highlight.js/lib/languages/javascript';
+import hljs from 'highlight.js';
 import { select } from './util';
+import commands from './commands';
+import icons from './icons';
 import Styler from './styler';
-
-hljs.registerLanguage('javascript', javascript);
 
 class Align {
   constructor(selector, {
@@ -11,6 +10,7 @@ class Align {
     styler = null
   } = {}) {
     this.el = select(selector);
+
     this.options = {
       defaultText,
       styler
@@ -26,9 +26,12 @@ class Align {
   }
 
   static extend(name, extension) {
-    Styler.extend(name, extension)
+    commands[name] = extension;
   }
 
+  static extendIcons(name, path) {
+    icons[name] = path;
+  }
   /**
    * Create all editor elements
    */
@@ -101,8 +104,10 @@ class Align {
    * Hight light code text
    */
   highlight() {
+    if (!hljs) {
+      return;
+    }
     const code = Array.from(this.text.querySelectorAll('pre'));
-
     code.forEach((block) => {
       hljs.highlightBlock(block);
     })

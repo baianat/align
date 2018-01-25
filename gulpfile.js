@@ -11,7 +11,7 @@ const gulpif = require('gulp-if');
 const rollup = require('gulp-rollup');
 const sequence = require('gulp-sequence');
 
-const buble = require('rollup-plugin-buble');
+const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const nodeResolve = require('rollup-plugin-node-resolve');
 
@@ -31,7 +31,7 @@ function isProduction() {
  */
 gulp.task('browser-sync', () => {
   browserSync.init({
-    proxy: 'align.dev'
+    server: './'
   });
 })
 
@@ -65,11 +65,15 @@ gulp.task('scripts', () => {
       input: 'src/js/align.js',
       format: 'umd',
       name: 'Align',
+      external: ['highlight.js'],
+      globals: {
+        'highlight.js': 'hljs'
+      },
       allowRealFiles: true,
       plugins: [
         nodeResolve(),
         commonjs(),
-        buble()
+        babel()
       ]
     }))
     .pipe(rename({

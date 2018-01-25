@@ -96,13 +96,14 @@ List of all available commands
 |h2           | Adds an HTML h2 tag around the line containing the current selection |
 |blockquote   | Adds an HTML blockquote tag around the line containing the current selection |
 |p            | Adds an HTML p tag around the line containing the current selection |
-|pre          | Adds an HTML pre tag around the line containing the current selection and highlight its script |
+|pre          | Adds an HTML pre tag around the line containing the current selection so you can highlight its script |
 |html         | Toggles HTML on/off for all text |
 |sperator     | Used for decoration to separate commands |
 
-### Adding your new custom commands
+### Adding new custom commands
 
-To add a new command you use `Align.extend()`
+To extend `Align`'s [commands](https://github.com/baianat/align/blob/master/src/js/commands.js#L5) object, use `Align.extend('commandName', { //setting })`
+> Note: use extend with caution, since you can overwrite the current commands behavior. if you used your `commandName` same as one of `Align`'s commands.
 
 ```javaScript
 Align.extend('commandName', {
@@ -172,12 +173,40 @@ Align.extend('addImage', {
 });
 ```
 
+### Adding new custom icon
+
+If you want to change `Align`'s [icons](https://github.com/baianat/align/blob/master/src/js/icons.js) or add a new one, use `Align.extendIcon('iconName', 'svg path')`
+> Note: your icon should be only one path SVG.
+
+```js
+// change bold command icon
+Align.extendIcons('bold', 'M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z');
+```
+
 ### Getting the content
 
 Finally, to get `Align`'s content you can use `content` property
 
 ```js
 saveToDatabase(myEditor.content);
+```
+
+### highlight 
+
+We using [highlight.js](https://highlightjs.org/) plug-in to highlight pre tags.
+To enable syntax highlighting you have to include `highlight.js` as external dependence before `Align`
+
+```html
+<head>
+  <link rel="stylesheet" href="dist/css/align.css">
+  <link rel="stylesheet" href="path-to/highlight.min.css">
+</head>
+<body>
+    ...
+  <script src="path-to/highlight.min.js"></script>
+  <script src="dist/js/align.js"></script>
+</body>
+
 ```
 
 ## License
