@@ -1,4 +1,5 @@
 import { normalizeNumber, debounce } from './util';
+import { setElementsPrefix, button, select, input } from './elements';
 import commands from './commands';
 import icons from './icons';
 
@@ -16,61 +17,14 @@ class Styler {
   }
 
   /**
-   * Create button HTML element
-   * @param {String} name
-   */
-  button(name) {
-    const button = document.createElement('button');
-    button.classList.add('styler-button');
-    button.id = name;
-    button.insertAdjacentHTML('afterbegin', `
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="${icons[name]}"/>
-      </svg>
-    `);
-    return button;
-  }
-
-  /**
-   * Create select options HTML element
-   * @param {String} name
-   * @param {Object} options
-   */
-  select(name, options) {
-    const select = document.createElement('select');
-    select.classList.add('styler-select');
-    select.id = name;
-    options.forEach((option) => {
-      const optionElement = document.createElement('option');
-      optionElement.value = option.value;
-      optionElement.innerText = option.text;
-      select.appendChild(optionElement);
-    })
-    return select;
-  }
-
-  /**
-   * Create input HTML element
-   * @param {String} name
-   * @param {String} type
-   */
-  input(name, type) {
-    const input = document.createElement('input');
-    input.classList.add(`styler-${name}`);
-    input.id = name;
-    input.type = type;
-    return input;
-  }
-
-  /**
    * Create the styler toolbar
    */
   init() {
+    setElementsPrefix('styler-');
     this.styler = document.createElement('ul');
     this.styler.classList.add('styler', `is-${this.settings.mode}`);
     this.style = {};
     this.inits = {};
-    this.align.el.appendChild(this.styler);
 
     this.settings.commands.forEach((el) => {
       const li = document.createElement('li');
@@ -82,7 +36,7 @@ class Styler {
 
       switch (current.element) {
         case 'button':
-          this.style[el] = this.button(el);
+          this.style[el] = button(el, icons[el]);
           // some buttons don't have commands
           // instead it use functions form align class
           // here we detect which callback should be use
@@ -98,7 +52,7 @@ class Styler {
           break;
 
         case 'select':
-          this.style[el] = this.select(el, current.options);
+          this.style[el] = select(el, current.options);
           this.style[el].addEventListener('change', () => {
             const selection = this.style[el];
             this.execute(current.command, selection[selection.selectedIndex].value);
@@ -106,7 +60,7 @@ class Styler {
           li.appendChild(this.style[el]);
           break;
         case 'input':
-          this.style[el] = this.input(el, current.type);
+          this.style[el] = input(el, current.type);
           this.style[el].addEventListener('change', () => {
             this.execute(current.command, this.style[el].value);
           });
@@ -132,7 +86,7 @@ class Styler {
 
       this.styler.appendChild(li);
     })
-
+    this.align.el.appendChild(this.styler);
     if (this.settings.mode === 'bubble') this.initBubble();
   }
 
@@ -161,7 +115,7 @@ class Styler {
     const editorRect = this.align.el.getBoundingClientRect();
     const stylerRect = this.styler.getBoundingClientRect();
     const scrolled = window.scrollY;
-    const deltaY = selectionRect.y + scrolled + ((selectionRect.height - stylerRect.height) / 2);
+    const deltaY = selectionRect.y + ((selectionRect.height - stylerRect.height) / 2);
     const deltaX = selectionRect.x + ((selectionRect.width - stylerRect.width) / 2)
 
     this.styler.style.top = `${deltaY}px`;

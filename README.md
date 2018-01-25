@@ -45,7 +45,7 @@ You need a div to render `Align` in it.
 
 <script>
   new Align('.align', {
-    //settings
+    // settings
   });
 </script>
 ```
@@ -58,7 +58,7 @@ You can also pass the element directly to the constructor
 <script>
   const myAlign = document.querySelector('.align');
   new Align(myAlign, {
-    //settings
+    // settings
   });
 </script>
 ```

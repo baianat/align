@@ -9,7 +9,7 @@ hljs = hljs && hljs.hasOwnProperty('default') ? hljs['default'] : hljs;
 /**
  * Utilities
  */
-function select(element) {
+function select$1(element) {
   if (typeof element === 'string') {
     return document.querySelector(element);
   }
@@ -1258,6 +1258,54 @@ var icons = {
   underline: 'M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z'
 };
 
+var NAMING_PREFIX = '';
+
+function setElementsPrefix(prefix) {
+  NAMING_PREFIX = prefix;
+}
+/**
+  * Create button HTML element
+  * @param {String} name
+  */
+function button(name, icon) {
+  var button = document.createElement('button');
+  button.classList.add(NAMING_PREFIX + 'button');
+  button.id = name;
+  button.insertAdjacentHTML('afterbegin', '\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="' + icon + '"/>\n      </svg>\n    ');
+  return button;
+}
+
+/**
+ * Create select options HTML element
+ * @param {String} name
+ * @param {Object} options
+ */
+function select$2(name, options) {
+  var select = document.createElement('select');
+  select.classList.add(NAMING_PREFIX + 'select');
+  select.id = name;
+  options.forEach(function (option) {
+    var optionElement = document.createElement('option');
+    optionElement.value = option.value;
+    optionElement.innerText = option.text;
+    select.appendChild(optionElement);
+  });
+  return select;
+}
+
+/**
+ * Create input HTML element
+ * @param {String} name
+ * @param {String} type
+ */
+function input$1(name, type) {
+  var input = document.createElement('input');
+  input.classList.add('' + NAMING_PREFIX + name);
+  input.id = name;
+  input.type = type;
+  return input;
+}
+
 var Styler = function () {
   function Styler(align) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
@@ -1277,72 +1325,20 @@ var Styler = function () {
   }
 
   /**
-   * Create button HTML element
-   * @param {String} name
+   * Create the styler toolbar
    */
 
 
   createClass(Styler, [{
-    key: 'button',
-    value: function button(name) {
-      var button = document.createElement('button');
-      button.classList.add('styler-button');
-      button.id = name;
-      button.insertAdjacentHTML('afterbegin', '\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="' + icons[name] + '"/>\n      </svg>\n    ');
-      return button;
-    }
-
-    /**
-     * Create select options HTML element
-     * @param {String} name
-     * @param {Object} options
-     */
-
-  }, {
-    key: 'select',
-    value: function select$$1(name, options) {
-      var select$$1 = document.createElement('select');
-      select$$1.classList.add('styler-select');
-      select$$1.id = name;
-      options.forEach(function (option) {
-        var optionElement = document.createElement('option');
-        optionElement.value = option.value;
-        optionElement.innerText = option.text;
-        select$$1.appendChild(optionElement);
-      });
-      return select$$1;
-    }
-
-    /**
-     * Create input HTML element
-     * @param {String} name
-     * @param {String} type
-     */
-
-  }, {
-    key: 'input',
-    value: function input(name, type) {
-      var input = document.createElement('input');
-      input.classList.add('styler-' + name);
-      input.id = name;
-      input.type = type;
-      return input;
-    }
-
-    /**
-     * Create the styler toolbar
-     */
-
-  }, {
     key: 'init',
     value: function init() {
       var _this = this;
 
+      setElementsPrefix('styler-');
       this.styler = document.createElement('ul');
       this.styler.classList.add('styler', 'is-' + this.settings.mode);
       this.style = {};
       this.inits = {};
-      this.align.el.appendChild(this.styler);
 
       this.settings.commands.forEach(function (el) {
         var li = document.createElement('li');
@@ -1354,7 +1350,7 @@ var Styler = function () {
 
         switch (current.element) {
           case 'button':
-            _this.style[el] = _this.button(el);
+            _this.style[el] = button(el, icons[el]);
             // some buttons don't have commands
             // instead it use functions form align class
             // here we detect which callback should be use
@@ -1367,7 +1363,7 @@ var Styler = function () {
             break;
 
           case 'select':
-            _this.style[el] = _this.select(el, current.options);
+            _this.style[el] = select$2(el, current.options);
             _this.style[el].addEventListener('change', function () {
               var selection = _this.style[el];
               _this.execute(current.command, selection[selection.selectedIndex].value);
@@ -1375,7 +1371,7 @@ var Styler = function () {
             li.appendChild(_this.style[el]);
             break;
           case 'input':
-            _this.style[el] = _this.input(el, current.type);
+            _this.style[el] = input$1(el, current.type);
             _this.style[el].addEventListener('change', function () {
               _this.execute(current.command, _this.style[el].value);
             });
@@ -1401,7 +1397,7 @@ var Styler = function () {
 
         _this.styler.appendChild(li);
       });
-
+      this.align.el.appendChild(this.styler);
       if (this.settings.mode === 'bubble') this.initBubble();
     }
   }, {
@@ -1435,7 +1431,7 @@ var Styler = function () {
       var editorRect = this.align.el.getBoundingClientRect();
       var stylerRect = this.styler.getBoundingClientRect();
       var scrolled = window.scrollY;
-      var deltaY = selectionRect.y + scrolled + (selectionRect.height - stylerRect.height) / 2;
+      var deltaY = selectionRect.y + (selectionRect.height - stylerRect.height) / 2;
       var deltaX = selectionRect.x + (selectionRect.width - stylerRect.width) / 2;
 
       this.styler.style.top = deltaY + 'px';
@@ -1499,22 +1495,137 @@ var Styler = function () {
   return Styler;
 }();
 
+var Creator = function () {
+  function Creator(align) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$mode = _ref.mode,
+        mode = _ref$mode === undefined ? 'default' : _ref$mode,
+        _ref$commands = _ref.commands,
+        commands$$1 = _ref$commands === undefined ? [] : _ref$commands;
+
+    classCallCheck(this, Creator);
+
+    this.align = align;
+    this.settings = {
+      mode: mode,
+      commands: commands$$1
+    };
+    this.init();
+  }
+
+  createClass(Creator, [{
+    key: 'init',
+    value: function init() {
+      var _this = this;
+
+      setElementsPrefix('creator-');
+      this.creator = document.createElement('ul');
+      this.creator.classList.add('creator', 'is-hidden', 'is-' + this.settings.mode);
+      this.create = {};
+      this.inits = {};
+
+      this.settings.commands.forEach(function (el) {
+        var li = document.createElement('li');
+        var current = commands[el];
+        if (!current) {
+          console.warn(el + ' is not found');
+          return;
+        }
+
+        switch (current.element) {
+          case 'button':
+            _this.create[el] = button(el, icons[el]);
+            // some buttons don't have commands
+            // instead it use functions form align class
+            // here we detect which callback should be use
+            var callBack = current.command ? _this.execute.bind(_this) : _this.align[current.func].bind(_this.align);
+
+            _this.create[el].addEventListener('click', function () {
+              callBack(current.command, current.value);
+            });
+            li.appendChild(_this.create[el]);
+            break;
+
+          case 'select':
+            _this.create[el] = select(el, current.options);
+            _this.create[el].addEventListener('change', function () {
+              var selection = _this.create[el];
+              _this.execute(current.command, selection[selection.selectedIndex].value);
+            });
+            li.appendChild(_this.create[el]);
+            break;
+          case 'input':
+            _this.create[el] = input(el, current.type);
+            _this.create[el].addEventListener('change', function () {
+              _this.execute(current.command, _this.create[el].value);
+            });
+            li.appendChild(_this.create[el]);
+            break;
+
+          case 'styling':
+            li.classList.add(current.class);
+            break;
+
+          case 'custom':
+            var markup = current.create();
+            li.appendChild(markup);
+            break;
+
+          default:
+            console.warn(el + ' is not found');
+        }
+
+        if (current.init) {
+          _this.inits[el] = new current.init(_this.create[el], current.initConfig);
+        }
+        _this.creator.appendChild(li);
+      });
+      this.align.el.appendChild(this.creator);
+    }
+  }, {
+    key: 'updateCreatorStates',
+    value: function updateCreatorStates() {
+      var selection = window.getSelection();
+      var scrolled = window.scrollY;
+      var anchorNode = selection.anchorNode;
+      var element = anchorNode.nodeType === 1 ? anchorNode : anchorNode.parentElement;
+      var selectionRect = element.getBoundingClientRect();
+      this.creator.style.top = selectionRect.top + scrolled + 'px';
+      this.creator.classList.add('is-visible');
+      this.creator.classList.remove('is-hidden');
+    }
+  }, {
+    key: 'execute',
+    value: function execute(cmd, value) {
+      if (this.align.HTML) return;
+      document.execCommand(cmd, false, value);
+      this.align.el.focus();
+      this.updateStylerStates();
+    }
+  }]);
+  return Creator;
+}();
+
 var Align = function () {
   function Align(selector) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
         _ref$defaultText = _ref.defaultText,
         defaultText = _ref$defaultText === undefined ? 'Type here' : _ref$defaultText,
         _ref$styler = _ref.styler,
-        styler = _ref$styler === undefined ? null : _ref$styler;
+        styler = _ref$styler === undefined ? null : _ref$styler,
+        _ref$creator = _ref.creator,
+        creator = _ref$creator === undefined ? null : _ref$creator;
 
     classCallCheck(this, Align);
 
-    this.el = select(selector);
-
-    this.options = {
-      defaultText: defaultText,
-      styler: styler
+    this.el = select$1(selector);
+    this.settings = {
+      defaultText: this.el.innerHTML ? this.el.innerHTML : defaultText,
+      styler: styler,
+      creator: creator
     };
+
+    this.el.innerText = '';
     this.init();
   }
 
@@ -1531,7 +1642,12 @@ var Align = function () {
      */
     value: function init() {
       this.HTML = false;
-      this.styler = new Styler(this, this.options.styler);
+      if (this.settings.creator) {
+        this.creator = new Creator(this, this.settings.creator);
+      }
+      if (this.settings.styler) {
+        this.styler = new Styler(this, this.settings.styler);
+      }
       this.initEditor();
       this.initEvents();
     }
@@ -1543,12 +1659,13 @@ var Align = function () {
   }, {
     key: 'initEditor',
     value: function initEditor() {
+      document.execCommand('defaultParagraphSeparator', false, 'p');
       this.text = document.createElement('div');
       this.paragraph = document.createElement('p');
 
       this.text.contentEditable = 'true';
       this.text.classList.add('align-text');
-      this.paragraph.innerText = this.options.defaultText + '\n';
+      this.paragraph.innerHTML = this.settings.defaultText + '\n';
 
       this.el.appendChild(this.text);
       this.text.appendChild(this.paragraph);
@@ -1567,15 +1684,15 @@ var Align = function () {
         _this.highlight();
       });
 
-      this.text.addEventListener('mouseup', function (event) {
-        _this.styler.updateStylerStates();
-      });
+      this.text.addEventListener('mouseup', this.updateToolbars.bind(this));
 
       window.addEventListener('keyup', function (event) {
         // Do nothing if the event was already processed
         if (event.defaultPrevented) {
           return;
         }
+
+        _this.updateToolbars();
 
         switch (event.key) {
           case 'ArrowDown':
@@ -1641,6 +1758,16 @@ var Align = function () {
       this.text.innerHTML = this.text.innerText;
       this.text.contentEditable = true;
       this.text.focus();
+    }
+  }, {
+    key: 'updateToolbars',
+    value: function updateToolbars() {
+      if (this.styler) {
+        this.styler.updateStylerStates();
+      }
+      if (this.creator) {
+        this.creator.updateCreatorStates();
+      }
     }
   }, {
     key: 'content',

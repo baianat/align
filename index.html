@@ -5,17 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="dist/css/align.css">
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
   
-  <title>Document</title>
+  <title>Align</title>
 </head>
 <body>
-  <div class="align"></div>
+  <style lang="">
+    .align {
+      width: 80vw;
+      margin: auto;
+    }
+  </style>
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <div class="align">
+    <h1 style="text-align: center;">Hello there I'm Baianat's editor!</h1>
+  </div>
+
   <script src="dist/js/align.js"></script>
   <script>
-    Align.extendIcons('bold', "M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z");
 
     Align.extend('addImage', {
       element: 'custom',
@@ -36,10 +42,10 @@
         const input = this.data.input;
         const icon = this.data.icon;
 
-        button.classList.add('styler-button');
+        button.classList.add('creator-button');
         button.appendChild(input);
         button.insertAdjacentHTML('beforeend', icon);
-        input.classList.add('styler-input');
+        input.classList.add('creator-input');
         input.type = 'file';
         input.id = 'addImage';
         input.addEventListener('change', this.action.bind(this));
@@ -65,13 +71,13 @@
     });
 
     let myEditor = new Align('.align', {
-      defaultText: `Hello there I'm Baianat's editor!`,
       styler: {
-        mode: 'default',
-        commands: ['fontSize', 'fontName', 'separator', 'addImage', 'separator', 'bold', 'italic', 'underline', 'strikeThrough', 'separator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'separator', 'h1', 'h2', 'pre', 'blockquote', 'p', 'separator', 'color']
+        mode: 'bubble',
+        commands: ['fontSize', 'fontName', 'separator', 'separator', 'bold', 'italic', 'underline', 'strikeThrough', 'separator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'separator', 'h1', 'h2', 'pre', 'blockquote', 'p', 'separator', 'color']
       },
       creator: {
-
+        mode: 'default',
+        commands: ['addImage']
       }
     });
   </script>

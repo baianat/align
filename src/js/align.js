@@ -3,18 +3,22 @@ import { select } from './util';
 import commands from './commands';
 import icons from './icons';
 import Styler from './styler';
+import Creator from './creator';
 
 class Align {
   constructor(selector, {
     defaultText = 'Type here',
-    styler = null
+    styler = null,
+    creator = null
   } = {}) {
     this.el = select(selector);
-
-    this.options = {
-      defaultText,
-      styler
+    this.settings = {
+      defaultText: this.el.innerHTML ? this.el.innerHTML : defaultText,
+      styler,
+      creator
     };
+
+    this.el.innerText = '';
     this.init();
   }
 
@@ -37,7 +41,12 @@ class Align {
    */
   init() {
     this.HTML = false;
-    this.styler = new Styler(this, this.options.styler);
+    if (this.settings.creator) {
+      this.creator = new Creator(this, this.settings.creator);
+    }
+    if (this.settings.styler) {
+      this.styler = new Styler(this, this.settings.styler);
+    }
     this.initEditor();
     this.initEvents();
   }
@@ -46,12 +55,13 @@ class Align {
    * Create the editor
    */
   initEditor() {
+    document.execCommand('defaultParagraphSeparator', false, 'p');
     this.text = document.createElement('div');
     this.paragraph = document.createElement('p');
 
     this.text.contentEditable = 'true';
     this.text.classList.add('align-text');
-    this.paragraph.innerText = this.options.defaultText + '\n';
+    this.paragraph.innerHTML = this.settings.defaultText + '\n';
 
     this.el.appendChild(this.text);
     this.text.appendChild(this.paragraph);
@@ -65,15 +75,15 @@ class Align {
       this.highlight();
     });
 
-    this.text.addEventListener('mouseup', (event) => {
-      this.styler.updateStylerStates();
-    });
+    this.text.addEventListener('mouseup', this.updateToolbars.bind(this));
 
     window.addEventListener('keyup', (event) => {
       // Do nothing if the event was already processed
       if (event.defaultPrevented) {
         return;
       }
+
+      this.updateToolbars();
 
       switch (event.key) {
         case 'ArrowDown':
@@ -133,6 +143,15 @@ class Align {
     this.text.innerHTML = this.text.innerText;
     this.text.contentEditable = true;
     this.text.focus();
+  }
+
+  updateToolbars() {
+    if (this.styler) {
+      this.styler.updateStylerStates();
+    }
+    if (this.creator) {
+      this.creator.updateCreatorStates();
+    }
   }
 }
 

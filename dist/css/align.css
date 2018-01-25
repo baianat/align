@@ -254,90 +254,6 @@
   fill: #1700ff;
 }
 
-/*
-
-Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-license.org/
-
-*/
-
-.hljs {
-  display: block;
-  overflow-x: auto;
-  padding: 0.5em;
-  background: #23241f;
-}
-
-.hljs,
-.hljs-tag,
-.hljs-subst {
-  color: #f8f8f2;
-}
-
-.hljs-strong,
-.hljs-emphasis {
-  color: #a8a8a2;
-}
-
-.hljs-bullet,
-.hljs-quote,
-.hljs-number,
-.hljs-regexp,
-.hljs-literal,
-.hljs-link {
-  color: #ae81ff;
-}
-
-.hljs-code,
-.hljs-title,
-.hljs-section,
-.hljs-selector-class {
-  color: #a6e22e;
-}
-
-.hljs-strong {
-  font-weight: bold;
-}
-
-.hljs-emphasis {
-  font-style: italic;
-}
-
-.hljs-keyword,
-.hljs-selector-tag,
-.hljs-name,
-.hljs-attr {
-  color: #f92672;
-}
-
-.hljs-symbol,
-.hljs-attribute {
-  color: #66d9ef;
-}
-
-.hljs-params,
-.hljs-class .hljs-title {
-  color: #f8f8f2;
-}
-
-.hljs-string,
-.hljs-type,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-selector-id,
-.hljs-selector-attr,
-.hljs-selector-pseudo,
-.hljs-addition,
-.hljs-variable,
-.hljs-template-variable {
-  color: #e6db74;
-}
-
-.hljs-comment,
-.hljs-deletion,
-.hljs-meta {
-  color: #75715e;
-}
-
 /**
  * eidtor elements
  */
@@ -425,12 +341,6 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   width: 20px;
   height: 20px;
 }
-.styler-input {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-}
 .styler-select {
   -webkit-appearance: none;
      -moz-appearance: none;
@@ -456,6 +366,57 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 .styler.is-visiable {
   display: -ms-flexbox;
   display: flex;
+}
+.creator {
+  position: absolute;
+  left: 0;
+  background-color: transparent;
+  margin: 0;
+  width: auto;
+  list-style: none;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+      justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
+  padding: 10px;
+  transform: translate3d(0, -50%, 0);
+}
+.creator-button {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+  margin: 0;
+  border-radius: 15px;
+  border: 0;
+  outline: none;
+  background-color: #fff;
+  fill: #aaa;
+}
+.creator-button:hover {
+  fill: #eb008b;
+}
+.creator-input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.creator .icon {
+  fill: inherit;
+}
+.creator.is-active {
+  fill: #eb008b;
+}
+.creator.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+.creator.is-hidden {
+  visibility: hidden;
+  opacity: 0;
 }
 .align blockquote {
   border-left: 5px solid #aaa;
