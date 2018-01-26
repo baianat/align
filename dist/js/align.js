@@ -936,16 +936,6 @@ var colorpicker = createCommonjsModule(function (module, exports) {
   });
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
 var asyncGenerator = function () {
   function AwaitValue(value) {
     this.value = value;
@@ -1087,7 +1077,34 @@ var createClass = function () {
   };
 }();
 
-var SELECTION = null;
+var SELECTED_RANGE = null;
+
+var Selection = function () {
+  function Selection() {
+    classCallCheck(this, Selection);
+  }
+
+  createClass(Selection, [{
+    key: "selectedRange",
+    set: function set$$1(range) {
+      console.log(range);
+      if (!range) return;
+      SELECTED_RANGE = range;
+    },
+    get: function get$$1() {
+      return SELECTED_RANGE;
+    }
+  }], [{
+    key: "updateSelection",
+    value: function updateSelection(range) {
+      if (!range) return;
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }]);
+  return Selection;
+}();
 
 var commands = {
   bold: {
@@ -1197,20 +1214,16 @@ var commands = {
       mode: 'hex',
       disableLum: true,
       events: {
-        click: function click() {},
         beforeSubmit: function beforeSubmit() {
-          console.log(SELECTION);
-          if (SELECTION) {
-            var sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(SELECTION);
-          }
+          console.log('submit', Selection.selectedRange);
+          Selection.updateSelection(Selection.selectedRange);
         },
         afterOpen: function afterOpen() {
-          var sel = window.getSelection();
-          if (sel.getRangeAt && sel.rangeCount) {
-            SELECTION = sel.getRangeAt(0);
-            console.log(typeof SELECTION === 'undefined' ? 'undefined' : _typeof(SELECTION));
+          Selection.selectedRange = window.getSelection().getRangeAt(0);
+        },
+        afterSelect: function afterSelect() {
+          if (window.getSelection().rangeCount && window.getSelection().anchorNode.nodeType === 3) {
+            Selection.selectedRange = window.getSelection().getRangeAt(0);
           }
         }
       }
@@ -1624,7 +1637,6 @@ var Align = function () {
       styler: styler,
       creator: creator
     };
-
     this.el.innerText = '';
     this.init();
   }
@@ -1684,7 +1696,7 @@ var Align = function () {
         _this.highlight();
       });
 
-      this.text.addEventListener('mouseup', this.updateToolbars.bind(this));
+      // this.text.addEventListener('mouseup', this.updateToolbars.bind(this));
 
       window.addEventListener('keyup', function (event) {
         // Do nothing if the event was already processed
@@ -1692,14 +1704,12 @@ var Align = function () {
           return;
         }
 
-        _this.updateToolbars();
-
         switch (event.key) {
           case 'ArrowDown':
-            _this.styler.updateStylerStates();
+            _this.updateToolbars();
             break;
           case 'ArrowUp':
-            _this.styler.updateStylerStates();
+            _this.updateToolbars();
             break;
           case 'ArrowLeft':
             _this.styler.updateStylerStates();
@@ -1708,7 +1718,7 @@ var Align = function () {
             _this.styler.updateStylerStates();
             break;
           case 'Tab':
-            _this.execute('indent');
+            _this.styler.execute('indent');
             break;
 
           default:

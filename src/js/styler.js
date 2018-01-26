@@ -2,6 +2,7 @@ import { normalizeNumber, debounce } from './util';
 import { setElementsPrefix, button, select, input } from './elements';
 import commands from './commands';
 import icons from './icons';
+import Selection from './selection';
 
 class Styler {
   constructor(align, {

@@ -17,7 +17,6 @@ class Align {
       styler,
       creator
     };
-
     this.el.innerText = '';
     this.init();
   }
@@ -75,7 +74,7 @@ class Align {
       this.highlight();
     });
 
-    this.text.addEventListener('mouseup', this.updateToolbars.bind(this));
+    // this.text.addEventListener('mouseup', this.updateToolbars.bind(this));
 
     window.addEventListener('keyup', (event) => {
       // Do nothing if the event was already processed
@@ -83,14 +82,13 @@ class Align {
         return;
       }
 
-      this.updateToolbars();
-
+      
       switch (event.key) {
         case 'ArrowDown':
-          this.styler.updateStylerStates();
+          this.updateToolbars();
           break;
         case 'ArrowUp':
-          this.styler.updateStylerStates();
+          this.updateToolbars();
           break;
         case 'ArrowLeft':
           this.styler.updateStylerStates();
@@ -99,7 +97,7 @@ class Align {
           this.styler.updateStylerStates();
           break;
         case 'Tab':
-          this.execute('indent');
+          this.styler.execute('indent');
           break;
 
         default:
