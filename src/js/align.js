@@ -60,7 +60,7 @@ class Align {
     this.paragraph = document.createElement('p');
 
     this.text.contentEditable = 'true';
-    this.text.classList.add('align-text');
+    this.text.classList.add('align-content');
     this.paragraph.innerHTML = this.settings.defaultText + '\n';
 
     this.el.appendChild(this.text);

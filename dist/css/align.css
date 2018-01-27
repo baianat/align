@@ -260,20 +260,16 @@
 .align {
   position: relative;
 }
-.align-text {
+.align-content {
   padding: 50px 100px;
   overflow: auto;
   white-space: normal;
 }
-.align-text:focus {
+.align-content:focus {
   outline: none;
 }
-.align-image {
-  width: 100%;
-  max-width: 400px;
-}
 .styler {
-  background-color: #000;
+  background-color: #fff;
   margin: 0;
   width: auto;
   list-style: none;
@@ -294,11 +290,28 @@
   right: 0;
   left: 0;
   z-index: 20;
+  box-shadow: 0 20px 25px -20px rgba(0,0,0,0.05);
+}
+.styler.is-toolbar .styler-button {
+  background-color: #fff;
+  fill: #000;
+}
+.styler.is-toolbar .styler-button.is-active {
+  fill: #eb008b;
 }
 .styler.is-bubble {
+  background-color: #000;
   position: fixed;
   z-index: 10;
   border-radius: 40px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.05);
+}
+.styler.is-bubble .styler-button {
+  background-color: #000;
+  fill: #fff;
+}
+.styler.is-bubble .styler-button.is-active {
+  fill: #eb008b;
 }
 .styler li:not(last-child) {
   margin-right: 1px;
@@ -324,14 +337,9 @@
   border-radius: 15px;
   border: 0;
   outline: none;
-  background-color: #000;
-  fill: #fff;
 }
 .styler-button .icon {
   fill: inherit;
-}
-.styler-button.is-active {
-  fill: #eb008b;
 }
 .styler-list {
   -webkit-appearance: none;
@@ -353,13 +361,21 @@
   height: 20px;
 }
 .styler-select {
+  margin: 0 7px;
+}
+.styler-select svg {
+  width: 18px;
+  height: 18px;
+  margin: 6px 0;
+  float: right;
+}
+.styler-select select {
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
   height: 30px;
   border-radius: 0;
   padding: 2px 5px;
-  margin: 0 7px;
   line-height: 26px;
   background: #fff;
   text-align: center;
@@ -368,10 +384,7 @@
   font-size: 14px;
   border-bottom: 1px solid #fff;
 }
-.styler-select:hover {
-  border-bottom-color: #eb008b;
-}
-.styler-select:focus {
+.styler-select select:focus {
   outline: none;
 }
 .styler.is-visiable {
@@ -387,7 +400,13 @@
  */
 .picker-guide {
   border-color: #fff;
+  border: 0;
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 .picker-menu {
-  background-color: rgba(255,255,255,0.9);
+  border: 0;
+  background-color: #fff;
+  box-shadow: 0 0 25px rgba(0,0,0,0.05);
 }

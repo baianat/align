@@ -1195,13 +1195,13 @@ var commands = {
   fontSize: {
     element: 'select',
     command: 'fontSize',
-    options: [{ value: '', text: 'Font size' }, { value: 1, text: 1 }, { value: 2, text: 2 }, { value: 3, text: 3 }, { value: 4, text: 4 }, { value: 5, text: 5 }, { value: 6, text: 6 }, { value: 7, text: 7 }]
+    options: [{ value: false, text: 'Font size' }, { value: 1, text: 1 }, { value: 2, text: 2 }, { value: 3, text: 3 }, { value: 4, text: 4 }, { value: 5, text: 5 }, { value: 6, text: 6 }, { value: 7, text: 7 }]
   },
 
   fontName: {
     element: 'select',
     command: 'fontName',
-    options: [{ value: 'Times', text: 'Font name' }, { value: 'Raleway', text: 'Raleway' }, { value: 'Roboto', text: 'Roboto' }, { value: 'Poppins', text: 'Poppins' }, { value: 'Cairo', text: 'Cairo' }]
+    options: [{ value: false, text: 'Font name' }, { value: 'Raleway', text: 'Raleway' }, { value: 'Roboto', text: 'Roboto' }, { value: 'Poppins', text: 'Poppins' }, { value: 'Cairo', text: 'Cairo' }]
   },
 
   separator: {
@@ -1301,8 +1301,11 @@ function button(name, icon) {
  * @param {Object} options
  */
 function select$1(name, options) {
+  var selectWrapper = document.createElement('div');
   var select = document.createElement('select');
-  select.classList.add(NAMING_PREFIX + 'select');
+  var icon = '\n    <svg viewBox="0 0 24 24">\n      <polygon points="8,15 12,19 16,15 "/>\n      <polygon points="8,9 12,5 16,9 "/>\n    </svg>';
+
+  selectWrapper.classList.add(NAMING_PREFIX + 'select');
   select.id = name;
   options.forEach(function (option) {
     var optionElement = document.createElement('option');
@@ -1310,7 +1313,9 @@ function select$1(name, options) {
     optionElement.innerText = option.text;
     select.appendChild(optionElement);
   });
-  return select;
+  selectWrapper.appendChild(select);
+  selectWrapper.insertAdjacentHTML('beforeend', icon);
+  return selectWrapper;
 }
 
 /**
@@ -1389,12 +1394,13 @@ var Styler = function () {
             break;
 
           case 'select':
-            _this.style[el] = select$1(el, current.options);
+            var selectWrapper = select$1(el, current.options);
+            _this.style[el] = selectWrapper.querySelector('select');
             _this.style[el].addEventListener('change', function () {
               var selection = _this.style[el];
               _this.execute(current.command, selection[selection.selectedIndex].value);
             });
-            li.appendChild(_this.style[el]);
+            li.appendChild(selectWrapper);
             break;
           case 'input':
             _this.style[el] = input(el, current.type);
@@ -1435,9 +1441,7 @@ var Styler = function () {
       this.selection = '';
       window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
     }
-  }, {
-    key: 'initCreator',
-    value: function initCreator() {}
+
     /**
      * Execute command for the selected button
      * @param {String} cmd
@@ -1587,7 +1591,7 @@ var Align = function () {
       this.paragraph = document.createElement('p');
 
       this.text.contentEditable = 'true';
-      this.text.classList.add('align-text');
+      this.text.classList.add('align-content');
       this.paragraph.innerHTML = this.settings.defaultText + '\n';
 
       this.el.appendChild(this.text);

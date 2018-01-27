@@ -56,12 +56,13 @@ class Styler {
           break;
 
         case 'select':
-          this.style[el] = select(el, current.options);
+          const selectWrapper = select(el, current.options);
+          this.style[el] = selectWrapper.querySelector('select');
           this.style[el].addEventListener('change', () => {
             const selection = this.style[el];
             this.execute(current.command, selection[selection.selectedIndex].value);
           });
-          li.appendChild(this.style[el]);
+          li.appendChild(selectWrapper);
           break;
         case 'input':
           this.style[el] = input(el, current.type);
@@ -102,7 +103,6 @@ class Styler {
     window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
   }
 
-  initCreator() {}
   /**
    * Execute command for the selected button
    * @param {String} cmd

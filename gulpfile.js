@@ -96,7 +96,7 @@ gulp.task('changeEnv', () => { env = 'production' });
 
 gulp.task('production', sequence(
   'clean',
-  ['styles', 'scripts'],
+  ['styles', 'scripts', 'font'],
   'changeEnv',
   ['styles', 'scripts']
 ));

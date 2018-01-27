@@ -93,7 +93,7 @@ const commands = {
     element: 'select',
     command: 'fontSize',
     options: [
-      { value: '', text: 'Font size' },
+      { value: false, text: 'Font size' },
       { value: 1, text: 1 },
       { value: 2, text: 2 },
       { value: 3, text: 3 },
@@ -108,7 +108,7 @@ const commands = {
     element: 'select',
     command: 'fontName',
     options: [
-      { value: 'Times', text: 'Font name' },
+      { value: false, text: 'Font name' },
       { value: 'Raleway', text: 'Raleway' },
       { value: 'Roboto', text: 'Roboto' },
       { value: 'Poppins', text: 'Poppins' },

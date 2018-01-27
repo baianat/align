@@ -25,8 +25,15 @@ export function button(name, icon) {
  * @param {Object} options
  */
 export function select(name, options) {
+  const selectWrapper = document.createElement('div');
   const select = document.createElement('select');
-  select.classList.add(`${NAMING_PREFIX}select`);
+  const icon = `
+    <svg viewBox="0 0 24 24">
+      <polygon points="8,15 12,19 16,15 "/>
+      <polygon points="8,9 12,5 16,9 "/>
+    </svg>`;
+
+  selectWrapper.classList.add(`${NAMING_PREFIX}select`);
   select.id = name;
   options.forEach((option) => {
     const optionElement = document.createElement('option');
@@ -34,7 +41,9 @@ export function select(name, options) {
     optionElement.innerText = option.text;
     select.appendChild(optionElement);
   })
-  return select;
+  selectWrapper.appendChild(select);
+  selectWrapper.insertAdjacentHTML('beforeend', icon);
+  return selectWrapper;
 }
 
 /**
