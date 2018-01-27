@@ -3,19 +3,20 @@ import { select } from './util';
 import commands from './commands';
 import icons from './icons';
 import Styler from './styler';
-import Creator from './creator';
 
 class Align {
   constructor(selector, {
     defaultText = 'Type here',
-    styler = null,
-    creator = null
+    toolbar = null,
+    creator = null,
+    bubble = null
   } = {}) {
     this.el = select(selector);
     this.settings = {
       defaultText: this.el.innerHTML ? this.el.innerHTML : defaultText,
-      styler,
-      creator
+      toolbar,
+      creator,
+      bubble
     };
     this.el.innerText = '';
     this.init();
@@ -40,11 +41,17 @@ class Align {
    */
   init() {
     this.HTML = false;
-    if (this.settings.creator) {
-      this.creator = new Creator(this, this.settings.creator);
+    if (this.settings.toolbar) {
+      this.settings.toolbar.mode = 'toolbar';
+      this.toolbar = new Styler(this, this.settings.toolbar);
     }
-    if (this.settings.styler) {
-      this.styler = new Styler(this, this.settings.styler);
+    if (this.settings.creator) {
+      this.settings.creator.mode = 'creator';
+      this.creator = new Styler(this, this.settings.creator);
+    }
+    if (this.settings.bubble) {
+      this.settings.bubble.mode = 'bubble';
+      this.bubble = new Styler(this, this.settings.bubble);
     }
     this.initEditor();
     this.initEvents();
@@ -74,7 +81,7 @@ class Align {
       this.highlight();
     });
 
-    // this.text.addEventListener('mouseup', this.updateToolbars.bind(this));
+    this.text.addEventListener('mouseup', this.updateStylers.bind(this));
 
     window.addEventListener('keyup', (event) => {
       // Do nothing if the event was already processed
@@ -85,16 +92,16 @@ class Align {
       
       switch (event.key) {
         case 'ArrowDown':
-          this.updateToolbars();
+          this.updateStylers();
           break;
         case 'ArrowUp':
-          this.updateToolbars();
+          this.updateStylers();
           break;
         case 'ArrowLeft':
-          this.styler.updateStylerStates();
+          this.bubble.updateStylerStates();
           break;
         case 'ArrowRight':
-          this.styler.updateStylerStates();
+          this.bubble.updateStylerStates();
           break;
         case 'Tab':
           this.styler.execute('indent');
@@ -143,12 +150,15 @@ class Align {
     this.text.focus();
   }
 
-  updateToolbars() {
-    if (this.styler) {
-      this.styler.updateStylerStates();
+  updateStylers() {
+    if (this.settings.toolbar) {
+      this.toolbar.updateStylerStates();
     }
-    if (this.creator) {
-      this.creator.updateCreatorStates();
+    if (this.settings.creator) {
+      this.creator.updateStylerStates();
+    }
+    if (this.settings.bubble) {
+      this.bubble.updateStylerStates();
     }
   }
 }

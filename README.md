@@ -65,13 +65,19 @@ You can also pass the element directly to the constructor
 
 ### Customizing Align
 
-To customize editor's styler, through `styler` key in the settings object.
+Align comes with two styling bars(stylers), the main toolbar (`toolbar`) and the pop-up toolbar (`bubble`) that pops when you select a text.
+
+You can choose to work with either of the toolbars, or both of them, by passing the `toolbar` object and/or the `bubble` object to the `Align` settings object.
+
+You can choose what commands you'd like both of the stylers to include, by passing the desired commands through the `commands` array.
 
 ```js
 new Align('.editor', {
-  styler: {
-    mode: 'default', // default or bubble
-    commands: ['color', 'sperator', 'fontName', 'fontSize']
+  toolbar: {
+    commands: ['fontSize', 'fontName', 'separator', 'separator', 'bold', 'italic', 'underline', 'strikeThrough', 'separator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'separator', 'h1', 'h2', 'blockquote', 'p', 'separator', 'addImage', 'separator', 'color']
+  },
+  bubble: {
+    commands: ['bold', 'italic', 'underline', 'strikeThrough', 'separator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull']
   }
 });
 ```
@@ -103,7 +109,7 @@ List of all available commands
 ### Adding new custom commands
 
 To extend `Align`'s [commands](https://github.com/baianat/align/blob/master/src/js/commands.js#L5) object, use `Align.extend('commandName', { //setting })`
-> Note: use extend with caution, since you can overwrite the current commands behavior. if you used your `commandName` same as one of `Align`'s commands.
+> Note: use extend with caution, since you can overwrite the current commands behavior, if you used your `commandName` same as one of `Align`'s commands.
 
 ```javaScript
 Align.extend('commandName', {
