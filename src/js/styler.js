@@ -38,17 +38,20 @@ class Styler {
       switch (current.element) {
         case 'button':
           this.style[el] = button(el, icons[el]);
-          // some buttons don't have commands
-          // instead it use functions form align class
-          // here we detect which callback should be use
-          const callBack =
-            current.command
-              ? this.execute.bind(this)
-              : this.align[current.func].bind(this.align);
 
-          this.style[el].addEventListener('click', () => {
-            callBack(current.command, current.value);
-          });
+          const callBack = () => {
+            if (current.command) {
+              this.execute(current.command, current.value);
+            }
+            if (typeof current.func === 'string') {
+              this.align[current.func](current.value);
+            }
+            if (typeof current.func === 'function') {
+              current.func(current.value);
+            }
+          }
+
+          this.style[el].addEventListener('click', callBack);
           li.appendChild(this.style[el]);
           break;
 

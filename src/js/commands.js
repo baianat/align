@@ -74,7 +74,8 @@ const commands = {
   pre: {
     element: 'button',
     command: 'formatblock',
-    value: 'pre'
+    value: 'pre',
+    func: 'highlight'
   },
 
   html: {
@@ -82,6 +83,12 @@ const commands = {
     func: 'toggleHTML'
   },
 
+  insertColumns: {
+    element: 'button',
+    func() {
+      
+    }
+  },
   fontSize: {
     element: 'select',
     command: 'fontSize',

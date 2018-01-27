@@ -8,14 +8,12 @@ class Align {
   constructor(selector, {
     defaultText = 'Type here',
     toolbar = null,
-    creator = null,
     bubble = null
   } = {}) {
     this.el = select(selector);
     this.settings = {
       defaultText: this.el.innerHTML ? this.el.innerHTML : defaultText,
       toolbar,
-      creator,
       bubble
     };
     this.el.innerText = '';
@@ -44,10 +42,6 @@ class Align {
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';
       this.toolbar = new Styler(this, this.settings.toolbar);
-    }
-    if (this.settings.creator) {
-      this.settings.creator.mode = 'creator';
-      this.creator = new Styler(this, this.settings.creator);
     }
     if (this.settings.bubble) {
       this.settings.bubble.mode = 'bubble';
@@ -128,6 +122,7 @@ class Align {
     })
   }
 
+
   /**
    * Toggle on/off HTML
    */
@@ -141,8 +136,10 @@ class Align {
       this.text.contentEditable = false;
       pre.id = 'content';
       pre.contentEditable = false;
+      pre.style.whiteSpace = 'pre-wrap';
       pre.appendChild(content);
       this.text.appendChild(pre);
+      this.highlight();
       return;
     }
     this.text.innerHTML = this.text.innerText;
@@ -153,9 +150,6 @@ class Align {
   updateStylers() {
     if (this.settings.toolbar) {
       this.toolbar.updateStylerStates();
-    }
-    if (this.settings.creator) {
-      this.creator.updateStylerStates();
     }
     if (this.settings.bubble) {
       this.bubble.updateStylerStates();
