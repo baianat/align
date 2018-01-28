@@ -3,6 +3,7 @@ import { select } from './util';
 import commands from './commands';
 import icons from './icons';
 import Styler from './styler';
+import Selection from './selection';
 
 class Align {
   constructor(selector, {
@@ -24,7 +25,7 @@ class Align {
    * Get editor's content
    */
   get content() {
-    return document.createTextNode(this.text.innerHTML);
+    return document.createTextNode(this.editor.innerHTML);
   }
 
   static extend(name, extension) {
@@ -56,26 +57,26 @@ class Align {
    */
   initEditor() {
     document.execCommand('defaultParagraphSeparator', false, 'p');
-    this.text = document.createElement('div');
+    this.editor = document.createElement('div');
     this.paragraph = document.createElement('p');
 
-    this.text.contentEditable = 'true';
-    this.text.classList.add('align-content');
+    this.editor.contentEditable = 'true';
+    this.editor.classList.add('align-content');
     this.paragraph.innerHTML = this.settings.defaultText + '\n';
 
-    this.el.appendChild(this.text);
-    this.text.appendChild(this.paragraph);
+    this.el.appendChild(this.editor);
+    this.editor.appendChild(this.paragraph);
   }
 
   /**
    * Add all events listeners
    */
   initEvents() {
-    this.text.addEventListener('focus', () => {
+    this.editor.addEventListener('focus', () => {
       this.highlight();
     });
 
-    this.text.addEventListener('mouseup', this.updateStylers.bind(this));
+    this.editor.addEventListener('mouseup', this.updateStylers.bind(this));
 
     window.addEventListener('keyup', (event) => {
       // Do nothing if the event was already processed
@@ -116,7 +117,7 @@ class Align {
     if (!hljs) {
       return;
     }
-    const code = Array.from(this.text.querySelectorAll('pre'));
+    const code = Array.from(this.editor.querySelectorAll('pre'));
     code.forEach((block) => {
       hljs.highlightBlock(block);
     })
@@ -129,31 +130,68 @@ class Align {
   toggleHTML() {
     this.HTML = !this.HTML;
     if (this.HTML) {
-      const content = document.createTextNode(this.text.innerHTML);
+      const content = document.createTextNode(this.editor.innerHTML);
       const pre = document.createElement('pre');
 
-      this.text.innerHTML = '';
-      this.text.contentEditable = false;
+      this.editor.innerHTML = '';
+      this.editor.contentEditable = false;
       pre.id = 'content';
       pre.contentEditable = false;
       pre.style.whiteSpace = 'pre-wrap';
       pre.appendChild(content);
-      this.text.appendChild(pre);
+      this.editor.appendChild(pre);
       this.highlight();
       return;
     }
-    this.text.innerHTML = this.text.innerText;
-    this.text.contentEditable = true;
-    this.text.focus();
+    this.editor.innerHTML = this.editor.innerText;
+    this.editor.contentEditable = true;
+    this.editor.focus();
   }
 
   updateStylers() {
-    if (this.settings.toolbar) {
-      this.toolbar.updateStylerStates();
+    Selection.selectedRange = window.getSelection().getRangeAt(0);
+    setTimeout(() => {
+      if (this.settings.toolbar) {
+        this.toolbar.updateStylerStates();
+      }
+      if (this.settings.bubble) {
+        this.bubble.updateStylerStates();
+      }
+    }, 16);
+  }
+
+  surroundContents(schema, className) {
+    if (!Selection.selectedRange) return;
+    const container = Selection.selectedRange.commonAncestorContainer;
+    const selectedElements = [];
+
+    if (container.nodeType === 3) {
+      selectedElements.push(container.parentNode);
     }
-    if (this.settings.bubble) {
-      this.bubble.updateStylerStates();
+
+    if (container.nodeType !== 3) {
+      const allElements = Array.from(container.querySelectorAll(':scope >*'));
+      allElements.map((el) => {
+        if (window.getSelection().containsNode(el, true)) {
+          selectedElements.push(el);
+        }
+      })
     }
+
+    selectedElements.map((el, index) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      if (index === 0) {
+        range.setStart(el.firstChild, Selection.selectedRange.startOffset);
+      }
+      if (index === selectedElements.length - 1) {
+        range.setEnd(el.firstChild, Selection.selectedRange.endOffset);
+      }
+
+      const span = document.createElement('span');
+      span.classList.add(`align-${schema.classPrefix}-${className.toLowerCase()}`);
+      range.surroundContents(span);
+    });
   }
 }
 

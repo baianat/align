@@ -89,31 +89,16 @@ const commands = {
       
     }
   },
+
   fontSize: {
     element: 'select',
-    command: 'fontSize',
-    options: [
-      { value: false, text: 'Font size' },
-      { value: 1, text: 1 },
-      { value: 2, text: 2 },
-      { value: 3, text: 3 },
-      { value: 4, text: 4 },
-      { value: 5, text: 5 },
-      { value: 6, text: 6 },
-      { value: 7, text: 7 }
-    ]
+    command: 'fontSize'
   },
 
-  fontName: {
+  font: {
     element: 'select',
-    command: 'fontName',
-    options: [
-      { value: false, text: 'Font name' },
-      { value: 'Raleway', text: 'Raleway' },
-      { value: 'Roboto', text: 'Roboto' },
-      { value: 'Poppins', text: 'Poppins' },
-      { value: 'Cairo', text: 'Cairo' }
-    ]
+    classPrefix: 'font',
+    func: 'surroundContents'
   },
 
   separator: {

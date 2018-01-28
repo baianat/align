@@ -6,13 +6,16 @@ class Selection {
   }
 
   set selectedRange(range) {
-    console.log(range);
     if (!range) return;
     SELECTED_RANGE = range;
   }
 
   get selectedRange() {
     return SELECTED_RANGE;
+  }
+
+  get selection() {
+    return window.getSelection();
   }
 
   static updateSelection(range) {

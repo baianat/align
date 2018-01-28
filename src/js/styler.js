@@ -22,84 +22,80 @@ class Styler {
    */
   init() {
     setElementsPrefix('styler-');
-    this.styler = document.createElement('ul');
-    this.styler.classList.add('styler', `is-${this.settings.mode}`);
-    this.style = {};
+    this.cmd = document.createElement('ul');
+    this.cmd.classList.add('styler', `is-${this.settings.mode}`);
+    this.cmds = {};
     this.inits = {};
 
     this.settings.commands.forEach((el) => {
       const li = document.createElement('li');
-      const current = commands[el];
-      if (!current) {
-        console.warn(el + ' is not found');
+      const cmd = typeof el === 'string' ? el : Object.keys(el)[0];
+      const cmdSchema = commands[cmd];
+      if (!cmd) {
+        console.warn(cmd + ' is not found');
         return;
       }
+      const callBack = (cmdSchema, value) => {
+        if (cmdSchema.command) {
+          this.execute(cmdSchema.command, value);
+        }
+        if (typeof cmdSchema.func === 'string') {
+          this.align[cmdSchema.func](cmdSchema, value);
+        }
+        if (typeof cmdSchema.func === 'function') {
+          cmdSchema.func(cmdSchema, value);
+        }
+      }
 
-      switch (current.element) {
+      switch (cmdSchema.element) {
         case 'button':
-          this.style[el] = button(el, icons[el]);
-
-          const callBack = () => {
-            if (current.command) {
-              this.execute(current.command, current.value);
-            }
-            if (typeof current.func === 'string') {
-              this.align[current.func](current.value);
-            }
-            if (typeof current.func === 'function') {
-              current.func(current.value);
-            }
-          }
-
-          this.style[el].addEventListener('click', callBack);
-          li.appendChild(this.style[el]);
+          this.cmds[cmd] = button(cmd, icons[cmd]);
+          this.cmds[cmd].addEventListener('click', () => callBack(cmdSchema, cmdSchema.value));
+          li.appendChild(this.cmds[cmd]);
           break;
 
         case 'select':
-          const selectWrapper = select(el, current.options);
-          this.style[el] = selectWrapper.querySelector('select');
-          this.style[el].addEventListener('change', () => {
-            const selection = this.style[el];
-            this.execute(current.command, selection[selection.selectedIndex].value);
-          });
+          const selectWrapper = select(cmd, el[cmd]);
+          this.cmds[cmd] = selectWrapper.querySelector('select');
+          this.cmds[cmd].addEventListener('change', 
+            () => callBack(cmdSchema, this.cmds[cmd][this.cmds[cmd].selectedIndex].value)
+          );
           li.appendChild(selectWrapper);
           break;
+
         case 'input':
-          this.style[el] = input(el, current.type);
-          this.style[el].addEventListener('change', () => {
-            this.execute(current.command, this.style[el].value);
+          this.cmds[cmd] = input(cmd, cmdSchema.type);
+          this.cmds[cmd].addEventListener('change', () => {
+            this.execute(cmdSchema.command, this.cmds[cmd].value);
           });
-          li.appendChild(this.style[el]);
+          li.appendChild(this.cmds[cmd]);
           break;
 
         case 'styling':
-          li.classList.add(current.class);
+          li.classList.add(cmdSchema.class);
           break;
 
         case 'custom':
-          const markup = current.create();
+          const markup = cmdSchema.create();
           li.appendChild(markup);
           break;
 
         default:
-          console.warn(el + ' is not found');
+          console.warn(cmd + ' is not found');
       }
 
-      if (current.init) {
-        this.inits[el] = new current.init(this.style[el], current.initConfig);
+      if (cmdSchema.init) {
+        this.inits[cmd] = new cmdSchema.init(this.cmds[cmd], cmdSchema.initConfig);
       }
 
-      this.styler.appendChild(li);
+      this.cmd.appendChild(li);
     })
-    this.align.el.appendChild(this.styler);
+    this.align.el.appendChild(this.cmd);
     if (this.settings.mode === 'bubble') this.initBubble();
-    if (this.settings.mode === 'creator') this.initCreator();
   }
 
   initBubble() {
-    this.styler.classList.add('is-hidden');
-    this.reference = document.createElement('sapn');
-    this.selection = '';
+    this.cmd.classList.add('is-hidden');
     window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
   }
 
@@ -116,11 +112,11 @@ class Styler {
   }
 
   updateBubblePosition() {
-    if (!this.selection) return;
+    if (!Selection.selectedRange) return;
     const marginRatio = 10;
-    const selectionRect = this.selection.getBoundingClientRect();
+    const selectionRect = Selection.selectedRange.getBoundingClientRect();
     const editorRect = this.align.el.getBoundingClientRect();
-    const stylerRect = this.styler.getBoundingClientRect();
+    const stylerRect = this.cmd.getBoundingClientRect();
     const scrolled = window.scrollY;
     const deltaY = selectionRect.y + scrolled - stylerRect.height - marginRatio;
     const deltaX = selectionRect.x + ((selectionRect.width - stylerRect.width) / 2);
@@ -131,27 +127,26 @@ class Styler {
       ? selectionRect.y + selectionRect.height + marginRatio 
       : selectionRect.y - stylerRect.height - marginRatio;
 
-    this.styler.style.top = `${yPosition}px`;
-    this.styler.style.left = `${xPosition}px`;
+    this.cmd.style.top = `${yPosition}px`;
+    this.cmd.style.left = `${xPosition}px`;
   }
 
   showStyler() {
-    this.styler.classList.add('is-visible');
-    this.styler.classList.remove('is-hidden');
+    this.cmd.classList.add('is-visible');
+    this.cmd.classList.remove('is-hidden');
     this.updateBubblePosition();
   }
 
   hideStyler() {
-    this.styler.classList.remove('is-visible');
-    this.styler.classList.add('is-hidden');
+    this.cmd.classList.remove('is-visible');
+    this.cmd.classList.add('is-hidden');
   }
 
   updateStylerStates() {
     this.updateStylerCommands();
     if (this.settings.mode !== 'bubble') return;
 
-    this.selection = window.getSelection().getRangeAt(0);
-    if (this.selection.collapsed) {
+    if (Selection.selectedRange.collapsed) {
       this.hideStyler();
       return;
     }
@@ -162,21 +157,19 @@ class Styler {
    * Update the state of the active style
    */
   updateStylerCommands() {
-    Object.keys(this.style).forEach((styl) => {
+    Object.keys(this.cmds).forEach((styl) => {
       if (document.queryCommandState(styl)) {
-        this.style[styl].classList.add('is-active');
+        this.cmds[styl].classList.add('is-active');
         return;
       }
       if (document.queryCommandValue('formatBlock') === styl) {
-        this.style[styl].classList.add('is-active');
+        this.cmds[styl].classList.add('is-active');
         return;
       }
-      if (document.queryCommandValue(styl) && document.queryCommandValue(styl) !== 'false') {
-        this.style[styl].value = document.queryCommandValue(styl);
-        return;
+      this.cmds[styl].classList.remove('is-active');
+      if (document.queryCommandValue(styl)) {
+        this.cmds[styl].value = document.queryCommandValue(styl);
       }
-
-      this.style[styl].classList.remove('is-active');
     })
   }
 }

@@ -37,8 +37,8 @@ export function select(name, options) {
   select.id = name;
   options.forEach((option) => {
     const optionElement = document.createElement('option');
-    optionElement.value = option.value;
-    optionElement.innerText = option.text;
+    optionElement.value = option;
+    optionElement.innerText = option === false ? name : option;
     select.appendChild(optionElement);
   })
   selectWrapper.appendChild(select);

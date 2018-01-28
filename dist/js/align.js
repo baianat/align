@@ -1087,12 +1087,16 @@ var Selection = function () {
   createClass(Selection, [{
     key: "selectedRange",
     set: function set$$1(range) {
-      console.log(range);
       if (!range) return;
       SELECTED_RANGE = range;
     },
     get: function get$$1() {
       return SELECTED_RANGE;
+    }
+  }, {
+    key: "selection",
+    get: function get$$1() {
+      return window.getSelection();
     }
   }], [{
     key: "updateSelection",
@@ -1192,16 +1196,16 @@ var commands = {
     element: 'button',
     func: function func() {}
   },
+
   fontSize: {
     element: 'select',
-    command: 'fontSize',
-    options: [{ value: false, text: 'Font size' }, { value: 1, text: 1 }, { value: 2, text: 2 }, { value: 3, text: 3 }, { value: 4, text: 4 }, { value: 5, text: 5 }, { value: 6, text: 6 }, { value: 7, text: 7 }]
+    command: 'fontSize'
   },
 
-  fontName: {
+  font: {
     element: 'select',
-    command: 'fontName',
-    options: [{ value: false, text: 'Font name' }, { value: 'Raleway', text: 'Raleway' }, { value: 'Roboto', text: 'Roboto' }, { value: 'Poppins', text: 'Poppins' }, { value: 'Cairo', text: 'Cairo' }]
+    classPrefix: 'font',
+    func: 'surroundContents'
   },
 
   separator: {
@@ -1309,8 +1313,8 @@ function select$1(name, options) {
   select.id = name;
   options.forEach(function (option) {
     var optionElement = document.createElement('option');
-    optionElement.value = option.value;
-    optionElement.innerText = option.text;
+    optionElement.value = option;
+    optionElement.innerText = option === false ? name : option;
     select.appendChild(optionElement);
   });
   selectWrapper.appendChild(select);
@@ -1360,85 +1364,83 @@ var Styler = function () {
       var _this = this;
 
       setElementsPrefix('styler-');
-      this.styler = document.createElement('ul');
-      this.styler.classList.add('styler', 'is-' + this.settings.mode);
-      this.style = {};
+      this.cmd = document.createElement('ul');
+      this.cmd.classList.add('styler', 'is-' + this.settings.mode);
+      this.cmds = {};
       this.inits = {};
 
       this.settings.commands.forEach(function (el) {
         var li = document.createElement('li');
-        var current = commands[el];
-        if (!current) {
-          console.warn(el + ' is not found');
+        var cmd = typeof el === 'string' ? el : Object.keys(el)[0];
+        var cmdSchema = commands[cmd];
+        if (!cmd) {
+          console.warn(cmd + ' is not found');
           return;
         }
+        var callBack = function callBack(cmdSchema, value) {
+          if (cmdSchema.command) {
+            _this.execute(cmdSchema.command, value);
+          }
+          if (typeof cmdSchema.func === 'string') {
+            _this.align[cmdSchema.func](cmdSchema, value);
+          }
+          if (typeof cmdSchema.func === 'function') {
+            cmdSchema.func(cmdSchema, value);
+          }
+        };
 
-        switch (current.element) {
+        switch (cmdSchema.element) {
           case 'button':
-            _this.style[el] = button(el, icons[el]);
-
-            var callBack = function callBack() {
-              if (current.command) {
-                _this.execute(current.command, current.value);
-              }
-              if (typeof current.func === 'string') {
-                _this.align[current.func](current.value);
-              }
-              if (typeof current.func === 'function') {
-                current.func(current.value);
-              }
-            };
-
-            _this.style[el].addEventListener('click', callBack);
-            li.appendChild(_this.style[el]);
+            _this.cmds[cmd] = button(cmd, icons[cmd]);
+            _this.cmds[cmd].addEventListener('click', function () {
+              return callBack(cmdSchema, cmdSchema.value);
+            });
+            li.appendChild(_this.cmds[cmd]);
             break;
 
           case 'select':
-            var selectWrapper = select$1(el, current.options);
-            _this.style[el] = selectWrapper.querySelector('select');
-            _this.style[el].addEventListener('change', function () {
-              var selection = _this.style[el];
-              _this.execute(current.command, selection[selection.selectedIndex].value);
+            var selectWrapper = select$1(cmd, el[cmd]);
+            _this.cmds[cmd] = selectWrapper.querySelector('select');
+            _this.cmds[cmd].addEventListener('change', function () {
+              return callBack(cmdSchema, _this.cmds[cmd][_this.cmds[cmd].selectedIndex].value);
             });
             li.appendChild(selectWrapper);
             break;
+
           case 'input':
-            _this.style[el] = input(el, current.type);
-            _this.style[el].addEventListener('change', function () {
-              _this.execute(current.command, _this.style[el].value);
+            _this.cmds[cmd] = input(cmd, cmdSchema.type);
+            _this.cmds[cmd].addEventListener('change', function () {
+              _this.execute(cmdSchema.command, _this.cmds[cmd].value);
             });
-            li.appendChild(_this.style[el]);
+            li.appendChild(_this.cmds[cmd]);
             break;
 
           case 'styling':
-            li.classList.add(current.class);
+            li.classList.add(cmdSchema.class);
             break;
 
           case 'custom':
-            var markup = current.create();
+            var markup = cmdSchema.create();
             li.appendChild(markup);
             break;
 
           default:
-            console.warn(el + ' is not found');
+            console.warn(cmd + ' is not found');
         }
 
-        if (current.init) {
-          _this.inits[el] = new current.init(_this.style[el], current.initConfig);
+        if (cmdSchema.init) {
+          _this.inits[cmd] = new cmdSchema.init(_this.cmds[cmd], cmdSchema.initConfig);
         }
 
-        _this.styler.appendChild(li);
+        _this.cmd.appendChild(li);
       });
-      this.align.el.appendChild(this.styler);
+      this.align.el.appendChild(this.cmd);
       if (this.settings.mode === 'bubble') this.initBubble();
-      if (this.settings.mode === 'creator') this.initCreator();
     }
   }, {
     key: 'initBubble',
     value: function initBubble() {
-      this.styler.classList.add('is-hidden');
-      this.reference = document.createElement('sapn');
-      this.selection = '';
+      this.cmd.classList.add('is-hidden');
       window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
     }
 
@@ -1459,11 +1461,11 @@ var Styler = function () {
   }, {
     key: 'updateBubblePosition',
     value: function updateBubblePosition() {
-      if (!this.selection) return;
+      if (!Selection.selectedRange) return;
       var marginRatio = 10;
-      var selectionRect = this.selection.getBoundingClientRect();
+      var selectionRect = Selection.selectedRange.getBoundingClientRect();
       var editorRect = this.align.el.getBoundingClientRect();
-      var stylerRect = this.styler.getBoundingClientRect();
+      var stylerRect = this.cmd.getBoundingClientRect();
       var scrolled = window.scrollY;
       var deltaY = selectionRect.y + scrolled - stylerRect.height - marginRatio;
       var deltaX = selectionRect.x + (selectionRect.width - stylerRect.width) / 2;
@@ -1472,21 +1474,21 @@ var Styler = function () {
       var xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
       var yPosition = deltaY < scrolled + 50 ? selectionRect.y + selectionRect.height + marginRatio : selectionRect.y - stylerRect.height - marginRatio;
 
-      this.styler.style.top = yPosition + 'px';
-      this.styler.style.left = xPosition + 'px';
+      this.cmd.style.top = yPosition + 'px';
+      this.cmd.style.left = xPosition + 'px';
     }
   }, {
     key: 'showStyler',
     value: function showStyler() {
-      this.styler.classList.add('is-visible');
-      this.styler.classList.remove('is-hidden');
+      this.cmd.classList.add('is-visible');
+      this.cmd.classList.remove('is-hidden');
       this.updateBubblePosition();
     }
   }, {
     key: 'hideStyler',
     value: function hideStyler() {
-      this.styler.classList.remove('is-visible');
-      this.styler.classList.add('is-hidden');
+      this.cmd.classList.remove('is-visible');
+      this.cmd.classList.add('is-hidden');
     }
   }, {
     key: 'updateStylerStates',
@@ -1494,8 +1496,7 @@ var Styler = function () {
       this.updateStylerCommands();
       if (this.settings.mode !== 'bubble') return;
 
-      this.selection = window.getSelection().getRangeAt(0);
-      if (this.selection.collapsed) {
+      if (Selection.selectedRange.collapsed) {
         this.hideStyler();
         return;
       }
@@ -1511,21 +1512,19 @@ var Styler = function () {
     value: function updateStylerCommands() {
       var _this2 = this;
 
-      Object.keys(this.style).forEach(function (styl) {
+      Object.keys(this.cmds).forEach(function (styl) {
         if (document.queryCommandState(styl)) {
-          _this2.style[styl].classList.add('is-active');
+          _this2.cmds[styl].classList.add('is-active');
           return;
         }
         if (document.queryCommandValue('formatBlock') === styl) {
-          _this2.style[styl].classList.add('is-active');
+          _this2.cmds[styl].classList.add('is-active');
           return;
         }
-        if (document.queryCommandValue(styl) && document.queryCommandValue(styl) !== 'false') {
-          _this2.style[styl].value = document.queryCommandValue(styl);
-          return;
+        _this2.cmds[styl].classList.remove('is-active');
+        if (document.queryCommandValue(styl)) {
+          _this2.cmds[styl].value = document.queryCommandValue(styl);
         }
-
-        _this2.style[styl].classList.remove('is-active');
       });
     }
   }]);
@@ -1587,15 +1586,15 @@ var Align = function () {
     key: 'initEditor',
     value: function initEditor() {
       document.execCommand('defaultParagraphSeparator', false, 'p');
-      this.text = document.createElement('div');
+      this.editor = document.createElement('div');
       this.paragraph = document.createElement('p');
 
-      this.text.contentEditable = 'true';
-      this.text.classList.add('align-content');
+      this.editor.contentEditable = 'true';
+      this.editor.classList.add('align-content');
       this.paragraph.innerHTML = this.settings.defaultText + '\n';
 
-      this.el.appendChild(this.text);
-      this.text.appendChild(this.paragraph);
+      this.el.appendChild(this.editor);
+      this.editor.appendChild(this.paragraph);
     }
 
     /**
@@ -1607,11 +1606,11 @@ var Align = function () {
     value: function initEvents() {
       var _this = this;
 
-      this.text.addEventListener('focus', function () {
+      this.editor.addEventListener('focus', function () {
         _this.highlight();
       });
 
-      this.text.addEventListener('mouseup', this.updateStylers.bind(this));
+      this.editor.addEventListener('mouseup', this.updateStylers.bind(this));
 
       window.addEventListener('keyup', function (event) {
         // Do nothing if the event was already processed
@@ -1654,7 +1653,7 @@ var Align = function () {
       if (!hljs) {
         return;
       }
-      var code = Array.from(this.text.querySelectorAll('pre'));
+      var code = Array.from(this.editor.querySelectorAll('pre'));
       code.forEach(function (block) {
         hljs.highlightBlock(block);
       });
@@ -1669,37 +1668,77 @@ var Align = function () {
     value: function toggleHTML() {
       this.HTML = !this.HTML;
       if (this.HTML) {
-        var content = document.createTextNode(this.text.innerHTML);
+        var content = document.createTextNode(this.editor.innerHTML);
         var pre = document.createElement('pre');
 
-        this.text.innerHTML = '';
-        this.text.contentEditable = false;
+        this.editor.innerHTML = '';
+        this.editor.contentEditable = false;
         pre.id = 'content';
         pre.contentEditable = false;
         pre.style.whiteSpace = 'pre-wrap';
         pre.appendChild(content);
-        this.text.appendChild(pre);
+        this.editor.appendChild(pre);
         this.highlight();
         return;
       }
-      this.text.innerHTML = this.text.innerText;
-      this.text.contentEditable = true;
-      this.text.focus();
+      this.editor.innerHTML = this.editor.innerText;
+      this.editor.contentEditable = true;
+      this.editor.focus();
     }
   }, {
     key: 'updateStylers',
     value: function updateStylers() {
-      if (this.settings.toolbar) {
-        this.toolbar.updateStylerStates();
+      var _this2 = this;
+
+      Selection.selectedRange = window.getSelection().getRangeAt(0);
+      setTimeout(function () {
+        if (_this2.settings.toolbar) {
+          _this2.toolbar.updateStylerStates();
+        }
+        if (_this2.settings.bubble) {
+          _this2.bubble.updateStylerStates();
+        }
+      }, 16);
+    }
+  }, {
+    key: 'surroundContents',
+    value: function surroundContents(schema, className) {
+      if (!Selection.selectedRange) return;
+      var container = Selection.selectedRange.commonAncestorContainer;
+      var selectedElements = [];
+
+      if (container.nodeType === 3) {
+        selectedElements.push(container.parentNode);
       }
-      if (this.settings.bubble) {
-        this.bubble.updateStylerStates();
+
+      if (container.nodeType !== 3) {
+        var allElements = Array.from(container.querySelectorAll(':scope >*'));
+        allElements.map(function (el) {
+          if (window.getSelection().containsNode(el, true)) {
+            selectedElements.push(el);
+          }
+        });
       }
+
+      selectedElements.map(function (el, index) {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        if (index === 0) {
+          range.setStart(el.firstChild, Selection.selectedRange.startOffset);
+        }
+        if (index === selectedElements.length - 1) {
+          range.setEnd(el.firstChild, Selection.selectedRange.endOffset);
+        }
+
+        var span = document.createElement('span');
+        span.classList.add('align-' + schema.classPrefix + '-' + className.toLowerCase());
+        range.surroundContents(span);
+      });
     }
   }, {
     key: 'content',
     get: function get$$1() {
-      return document.createTextNode(this.text.innerHTML);
+      return document.createTextNode(this.editor.innerHTML);
     }
   }], [{
     key: 'extend',

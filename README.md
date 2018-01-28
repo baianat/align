@@ -9,7 +9,7 @@ A simple text editor with expandable commands.
 * Built-in, fully-integrated colorpicker
 * The ability to add more custom commands
 
-[example](https://baianat.github.io/editor/)
+[example](https://baianat.github.io/align/)
 
 ## How to use
 
@@ -63,7 +63,7 @@ You can also pass the element directly to the constructor
 </script>
 ```
 
-### Customizing Align
+### Align
 
 Align comes with two styling bars(stylers), the main toolbar (`toolbar`) and the pop-up toolbar (`bubble`) that pops when you select a text.
 
@@ -74,10 +74,27 @@ You can choose what commands you'd like both of the stylers to include, by passi
 ```js
 new Align('.editor', {
   toolbar: {
-    commands: ['fontSize', 'fontName', 'separator', 'separator', 'bold', 'italic', 'underline', 'strikeThrough', 'separator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'separator', 'h1', 'h2', 'blockquote', 'p', 'separator', 'addImage', 'separator', 'color']
+    commands: [
+      {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
+      {'font': ['Raleway', 'Roboto', 'Poppins']},
+      'separator',
+      'bold', 'italic', 'underline', 'strikeThrough',
+      'separator',
+      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
+      'separator',
+      'h1', 'h2', 'p', 'blockquote', 'pre',
+      'separator',
+      'addImage', 'html',
+      'separator',
+      'color'
+    ]
   },
   bubble: {
-    commands: ['bold', 'italic', 'underline', 'strikeThrough', 'separator', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull']
+    commands: [
+      'bold', 'italic', 'underline', 'strikeThrough',
+      'separator',
+      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'
+    ]
   }
 });
 ```
@@ -86,8 +103,8 @@ List of all available commands
 
 | COMMAND     | DESCRIPTION |
 |-------------|-------------|
+|font         | Surround selected text with an element, with class name same as selected font e.g. `align-font-roboto`|
 |color        | Changes a font color for the selection or at the insertion point |
-|fontName     | Changes the font name for the selection or at the insertion point |
 |fontSize     | Changes the font size for the selection or at the insertion point |
 |bold         | Toggles bold on/off for the selection or at the insertion point |
 |italic       | Toggles italics on/off for the selection or at the insertion point |
