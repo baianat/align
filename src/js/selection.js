@@ -18,11 +18,18 @@ class Selection {
     return window.getSelection();
   }
 
-  static updateSelection(range) {
+  static updateSelection(range = Selection.selectedRange) {
     if (!range) return;
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
+  }
+
+  static updateSelectedRange() {
+    const sel = window.getSelection();
+    if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
+      Selection.selectedRange = sel.getRangeAt(0);
+    }
   }
 }
 

@@ -117,16 +117,13 @@ const commands = {
       disableLum: true,
       events: {
         beforeSubmit() {
-          console.log('submit', Selection.selectedRange);
-          Selection.updateSelection(Selection.selectedRange);
+          Selection.updateSelection();
         },
         afterOpen() {
-          Selection.selectedRange = window.getSelection().getRangeAt(0);
+          Selection.updateSelectedRange();
         },
         afterSelect() {
-          if (window.getSelection().rangeCount && window.getSelection().anchorNode.nodeType === 3) {
-            Selection.selectedRange = window.getSelection().getRangeAt(0);
-          }
+          Selection.updateSelectedRange();
         }
       }
     }

@@ -81,19 +81,23 @@
     height: 20px
 
   &-select
+    position: relative
     margin: 0 7px
     svg
+      position: absolute
+      top: 0
+      right: 0
       width: 18px
       height: 18px
       margin: 6px 0
-      float: right
+      z-index: -1
     select
       appearance: none
       height: 30px
       border-radius: 0
-      padding: 2px 5px
+      padding: 2px 23px 2px 5px
       line-height: 26px
-      background: $white
+      background: transparent
       text-align: center
       border-width: 0
       border-color: $dark

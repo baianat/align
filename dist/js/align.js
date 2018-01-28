@@ -1100,11 +1100,21 @@ var Selection = function () {
     }
   }], [{
     key: "updateSelection",
-    value: function updateSelection(range) {
+    value: function updateSelection() {
+      var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.selectedRange;
+
       if (!range) return;
       var sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
+    }
+  }, {
+    key: "updateSelectedRange",
+    value: function updateSelectedRange() {
+      var sel = window.getSelection();
+      if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
+        Selection.selectedRange = sel.getRangeAt(0);
+      }
     }
   }]);
   return Selection;
@@ -1224,16 +1234,13 @@ var commands = {
       disableLum: true,
       events: {
         beforeSubmit: function beforeSubmit() {
-          console.log('submit', Selection.selectedRange);
-          Selection.updateSelection(Selection.selectedRange);
+          Selection.updateSelection();
         },
         afterOpen: function afterOpen() {
-          Selection.selectedRange = window.getSelection().getRangeAt(0);
+          Selection.updateSelectedRange();
         },
         afterSelect: function afterSelect() {
-          if (window.getSelection().rangeCount && window.getSelection().anchorNode.nodeType === 3) {
-            Selection.selectedRange = window.getSelection().getRangeAt(0);
-          }
+          Selection.updateSelectedRange();
         }
       }
     }
@@ -1400,9 +1407,9 @@ var Styler = function () {
 
           case 'select':
             var selectWrapper = select$1(cmd, el[cmd]);
-            _this.cmds[cmd] = selectWrapper.querySelector('select');
-            _this.cmds[cmd].addEventListener('change', function () {
-              return callBack(cmdSchema, _this.cmds[cmd][_this.cmds[cmd].selectedIndex].value);
+            var temp = _this.cmds[cmd] = selectWrapper.querySelector('select');
+            temp.addEventListener('change', function () {
+              return callBack(cmdSchema, temp[temp.selectedIndex].value);
             });
             li.appendChild(selectWrapper);
             break;
@@ -1456,6 +1463,7 @@ var Styler = function () {
       if (this.align.HTML) return;
       document.execCommand(cmd, false, value);
       this.align.el.focus();
+      Selection.updateSelectedRange();
       this.updateStylerStates();
     }
   }, {
@@ -1610,7 +1618,7 @@ var Align = function () {
         _this.highlight();
       });
 
-      this.editor.addEventListener('mouseup', this.updateStylers.bind(this));
+      window.addEventListener('mouseup', this.updateStylers.bind(this));
 
       window.addEventListener('keyup', function (event) {
         // Do nothing if the event was already processed
@@ -1626,10 +1634,10 @@ var Align = function () {
             _this.updateStylers();
             break;
           case 'ArrowLeft':
-            _this.bubble.updateStylerStates();
+            _this.updateStylers();
             break;
           case 'ArrowRight':
-            _this.bubble.updateStylerStates();
+            _this.updateStylers();
             break;
           case 'Tab':
             _this.styler.execute('indent');
@@ -1690,7 +1698,7 @@ var Align = function () {
     value: function updateStylers() {
       var _this2 = this;
 
-      Selection.selectedRange = window.getSelection().getRangeAt(0);
+      Selection.updateSelectedRange();
       setTimeout(function () {
         if (_this2.settings.toolbar) {
           _this2.toolbar.updateStylerStates();

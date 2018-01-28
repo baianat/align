@@ -56,9 +56,9 @@ class Styler {
 
         case 'select':
           const selectWrapper = select(cmd, el[cmd]);
-          this.cmds[cmd] = selectWrapper.querySelector('select');
-          this.cmds[cmd].addEventListener('change', 
-            () => callBack(cmdSchema, this.cmds[cmd][this.cmds[cmd].selectedIndex].value)
+          const temp = this.cmds[cmd] = selectWrapper.querySelector('select');
+          temp.addEventListener('change', 
+            () => callBack(cmdSchema, temp[temp.selectedIndex].value)
           );
           li.appendChild(selectWrapper);
           break;
@@ -108,6 +108,7 @@ class Styler {
     if (this.align.HTML) return;
     document.execCommand(cmd, false, value);
     this.align.el.focus();
+    Selection.updateSelectedRange();
     this.updateStylerStates();
   }
 

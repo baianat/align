@@ -76,7 +76,7 @@ class Align {
       this.highlight();
     });
 
-    this.editor.addEventListener('mouseup', this.updateStylers.bind(this));
+    window.addEventListener('mouseup', this.updateStylers.bind(this));
 
     window.addEventListener('keyup', (event) => {
       // Do nothing if the event was already processed
@@ -93,10 +93,10 @@ class Align {
           this.updateStylers();
           break;
         case 'ArrowLeft':
-          this.bubble.updateStylerStates();
+          this.updateStylers();
           break;
         case 'ArrowRight':
-          this.bubble.updateStylerStates();
+          this.updateStylers();
           break;
         case 'Tab':
           this.styler.execute('indent');
@@ -149,7 +149,7 @@ class Align {
   }
 
   updateStylers() {
-    Selection.selectedRange = window.getSelection().getRangeAt(0);
+    Selection.updateSelectedRange();
     setTimeout(() => {
       if (this.settings.toolbar) {
         this.toolbar.updateStylerStates();
