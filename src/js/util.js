@@ -69,24 +69,6 @@ export function wrap(el, wrapper) {
   wrapper.appendChild(el);
 }
 
-/**
- * Converts an array-like object to an array.
- */
-export function toArray(arrayLike, mappingFn) {
-  if (Array.from) {
-    return Array.from(arrayLike, mappingFn);
-  }
-
-  const array = [];
-  const shouldMap = typeof mappingFn === 'function';
-  const length = arrayLike.length;
-  for (let i = 0; i < length; i++) {
-    array.push(shouldMap ? mappingFn(arrayLike[i]) : arrayLike[i]);
-  }
-
-  return array;
-}
-
 export function normalizeNumber(number, min, max) {
   return Math.round(Math.max(Math.min(Number(number), max), min));
 }

@@ -395,10 +395,6 @@
   display: -ms-flexbox;
   display: flex;
 }
-.align blockquote {
-  border-left: 5px solid #aaa;
-  padding: 10px 0 10px 20px;
-}
 /**
  * external packages styling
  */

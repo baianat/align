@@ -84,8 +84,12 @@ class Styler {
           console.warn(cmd + ' is not found');
       }
 
-      if (cmdSchema.init) {
+      if (typeof cmdSchema.init === 'function') {
         this.inits[cmd] = new cmdSchema.init(this.cmds[cmd], cmdSchema.initConfig);
+      }
+
+      if (typeof cmdSchema.init === 'string') {
+        this.align[cmdSchema.init](cmdSchema, el);
       }
 
       this.cmd.appendChild(li);

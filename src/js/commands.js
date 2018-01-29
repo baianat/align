@@ -98,7 +98,12 @@ const commands = {
   font: {
     element: 'select',
     classPrefix: 'font',
-    func: 'surroundContents'
+    init: 'applyFont',
+    func(schema, selectedValue) {
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand('fontName', false, selectedValue);
+      document.execCommand('styleWithCSS', false, false);
+    }
   },
 
   separator: {

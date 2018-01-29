@@ -14,10 +14,6 @@ class Selection {
     return SELECTED_RANGE;
   }
 
-  get selection() {
-    return window.getSelection();
-  }
-
   static updateSelection(range = Selection.selectedRange) {
     if (!range) return;
     const sel = window.getSelection();

@@ -1,19 +1,19 @@
 import hljs from 'highlight.js';
-import { select } from './util';
+import { select, getTextNode } from './util';
 import commands from './commands';
 import icons from './icons';
 import Styler from './styler';
 import Selection from './selection';
+import selection from './selection';
 
 class Align {
   constructor(selector, {
-    defaultText = 'Type here',
     toolbar = null,
     bubble = null
   } = {}) {
     this.el = select(selector);
     this.settings = {
-      defaultText: this.el.innerHTML ? this.el.innerHTML : defaultText,
+      defaultText: this.el.innerHTML,
       toolbar,
       bubble
     };
@@ -57,15 +57,14 @@ class Align {
    */
   initEditor() {
     document.execCommand('defaultParagraphSeparator', false, 'p');
+    
     this.editor = document.createElement('div');
-    this.paragraph = document.createElement('p');
 
     this.editor.contentEditable = 'true';
     this.editor.classList.add('align-content');
-    this.paragraph.innerHTML = this.settings.defaultText + '\n';
+    this.editor.innerHTML = this.settings.defaultText + '\n';
 
     this.el.appendChild(this.editor);
-    this.editor.appendChild(this.paragraph);
   }
 
   /**
@@ -160,38 +159,8 @@ class Align {
     }, 16);
   }
 
-  surroundContents(schema, className) {
-    if (!Selection.selectedRange) return;
-    const container = Selection.selectedRange.commonAncestorContainer;
-    const selectedElements = [];
-
-    if (container.nodeType === 3) {
-      selectedElements.push(container.parentNode);
-    }
-
-    if (container.nodeType !== 3) {
-      const allElements = Array.from(container.querySelectorAll(':scope >*'));
-      allElements.map((el) => {
-        if (window.getSelection().containsNode(el, true)) {
-          selectedElements.push(el);
-        }
-      })
-    }
-
-    selectedElements.map((el, index) => {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      if (index === 0) {
-        range.setStart(el.firstChild, Selection.selectedRange.startOffset);
-      }
-      if (index === selectedElements.length - 1) {
-        range.setEnd(el.firstChild, Selection.selectedRange.endOffset);
-      }
-
-      const span = document.createElement('span');
-      span.classList.add(`align-${schema.classPrefix}-${className.toLowerCase()}`);
-      range.surroundContents(span);
-    });
+  applyFont(schema, cmd) {
+    this.el.style.fontFamily = cmd.font[0];
   }
 }
 

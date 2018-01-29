@@ -47,11 +47,6 @@ function debounce(callback) {
 
 
 
-/**
- * Converts an array-like object to an array.
- */
-
-
 function normalizeNumber(number, min, max) {
   return Math.round(Math.max(Math.min(Number(number), max), min));
 }
@@ -1093,11 +1088,6 @@ var Selection = function () {
     get: function get$$1() {
       return SELECTED_RANGE;
     }
-  }, {
-    key: "selection",
-    get: function get$$1() {
-      return window.getSelection();
-    }
   }], [{
     key: "updateSelection",
     value: function updateSelection() {
@@ -1215,7 +1205,12 @@ var commands = {
   font: {
     element: 'select',
     classPrefix: 'font',
-    func: 'surroundContents'
+    init: 'applyFont',
+    func: function func(schema, selectedValue) {
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand('fontName', false, selectedValue);
+      document.execCommand('styleWithCSS', false, false);
+    }
   },
 
   separator: {
@@ -1435,8 +1430,12 @@ var Styler = function () {
             console.warn(cmd + ' is not found');
         }
 
-        if (cmdSchema.init) {
+        if (typeof cmdSchema.init === 'function') {
           _this.inits[cmd] = new cmdSchema.init(_this.cmds[cmd], cmdSchema.initConfig);
+        }
+
+        if (typeof cmdSchema.init === 'string') {
+          _this.align[cmdSchema.init](cmdSchema, el);
         }
 
         _this.cmd.appendChild(li);
@@ -1542,8 +1541,6 @@ var Styler = function () {
 var Align = function () {
   function Align(selector) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref$defaultText = _ref.defaultText,
-        defaultText = _ref$defaultText === undefined ? 'Type here' : _ref$defaultText,
         _ref$toolbar = _ref.toolbar,
         toolbar = _ref$toolbar === undefined ? null : _ref$toolbar,
         _ref$bubble = _ref.bubble,
@@ -1553,7 +1550,7 @@ var Align = function () {
 
     this.el = select(selector);
     this.settings = {
-      defaultText: this.el.innerHTML ? this.el.innerHTML : defaultText,
+      defaultText: this.el.innerHTML,
       toolbar: toolbar,
       bubble: bubble
     };
@@ -1594,15 +1591,14 @@ var Align = function () {
     key: 'initEditor',
     value: function initEditor() {
       document.execCommand('defaultParagraphSeparator', false, 'p');
+
       this.editor = document.createElement('div');
-      this.paragraph = document.createElement('p');
 
       this.editor.contentEditable = 'true';
       this.editor.classList.add('align-content');
-      this.paragraph.innerHTML = this.settings.defaultText + '\n';
+      this.editor.innerHTML = this.settings.defaultText + '\n';
 
       this.el.appendChild(this.editor);
-      this.editor.appendChild(this.paragraph);
     }
 
     /**
@@ -1709,39 +1705,9 @@ var Align = function () {
       }, 16);
     }
   }, {
-    key: 'surroundContents',
-    value: function surroundContents(schema, className) {
-      if (!Selection.selectedRange) return;
-      var container = Selection.selectedRange.commonAncestorContainer;
-      var selectedElements = [];
-
-      if (container.nodeType === 3) {
-        selectedElements.push(container.parentNode);
-      }
-
-      if (container.nodeType !== 3) {
-        var allElements = Array.from(container.querySelectorAll(':scope >*'));
-        allElements.map(function (el) {
-          if (window.getSelection().containsNode(el, true)) {
-            selectedElements.push(el);
-          }
-        });
-      }
-
-      selectedElements.map(function (el, index) {
-        var range = document.createRange();
-        range.selectNodeContents(el);
-        if (index === 0) {
-          range.setStart(el.firstChild, Selection.selectedRange.startOffset);
-        }
-        if (index === selectedElements.length - 1) {
-          range.setEnd(el.firstChild, Selection.selectedRange.endOffset);
-        }
-
-        var span = document.createElement('span');
-        span.classList.add('align-' + schema.classPrefix + '-' + className.toLowerCase());
-        range.surroundContents(span);
-      });
+    key: 'applyFont',
+    value: function applyFont(schema, cmd) {
+      this.el.style.fontFamily = cmd.font[0];
     }
   }, {
     key: 'content',
