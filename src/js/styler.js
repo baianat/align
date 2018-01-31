@@ -25,7 +25,6 @@ class Styler {
     this.styler = document.createElement('ul');
     this.styler.classList.add('styler', `is-${this.settings.mode}`);
     this.cmds = {};
-    this.inits = {};
 
     this.settings.commands.forEach((el) => {
       const li = document.createElement('li');
@@ -36,40 +35,30 @@ class Styler {
         return;
       }
 
-      const callBack = (cmdSchema, value) => {
-        if (cmdSchema.command) {
-          this.execute(cmdSchema.command, value);
-        }
-        if (typeof cmdSchema.func === 'string') {
-          this.align[cmdSchema.func](this, value);
-        }
-        if (typeof cmdSchema.func === 'function') {
-          cmdSchema.func(this, value);
-        }
-      }
+      const currentCmd = this.cmds[cmd] = { schema: cmdSchema };
 
       switch (cmdSchema.element) {
         case 'button':
-          this.cmds[cmd] = button(cmd, icons[cmd]);
-          this.cmds[cmd].addEventListener('click', () => callBack(cmdSchema, cmdSchema.value));
-          li.appendChild(this.cmds[cmd]);
+          currentCmd.el = button(cmd, icons[cmd]);
+          currentCmd.el.addEventListener('click', () => this.cmdCallback(cmdSchema, cmdSchema.value));
+          li.appendChild(currentCmd.el);
           break;
 
         case 'select':
           const selectWrapper = select(cmd, el[cmd]);
-          const temp = this.cmds[cmd] = selectWrapper.querySelector('select');
+          const temp = currentCmd.el = selectWrapper.querySelector('select');
           temp.addEventListener('change', 
-            () => callBack(cmdSchema, temp[temp.selectedIndex].value)
+            () => this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value)
           );
           li.appendChild(selectWrapper);
           break;
 
         case 'input':
-          this.cmds[cmd] = input(cmd, cmdSchema.type);
-          this.cmds[cmd].addEventListener('change', () => {
-            callBack(cmdSchema, this.cmds[cmd].value)
+          currentCmd.el = input(cmd, cmdSchema.type);
+          currentCmd.el.addEventListener('change', () => {
+            this.cmdCallback(cmdSchema, currentCmd.el.value)
           });
-          li.appendChild(this.cmds[cmd]);
+          li.appendChild(currentCmd.el);
           break;
 
         case 'styling':
@@ -86,17 +75,30 @@ class Styler {
       }
 
       if (typeof cmdSchema.init === 'function') {
-        this.inits[cmd] = cmdSchema.init = new cmdSchema.init(this.cmds[cmd], cmdSchema.initConfig);
+        cmdSchema.init = new cmdSchema.init(currentCmd.el, cmdSchema.initConfig);
       }
 
       if (typeof cmdSchema.init === 'string') {
         this.align[cmdSchema.init](cmdSchema, el);
+        cmdSchema.init = null;
       }
 
       this.styler.appendChild(li);
     })
     this.align.el.appendChild(this.styler);
     if (this.settings.mode === 'bubble') this.initBubble();
+  }
+
+  cmdCallback(cmdSchema, value) {
+    if (cmdSchema.command) {
+      this.execute(cmdSchema.command, value, cmdSchema.useCSS);
+    }
+    if (typeof cmdSchema.func === 'string') {
+      this.align[cmdSchema.func](this, value);
+    }
+    if (typeof cmdSchema.func === 'function') {
+      cmdSchema.func(this, value);
+    }
   }
 
   initBubble() {
@@ -109,9 +111,11 @@ class Styler {
    * @param {String} cmd
    * @param {String|Number} value
    */
-  execute(cmd, value) {
+  execute(cmd, value, useCSS = false) {
     if (this.align.HTML) return;
+    document.execCommand('styleWithCSS', false, useCSS);
     document.execCommand(cmd, false, value);
+    document.execCommand('styleWithCSS', false, false);
     this.align.el.focus();
     Selection.updateSelectedRange();
     this.updateStylerStates();
@@ -165,20 +169,30 @@ class Styler {
    */
   updateStylerCommands() {
     Object.keys(this.cmds).forEach((cmd) => {
-      const command = this.cmds;
-      console.log(command);
+      const currentCmd = this.cmds[cmd];
+      const command = currentCmd.schema.command;
+      const value = currentCmd.schema.value;
+      const init = currentCmd.schema.init;
+      
+      if (!command) {
+        return;
+      }
       if (document.queryCommandState(command)) {
-        this.cmds[cmd].classList.add('is-active');
+        currentCmd.el.classList.add('is-active');
         return;
       }
-      if (document.queryCommandValue('formatBlock') === command) {
-        this.cmds[cmd].classList.add('is-active');
+      if (document.queryCommandValue(command) === value) {
+        currentCmd.el.classList.add('is-active');
         return;
       }
-      this.cmds[cmd].classList.remove('is-active');
+      if (init) {
+        init.selectColor(document.queryCommandValue(command), true);
+        return;
+      }
       if (document.queryCommandValue(command)) {
-        this.cmds[cmd].value = document.queryCommandValue(cmd);
+        currentCmd.el.value = document.queryCommandValue(command);
       }
+      currentCmd.el.classList.remove('is-active');
     })
   }
 }

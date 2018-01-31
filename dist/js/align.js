@@ -1216,11 +1216,8 @@ var commands = {
   fontName: {
     element: 'select',
     init: 'applyFont',
-    func: function func($styler, selectedValue) {
-      $styler.execute('styleWithCSS', true);
-      $styler.execute('fontName', selectedValue);
-      $styler.execute('styleWithCSS', false);
-    }
+    command: 'fontName',
+    useCSS: true
   },
 
   separator: {
@@ -1232,6 +1229,7 @@ var commands = {
     element: 'input',
     type: 'text',
     command: 'foreColor',
+    useCSS: true,
     init: colorpicker,
     initConfig: {
       defaultColor: '#000000',
@@ -1256,6 +1254,7 @@ var commands = {
     element: 'input',
     type: 'text',
     command: 'backColor',
+    useCSS: true,
     init: colorpicker,
     initConfig: {
       defaultColor: '#fdfdfd',
@@ -1404,7 +1403,6 @@ var Styler = function () {
       this.styler = document.createElement('ul');
       this.styler.classList.add('styler', 'is-' + this.settings.mode);
       this.cmds = {};
-      this.inits = {};
 
       this.settings.commands.forEach(function (el) {
         var li = document.createElement('li');
@@ -1415,42 +1413,32 @@ var Styler = function () {
           return;
         }
 
-        var callBack = function callBack(cmdSchema, value) {
-          if (cmdSchema.command) {
-            _this.execute(cmdSchema.command, value);
-          }
-          if (typeof cmdSchema.func === 'string') {
-            _this.align[cmdSchema.func](_this, value);
-          }
-          if (typeof cmdSchema.func === 'function') {
-            cmdSchema.func(_this, value);
-          }
-        };
+        var currentCmd = _this.cmds[cmd] = { schema: cmdSchema };
 
         switch (cmdSchema.element) {
           case 'button':
-            _this.cmds[cmd] = button(cmd, icons[cmd]);
-            _this.cmds[cmd].addEventListener('click', function () {
-              return callBack(cmdSchema, cmdSchema.value);
+            currentCmd.el = button(cmd, icons[cmd]);
+            currentCmd.el.addEventListener('click', function () {
+              return _this.cmdCallback(cmdSchema, cmdSchema.value);
             });
-            li.appendChild(_this.cmds[cmd]);
+            li.appendChild(currentCmd.el);
             break;
 
           case 'select':
             var selectWrapper = select$1(cmd, el[cmd]);
-            var temp = _this.cmds[cmd] = selectWrapper.querySelector('select');
+            var temp = currentCmd.el = selectWrapper.querySelector('select');
             temp.addEventListener('change', function () {
-              return callBack(cmdSchema, temp[temp.selectedIndex].value);
+              return _this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value);
             });
             li.appendChild(selectWrapper);
             break;
 
           case 'input':
-            _this.cmds[cmd] = input(cmd, cmdSchema.type);
-            _this.cmds[cmd].addEventListener('change', function () {
-              callBack(cmdSchema, _this.cmds[cmd].value);
+            currentCmd.el = input(cmd, cmdSchema.type);
+            currentCmd.el.addEventListener('change', function () {
+              _this.cmdCallback(cmdSchema, currentCmd.el.value);
             });
-            li.appendChild(_this.cmds[cmd]);
+            li.appendChild(currentCmd.el);
             break;
 
           case 'styling':
@@ -1467,17 +1455,31 @@ var Styler = function () {
         }
 
         if (typeof cmdSchema.init === 'function') {
-          _this.inits[cmd] = cmdSchema.init = new cmdSchema.init(_this.cmds[cmd], cmdSchema.initConfig);
+          cmdSchema.init = new cmdSchema.init(currentCmd.el, cmdSchema.initConfig);
         }
 
         if (typeof cmdSchema.init === 'string') {
           _this.align[cmdSchema.init](cmdSchema, el);
+          cmdSchema.init = null;
         }
 
         _this.styler.appendChild(li);
       });
       this.align.el.appendChild(this.styler);
       if (this.settings.mode === 'bubble') this.initBubble();
+    }
+  }, {
+    key: 'cmdCallback',
+    value: function cmdCallback(cmdSchema, value) {
+      if (cmdSchema.command) {
+        this.execute(cmdSchema.command, value, cmdSchema.useCSS);
+      }
+      if (typeof cmdSchema.func === 'string') {
+        this.align[cmdSchema.func](this, value);
+      }
+      if (typeof cmdSchema.func === 'function') {
+        cmdSchema.func(this, value);
+      }
     }
   }, {
     key: 'initBubble',
@@ -1495,8 +1497,12 @@ var Styler = function () {
   }, {
     key: 'execute',
     value: function execute(cmd, value) {
+      var useCSS = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
       if (this.align.HTML) return;
+      document.execCommand('styleWithCSS', false, useCSS);
       document.execCommand(cmd, false, value);
+      document.execCommand('styleWithCSS', false, false);
       this.align.el.focus();
       Selection.updateSelectedRange();
       this.updateStylerStates();
@@ -1557,20 +1563,30 @@ var Styler = function () {
       var _this2 = this;
 
       Object.keys(this.cmds).forEach(function (cmd) {
-        var command = _this2.cmds;
-        console.log(command);
+        var currentCmd = _this2.cmds[cmd];
+        var command = currentCmd.schema.command;
+        var value = currentCmd.schema.value;
+        var init = currentCmd.schema.init;
+
+        if (!command) {
+          return;
+        }
         if (document.queryCommandState(command)) {
-          _this2.cmds[cmd].classList.add('is-active');
+          currentCmd.el.classList.add('is-active');
           return;
         }
-        if (document.queryCommandValue('formatBlock') === command) {
-          _this2.cmds[cmd].classList.add('is-active');
+        if (document.queryCommandValue(command) === value) {
+          currentCmd.el.classList.add('is-active');
           return;
         }
-        _this2.cmds[cmd].classList.remove('is-active');
+        if (init) {
+          init.selectColor(document.queryCommandValue(command), true);
+          return;
+        }
         if (document.queryCommandValue(command)) {
-          _this2.cmds[cmd].value = document.queryCommandValue(cmd);
+          currentCmd.el.value = document.queryCommandValue(command);
         }
+        currentCmd.el.classList.remove('is-active');
       });
     }
   }]);

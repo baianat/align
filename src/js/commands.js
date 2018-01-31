@@ -91,11 +91,8 @@ const commands = {
   fontName: {
     element: 'select',
     init: 'applyFont',
-    func($styler, selectedValue) {
-      $styler.execute('styleWithCSS', true);
-      $styler.execute('fontName', selectedValue);
-      $styler.execute('styleWithCSS', false);
-    }
+    command: 'fontName',
+    useCSS: true
   },
 
   separator: {
@@ -107,6 +104,7 @@ const commands = {
     element: 'input',
     type: 'text',
     command: 'foreColor',
+    useCSS: true,
     init: Colorpicker,
     initConfig: {
       defaultColor: '#000000',
@@ -136,6 +134,7 @@ const commands = {
     element: 'input',
     type: 'text',
     command: 'backColor',
+    useCSS: true,
     init: Colorpicker,
     initConfig: {
       defaultColor: '#fdfdfd',
