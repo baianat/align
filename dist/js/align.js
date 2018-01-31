@@ -484,6 +484,16 @@ var colorpicker = createCommonjsModule(function (module, exports) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    function isElementClosest(element, wrapper) {
+      while (element !== document && element !== null) {
+        if (element === wrapper) {
+          return true;
+        }
+        element = element.parentNode;
+      }
+      return false;
+    }
+
     function normalizeColorValue(value) {
       if (value > 255) {
         return 255;
@@ -574,7 +584,7 @@ var colorpicker = createCommonjsModule(function (module, exports) {
       var events = ref.events;if (events === void 0) events = {};
       var recentColors = ref.recentColors;if (recentColors === void 0) recentColors = getArray(6, getRandomColor);
       var disableLum = ref.disableLum;if (disableLum === void 0) disableLum = false;
-
+      var guideIcon = ref.guideIcon;if (guideIcon === void 0) guideIcon = "<svg viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"12\"/></svg>";
       this.el = select(selector);
       this.options = {
         defaultColor: defaultColor,
@@ -582,7 +592,8 @@ var colorpicker = createCommonjsModule(function (module, exports) {
         mode: mode,
         events: events,
         recentColors: recentColors,
-        disableLum: disableLum
+        disableLum: disableLum,
+        guideIcon: guideIcon
       };
       this.init();
     };
@@ -603,7 +614,7 @@ var colorpicker = createCommonjsModule(function (module, exports) {
 
       // create elements and config them
       this.picker = document.createElement('div');
-      this.picker.insertAdjacentHTML('afterbegin', "\n      <button class=\"picker-guide\"></button>\n      <div class=\"picker-menu is-hidden\" tabindex=\"-1\">\n        <div class=\"picker-wheel\">\n          <canvas class=\"picker-canvas\"></canvas>\n          <div class=\"picker-cursor\"></div>\n        </div>\n        " + (this.options.disableLum ? '' : '<input class="picker-saturation" type="number" min="0" max="100" value="100">') + "\n        <input id=\"red\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <input id=\"green\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <input id=\"blue\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <div class=\"picker-input\">\n          <button class=\"picker-submit\">\n            <svg class=\"icon\" viewBox=\"0 0 24 24\">\n              <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n            </svg>\n          </button>\n        </div>\n        <div class=\"picker-recent\"></div>\n      </div>\n    ");
+      this.picker.insertAdjacentHTML('afterbegin', "\n      <button class=\"picker-guide\">\n        " + this.options.guideIcon + "\n      </button>\n      <div class=\"picker-menu is-hidden\" tabindex=\"-1\">\n        <div class=\"picker-wheel\">\n          <canvas class=\"picker-canvas\"></canvas>\n          <div class=\"picker-cursor\"></div>\n        </div>\n        " + (this.options.disableLum ? '' : '<input class="picker-saturation" type="number" min="0" max="100" value="100">') + "\n        <input id=\"red\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <input id=\"green\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <input id=\"blue\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <div class=\"picker-input\">\n          <button class=\"picker-submit\">\n            <svg class=\"icon\" viewBox=\"0 0 24 24\">\n              <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n            </svg>\n          </button>\n        </div>\n        <div class=\"picker-recent\"></div>\n      </div>\n    ");
 
       this.menu = this.picker.querySelector('.picker-menu');
       this.recent = this.picker.querySelector('.picker-recent');
@@ -623,7 +634,8 @@ var colorpicker = createCommonjsModule(function (module, exports) {
       this.el.classList.add('picker-value');
       this.picker.classList.add('picker');
       this.submit.parentNode.insertBefore(this.el, this.submit);
-      this.guide.style.backgroundColor = this.options.defaultColor;
+      this.guide.style.color = this.options.defaultColor;
+      this.guide.style.fill = this.options.defaultColor;
 
       this.sliders = {};
       if (!this.options.disableLum) {
@@ -861,7 +873,8 @@ var colorpicker = createCommonjsModule(function (module, exports) {
       var hexColor = color.slice(0, 1) === '#' ? color : rgb2hex(color);
       var hslColor = rgb2hsl(color);
       this.el.value = this.options.mode === 'hex' ? hexColor : this.options.mode === 'hsl' ? hslColor : color;
-      this.guide.style.backgroundColor = color;
+      this.guide.style.color = color;
+      this.guide.style.fill = color;
       this.sliders.red.update(getDecimalValue(hexColor.slice(1, 3)), true);
       this.sliders.green.update(getDecimalValue(hexColor.slice(3, 5)), true);
       this.sliders.blue.update(getDecimalValue(hexColor.slice(5, 7)), true);
@@ -899,6 +912,7 @@ var colorpicker = createCommonjsModule(function (module, exports) {
     };
 
     Colorpicker.prototype.togglePicker = function togglePicker() {
+
       if (this.isMenuActive) {
         this.closePicker();
         return;
@@ -909,7 +923,7 @@ var colorpicker = createCommonjsModule(function (module, exports) {
     Colorpicker.prototype.closePicker = function closePicker() {
       this.menu.classList.add('is-hidden');
       this.isMenuActive = false;
-      document.onclick = '';
+      document.removeEventListener('click', this.documentCallback);
     };
 
     Colorpicker.prototype.openPiker = function openPiker() {
@@ -917,13 +931,15 @@ var colorpicker = createCommonjsModule(function (module, exports) {
 
       this.menu.classList.remove('is-hidden');
       this.isMenuActive = true;
-      document.onclick = function (evnt) {
-        if (!evnt.target.closest('.picker-menu') && evnt.target !== this$1.guide) {
+      var documentCallback = function documentCallback(evnt) {
+        if (!isElementClosest(evnt.target, this$1.menu) && !isElementClosest(evnt.target, this$1.guide)) {
           this$1.closePicker();
           return;
         }
         call(this$1.options.events.clicked);
       };
+      this.documentCallback = documentCallback.bind(this);
+      document.addEventListener('click', this.documentCallback);
       call(this.options.events.afterOpen);
     };
 
@@ -1192,11 +1208,6 @@ var commands = {
     func: 'toggleHTML'
   },
 
-  insertColumns: {
-    element: 'button',
-    func: function func() {}
-  },
-
   fontSize: {
     element: 'select',
     command: 'fontSize'
@@ -1205,10 +1216,10 @@ var commands = {
   fontName: {
     element: 'select',
     init: 'applyFont',
-    func: function func(schema, selectedValue) {
-      document.execCommand('styleWithCSS', false, true);
-      document.execCommand('fontName', false, selectedValue);
-      document.execCommand('styleWithCSS', false, false);
+    func: function func($styler, selectedValue) {
+      $styler.execute('styleWithCSS', true);
+      $styler.execute('fontName', selectedValue);
+      $styler.execute('styleWithCSS', false);
     }
   },
 
@@ -1226,6 +1237,7 @@ var commands = {
       defaultColor: '#000000',
       mode: 'hex',
       disableLum: true,
+      guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: #000" d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
           Selection.updateSelection();
@@ -1246,9 +1258,10 @@ var commands = {
     command: 'backColor',
     init: colorpicker,
     initConfig: {
-      defaultColor: '#000000',
+      defaultColor: '#fdfdfd',
       mode: 'hex',
       disableLum: true,
+      guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path style="fill: #000" d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/>\n          <path d="M0 20h24v4H0z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
           Selection.updateSelection();
@@ -1388,8 +1401,8 @@ var Styler = function () {
       var _this = this;
 
       setElementsPrefix('styler-');
-      this.cmd = document.createElement('ul');
-      this.cmd.classList.add('styler', 'is-' + this.settings.mode);
+      this.styler = document.createElement('ul');
+      this.styler.classList.add('styler', 'is-' + this.settings.mode);
       this.cmds = {};
       this.inits = {};
 
@@ -1397,19 +1410,20 @@ var Styler = function () {
         var li = document.createElement('li');
         var cmd = typeof el === 'string' ? el : Object.keys(el)[0];
         var cmdSchema = commands[cmd];
-        if (!cmd) {
+        if (!cmdSchema) {
           console.warn(cmd + ' is not found');
           return;
         }
+
         var callBack = function callBack(cmdSchema, value) {
           if (cmdSchema.command) {
             _this.execute(cmdSchema.command, value);
           }
           if (typeof cmdSchema.func === 'string') {
-            _this.align[cmdSchema.func](cmdSchema, value);
+            _this.align[cmdSchema.func](_this, value);
           }
           if (typeof cmdSchema.func === 'function') {
-            cmdSchema.func(cmdSchema, value);
+            cmdSchema.func(_this, value);
           }
         };
 
@@ -1434,7 +1448,7 @@ var Styler = function () {
           case 'input':
             _this.cmds[cmd] = input(cmd, cmdSchema.type);
             _this.cmds[cmd].addEventListener('change', function () {
-              _this.execute(cmdSchema.command, _this.cmds[cmd].value);
+              callBack(cmdSchema, _this.cmds[cmd].value);
             });
             li.appendChild(_this.cmds[cmd]);
             break;
@@ -1449,26 +1463,26 @@ var Styler = function () {
             break;
 
           default:
-            console.warn(cmd + ' is not found');
+            console.warn(cmd + ' element not found');
         }
 
         if (typeof cmdSchema.init === 'function') {
-          _this.inits[cmd] = new cmdSchema.init(_this.cmds[cmd], cmdSchema.initConfig);
+          _this.inits[cmd] = cmdSchema.init = new cmdSchema.init(_this.cmds[cmd], cmdSchema.initConfig);
         }
 
         if (typeof cmdSchema.init === 'string') {
           _this.align[cmdSchema.init](cmdSchema, el);
         }
 
-        _this.cmd.appendChild(li);
+        _this.styler.appendChild(li);
       });
-      this.align.el.appendChild(this.cmd);
+      this.align.el.appendChild(this.styler);
       if (this.settings.mode === 'bubble') this.initBubble();
     }
   }, {
     key: 'initBubble',
     value: function initBubble() {
-      this.cmd.classList.add('is-hidden');
+      this.styler.classList.add('is-hidden');
       window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
     }
 
@@ -1494,7 +1508,7 @@ var Styler = function () {
       var marginRatio = 10;
       var selectionRect = Selection.selectedRange.getBoundingClientRect();
       var editorRect = this.align.el.getBoundingClientRect();
-      var stylerRect = this.cmd.getBoundingClientRect();
+      var stylerRect = this.styler.getBoundingClientRect();
 
       var scrolled = window.scrollY;
       var deltaY = selectionRect.top + scrolled - stylerRect.height - marginRatio;
@@ -1504,21 +1518,21 @@ var Styler = function () {
       var xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
       var yPosition = deltaY < scrolled + 50 ? selectionRect.top + selectionRect.height + marginRatio : selectionRect.top - stylerRect.height - marginRatio;
 
-      this.cmd.style.top = yPosition + 'px';
-      this.cmd.style.left = xPosition + 'px';
+      this.styler.style.top = yPosition + 'px';
+      this.styler.style.left = xPosition + 'px';
     }
   }, {
     key: 'showStyler',
     value: function showStyler() {
-      this.cmd.classList.add('is-visible');
-      this.cmd.classList.remove('is-hidden');
+      this.styler.classList.add('is-visible');
+      this.styler.classList.remove('is-hidden');
       this.updateBubblePosition();
     }
   }, {
     key: 'hideStyler',
     value: function hideStyler() {
-      this.cmd.classList.remove('is-visible');
-      this.cmd.classList.add('is-hidden');
+      this.styler.classList.remove('is-visible');
+      this.styler.classList.add('is-hidden');
     }
   }, {
     key: 'updateStylerStates',
@@ -1542,18 +1556,20 @@ var Styler = function () {
     value: function updateStylerCommands() {
       var _this2 = this;
 
-      Object.keys(this.cmds).forEach(function (styl) {
-        if (document.queryCommandState(styl)) {
-          _this2.cmds[styl].classList.add('is-active');
+      Object.keys(this.cmds).forEach(function (cmd) {
+        var command = _this2.cmds;
+        console.log(command);
+        if (document.queryCommandState(command)) {
+          _this2.cmds[cmd].classList.add('is-active');
           return;
         }
-        if (document.queryCommandValue('formatBlock') === styl) {
-          _this2.cmds[styl].classList.add('is-active');
+        if (document.queryCommandValue('formatBlock') === command) {
+          _this2.cmds[cmd].classList.add('is-active');
           return;
         }
-        _this2.cmds[styl].classList.remove('is-active');
-        if (document.queryCommandValue(styl)) {
-          _this2.cmds[styl].value = document.queryCommandValue(styl);
+        _this2.cmds[cmd].classList.remove('is-active');
+        if (document.queryCommandValue(command)) {
+          _this2.cmds[cmd].value = document.queryCommandValue(cmd);
         }
       });
     }
@@ -1703,9 +1719,9 @@ var Align = function () {
         var pre = document.createElement('pre');
 
         this.editor.innerHTML = '';
-        this.editor.contentEditable = false;
+        // this.editor.contentEditable = false;
         pre.id = 'content';
-        pre.contentEditable = false;
+        // pre.contentEditable = false;
         pre.style.whiteSpace = 'pre-wrap';
         pre.appendChild(content);
         this.editor.appendChild(pre);

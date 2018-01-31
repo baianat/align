@@ -4,7 +4,7 @@
   "description": "ES6 text editor",
   "main": "dist/js/align.js",
   "dependencies": {
-    "@baianat/colorpicker": "0.0.9",
+    "@baianat/colorpicker": "0.0.10",
     "highlight.js": "^9.12.0"
   },
   "files": [

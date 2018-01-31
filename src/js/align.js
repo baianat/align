@@ -1,5 +1,5 @@
 import hljs from 'highlight.js';
-import { select, getTextNode } from './util';
+import { select } from './util';
 import commands from './commands';
 import icons from './icons';
 import Styler from './styler';
@@ -136,9 +136,9 @@ class Align {
       const pre = document.createElement('pre');
 
       this.editor.innerHTML = '';
-      this.editor.contentEditable = false;
+      // this.editor.contentEditable = false;
       pre.id = 'content';
-      pre.contentEditable = false;
+      // pre.contentEditable = false;
       pre.style.whiteSpace = 'pre-wrap';
       pre.appendChild(content);
       this.editor.appendChild(pre);

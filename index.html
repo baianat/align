@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="dist/css/align.css">
   <link href="https://fonts.googleapis.com/css?family=Poppins|Raleway|Roboto" rel="stylesheet">
-  <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/styles/default.min.css"> -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.12.0/build/styles/default.min.css">
   
   <title>Align</title>
 </head>
@@ -15,19 +15,9 @@
     body {
       margin: 0;
     }
-    .align {
-      width: 100%;
-      margin: auto;
-    }
     .align-image {
       width: 100%;
       max-width: 400px;
-    }
-    .align-row {
-      display: flex;
-    }
-    .align-row div {
-      flex: 1;
     }
     .align blockquote {
       border-left: 5px solid #AAAAAA;
@@ -36,7 +26,7 @@
   </style>
 
   <div class="align">
-    <h1 style="text-align: center;">Hello there, I'm Align!</h1>
+    <h1 style="text-align: center;">Hello there, I'm <span style="background-color: #000; color: #fff">&nbsp;Align </span>!</h1>
     <h2 style="text-align: center;"> I was born in Baianat.</h2> 
 
     <p>Our innovative solutions transcend business excellency to influence societies, through authentic, culture-changing standards.</p>
@@ -54,7 +44,7 @@
   </div>
 
 
-  <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script> -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script src="dist/js/align.js"></script>
   <script>
 
@@ -123,9 +113,9 @@
           'separator', 
           'addImage', 'html', 
           'separator',
-          'color',
+          'color', 'backColor',
           'separator',
-          'backColor'
+          'removeFormat'
         ]
       },
       bubble: {

@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@baianat/colorpicker@0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@baianat/colorpicker/-/colorpicker-0.0.9.tgz#6f54f07a5123ebe5be1c38ea2a55ae74ed7c0da9"
+"@baianat/colorpicker@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@baianat/colorpicker/-/colorpicker-0.0.10.tgz#9c5d88425f03b6d44ea605a32748cb5a6a0c75d5"
   dependencies:
     "@baianat/slider" "^0.0.1"
 

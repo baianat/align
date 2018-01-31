@@ -22,8 +22,8 @@ class Styler {
    */
   init() {
     setElementsPrefix('styler-');
-    this.cmd = document.createElement('ul');
-    this.cmd.classList.add('styler', `is-${this.settings.mode}`);
+    this.styler = document.createElement('ul');
+    this.styler.classList.add('styler', `is-${this.settings.mode}`);
     this.cmds = {};
     this.inits = {};
 
@@ -31,19 +31,20 @@ class Styler {
       const li = document.createElement('li');
       const cmd = typeof el === 'string' ? el : Object.keys(el)[0];
       const cmdSchema = commands[cmd];
-      if (!cmd) {
+      if (!cmdSchema) {
         console.warn(cmd + ' is not found');
         return;
       }
+
       const callBack = (cmdSchema, value) => {
         if (cmdSchema.command) {
           this.execute(cmdSchema.command, value);
         }
         if (typeof cmdSchema.func === 'string') {
-          this.align[cmdSchema.func](cmdSchema, value);
+          this.align[cmdSchema.func](this, value);
         }
         if (typeof cmdSchema.func === 'function') {
-          cmdSchema.func(cmdSchema, value);
+          cmdSchema.func(this, value);
         }
       }
 
@@ -66,7 +67,7 @@ class Styler {
         case 'input':
           this.cmds[cmd] = input(cmd, cmdSchema.type);
           this.cmds[cmd].addEventListener('change', () => {
-            this.execute(cmdSchema.command, this.cmds[cmd].value);
+            callBack(cmdSchema, this.cmds[cmd].value)
           });
           li.appendChild(this.cmds[cmd]);
           break;
@@ -81,25 +82,25 @@ class Styler {
           break;
 
         default:
-          console.warn(cmd + ' is not found');
+          console.warn(cmd + ' element not found');
       }
 
       if (typeof cmdSchema.init === 'function') {
-        this.inits[cmd] = new cmdSchema.init(this.cmds[cmd], cmdSchema.initConfig);
+        this.inits[cmd] = cmdSchema.init = new cmdSchema.init(this.cmds[cmd], cmdSchema.initConfig);
       }
 
       if (typeof cmdSchema.init === 'string') {
         this.align[cmdSchema.init](cmdSchema, el);
       }
 
-      this.cmd.appendChild(li);
+      this.styler.appendChild(li);
     })
-    this.align.el.appendChild(this.cmd);
+    this.align.el.appendChild(this.styler);
     if (this.settings.mode === 'bubble') this.initBubble();
   }
 
   initBubble() {
-    this.cmd.classList.add('is-hidden');
+    this.styler.classList.add('is-hidden');
     window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
   }
 
@@ -121,7 +122,7 @@ class Styler {
     const marginRatio = 10;
     const selectionRect = Selection.selectedRange.getBoundingClientRect();
     const editorRect = this.align.el.getBoundingClientRect();
-    const stylerRect = this.cmd.getBoundingClientRect();
+    const stylerRect = this.styler.getBoundingClientRect();
 
     const scrolled = window.scrollY;
     const deltaY = selectionRect.top + scrolled - stylerRect.height - marginRatio;
@@ -133,19 +134,19 @@ class Styler {
     ? selectionRect.top + selectionRect.height + marginRatio 
     : selectionRect.top - stylerRect.height - marginRatio;
     
-    this.cmd.style.top = `${yPosition}px`;
-    this.cmd.style.left = `${xPosition}px`;
+    this.styler.style.top = `${yPosition}px`;
+    this.styler.style.left = `${xPosition}px`;
   }
 
   showStyler() {
-    this.cmd.classList.add('is-visible');
-    this.cmd.classList.remove('is-hidden');
+    this.styler.classList.add('is-visible');
+    this.styler.classList.remove('is-hidden');
     this.updateBubblePosition();
   }
 
   hideStyler() {
-    this.cmd.classList.remove('is-visible');
-    this.cmd.classList.add('is-hidden');
+    this.styler.classList.remove('is-visible');
+    this.styler.classList.add('is-hidden');
   }
 
   updateStylerStates() {
@@ -163,18 +164,20 @@ class Styler {
    * Update the state of the active style
    */
   updateStylerCommands() {
-    Object.keys(this.cmds).forEach((styl) => {
-      if (document.queryCommandState(styl)) {
-        this.cmds[styl].classList.add('is-active');
+    Object.keys(this.cmds).forEach((cmd) => {
+      const command = this.cmds;
+      console.log(command);
+      if (document.queryCommandState(command)) {
+        this.cmds[cmd].classList.add('is-active');
         return;
       }
-      if (document.queryCommandValue('formatBlock') === styl) {
-        this.cmds[styl].classList.add('is-active');
+      if (document.queryCommandValue('formatBlock') === command) {
+        this.cmds[cmd].classList.add('is-active');
         return;
       }
-      this.cmds[styl].classList.remove('is-active');
-      if (document.queryCommandValue(styl)) {
-        this.cmds[styl].value = document.queryCommandValue(styl);
+      this.cmds[cmd].classList.remove('is-active');
+      if (document.queryCommandValue(command)) {
+        this.cmds[cmd].value = document.queryCommandValue(cmd);
       }
     })
   }
