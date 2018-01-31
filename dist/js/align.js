@@ -1202,9 +1202,8 @@ var commands = {
     command: 'fontSize'
   },
 
-  font: {
+  fontName: {
     element: 'select',
-    classPrefix: 'font',
     init: 'applyFont',
     func: function func(schema, selectedValue) {
       document.execCommand('styleWithCSS', false, true);
@@ -1222,6 +1221,29 @@ var commands = {
     element: 'input',
     type: 'text',
     command: 'foreColor',
+    init: colorpicker,
+    initConfig: {
+      defaultColor: '#000000',
+      mode: 'hex',
+      disableLum: true,
+      events: {
+        beforeSubmit: function beforeSubmit() {
+          Selection.updateSelection();
+        },
+        afterOpen: function afterOpen() {
+          Selection.updateSelectedRange();
+        },
+        afterSelect: function afterSelect() {
+          Selection.updateSelectedRange();
+        }
+      }
+    }
+  },
+
+  backColor: {
+    element: 'input',
+    type: 'text',
+    command: 'backColor',
     init: colorpicker,
     initConfig: {
       defaultColor: '#000000',
@@ -1473,13 +1495,14 @@ var Styler = function () {
       var selectionRect = Selection.selectedRange.getBoundingClientRect();
       var editorRect = this.align.el.getBoundingClientRect();
       var stylerRect = this.cmd.getBoundingClientRect();
+
       var scrolled = window.scrollY;
-      var deltaY = selectionRect.y + scrolled - stylerRect.height - marginRatio;
-      var deltaX = selectionRect.x + (selectionRect.width - stylerRect.width) / 2;
-      var startBoundary = editorRect.x;
-      var endBoundary = editorRect.x + editorRect.width - stylerRect.width;
+      var deltaY = selectionRect.top + scrolled - stylerRect.height - marginRatio;
+      var deltaX = selectionRect.left + (selectionRect.width - stylerRect.width) / 2;
+      var startBoundary = editorRect.left;
+      var endBoundary = editorRect.left + editorRect.width - stylerRect.width;
       var xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
-      var yPosition = deltaY < scrolled + 50 ? selectionRect.y + selectionRect.height + marginRatio : selectionRect.y - stylerRect.height - marginRatio;
+      var yPosition = deltaY < scrolled + 50 ? selectionRect.top + selectionRect.height + marginRatio : selectionRect.top - stylerRect.height - marginRatio;
 
       this.cmd.style.top = yPosition + 'px';
       this.cmd.style.left = xPosition + 'px';
@@ -1624,15 +1647,19 @@ var Align = function () {
 
         switch (event.key) {
           case 'ArrowDown':
+          case 'Down':
             _this.updateStylers();
             break;
           case 'ArrowUp':
+          case 'Up':
             _this.updateStylers();
             break;
           case 'ArrowLeft':
+          case 'Left':
             _this.updateStylers();
             break;
           case 'ArrowRight':
+          case 'Right':
             _this.updateStylers();
             break;
           case 'Tab':
@@ -1707,7 +1734,7 @@ var Align = function () {
   }, {
     key: 'applyFont',
     value: function applyFont(schema, cmd) {
-      this.el.style.fontFamily = cmd.font[0];
+      this.el.style.fontFamily = cmd.fontName[0];
     }
   }, {
     key: 'content',

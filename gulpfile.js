@@ -31,7 +31,7 @@ function isProduction() {
  */
 gulp.task('browser-sync', () => {
   browserSync.init({
-    server: './'
+    server: true
   });
 })
 

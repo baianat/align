@@ -39,7 +39,7 @@
     <h1 style="text-align: center;">Hello there, I'm Align!</h1>
     <h2 style="text-align: center;"> I was born in Baianat.</h2> 
 
-    <p>Our innovative solutions transcend business excellency to influence socities, through authentic, culture-changing standards.</p>
+    <p>Our innovative solutions transcend business excellency to influence societies, through authentic, culture-changing standards.</p>
 
     <p>We are a brand-driven foundation agency, crafting unique brands.</p>
 
@@ -90,17 +90,21 @@
       action() {
         const file = this.data.input.files[0];
         if (!file) return;
-        const imageURL = URL.createObjectURL(file);
+        if (!window.getSelection().rangeCount) return;
         const img = document.createElement('img');
         const p = document.createElement('p');
-        let selectedPosition;
-
-        img.src = imageURL;
-        img.classList.add('align-image');
-        if (!window.getSelection().rangeCount) return;
+        
+        const reader = new FileReader();
+        reader.onloadend = function () {
+          img.src = reader.result;
+          img.classList.add('align-image');
+          img.dataset.alignFilename = 'ddd';
+        }
+        reader.readAsDataURL(file);
         selectedPosition = window.getSelection().getRangeAt(0);
         p.appendChild(img);
         selectedPosition.insertNode(p);
+        document.execCommand('enableObjectResizing', false, true);
         this.data.input.value = null;
       }
     });
@@ -109,7 +113,7 @@
       toolbar: {
         commands: [
           {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
-          {'font': ['Poppins', 'Raleway', 'Roboto']},
+          {'fontName': ['Poppins', 'Raleway', 'Roboto']},
           'separator', 
           'bold', 'italic', 'underline', 'strikeThrough', 
           'separator', 
@@ -119,7 +123,9 @@
           'separator', 
           'addImage', 'html', 
           'separator',
-          'color'
+          'color',
+          'separator',
+          'backColor'
         ]
       },
       bubble: {

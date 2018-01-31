@@ -122,16 +122,17 @@ class Styler {
     const selectionRect = Selection.selectedRange.getBoundingClientRect();
     const editorRect = this.align.el.getBoundingClientRect();
     const stylerRect = this.cmd.getBoundingClientRect();
+
     const scrolled = window.scrollY;
-    const deltaY = selectionRect.y + scrolled - stylerRect.height - marginRatio;
-    const deltaX = selectionRect.x + ((selectionRect.width - stylerRect.width) / 2);
-    const startBoundary = editorRect.x;
-    const endBoundary = editorRect.x + editorRect.width - stylerRect.width;
+    const deltaY = selectionRect.top + scrolled - stylerRect.height - marginRatio;
+    const deltaX = selectionRect.left + ((selectionRect.width - stylerRect.width) / 2);
+    const startBoundary = editorRect.left;
+    const endBoundary = editorRect.left + editorRect.width - stylerRect.width;
     const xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
     const yPosition = deltaY < scrolled + 50
-      ? selectionRect.y + selectionRect.height + marginRatio 
-      : selectionRect.y - stylerRect.height - marginRatio;
-
+    ? selectionRect.top + selectionRect.height + marginRatio 
+    : selectionRect.top - stylerRect.height - marginRatio;
+    
     this.cmd.style.top = `${yPosition}px`;
     this.cmd.style.left = `${xPosition}px`;
   }

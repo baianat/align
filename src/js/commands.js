@@ -95,9 +95,8 @@ const commands = {
     command: 'fontSize'
   },
 
-  font: {
+  fontName: {
     element: 'select',
-    classPrefix: 'font',
     init: 'applyFont',
     func(schema, selectedValue) {
       document.execCommand('styleWithCSS', false, true);
@@ -115,6 +114,29 @@ const commands = {
     element: 'input',
     type: 'text',
     command: 'foreColor',
+    init: Colorpicker,
+    initConfig: {
+      defaultColor: '#000000',
+      mode: 'hex',
+      disableLum: true,
+      events: {
+        beforeSubmit() {
+          Selection.updateSelection();
+        },
+        afterOpen() {
+          Selection.updateSelectedRange();
+        },
+        afterSelect() {
+          Selection.updateSelectedRange();
+        }
+      }
+    }
+  },
+
+  backColor: {
+    element: 'input',
+    type: 'text',
+    command: 'backColor',
     init: Colorpicker,
     initConfig: {
       defaultColor: '#000000',

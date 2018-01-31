@@ -83,18 +83,21 @@ class Align {
         return;
       }
 
-      
       switch (event.key) {
         case 'ArrowDown':
+        case 'Down':
           this.updateStylers();
           break;
         case 'ArrowUp':
+        case 'Up':
           this.updateStylers();
           break;
         case 'ArrowLeft':
+        case 'Left':
           this.updateStylers();
           break;
         case 'ArrowRight':
+        case 'Right':
           this.updateStylers();
           break;
         case 'Tab':
@@ -160,7 +163,7 @@ class Align {
   }
 
   applyFont(schema, cmd) {
-    this.el.style.fontFamily = cmd.font[0];
+    this.el.style.fontFamily = cmd.fontName[0];
   }
 }
 
