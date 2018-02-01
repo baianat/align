@@ -1275,7 +1275,7 @@ var cmdsSchemas = {
   unorderedList: {
     element: 'button',
     command: 'insertUnorderedList',
-    tooltip: 'Unrdered list'
+    tooltip: 'Unordered list'
   },
 
   insertLine: {
@@ -1884,22 +1884,6 @@ var Align = function () {
         }
 
         switch (event.key) {
-          case 'ArrowDown':
-            return;
-          case 'ArrowUp':
-            return;
-          case 'ArrowLeft':
-            return;
-          case 'ArrowRight':
-            return;
-          case 'Enter':
-            return;
-          case 'Escape':
-            return;
-          case 'Delete':
-            return;
-          case 'Backspace':
-            return;
           case 'Tab':
             if (event.shiftKey) {
               _this.execute('outdent', false, true);break;
@@ -1908,9 +1892,6 @@ var Align = function () {
           default:
             break;
         }
-
-        // Cancel the default action to avoid it being handled twice
-        event.preventDefault();
       }, true);
     }
 

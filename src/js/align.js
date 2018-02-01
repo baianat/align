@@ -121,22 +121,6 @@ class Align {
       }
 
       switch (event.key) {
-        case 'ArrowDown':
-          return;
-        case 'ArrowUp':
-          return;
-        case 'ArrowLeft':
-          return;
-        case 'ArrowRight':
-          return;
-        case 'Enter':
-          return;
-        case 'Escape':
-          return;
-        case 'Delete':
-          return;
-        case 'Backspace':
-          return;
         case 'Tab':
           if (event.shiftKey) {
             this.execute('outdent', false, true); break;
@@ -145,9 +129,6 @@ class Align {
         default:
           break;
       }
-
-      // Cancel the default action to avoid it being handled twice
-      event.preventDefault();
     }, true);
   }
 

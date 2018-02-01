@@ -112,7 +112,7 @@ const cmdsSchemas = {
   unorderedList: {
     element: 'button',
     command: 'insertUnorderedList',
-    tooltip: 'Unrdered list'
+    tooltip: 'Unordered list'
   },
   
   insertLine: {
