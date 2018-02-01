@@ -1,6 +1,6 @@
 import hljs from 'highlight.js';
 import { select } from './util';
-import commands from './commands';
+import cmdsSchemas from './cmdsSchemas';
 import icons from './icons';
 import Styler from './styler';
 import Selection from './selection';
@@ -17,7 +17,6 @@ class Align {
       toolbar,
       bubble
     };
-    this.el.innerText = '';
     this.init();
   }
 
@@ -29,7 +28,7 @@ class Align {
   }
 
   static extend(name, extension) {
-    commands[name] = extension;
+    cmdsSchemas[name] = extension;
   }
 
   static extendIcons(name, path) {
@@ -40,6 +39,7 @@ class Align {
    */
   init() {
     this.HTML = false;
+    this.el.innerText = '';
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';
       this.toolbar = new Styler(this, this.settings.toolbar);
@@ -57,14 +57,15 @@ class Align {
    */
   initEditor() {
     document.execCommand('defaultParagraphSeparator', false, 'p');
-    
-    this.editor = document.createElement('div');
 
+    this.editor = document.createElement('div');
     this.editor.contentEditable = 'true';
     this.editor.classList.add('align-content');
     this.editor.innerHTML = this.settings.defaultText + '\n';
 
     this.el.appendChild(this.editor);
+    this.editor.focus();
+    Selection.updateSelectedRange();
   }
 
   /**
@@ -82,24 +83,9 @@ class Align {
       if (event.defaultPrevented) {
         return;
       }
+      this.updateStylers();
 
       switch (event.key) {
-        case 'ArrowDown':
-        case 'Down':
-          this.updateStylers();
-          break;
-        case 'ArrowUp':
-        case 'Up':
-          this.updateStylers();
-          break;
-        case 'ArrowLeft':
-        case 'Left':
-          this.updateStylers();
-          break;
-        case 'ArrowRight':
-        case 'Right':
-          this.updateStylers();
-          break;
         case 'Tab':
           this.styler.execute('indent');
           break;
@@ -136,9 +122,7 @@ class Align {
       const pre = document.createElement('pre');
 
       this.editor.innerHTML = '';
-      // this.editor.contentEditable = false;
       pre.id = 'content';
-      // pre.contentEditable = false;
       pre.style.whiteSpace = 'pre-wrap';
       pre.appendChild(content);
       this.editor.appendChild(pre);

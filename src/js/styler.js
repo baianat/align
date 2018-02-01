@@ -1,6 +1,6 @@
 import { normalizeNumber, debounce } from './util';
 import { setElementsPrefix, button, select, input } from './elements';
-import commands from './commands';
+import cmdsSchemas from './cmdsSchemas';
 import icons from './icons';
 import Selection from './selection';
 
@@ -29,7 +29,7 @@ class Styler {
     this.settings.commands.forEach((el) => {
       const li = document.createElement('li');
       const cmd = typeof el === 'string' ? el : Object.keys(el)[0];
-      const cmdSchema = commands[cmd];
+      const cmdSchema = cmdsSchemas[cmd];
       if (!cmdSchema) {
         console.warn(cmd + ' is not found');
         return;
@@ -117,7 +117,7 @@ class Styler {
     document.execCommand(cmd, false, value);
     document.execCommand('styleWithCSS', false, false);
     this.align.el.focus();
-    Selection.updateSelectedRange();
+    // Selection.updateSelectedRange();
     this.updateStylerStates();
   }
 
@@ -173,7 +173,6 @@ class Styler {
       const command = currentCmd.schema.command;
       const value = currentCmd.schema.value;
       const init = currentCmd.schema.init;
-      
       if (!command) {
         return;
       }

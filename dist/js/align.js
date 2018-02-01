@@ -1126,7 +1126,7 @@ var Selection = function () {
   return Selection;
 }();
 
-var commands = {
+var cmdsSchemas = {
   bold: {
     element: 'button',
     command: 'bold'
@@ -1273,6 +1273,52 @@ var commands = {
         }
       }
     }
+  },
+
+  addImage: {
+    element: 'custom',
+    data: function data() {
+      return {
+        button: document.createElement('button'),
+        input: document.createElement('input'),
+        icon: '<svg class="icon" viewBox="0 0 24 24">\n              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>\n            </svg>'
+      };
+    },
+    create: function create() {
+      this.$data = this.data;
+      this.data = this.$data();
+      var button = this.data.button;
+      var input = this.data.input;
+      var icon = this.data.icon;
+
+      button.classList.add('styler-button');
+      button.appendChild(input);
+      button.insertAdjacentHTML('beforeend', icon);
+      input.classList.add('styler-input');
+      input.type = 'file';
+      input.id = 'addImage';
+      input.addEventListener('change', this.action.bind(this));
+
+      return button;
+    },
+    action: function action() {
+      var file = this.data.input.files[0];
+      if (!file) return;
+      if (!window.getSelection().rangeCount) return;
+      var img = document.createElement('img');
+
+      var reader = new FileReader();
+      reader.addEventListener('load', function () {
+        img.src = reader.result;
+        img.classList.add('align-image');
+        img.dataset.alignFilename = file.name;
+      });
+      reader.readAsDataURL(file);
+      Selection.selectedRange = window.getSelection().getRangeAt(0);
+      Selection.selectedRange.insertNode(img);
+      document.execCommand('enableObjectResizing', false, true);
+      this.data.input.value = null;
+    }
   }
 };
 
@@ -1377,14 +1423,14 @@ var Styler = function () {
         _ref$mode = _ref.mode,
         mode = _ref$mode === undefined ? 'default' : _ref$mode,
         _ref$commands = _ref.commands,
-        commands$$1 = _ref$commands === undefined ? ['bold', 'italic', 'underline'] : _ref$commands;
+        commands = _ref$commands === undefined ? ['bold', 'italic', 'underline'] : _ref$commands;
 
     classCallCheck(this, Styler);
 
     this.align = align;
     this.settings = {
       mode: mode,
-      commands: commands$$1
+      commands: commands
     };
     this.init();
   }
@@ -1407,7 +1453,7 @@ var Styler = function () {
       this.settings.commands.forEach(function (el) {
         var li = document.createElement('li');
         var cmd = typeof el === 'string' ? el : Object.keys(el)[0];
-        var cmdSchema = commands[cmd];
+        var cmdSchema = cmdsSchemas[cmd];
         if (!cmdSchema) {
           console.warn(cmd + ' is not found');
           return;
@@ -1504,7 +1550,7 @@ var Styler = function () {
       document.execCommand(cmd, false, value);
       document.execCommand('styleWithCSS', false, false);
       this.align.el.focus();
-      Selection.updateSelectedRange();
+      // Selection.updateSelectedRange();
       this.updateStylerStates();
     }
   }, {
@@ -1567,7 +1613,6 @@ var Styler = function () {
         var command = currentCmd.schema.command;
         var value = currentCmd.schema.value;
         var init = currentCmd.schema.init;
-
         if (!command) {
           return;
         }
@@ -1609,7 +1654,6 @@ var Align = function () {
       toolbar: toolbar,
       bubble: bubble
     };
-    this.el.innerText = '';
     this.init();
   }
 
@@ -1626,6 +1670,7 @@ var Align = function () {
      */
     value: function init() {
       this.HTML = false;
+      this.el.innerText = '';
       if (this.settings.toolbar) {
         this.settings.toolbar.mode = 'toolbar';
         this.toolbar = new Styler(this, this.settings.toolbar);
@@ -1648,12 +1693,13 @@ var Align = function () {
       document.execCommand('defaultParagraphSeparator', false, 'p');
 
       this.editor = document.createElement('div');
-
       this.editor.contentEditable = 'true';
       this.editor.classList.add('align-content');
       this.editor.innerHTML = this.settings.defaultText + '\n';
 
       this.el.appendChild(this.editor);
+      this.editor.focus();
+      Selection.updateSelectedRange();
     }
 
     /**
@@ -1676,24 +1722,9 @@ var Align = function () {
         if (event.defaultPrevented) {
           return;
         }
+        _this.updateStylers();
 
         switch (event.key) {
-          case 'ArrowDown':
-          case 'Down':
-            _this.updateStylers();
-            break;
-          case 'ArrowUp':
-          case 'Up':
-            _this.updateStylers();
-            break;
-          case 'ArrowLeft':
-          case 'Left':
-            _this.updateStylers();
-            break;
-          case 'ArrowRight':
-          case 'Right':
-            _this.updateStylers();
-            break;
           case 'Tab':
             _this.styler.execute('indent');
             break;
@@ -1735,9 +1766,7 @@ var Align = function () {
         var pre = document.createElement('pre');
 
         this.editor.innerHTML = '';
-        // this.editor.contentEditable = false;
         pre.id = 'content';
-        // pre.contentEditable = false;
         pre.style.whiteSpace = 'pre-wrap';
         pre.appendChild(content);
         this.editor.appendChild(pre);
@@ -1776,7 +1805,7 @@ var Align = function () {
   }], [{
     key: 'extend',
     value: function extend(name, extension) {
-      commands[name] = extension;
+      cmdsSchemas[name] = extension;
     }
   }, {
     key: 'extendIcons',

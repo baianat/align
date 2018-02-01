@@ -125,8 +125,8 @@ List of all available commands
 
 ### Adding new custom commands
 
-To extend `Align`'s [commands](https://github.com/baianat/align/blob/master/src/js/commands.js#L5) object, use `Align.extend('commandName', { //setting })`
-> Note: use extend with caution, since you can overwrite the current commands behavior, if you used your `commandName` same as one of `Align`'s commands.
+To extend `Align`'s [cmdsSchemas](https://github.com/baianat/align/blob/master/src/js/cmdsSchemas.js) object to add a new command or overwrite a current command behavior, use `Align.extend('commandName', { //setting })`
+> Note: you can overwrite the current commands behavior, if you used your `commandName` same as one of `Align`'s commands.
 
 ```javaScript
 Align.extend('commandName', {
@@ -143,7 +143,7 @@ Align.extend('commandName', {
 })
 ```
 
-A full working example on how to add a custom image input command
+A full working example on how to overwrite the current `addImage` command
 
 ```javaScript
 Align.extend('addImage', {
@@ -177,21 +177,17 @@ Align.extend('addImage', {
   },
   action() {
     const file = this.data.input.files[0];
-    if (!file) return;
+    const selectedPosition = window.getSelection().getRangeAt(0);
+    if (!file || !window.getSelection().rangeCount) return;
     const imageURL = URL.createObjectURL(file);
     const img = document.createElement('img');
-    const p = document.createElement('p');
-    let selectedPosition;
 
     img.src = imageURL;
     img.classList.add('align-image');
-    if (!window.getSelection().rangeCount) return;
-    selectedPosition = window.getSelection().getRangeAt(0);
-    p.appendChild(img);
-    selectedPosition.insertNode(p);
+    selectedPosition.insertNode(img);
     this.data.input.value = null;
 
-    // add your logic to save image in database
+    // add your logic to save `imageURL` in the database
   }
 });
 ```
