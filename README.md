@@ -73,7 +73,9 @@ You can choose what commands you'd like both of the stylers to include, by passi
 
 ```js
 new Align('.editor', {
+  shortcuts: true, // enable or disable keyboard shortcuts
   toolbar: {
+    tooltip: true, // show or hide commands tooltip
     commands: [
       {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
       {'font': ['Raleway', 'Roboto', 'Poppins']},
@@ -101,27 +103,37 @@ new Align('.editor', {
 
 List of all available commands
 
-| COMMAND     | DESCRIPTION |
-|-------------|-------------|
-|font         | Surround selected text with an element, with class name same as selected font e.g. `align-font-roboto`|
-|color        | Changes a font color for the selection or at the insertion point |
-|fontSize     | Changes the font size for the selection or at the insertion point |
-|bold         | Toggles bold on/off for the selection or at the insertion point |
-|italic       | Toggles italics on/off for the selection or at the insertion point |
-|underline    | Toggles underline on/off for the selection or at the insertion point |
-|strikeThrough| Toggles strikethrough on/off for the selection or at the insertion point |
-|removeFormat | Removes all formatting from the current selection |
-|justifyLeft  | Justifies the selection or insertion point to the left |
-|justifyCenter| Centers the selection or insertion point |
-|justifyRight | Right-justifies the selection or the insertion point |
-|justifyFull  | Justifies the selection or insertion point |
-|h1           | Adds an HTML h1 tag around the line containing the current selection |
-|h2           | Adds an HTML h2 tag around the line containing the current selection |
-|blockquote   | Adds an HTML blockquote tag around the line containing the current selection |
-|p            | Adds an HTML p tag around the line containing the current selection |
-|pre          | Adds an HTML pre tag around the line containing the current selection so you can highlight its script |
-|html         | Toggles HTML on/off for all text |
-|sperator     | Used for decoration to separate commands |
+| COMMAND       | SHORTCUT | DESCRIPTION |
+|---------------|----------| ----------- |
+| font          | | changes the font name for the selection or at the insertion point.|
+| color         | | changes a font color for the selection or at the insertion point. |
+| backColor     | | changes the element background color. |
+| fontSize      | | changes the font size for the selection or at the insertion point. |
+| bold          | Mac: ⌘ B <br/> Win: Ctrl B | toggles bold on/off for the selection or at the insertion point. |
+| italic        | Mac: ⌘ I <br/> Win: Ctrl I | toggles italics on/off for the selection or at the insertion point. |
+| underline     | Mac: ⌘ U <br/> Win: Ctrl U | toggles underline on/off for the selection or at the insertion point. |
+| strikeThrough | | toggles strikethrough on/off for the selection or at the insertion point. |
+| justifyLeft   | Mac: ⌘ L <br/> Win: Ctrl L | justifies the selection or insertion point to the left. |
+| justifyCenter | Mac: ⌘ E <br/> Win: Ctrl E | centers the selection or insertion point.|
+|justifyRight   | Mac: ⌘ R <br/> Win: Ctrl R | right-justifies the selection or the insertion point. |
+| justifyFull   | Mac: ⌘ J <br/> Win: Ctrl J | justifies the selection or insertion point. |
+| superscript   | Mac: ⌘ ⇧ = <br/> Win: Ctrl ⇧ = | toggles superscript on/off for the selection or at the insertion point. |
+| subscript     | Mac: ⌘ = <br/> Win: Ctrl = | toggles subscript on/off for the selection or at the insertion point. |
+| indent        | Mac: ⇥ <br/> Win: Tab | indents the line containing the selection or insertion point. |
+| outdent       | Mac: ⇧ ⇥ <br/> Win: Shift Tab | outdents the line containing the selection or insertion point. |
+| selectAll     | Mac: ⌘ A <br/> Win: Ctrl A | selects all of the content of the editor region. |
+| removeFormat  | Mac: ⌘ \ <br/> Win: Ctrl \ | removes all formatting from the current selection. |
+| h1            | | adds an HTML h1 tag around the line containing the current selection. |
+| h2            | | adds an HTML h2 tag around the line containing the current selection. |
+| blockquote    | | adds an HTML blockquote tag around the line containing the current selection. |
+| p             | | adds an HTML p tag around the line containing the current selection. |
+| pre           | | adds an HTML pre tag around the line containing the current selection so you can highlight its script. |
+| orderedList   | | creates a numbered ordered list for the selection or at the insertion point. |
+| unorderedList | | creates a bulleted unordered list for the selection or at the insertion point. |
+| insertLine    | | inserts a horizontal rule at the insertion point (deletes selection). |
+| createLink    | | creates an anchor link from the selection text. |
+| html          | | toggles HTML on/off for all text. |
+| sperator      | | used for decoration to separate commands. |
 
 ### Adding new custom commands
 
