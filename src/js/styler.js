@@ -112,13 +112,7 @@ class Styler {
    * @param {String|Number} value
    */
   execute(cmd, value, useCSS = false) {
-    if (this.align.HTML) return;
-    document.execCommand('styleWithCSS', false, useCSS);
-    document.execCommand(cmd, false, value);
-    document.execCommand('styleWithCSS', false, false);
-    this.align.el.focus();
-    // Selection.updateSelectedRange();
-    this.updateStylerStates();
+    this.align.execute(...arguments);
   }
 
   updateBubblePosition() {

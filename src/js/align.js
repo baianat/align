@@ -78,7 +78,7 @@ class Align {
 
     window.addEventListener('mouseup', this.updateStylers.bind(this));
 
-    window.addEventListener('keyup', (event) => {
+    window.addEventListener('keydown', (event) => {
       // Do nothing if the event was already processed
       if (event.defaultPrevented) {
         return;
@@ -87,14 +87,18 @@ class Align {
 
       switch (event.key) {
         case 'Tab':
-          this.styler.execute('indent');
+          event.preventDefault();
+          if (event.shiftKey) {
+            this.execute('outdent', false, true);
+            return;
+          }
+          this.execute('indent', false, true);
           break;
 
         default:
       }
 
       // Cancel the default action to avoid it being handled twice
-      event.preventDefault();
     }, true);
   }
 
@@ -148,6 +152,15 @@ class Align {
 
   applyFont(schema, cmd) {
     this.el.style.fontFamily = cmd.fontName[0];
+  }
+
+  execute(cmd, value, useCSS = false) {
+    if (this.HTML) return;
+    document.execCommand('styleWithCSS', false, useCSS);
+    document.execCommand(cmd, false, value);
+    document.execCommand('styleWithCSS', false, false);
+    this.el.focus();
+    this.updateStylers();
   }
 }
 

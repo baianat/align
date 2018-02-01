@@ -71,6 +71,38 @@ const cmdsSchemas = {
     value: 'p'
   },
 
+  orderedList: {
+    element: 'button',
+    command: 'insertOrderedList'
+  },
+
+  unorderedList: {
+    element: 'button',
+    command: 'insertUnorderedList'
+  },
+  
+  indent: {
+    element: 'button',
+    command: 'indent',
+    useCSS: true
+  },
+
+  outdent: {
+    element: 'button',
+    command: 'outdent',
+    useCSS: true
+  },
+
+  superscript: {
+    element: 'button',
+    command: 'superscript'
+  },
+
+  subscript: {
+    element: 'button',
+    command: 'subscript'
+  },
+
   pre: {
     element: 'button',
     command: 'formatblock',

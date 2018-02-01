@@ -1088,6 +1088,25 @@ var createClass = function () {
   };
 }();
 
+
+
+
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
 var SELECTED_RANGE = null;
 
 var Selection = function () {
@@ -1194,6 +1213,38 @@ var cmdsSchemas = {
     element: 'button',
     command: 'formatblock',
     value: 'p'
+  },
+
+  orderedList: {
+    element: 'button',
+    command: 'insertOrderedList'
+  },
+
+  unorderedList: {
+    element: 'button',
+    command: 'insertUnorderedList'
+  },
+
+  indent: {
+    element: 'button',
+    command: 'indent',
+    useCSS: true
+  },
+
+  outdent: {
+    element: 'button',
+    command: 'outdent',
+    useCSS: true
+  },
+
+  superscript: {
+    element: 'button',
+    command: 'superscript'
+  },
+
+  subscript: {
+    element: 'button',
+    command: 'subscript'
   },
 
   pre: {
@@ -1322,7 +1373,9 @@ var cmdsSchemas = {
   }
 };
 
-var icons = {
+var _icons;
+
+var icons = (_icons = {
   blockquote: 'M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z',
 
   bold: 'M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z',
@@ -1361,8 +1414,13 @@ var icons = {
 
   underline: 'M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z',
 
-  insertColumn: 'M13 12h7v1.5h-7zm0-2.5h7V11h-7zm0 5h7V16h-7zM21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15h-9V6h9v13z'
-};
+  insertColumn: 'M13 12h7v1.5h-7zm0-2.5h7V11h-7zm0 5h7V16h-7zM21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15h-9V6h9v13z',
+
+  unorderedList: 'M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z',
+
+  orderedList: 'M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z'
+
+}, defineProperty(_icons, 'indent', 'M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z'), defineProperty(_icons, 'outdent', 'M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z'), defineProperty(_icons, 'superscript', 'M16 18.6L14.6 20 9 14.4 3.4 20 2 18.6 7.6 13 2 7.4 3.4 6 9 11.6 14.6 6 16 7.4 10.4 13l5.6 5.6zm2.3-14.2c0-.2.1-.4.1-.6.1-.2.2-.3.3-.4.1-.1.3-.2.4-.3.2-.1.4-.1.5-.1.2 0 .3 0 .4.1.1.1.3.1.3.2.1.1.2.2.2.4.1.1.1.3.1.5s-.1.4-.2.6c-.1.2-.2.3-.4.5-.2.1-.4.3-.6.4-.2.1-.5.3-.7.4-.2.1-.5.3-.7.4s-.2.3-.4.5-.3.3-.4.5c-.1.2-.2.4-.2.7V9h5V8h-3.8c.1-.2.3-.4.5-.6.3-.2.6-.4.8-.6s.6-.4.9-.5c.3-.2.6-.4.8-.6s.4-.5.6-.7c.1-.3.2-.6.2-.9 0-.3 0-.5-.1-.8s-.2-.5-.4-.7c-.2-.2-.4-.3-.7-.5-.4 0-.7-.1-1.2-.1-.4 0-.7.1-1 .2s-.6.3-.8.5c-.2.2-.4.5-.5.8-.2.2-.3.5-.3.9h1.3z'), defineProperty(_icons, 'subscript', 'M16 16.6L14.6 18 9 12.4 3.4 18 2 16.6 7.6 11 2 5.4 3.4 4 9 9.6 14.6 4 16 5.4 10.4 11l5.6 5.6zm2.3.8c0-.2.1-.4.1-.6.1-.2.2-.3.3-.4.1-.1.3-.2.4-.3s.3-.1.5-.1.3 0 .4.1c.1.1.3.1.3.2.1.1.2.2.2.4s.1.3.1.5-.1.4-.2.6c-.1.2-.2.3-.4.5-.2.1-.4.3-.6.4-.2.1-.5.3-.7.4-.2.1-.5.3-.7.4s-.4.3-.6.5c-.2.2-.3.3-.4.5-.1.2-.2.4-.2.6v.9h5v-1H18c.1-.2.3-.4.5-.6.2-.2.5-.4.8-.5s.6-.4.9-.5c.3-.2.6-.4.8-.6s.4-.5.6-.7c.2-.3.2-.6.2-.9 0-.3 0-.5-.1-.8s-.2-.5-.4-.7c-.2-.2-.4-.3-.7-.5-.3-.1-.7-.2-1.1-.2-.4 0-.7.1-1 .2-.3.1-.6.3-.8.5-.2.2-.4.5-.5.8-.1.3-.2.6-.3 1h1.4z'), _icons);
 
 var NAMING_PREFIX = '';
 
@@ -1543,15 +1601,9 @@ var Styler = function () {
   }, {
     key: 'execute',
     value: function execute(cmd, value) {
-      var useCSS = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var _align;
 
-      if (this.align.HTML) return;
-      document.execCommand('styleWithCSS', false, useCSS);
-      document.execCommand(cmd, false, value);
-      document.execCommand('styleWithCSS', false, false);
-      this.align.el.focus();
-      // Selection.updateSelectedRange();
-      this.updateStylerStates();
+      (_align = this.align).execute.apply(_align, arguments);
     }
   }, {
     key: 'updateBubblePosition',
@@ -1717,7 +1769,7 @@ var Align = function () {
 
       window.addEventListener('mouseup', this.updateStylers.bind(this));
 
-      window.addEventListener('keyup', function (event) {
+      window.addEventListener('keydown', function (event) {
         // Do nothing if the event was already processed
         if (event.defaultPrevented) {
           return;
@@ -1726,14 +1778,18 @@ var Align = function () {
 
         switch (event.key) {
           case 'Tab':
-            _this.styler.execute('indent');
+            event.preventDefault();
+            if (event.shiftKey) {
+              _this.execute('outdent', false, true);
+              return;
+            }
+            _this.execute('indent', false, true);
             break;
 
           default:
         }
 
         // Cancel the default action to avoid it being handled twice
-        event.preventDefault();
       }, true);
     }
 
@@ -1796,6 +1852,18 @@ var Align = function () {
     key: 'applyFont',
     value: function applyFont(schema, cmd) {
       this.el.style.fontFamily = cmd.fontName[0];
+    }
+  }, {
+    key: 'execute',
+    value: function execute(cmd, value) {
+      var useCSS = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      if (this.HTML) return;
+      document.execCommand('styleWithCSS', false, useCSS);
+      document.execCommand(cmd, false, value);
+      document.execCommand('styleWithCSS', false, false);
+      this.el.focus();
+      this.updateStylers();
     }
   }, {
     key: 'content',
