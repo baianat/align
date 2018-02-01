@@ -51,6 +51,26 @@ function normalizeNumber(number, min, max) {
   return Math.round(Math.max(Math.min(Number(number), max), min));
 }
 
+function userOS() {
+  var appVersion = navigator.appVersion;
+  if (appVersion.indexOf('Win') != -1) return 'Win';
+  if (appVersion.indexOf('Mac') != -1) return 'Mac';
+  if (appVersion.indexOf('X11') != -1) return 'UNIX';
+  if (appVersion.indexOf('Linux') != -1) return 'Linux';
+  return 'Other';
+}
+
+function generateKeysSymbols() {
+  var OS = userOS();
+  return {
+    cmdKey: OS === 'Mac' ? '⌘' : 'Ctrl',
+    shift: OS === 'Mac' ? '⇧' : 'Shift',
+    ctrl: OS === 'Mac' ? '⌃' : 'Ctrl',
+    alt: OS === 'Mac' ? '⌥' : 'Alt',
+    tab: OS === 'Mac' ? '⇥' : 'Tab'
+  };
+}
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -1145,20 +1165,25 @@ var Selection = function () {
   return Selection;
 }();
 
+var symbols = generateKeysSymbols();
+
 var cmdsSchemas = {
   bold: {
     element: 'button',
-    command: 'bold'
+    command: 'bold',
+    tooltip: 'Bold (' + symbols.cmdKey + ' B)'
   },
 
   italic: {
     element: 'button',
-    command: 'italic'
+    command: 'italic',
+    tooltip: 'Italic (' + symbols.cmdKey + ' I)'
   },
 
   underline: {
     element: 'button',
-    command: 'underline'
+    command: 'underline',
+    tooltip: 'underline (' + symbols.cmdKey + ' U)'
   },
 
   strikeThrough: {
@@ -1168,95 +1193,135 @@ var cmdsSchemas = {
 
   removeFormat: {
     element: 'button',
-    command: 'removeFormat'
+    command: 'removeFormat',
+    tooltip: 'underline (' + symbols.cmdKey + ' \\)'
   },
 
   justifyLeft: {
     element: 'button',
-    command: 'justifyLeft'
+    command: 'justifyLeft',
+    tooltip: 'Align left (' + symbols.cmdKey + ' L)'
   },
 
   justifyCenter: {
     element: 'button',
-    command: 'justifyCenter'
+    command: 'justifyCenter',
+    tooltip: 'Align center (' + symbols.cmdKey + ' E)'
   },
 
   justifyRight: {
     element: 'button',
-    command: 'justifyRight'
+    command: 'justifyRight',
+    tooltip: 'Align right (' + symbols.cmdKey + ' R)'
+  },
+
+  selectAll: {
+    element: 'button',
+    command: 'selectAll',
+    tooltip: 'Select all (' + symbols.cmdKey + ' A)'
   },
 
   justifyFull: {
     element: 'button',
-    command: 'justifyFull'
+    command: 'justifyFull',
+    tooltip: 'Justify full (' + symbols.cmdKey + ' J)'
+  },
+
+  createLink: {
+    element: 'button',
+    tooltip: 'Hyperlink',
+    func: function func(styler) {
+      var link = prompt('Write the URL here', '');
+      if (link && link !== '') {
+        styler.align.execute('createLink', link);
+      }
+    }
   },
 
   h1: {
     element: 'button',
     command: 'formatblock',
-    value: 'h1'
+    value: 'h1',
+    tooltip: 'Heading-1'
   },
 
   h2: {
     element: 'button',
     command: 'formatblock',
-    value: 'h2'
+    value: 'h2',
+    tooltip: 'Heading-2'
   },
 
   blockquote: {
     element: 'button',
     command: 'formatblock',
-    value: 'blockquote'
+    value: 'blockquote',
+    tooltip: 'Quote'
   },
 
   p: {
     element: 'button',
     command: 'formatblock',
-    value: 'p'
+    value: 'p',
+    tooltip: 'Paragraph'
   },
 
   orderedList: {
     element: 'button',
-    command: 'insertOrderedList'
+    command: 'insertOrderedList',
+    tooltip: 'Ordered list'
   },
 
   unorderedList: {
     element: 'button',
-    command: 'insertUnorderedList'
+    command: 'insertUnorderedList',
+    tooltip: 'Unrdered list'
+  },
+
+  insertLine: {
+    element: 'button',
+    command: 'insertHorizontalRule',
+    tooltip: 'Insert line'
   },
 
   indent: {
     element: 'button',
     command: 'indent',
-    useCSS: true
+    useCSS: true,
+    tooltip: 'indent (' + symbols.tab + ')'
   },
 
   outdent: {
     element: 'button',
     command: 'outdent',
-    useCSS: true
+    useCSS: true,
+    tooltip: 'outdent (' + symbols.shift + ' ' + symbols.tab + ')'
   },
 
   superscript: {
     element: 'button',
-    command: 'superscript'
+    command: 'superscript',
+    tooltip: 'superscript (' + symbols.cmdKey + ' ' + symbols.shift + ' =)'
   },
 
   subscript: {
     element: 'button',
-    command: 'subscript'
+    command: 'subscript',
+    tooltip: 'subscript (' + symbols.cmdKey + ' =)'
   },
 
   pre: {
     element: 'button',
     command: 'formatblock',
     value: 'pre',
-    func: 'highlight'
+    func: 'highlight',
+    tooltip: 'Script'
   },
 
   html: {
     element: 'button',
-    func: 'toggleHTML'
+    func: 'toggleHTML',
+    tooltip: 'Show HTML'
   },
 
   fontSize: {
@@ -1420,7 +1485,7 @@ var icons = (_icons = {
 
   orderedList: 'M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z'
 
-}, defineProperty(_icons, 'indent', 'M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z'), defineProperty(_icons, 'outdent', 'M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z'), defineProperty(_icons, 'superscript', 'M16 18.6L14.6 20 9 14.4 3.4 20 2 18.6 7.6 13 2 7.4 3.4 6 9 11.6 14.6 6 16 7.4 10.4 13l5.6 5.6zm2.3-14.2c0-.2.1-.4.1-.6.1-.2.2-.3.3-.4.1-.1.3-.2.4-.3.2-.1.4-.1.5-.1.2 0 .3 0 .4.1.1.1.3.1.3.2.1.1.2.2.2.4.1.1.1.3.1.5s-.1.4-.2.6c-.1.2-.2.3-.4.5-.2.1-.4.3-.6.4-.2.1-.5.3-.7.4-.2.1-.5.3-.7.4s-.2.3-.4.5-.3.3-.4.5c-.1.2-.2.4-.2.7V9h5V8h-3.8c.1-.2.3-.4.5-.6.3-.2.6-.4.8-.6s.6-.4.9-.5c.3-.2.6-.4.8-.6s.4-.5.6-.7c.1-.3.2-.6.2-.9 0-.3 0-.5-.1-.8s-.2-.5-.4-.7c-.2-.2-.4-.3-.7-.5-.4 0-.7-.1-1.2-.1-.4 0-.7.1-1 .2s-.6.3-.8.5c-.2.2-.4.5-.5.8-.2.2-.3.5-.3.9h1.3z'), defineProperty(_icons, 'subscript', 'M16 16.6L14.6 18 9 12.4 3.4 18 2 16.6 7.6 11 2 5.4 3.4 4 9 9.6 14.6 4 16 5.4 10.4 11l5.6 5.6zm2.3.8c0-.2.1-.4.1-.6.1-.2.2-.3.3-.4.1-.1.3-.2.4-.3s.3-.1.5-.1.3 0 .4.1c.1.1.3.1.3.2.1.1.2.2.2.4s.1.3.1.5-.1.4-.2.6c-.1.2-.2.3-.4.5-.2.1-.4.3-.6.4-.2.1-.5.3-.7.4-.2.1-.5.3-.7.4s-.4.3-.6.5c-.2.2-.3.3-.4.5-.1.2-.2.4-.2.6v.9h5v-1H18c.1-.2.3-.4.5-.6.2-.2.5-.4.8-.5s.6-.4.9-.5c.3-.2.6-.4.8-.6s.4-.5.6-.7c.2-.3.2-.6.2-.9 0-.3 0-.5-.1-.8s-.2-.5-.4-.7c-.2-.2-.4-.3-.7-.5-.3-.1-.7-.2-1.1-.2-.4 0-.7.1-1 .2-.3.1-.6.3-.8.5-.2.2-.4.5-.5.8-.1.3-.2.6-.3 1h1.4z'), _icons);
+}, defineProperty(_icons, 'indent', 'M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z'), defineProperty(_icons, 'outdent', 'M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z'), defineProperty(_icons, 'superscript', 'M16 18.6L14.6 20 9 14.4 3.4 20 2 18.6 7.6 13 2 7.4 3.4 6 9 11.6 14.6 6 16 7.4 10.4 13l5.6 5.6zm2.3-14.2c0-.2.1-.4.1-.6.1-.2.2-.3.3-.4.1-.1.3-.2.4-.3.2-.1.4-.1.5-.1.2 0 .3 0 .4.1.1.1.3.1.3.2.1.1.2.2.2.4.1.1.1.3.1.5s-.1.4-.2.6c-.1.2-.2.3-.4.5-.2.1-.4.3-.6.4-.2.1-.5.3-.7.4-.2.1-.5.3-.7.4s-.2.3-.4.5-.3.3-.4.5c-.1.2-.2.4-.2.7V9h5V8h-3.8c.1-.2.3-.4.5-.6.3-.2.6-.4.8-.6s.6-.4.9-.5c.3-.2.6-.4.8-.6s.4-.5.6-.7c.1-.3.2-.6.2-.9 0-.3 0-.5-.1-.8s-.2-.5-.4-.7c-.2-.2-.4-.3-.7-.5-.4 0-.7-.1-1.2-.1-.4 0-.7.1-1 .2s-.6.3-.8.5c-.2.2-.4.5-.5.8-.2.2-.3.5-.3.9h1.3z'), defineProperty(_icons, 'subscript', 'M16 16.6L14.6 18 9 12.4 3.4 18 2 16.6 7.6 11 2 5.4 3.4 4 9 9.6 14.6 4 16 5.4 10.4 11l5.6 5.6zm2.3.8c0-.2.1-.4.1-.6.1-.2.2-.3.3-.4.1-.1.3-.2.4-.3s.3-.1.5-.1.3 0 .4.1c.1.1.3.1.3.2.1.1.2.2.2.4s.1.3.1.5-.1.4-.2.6c-.1.2-.2.3-.4.5-.2.1-.4.3-.6.4-.2.1-.5.3-.7.4-.2.1-.5.3-.7.4s-.4.3-.6.5c-.2.2-.3.3-.4.5-.1.2-.2.4-.2.6v.9h5v-1H18c.1-.2.3-.4.5-.6.2-.2.5-.4.8-.5s.6-.4.9-.5c.3-.2.6-.4.8-.6s.4-.5.6-.7c.2-.3.2-.6.2-.9 0-.3 0-.5-.1-.8s-.2-.5-.4-.7c-.2-.2-.4-.3-.7-.5-.3-.1-.7-.2-1.1-.2-.4 0-.7.1-1 .2-.3.1-.6.3-.8.5-.2.2-.4.5-.5.8-.1.3-.2.6-.3 1h1.4z'), defineProperty(_icons, 'createLink', 'M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z'), defineProperty(_icons, 'selectAll', 'M19.51 3.08L3.08 19.51c.09.34.27.65.51.9.25.24.56.42.9.51L20.93 4.49c-.19-.69-.73-1.23-1.42-1.41zM11.88 3L3 11.88v2.83L14.71 3h-2.83zM5 3c-1.1 0-2 .9-2 2v2l4-4H5zm14 18c.55 0 1.05-.22 1.41-.59.37-.36.59-.86.59-1.41v-2l-4 4h2zm-9.71 0h2.83L21 12.12V9.29L9.29 21z'), defineProperty(_icons, 'insertLine', 'M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3 3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z'), _icons);
 
 var NAMING_PREFIX = '';
 
@@ -1431,10 +1496,13 @@ function setElementsPrefix(prefix) {
   * Create button HTML element
   * @param {String} name
   */
-function button(name, icon) {
+function button(name, icon, tooltip) {
   var button = document.createElement('button');
   button.classList.add(NAMING_PREFIX + 'button');
   button.id = name;
+  if (tooltip !== false) {
+    button.dataset.tooltip = tooltip === undefined ? name : tooltip;
+  }
   button.insertAdjacentHTML('afterbegin', '\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="' + icon + '"/>\n      </svg>\n    ');
   return button;
 }
@@ -1481,14 +1549,17 @@ var Styler = function () {
         _ref$mode = _ref.mode,
         mode = _ref$mode === undefined ? 'default' : _ref$mode,
         _ref$commands = _ref.commands,
-        commands = _ref$commands === undefined ? ['bold', 'italic', 'underline'] : _ref$commands;
+        commands = _ref$commands === undefined ? ['bold', 'italic', 'underline'] : _ref$commands,
+        _ref$tooltip = _ref.tooltip,
+        tooltip = _ref$tooltip === undefined ? true : _ref$tooltip;
 
     classCallCheck(this, Styler);
 
     this.align = align;
     this.settings = {
       mode: mode,
-      commands: commands
+      commands: commands,
+      tooltip: tooltip
     };
     this.init();
   }
@@ -1521,7 +1592,7 @@ var Styler = function () {
 
         switch (cmdSchema.element) {
           case 'button':
-            currentCmd.el = button(cmd, icons[cmd]);
+            currentCmd.el = button(cmd, icons[cmd], _this.settings.tooltip ? cmdSchema.tooltip : false);
             currentCmd.el.addEventListener('click', function () {
               return _this.cmdCallback(cmdSchema, cmdSchema.value);
             });
@@ -1696,7 +1767,9 @@ var Align = function () {
         _ref$toolbar = _ref.toolbar,
         toolbar = _ref$toolbar === undefined ? null : _ref$toolbar,
         _ref$bubble = _ref.bubble,
-        bubble = _ref$bubble === undefined ? null : _ref$bubble;
+        bubble = _ref$bubble === undefined ? null : _ref$bubble,
+        _ref$shortcuts = _ref.shortcuts,
+        shortcuts = _ref$shortcuts === undefined ? true : _ref$shortcuts;
 
     classCallCheck(this, Align);
 
@@ -1704,7 +1777,8 @@ var Align = function () {
     this.settings = {
       defaultText: this.el.innerHTML,
       toolbar: toolbar,
-      bubble: bubble
+      bubble: bubble,
+      shortcuts: shortcuts
     };
     this.init();
   }
@@ -1729,6 +1803,7 @@ var Align = function () {
       }
       if (this.settings.bubble) {
         this.settings.bubble.mode = 'bubble';
+        this.settings.bubble.tooltip = false;
         this.bubble = new Styler(this, this.settings.bubble);
       }
       this.initEditor();
@@ -1751,6 +1826,8 @@ var Align = function () {
 
       this.el.appendChild(this.editor);
       this.editor.focus();
+      this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
+      this.cmdKeyPressed = false;
       Selection.updateSelectedRange();
     }
 
@@ -1776,20 +1853,64 @@ var Align = function () {
         }
         _this.updateStylers();
 
-        switch (event.key) {
-          case 'Tab':
-            event.preventDefault();
-            if (event.shiftKey) {
-              _this.execute('outdent', false, true);
-              return;
-            }
-            _this.execute('indent', false, true);
-            break;
+        if (event[_this.cmdKey] && _this.settings.shortcuts) {
+          switch (event.key.toUpperCase()) {
+            case 'B':
+              _this.execute('bold');break;
+            case 'I':
+              _this.execute('italic');break;
+            case 'U':
+              _this.execute('underline');break;
+            case 'E':
+              _this.execute('justifyCenter');break;
+            case 'R':
+              _this.execute('justifyRight');break;
+            case 'L':
+              _this.execute('justifyLeft');break;
+            case 'J':
+              _this.execute('justifyFull');break;
+            case 'A':
+              _this.execute('selectAll');break;
+            case '\\':
+              _this.execute('removeFormat');break;
+            case '=':
+              if (event.shiftKey) {
+                _this.execute('superscript');break;
+              }
+              _this.execute('subscript');break;
+            default:
+              break;
+          }
+        }
 
+        switch (event.key) {
+          case 'ArrowDown':
+            return;
+          case 'ArrowUp':
+            return;
+          case 'ArrowLeft':
+            return;
+          case 'ArrowRight':
+            return;
+          case 'Enter':
+            return;
+          case 'Escape':
+            return;
+          case 'Delete':
+            return;
+          case 'Backspace':
+            return;
+          case 'Tab':
+            if (event.shiftKey) {
+              _this.execute('outdent', false, true);break;
+            }
+            _this.execute('indent', false, true);break;
           default:
+            break;
         }
 
         // Cancel the default action to avoid it being handled twice
+        event.preventDefault();
       }, true);
     }
 

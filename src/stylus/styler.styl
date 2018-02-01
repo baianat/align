@@ -108,3 +108,53 @@
 
   &.is-visiable
     display: flex
+
+
+[data-tooltip]
+  position: relative
+  background: red
+
+  &:focus
+    outline: none
+  &:hover
+    &:before,
+    &:after
+      visibility: visible
+      opacity: 1
+
+  &:before
+    position: absolute
+    bottom: -13px
+    left: 50%
+    z-index: 99999
+    display: block
+    visibility: hidden
+    width: 0
+    height: 0
+    border-width: 0 7px 7px 7px
+    border-style: solid
+    border-color: transparent transparent $black transparent
+    content: ''
+    opacity: 0
+    transition: 0.4s
+    transform: translate(-50%, 0)
+    user-select: none
+
+  &:after
+    position: absolute
+    bottom: -44px
+    left: 50%
+    z-index: 99999
+    display: block
+    visibility: hidden
+    padding: 7px
+    border-radius: 4px
+    background-color: $black
+    color: $white
+    content: attr(data-tooltip)
+    white-space: nowrap
+    opacity: 0
+    transition: 0.4s
+    transform: translate(-50%, 0)
+    user-select: none
+    font-size: 14px

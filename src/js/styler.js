@@ -7,12 +7,14 @@ import Selection from './selection';
 class Styler {
   constructor(align, {
     mode = 'default',
-    commands = ['bold', 'italic', 'underline']
+    commands = ['bold', 'italic', 'underline'],
+    tooltip = true
   } = {}) {
     this.align = align;
     this.settings = {
       mode,
-      commands
+      commands,
+      tooltip
     };
     this.init();
   }
@@ -39,7 +41,7 @@ class Styler {
 
       switch (cmdSchema.element) {
         case 'button':
-          currentCmd.el = button(cmd, icons[cmd]);
+          currentCmd.el = button(cmd, icons[cmd], this.settings.tooltip ? cmdSchema.tooltip : false);
           currentCmd.el.addEventListener('click', () => this.cmdCallback(cmdSchema, cmdSchema.value));
           li.appendChild(currentCmd.el);
           break;

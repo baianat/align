@@ -1,5 +1,5 @@
 import hljs from 'highlight.js';
-import { select } from './util';
+import { select, userOS } from './util';
 import cmdsSchemas from './cmdsSchemas';
 import icons from './icons';
 import Styler from './styler';
@@ -9,13 +9,15 @@ import selection from './selection';
 class Align {
   constructor(selector, {
     toolbar = null,
-    bubble = null
+    bubble = null,
+    shortcuts = true
   } = {}) {
     this.el = select(selector);
     this.settings = {
       defaultText: this.el.innerHTML,
       toolbar,
-      bubble
+      bubble,
+      shortcuts
     };
     this.init();
   }
@@ -46,6 +48,7 @@ class Align {
     }
     if (this.settings.bubble) {
       this.settings.bubble.mode = 'bubble';
+      this.settings.bubble.tooltip = false;
       this.bubble = new Styler(this, this.settings.bubble);
     }
     this.initEditor();
@@ -65,6 +68,8 @@ class Align {
 
     this.el.appendChild(this.editor);
     this.editor.focus();
+    this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
+    this.cmdKeyPressed = false;
     Selection.updateSelectedRange();
   }
 
@@ -85,20 +90,64 @@ class Align {
       }
       this.updateStylers();
 
-      switch (event.key) {
-        case 'Tab':
-          event.preventDefault();
+      if (event[this.cmdKey] && this.settings.shortcuts) { 
+        switch (event.key.toUpperCase()) {
+        case 'B':
+          this.execute('bold'); break;
+        case 'I':
+          this.execute('italic'); break;
+        case 'U':
+          this.execute('underline'); break;
+        case 'E':
+          this.execute('justifyCenter'); break;
+        case 'R':
+          this.execute('justifyRight'); break;
+        case 'L':
+          this.execute('justifyLeft'); break;
+        case 'J':
+          this.execute('justifyFull'); break;
+        case 'A':
+          this.execute('selectAll'); break;
+        case '\\':
+          this.execute('removeFormat'); break;
+        case '=':
           if (event.shiftKey) {
-            this.execute('outdent', false, true);
-            return;
+            this.execute('superscript'); break;
           }
-          this.execute('indent', false, true);
-          break;
-
+          this.execute('subscript'); break;
         default:
+          break;
+        }
+      }
+
+      switch (event.key) {
+        case 'ArrowDown':
+          return;
+        case 'ArrowUp':
+          return;
+        case 'ArrowLeft':
+          return;
+        case 'ArrowRight':
+          return;
+        case 'Enter':
+          return;
+        case 'Escape':
+          return;
+        case 'Delete':
+          return;
+        case 'Backspace':
+          return;
+        case 'Tab':
+          if (event.shiftKey) {
+            this.execute('outdent', false, true); break;
+          }
+          this.execute('indent', false, true); break;
+        default:
+          break;
       }
 
       // Cancel the default action to avoid it being handled twice
+      event.preventDefault();
     }, true);
   }
 

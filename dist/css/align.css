@@ -401,6 +401,63 @@
   display: -ms-flexbox;
   display: flex;
 }
+[data-tooltip] {
+  position: relative;
+  background: #f00;
+}
+[data-tooltip]:focus {
+  outline: none;
+}
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  visibility: visible;
+  opacity: 1;
+}
+[data-tooltip]:before {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  z-index: 99999;
+  display: block;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  border-width: 0 7px 7px 7px;
+  border-style: solid;
+  border-color: transparent transparent #000 transparent;
+  content: '';
+  opacity: 0;
+  transition: 0.4s;
+  -ms-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+[data-tooltip]:after {
+  position: absolute;
+  bottom: -44px;
+  left: 50%;
+  z-index: 99999;
+  display: block;
+  visibility: hidden;
+  padding: 7px;
+  border-radius: 4px;
+  background-color: #000;
+  color: #fff;
+  content: attr(data-tooltip);
+  white-space: nowrap;
+  opacity: 0;
+  transition: 0.4s;
+  -ms-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  font-size: 14px;
+}
 .picker-guide {
   width: 30px;
   height: 30px;

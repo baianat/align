@@ -7,10 +7,13 @@ export function setElementsPrefix(prefix) {
   * Create button HTML element
   * @param {String} name
   */
-export function button(name, icon) {
+export function button(name, icon, tooltip) {
   const button = document.createElement('button');
   button.classList.add(`${NAMING_PREFIX}button`);
   button.id = name;
+  if (tooltip !== false) {
+    button.dataset.tooltip = tooltip === undefined ? name : tooltip;
+  }
   button.insertAdjacentHTML('afterbegin', `
       <svg class="icon" viewBox="0 0 24 24">
         <path d="${icon}"/>

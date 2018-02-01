@@ -1,20 +1,26 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from './selection';
+import { generateKeysSymbols } from './util';
+
+const symbols = generateKeysSymbols();
 
 const cmdsSchemas = {
   bold: {
     element: 'button',
-    command: 'bold'
+    command: 'bold',
+    tooltip: `Bold (${symbols.cmdKey} B)`
   },
 
   italic: {
     element: 'button',
-    command: 'italic'
+    command: 'italic',
+    tooltip: `Italic (${symbols.cmdKey} I)`
   },
 
   underline: {
     element: 'button',
-    command: 'underline'
+    command: 'underline',
+    tooltip: `underline (${symbols.cmdKey} U)`
   },
 
   strikeThrough: {
@@ -24,95 +30,135 @@ const cmdsSchemas = {
 
   removeFormat: {
     element: 'button',
-    command: 'removeFormat'
+    command: 'removeFormat',
+    tooltip: `underline (${symbols.cmdKey} \\)`
   },
 
   justifyLeft: {
     element: 'button',
-    command: 'justifyLeft'
+    command: 'justifyLeft',
+    tooltip: `Align left (${symbols.cmdKey} L)`
   },
 
   justifyCenter: {
     element: 'button',
-    command: 'justifyCenter'
+    command: 'justifyCenter',
+    tooltip: `Align center (${symbols.cmdKey} E)`
   },
 
   justifyRight: {
     element: 'button',
-    command: 'justifyRight'
+    command: 'justifyRight',
+    tooltip: `Align right (${symbols.cmdKey} R)`
+  },
+
+  selectAll: {
+    element: 'button',
+    command: 'selectAll',
+    tooltip: `Select all (${symbols.cmdKey} A)`
   },
 
   justifyFull: {
     element: 'button',
-    command: 'justifyFull'
+    command: 'justifyFull',
+    tooltip: `Justify full (${symbols.cmdKey} J)`
+  },
+
+  createLink: {
+    element: 'button',
+    tooltip: 'Hyperlink',
+    func(styler) {
+      var link = prompt('Write the URL here', '');
+      if(link && link !== '') {
+        styler.align.execute('createLink', link);
+      }
+    }
   },
 
   h1: {
     element: 'button',
     command: 'formatblock',
-    value: 'h1'
+    value: 'h1',
+    tooltip: 'Heading-1'
   },
 
   h2: {
     element: 'button',
     command: 'formatblock',
-    value: 'h2'
+    value: 'h2',
+    tooltip: 'Heading-2'
   },
 
   blockquote: {
     element: 'button',
     command: 'formatblock',
-    value: 'blockquote'
+    value: 'blockquote',
+    tooltip: 'Quote'
   },
 
   p: {
     element: 'button',
     command: 'formatblock',
-    value: 'p'
+    value: 'p',
+    tooltip: 'Paragraph'
   },
 
   orderedList: {
     element: 'button',
-    command: 'insertOrderedList'
+    command: 'insertOrderedList',
+    tooltip: 'Ordered list'
   },
 
   unorderedList: {
     element: 'button',
-    command: 'insertUnorderedList'
+    command: 'insertUnorderedList',
+    tooltip: 'Unrdered list'
   },
   
+  insertLine: {
+    element: 'button',
+    command: 'insertHorizontalRule',
+    tooltip: `Insert line`
+  },
+
   indent: {
     element: 'button',
     command: 'indent',
-    useCSS: true
+    useCSS: true,
+    tooltip: `indent (${symbols.tab})`
   },
 
   outdent: {
     element: 'button',
     command: 'outdent',
-    useCSS: true
+    useCSS: true,
+    tooltip: `outdent (${symbols.shift} ${symbols.tab})`
   },
 
   superscript: {
     element: 'button',
-    command: 'superscript'
+    command: 'superscript',
+    tooltip: `superscript (${symbols.cmdKey} ${symbols.shift} =)`
   },
 
   subscript: {
     element: 'button',
-    command: 'subscript'
+    command: 'subscript',
+    tooltip: `subscript (${symbols.cmdKey} =)`
   },
 
   pre: {
     element: 'button',
     command: 'formatblock',
     value: 'pre',
-    func: 'highlight'
+    func: 'highlight',
+    tooltip: 'Script'
   },
 
   html: {
     element: 'button',
-    func: 'toggleHTML'
+    func: 'toggleHTML',
+    tooltip: 'Show HTML'
   },
 
   fontSize: {
