@@ -1854,6 +1854,8 @@ var Align = function () {
         _this.updateStylers();
 
         if (event[_this.cmdKey] && _this.settings.shortcuts) {
+          event.preventDefault();
+
           switch (event.key.toUpperCase()) {
             case 'B':
               _this.execute('bold');break;
@@ -1885,6 +1887,7 @@ var Align = function () {
 
         switch (event.key) {
           case 'Tab':
+            event.preventDefault();
             if (event.shiftKey) {
               _this.execute('outdent', false, true);break;
             }

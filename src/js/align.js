@@ -4,7 +4,6 @@ import cmdsSchemas from './cmdsSchemas';
 import icons from './icons';
 import Styler from './styler';
 import Selection from './selection';
-import selection from './selection';
 
 class Align {
   constructor(selector, {
@@ -90,38 +89,41 @@ class Align {
       }
       this.updateStylers();
 
-      if (event[this.cmdKey] && this.settings.shortcuts) { 
+      if (event[this.cmdKey] && this.settings.shortcuts) {
+        event.preventDefault();
+
         switch (event.key.toUpperCase()) {
-        case 'B':
-          this.execute('bold'); break;
-        case 'I':
-          this.execute('italic'); break;
-        case 'U':
-          this.execute('underline'); break;
-        case 'E':
-          this.execute('justifyCenter'); break;
-        case 'R':
-          this.execute('justifyRight'); break;
-        case 'L':
-          this.execute('justifyLeft'); break;
-        case 'J':
-          this.execute('justifyFull'); break;
-        case 'A':
-          this.execute('selectAll'); break;
-        case '\\':
-          this.execute('removeFormat'); break;
-        case '=':
-          if (event.shiftKey) {
-            this.execute('superscript'); break;
-          }
-          this.execute('subscript'); break;
-        default:
-          break;
+          case 'B':
+            this.execute('bold'); break;
+          case 'I':
+            this.execute('italic'); break;
+          case 'U':
+            this.execute('underline'); break;
+          case 'E':
+            this.execute('justifyCenter'); break;
+          case 'R':
+            this.execute('justifyRight'); break;
+          case 'L':
+            this.execute('justifyLeft'); break;
+          case 'J':
+            this.execute('justifyFull'); break;
+          case 'A':
+            this.execute('selectAll'); break;
+          case '\\':
+            this.execute('removeFormat'); break;
+          case '=':
+            if (event.shiftKey) {
+              this.execute('superscript'); break;
+            }
+            this.execute('subscript'); break;
+          default:
+            break;
         }
       }
 
       switch (event.key) {
         case 'Tab':
+          event.preventDefault();
           if (event.shiftKey) {
             this.execute('outdent', false, true); break;
           }
@@ -144,7 +146,6 @@ class Align {
       hljs.highlightBlock(block);
     })
   }
-
 
   /**
    * Toggle on/off HTML
