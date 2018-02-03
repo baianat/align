@@ -11,8 +11,8 @@ export function button(name, icon, tooltip) {
   const button = document.createElement('button');
   button.classList.add(`${NAMING_PREFIX}button`);
   button.id = name;
-  if (tooltip !== false) {
-    button.dataset.tooltip = tooltip === undefined ? name : tooltip;
+  if (tooltip) {
+    button.dataset.tooltip = tooltip;
   }
   button.insertAdjacentHTML('afterbegin', `
       <svg class="icon" viewBox="0 0 24 24">

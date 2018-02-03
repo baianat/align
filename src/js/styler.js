@@ -8,7 +8,7 @@ class Styler {
   constructor(align, {
     mode = 'default',
     commands = ['bold', 'italic', 'underline'],
-    tooltip = true
+    tooltip = false
   } = {}) {
     this.align = align;
     this.settings = {
@@ -41,7 +41,7 @@ class Styler {
 
       switch (cmdSchema.element) {
         case 'button':
-          currentCmd.el = button(cmd, icons[cmd], this.settings.tooltip ? cmdSchema.tooltip : false);
+          currentCmd.el = button(cmd, icons[cmd], this.getTooltip(cmdSchema));
           currentCmd.el.addEventListener('click', () => this.cmdCallback(cmdSchema, cmdSchema.value));
           li.appendChild(currentCmd.el);
           break;
@@ -49,7 +49,7 @@ class Styler {
         case 'select':
           const selectWrapper = select(cmd, el[cmd]);
           const temp = currentCmd.el = selectWrapper.querySelector('select');
-          temp.addEventListener('change', 
+          temp.addEventListener('change',
             () => this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value)
           );
           li.appendChild(selectWrapper);
@@ -131,9 +131,9 @@ class Styler {
     const endBoundary = editorRect.left + editorRect.width - stylerRect.width;
     const xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
     const yPosition = deltaY < scrolled + 50
-    ? selectionRect.top + selectionRect.height + marginRatio 
-    : selectionRect.top - stylerRect.height - marginRatio;
-    
+      ? selectionRect.top + selectionRect.height + marginRatio
+      : selectionRect.top - stylerRect.height - marginRatio;
+
     this.styler.style.top = `${yPosition}px`;
     this.styler.style.left = `${xPosition}px`;
   }
@@ -159,6 +159,13 @@ class Styler {
     }
     this.showStyler();
   };
+
+  getTooltip(schema) {
+    if (!schema.tooltip || !this.settings.tooltip) {
+      return false;
+    }
+    return this.align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
+  }
 
   /**
    * Update the state of the active style

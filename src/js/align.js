@@ -9,7 +9,7 @@ class Align {
   constructor(selector, {
     toolbar = null,
     bubble = null,
-    shortcuts = true
+    shortcuts = false
   } = {}) {
     this.el = select(selector);
     this.settings = {

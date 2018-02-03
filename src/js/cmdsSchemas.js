@@ -20,18 +20,19 @@ const cmdsSchemas = {
   underline: {
     element: 'button',
     command: 'underline',
-    tooltip: `underline (${symbols.cmdKey} U)`
+    tooltip: `Underline (${symbols.cmdKey} U)`
   },
 
   strikeThrough: {
     element: 'button',
-    command: 'strikeThrough'
+    command: 'strikeThrough',
+    tooltip: `Strike through`
   },
 
   removeFormat: {
     element: 'button',
     command: 'removeFormat',
-    tooltip: `underline (${symbols.cmdKey} \\)`
+    tooltip: `Remove format (${symbols.cmdKey} \\)`
   },
 
   justifyLeft: {
@@ -69,7 +70,7 @@ const cmdsSchemas = {
     tooltip: 'Hyperlink',
     func(styler) {
       var link = prompt('Write the URL here', '');
-      if(link && link !== '') {
+      if (link && link !== '') {
         styler.align.execute('createLink', link);
       }
     }
@@ -79,14 +80,14 @@ const cmdsSchemas = {
     element: 'button',
     command: 'formatblock',
     value: 'h1',
-    tooltip: 'Heading-1'
+    tooltip: 'Heading 1'
   },
 
   h2: {
     element: 'button',
     command: 'formatblock',
     value: 'h2',
-    tooltip: 'Heading-2'
+    tooltip: 'Heading 2'
   },
 
   blockquote: {
@@ -114,7 +115,7 @@ const cmdsSchemas = {
     command: 'insertUnorderedList',
     tooltip: 'Unordered list'
   },
-  
+
   insertLine: {
     element: 'button',
     command: 'insertHorizontalRule',
@@ -125,26 +126,26 @@ const cmdsSchemas = {
     element: 'button',
     command: 'indent',
     useCSS: true,
-    tooltip: `indent (${symbols.tab})`
+    tooltip: `Indent (${symbols.tab})`
   },
 
   outdent: {
     element: 'button',
     command: 'outdent',
     useCSS: true,
-    tooltip: `outdent (${symbols.shift} ${symbols.tab})`
+    tooltip: `Outdent (${symbols.shift} ${symbols.tab})`
   },
 
   superscript: {
     element: 'button',
     command: 'superscript',
-    tooltip: `superscript (${symbols.cmdKey} ${symbols.shift} =)`
+    tooltip: `Superscript (${symbols.cmdKey} ${symbols.shift} =)`
   },
 
   subscript: {
     element: 'button',
     command: 'subscript',
-    tooltip: `subscript (${symbols.cmdKey} =)`
+    tooltip: `Subscript (${symbols.cmdKey} =)`
   },
 
   pre: {

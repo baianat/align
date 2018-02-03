@@ -1183,18 +1183,19 @@ var cmdsSchemas = {
   underline: {
     element: 'button',
     command: 'underline',
-    tooltip: 'underline (' + symbols.cmdKey + ' U)'
+    tooltip: 'Underline (' + symbols.cmdKey + ' U)'
   },
 
   strikeThrough: {
     element: 'button',
-    command: 'strikeThrough'
+    command: 'strikeThrough',
+    tooltip: 'Strike through'
   },
 
   removeFormat: {
     element: 'button',
     command: 'removeFormat',
-    tooltip: 'underline (' + symbols.cmdKey + ' \\)'
+    tooltip: 'Remove format (' + symbols.cmdKey + ' \\)'
   },
 
   justifyLeft: {
@@ -1242,14 +1243,14 @@ var cmdsSchemas = {
     element: 'button',
     command: 'formatblock',
     value: 'h1',
-    tooltip: 'Heading-1'
+    tooltip: 'Heading 1'
   },
 
   h2: {
     element: 'button',
     command: 'formatblock',
     value: 'h2',
-    tooltip: 'Heading-2'
+    tooltip: 'Heading 2'
   },
 
   blockquote: {
@@ -1288,26 +1289,26 @@ var cmdsSchemas = {
     element: 'button',
     command: 'indent',
     useCSS: true,
-    tooltip: 'indent (' + symbols.tab + ')'
+    tooltip: 'Indent (' + symbols.tab + ')'
   },
 
   outdent: {
     element: 'button',
     command: 'outdent',
     useCSS: true,
-    tooltip: 'outdent (' + symbols.shift + ' ' + symbols.tab + ')'
+    tooltip: 'Outdent (' + symbols.shift + ' ' + symbols.tab + ')'
   },
 
   superscript: {
     element: 'button',
     command: 'superscript',
-    tooltip: 'superscript (' + symbols.cmdKey + ' ' + symbols.shift + ' =)'
+    tooltip: 'Superscript (' + symbols.cmdKey + ' ' + symbols.shift + ' =)'
   },
 
   subscript: {
     element: 'button',
     command: 'subscript',
-    tooltip: 'subscript (' + symbols.cmdKey + ' =)'
+    tooltip: 'Subscript (' + symbols.cmdKey + ' =)'
   },
 
   pre: {
@@ -1500,8 +1501,8 @@ function button(name, icon, tooltip) {
   var button = document.createElement('button');
   button.classList.add(NAMING_PREFIX + 'button');
   button.id = name;
-  if (tooltip !== false) {
-    button.dataset.tooltip = tooltip === undefined ? name : tooltip;
+  if (tooltip) {
+    button.dataset.tooltip = tooltip;
   }
   button.insertAdjacentHTML('afterbegin', '\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="' + icon + '"/>\n      </svg>\n    ');
   return button;
@@ -1551,7 +1552,7 @@ var Styler = function () {
         _ref$commands = _ref.commands,
         commands = _ref$commands === undefined ? ['bold', 'italic', 'underline'] : _ref$commands,
         _ref$tooltip = _ref.tooltip,
-        tooltip = _ref$tooltip === undefined ? true : _ref$tooltip;
+        tooltip = _ref$tooltip === undefined ? false : _ref$tooltip;
 
     classCallCheck(this, Styler);
 
@@ -1592,7 +1593,7 @@ var Styler = function () {
 
         switch (cmdSchema.element) {
           case 'button':
-            currentCmd.el = button(cmd, icons[cmd], _this.settings.tooltip ? cmdSchema.tooltip : false);
+            currentCmd.el = button(cmd, icons[cmd], _this.getTooltip(cmdSchema));
             currentCmd.el.addEventListener('click', function () {
               return _this.cmdCallback(cmdSchema, cmdSchema.value);
             });
@@ -1722,12 +1723,20 @@ var Styler = function () {
       this.showStyler();
     }
   }, {
-    key: 'updateStylerCommands',
-
+    key: 'getTooltip',
+    value: function getTooltip(schema) {
+      if (!schema.tooltip || !this.settings.tooltip) {
+        return false;
+      }
+      return this.align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
+    }
 
     /**
      * Update the state of the active style
      */
+
+  }, {
+    key: 'updateStylerCommands',
     value: function updateStylerCommands() {
       var _this2 = this;
 
@@ -1769,7 +1778,7 @@ var Align = function () {
         _ref$bubble = _ref.bubble,
         bubble = _ref$bubble === undefined ? null : _ref$bubble,
         _ref$shortcuts = _ref.shortcuts,
-        shortcuts = _ref$shortcuts === undefined ? true : _ref$shortcuts;
+        shortcuts = _ref$shortcuts === undefined ? false : _ref$shortcuts;
 
     classCallCheck(this, Align);
 

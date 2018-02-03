@@ -73,9 +73,9 @@ You can choose what commands you'd like both of the stylers to include, by passi
 
 ```js
 new Align('.editor', {
-  shortcuts: true, // enable or disable keyboard shortcuts
+  shortcuts: true, // enable or disable keyboard shortcuts default (false)
   toolbar: {
-    tooltip: true, // show or hide commands tooltip
+    tooltip: true, // show or hide commands tooltip default (false)
     commands: [
       {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
       {'font': ['Raleway', 'Roboto', 'Poppins']},
