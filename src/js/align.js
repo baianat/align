@@ -90,28 +90,42 @@ class Align {
       this.updateStylers();
 
       if (event[this.cmdKey] && this.settings.shortcuts) {
-        event.preventDefault();
-
         switch (event.key.toUpperCase()) {
           case 'B':
+            event.preventDefault();
             this.execute('bold'); break;
           case 'I':
+            event.preventDefault();
             this.execute('italic'); break;
           case 'U':
+            event.preventDefault();
             this.execute('underline'); break;
           case 'E':
+            event.preventDefault();
             this.execute('justifyCenter'); break;
           case 'R':
+            event.preventDefault();
             this.execute('justifyRight'); break;
           case 'L':
+            event.preventDefault();
             this.execute('justifyLeft'); break;
           case 'J':
+            event.preventDefault();
             this.execute('justifyFull'); break;
           case 'A':
+            event.preventDefault();
             this.execute('selectAll'); break;
+          case 'Z':
+            event.preventDefault();
+            if (event.shiftKey) {
+              this.execute('redo'); break;
+            }
+            this.execute('undo'); break;
           case '\\':
+            event.preventDefault();
             this.execute('removeFormat'); break;
           case '=':
+            event.preventDefault();
             if (event.shiftKey) {
               this.execute('superscript'); break;
             }

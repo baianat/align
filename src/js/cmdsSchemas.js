@@ -29,6 +29,18 @@ const cmdsSchemas = {
     tooltip: `Strike through`
   },
 
+  undo: {
+    element: 'button',
+    command: 'undo',
+    tooltip: `Undo (${symbols.cmdKey} Z)`
+  },
+
+  redo: {
+    element: 'button',
+    command: 'redo',
+    tooltip: `Redo (${symbols.cmdKey} ${symbols.shift} Z)`
+  },
+
   removeFormat: {
     element: 'button',
     command: 'removeFormat',
