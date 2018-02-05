@@ -27,7 +27,7 @@ export function callable(func) {
 export function getAverage(array, length) {
   let sum = 0;
   const elements = array.slice(Math.max(array.length - length, 1));
-  elements.forEach((value) => sum = sum + value);
+  elements.forEach((value) => { sum = sum + value });
   return Math.ceil(sum / length);
 }
 
@@ -35,6 +35,7 @@ export function getArray(length, value) {
   return new Array(length).fill(value);
 }
 
+/* eslint-disable */
 export function debounce(callback, immediate = false) {
   let timeout;
   return function () {
@@ -47,6 +48,7 @@ export function debounce(callback, immediate = false) {
     if (callNow) callback(...arguments);
   };
 }
+/* eslint-enable */
 
 export function throttle(callback, limit) {
   let wait = false;
@@ -73,13 +75,12 @@ export function normalizeNumber(number, min, max) {
   return Math.round(Math.max(Math.min(Number(number), max), min));
 }
 
-
 export function userOS() {
   const appVersion = navigator.appVersion;
-  if (appVersion.indexOf('Win') != -1) return 'Win';
-  if (appVersion.indexOf('Mac') != -1) return 'Mac';
-  if (appVersion.indexOf('X11') != -1) return 'UNIX';
-  if (appVersion.indexOf('Linux') != -1) return 'Linux';
+  if (appVersion.indexOf('Win') !== -1) return 'Win';
+  if (appVersion.indexOf('Mac') !== -1) return 'Mac';
+  if (appVersion.indexOf('X11') !== -1) return 'UNIX';
+  if (appVersion.indexOf('Linux') !== -1) return 'Linux';
   return 'Other';
 }
 

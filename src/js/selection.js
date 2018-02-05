@@ -1,10 +1,6 @@
 let SELECTED_RANGE = null;
 
 class Selection {
-  constructor() {
-
-  }
-
   set selectedRange(range) {
     if (!range) return;
     SELECTED_RANGE = range;

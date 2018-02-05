@@ -77,7 +77,7 @@ class Styler {
       }
 
       if (typeof cmdSchema.init === 'function') {
-        cmdSchema.init = new cmdSchema.init(currentCmd.el, cmdSchema.initConfig);
+        cmdSchema.init = new cmdSchema.init(currentCmd.el, cmdSchema.initConfig); // eslint-disable-line
       }
 
       if (typeof cmdSchema.init === 'string') {

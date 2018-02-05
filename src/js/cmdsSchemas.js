@@ -81,7 +81,7 @@ const cmdsSchemas = {
     element: 'button',
     tooltip: 'Hyperlink',
     func(styler) {
-      var link = prompt('Write the URL here', '');
+      var link = prompt('Write the URL here', ''); // eslint-disable-line
       if (link && link !== '') {
         styler.align.execute('createLink', link);
       }
@@ -286,7 +286,7 @@ const cmdsSchemas = {
       if (!window.getSelection().rangeCount) return;
       const img = document.createElement('img');
 
-      const reader = new FileReader();
+      const reader = new FileReader(); // eslint-disable-line
       reader.addEventListener('load', () => {
         img.src = reader.result;
         img.classList.add('align-image');
