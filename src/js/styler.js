@@ -8,13 +8,15 @@ class Styler {
   constructor(align, {
     mode = 'default',
     commands = ['bold', 'italic', 'underline'],
-    tooltip = false
+    tooltip = false,
+    theme = 'light'
   } = {}) {
     this.align = align;
     this.settings = {
       mode,
       commands,
-      tooltip
+      tooltip,
+      theme
     };
     this.init();
   }
@@ -24,8 +26,9 @@ class Styler {
    */
   init() {
     setElementsPrefix('styler-');
+    this.cmdsSchemas = (() => cmdsSchemas)();
     this.styler = document.createElement('ul');
-    this.styler.classList.add('styler', `is-${this.settings.mode}`);
+    this.styler.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
     this.cmds = {};
 
     this.settings.commands.forEach((el) => {

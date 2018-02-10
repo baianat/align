@@ -8,6 +8,35 @@
   justify-content: center
   align-items: center
   padding: 10px
+  box-shadow: 0 20px 25px -20px alpha($black, 5%)
+  .styler-button
+    background-color: $white
+    fill: $black
+
+    &.is-active
+      fill: $magenta
+
+  .picker-guide
+    width: 30px
+    height: 30px
+    padding: 5px
+    svg
+      color: $black
+
+  &.is-dark
+    background-color: $black
+    color: $white
+    .styler-button
+      background-color: $black
+      fill: $white
+      &.is-active
+        fill: $magenta
+    .styler-select
+      color: $white
+    .styler-icon
+      color: $white !important
+    .picker-guide svg
+      color: $white
 
   &.is-toolbar
     position: sticky
@@ -15,24 +44,12 @@
     right: 0
     left: 0
     z-index: 10
-    box-shadow: 0 20px 25px -20px alpha($black, 5%)
-    .styler-button
-      background-color: $white
-      fill: $black
-      &.is-active
-        fill: $magenta
-
+    
   &.is-bubble
-    background-color: $black
     position: fixed
     z-index: 20
     border-radius: 40px
     box-shadow: 0 0 25px alpha($black, 5%)
-    .styler-button
-      background-color: $black
-      fill: $white
-      &.is-active
-        fill: $magenta
 
   li
     &:not(last-child)
@@ -60,6 +77,8 @@
     outline: none
     .icon
       fill: inherit
+
+
 
   &-list
     -webkit-appearance: none
@@ -91,6 +110,7 @@
       height: 18px
       margin: 6px 0
       z-index: -1
+      fill: currentColor
     select
       appearance: none
       height: 30px
@@ -100,9 +120,8 @@
       background: transparent
       text-align: center
       border-width: 0
-      border-color: $dark
       font-size: 14px
-      border-bottom: 1px solid $white
+      color: currentColor
       &:focus
         outline: none
 
