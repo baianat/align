@@ -255,7 +255,7 @@ const cmdsSchemas = {
     element: 'custom',
     data() {
       return {
-        button: document.createElement('button'),
+        button: document.createElement('div'),
         input: document.createElement('input'),
         icon:
           `<svg class="icon" viewBox="0 0 24 24">
