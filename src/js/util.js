@@ -76,6 +76,7 @@ export function normalizeNumber(number, min, max) {
 }
 
 export function userOS() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
   const appVersion = navigator.appVersion;
   if (appVersion.indexOf('Win') !== -1) return 'Win';
   if (appVersion.indexOf('Mac') !== -1) return 'Mac';
