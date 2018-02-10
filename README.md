@@ -78,7 +78,7 @@ new Align('.editor', {
     tooltip: true, // show or hide commands tooltip default (false)
     commands: [
       {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
-      {'font': ['Raleway', 'Roboto', 'Poppins']},
+      {'fontName': ['Raleway', 'Roboto', 'Poppins']},
       'separator',
       'bold', 'italic', 'underline', 'strikeThrough',
       'separator',

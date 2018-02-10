@@ -1787,7 +1787,9 @@ var Align = function () {
         _ref$bubble = _ref.bubble,
         bubble = _ref$bubble === undefined ? null : _ref$bubble,
         _ref$shortcuts = _ref.shortcuts,
-        shortcuts = _ref$shortcuts === undefined ? false : _ref$shortcuts;
+        shortcuts = _ref$shortcuts === undefined ? false : _ref$shortcuts,
+        _ref$postTitle = _ref.postTitle,
+        postTitle = _ref$postTitle === undefined ? false : _ref$postTitle;
 
     classCallCheck(this, Align);
 
@@ -1796,7 +1798,8 @@ var Align = function () {
       defaultText: this.el.innerHTML,
       toolbar: toolbar,
       bubble: bubble,
-      shortcuts: shortcuts
+      shortcuts: shortcuts,
+      postTitle: postTitle
     };
     this.init();
   }
@@ -1847,6 +1850,12 @@ var Align = function () {
       this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
       this.cmdKeyPressed = false;
       Selection.updateSelectedRange();
+      if (this.settings.postTitle) {
+        this.postTitle = document.createElement('textarea');
+        this.postTitle.placeholder = this.settings.postTitle;
+        this.postTitle.classList.add('align-title');
+        this.el.insertBefore(this.postTitle, this.editor);
+      }
     }
 
     /**
@@ -2005,7 +2014,14 @@ var Align = function () {
   }, {
     key: 'content',
     get: function get$$1() {
-      return document.createTextNode(this.editor.innerHTML);
+      return this.editor.innerHTML;
+    }
+  }, {
+    key: 'title',
+    get: function get$$1() {
+      if (this.postTitle) {
+        return this.postTitle.value;
+      }
     }
   }], [{
     key: 'extend',

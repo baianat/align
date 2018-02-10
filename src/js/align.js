@@ -9,14 +9,16 @@ class Align {
   constructor(selector, {
     toolbar = null,
     bubble = null,
-    shortcuts = false
+    shortcuts = false,
+    postTitle = false
   } = {}) {
     this.el = select(selector);
     this.settings = {
       defaultText: this.el.innerHTML,
       toolbar,
       bubble,
-      shortcuts
+      shortcuts,
+      postTitle
     };
     this.init();
   }
@@ -25,7 +27,13 @@ class Align {
    * Get editor's content
    */
   get content() {
-    return document.createTextNode(this.editor.innerHTML);
+    return this.editor.innerHTML;
+  }
+
+  get title() {
+    if (this.postTitle) {
+      return this.postTitle.value;
+    }
   }
 
   static extend(name, extension) {
@@ -70,6 +78,12 @@ class Align {
     this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
     this.cmdKeyPressed = false;
     Selection.updateSelectedRange();
+    if (this.settings.postTitle) {
+      this.postTitle = document.createElement('textarea');
+      this.postTitle.placeholder = this.settings.postTitle;
+      this.postTitle.classList.add('align-title');
+      this.el.insertBefore(this.postTitle, this.editor);
+    }
   }
 
   /**
