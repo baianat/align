@@ -26,7 +26,7 @@ class Styler {
    */
   init() {
     setElementsPrefix('styler-');
-    this.cmdsSchemas = (() => cmdsSchemas)();
+    this.cmdsSchemas = cmdsSchemas;
     this.styler = document.createElement('ul');
     this.styler.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
     this.cmds = {};
@@ -34,7 +34,7 @@ class Styler {
     this.settings.commands.forEach((el) => {
       const li = document.createElement('li');
       const cmd = typeof el === 'string' ? el : Object.keys(el)[0];
-      const cmdSchema = cmdsSchemas[cmd];
+      const cmdSchema = this.cmdsSchemas[cmd];
       if (!cmdSchema) {
         console.warn(cmd + ' is not found');
         return;

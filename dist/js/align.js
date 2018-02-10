@@ -1588,9 +1588,7 @@ var Styler = function () {
       var _this = this;
 
       setElementsPrefix('styler-');
-      this.cmdsSchemas = function () {
-        return cmdsSchemas;
-      }();
+      this.cmdsSchemas = cmdsSchemas;
       this.styler = document.createElement('ul');
       this.styler.classList.add('styler', 'is-' + this.settings.mode, 'is-' + this.settings.theme);
       this.cmds = {};
@@ -1598,7 +1596,7 @@ var Styler = function () {
       this.settings.commands.forEach(function (el) {
         var li = document.createElement('li');
         var cmd = typeof el === 'string' ? el : Object.keys(el)[0];
-        var cmdSchema = cmdsSchemas[cmd];
+        var cmdSchema = _this.cmdsSchemas[cmd];
         if (!cmdSchema) {
           console.warn(cmd + ' is not found');
           return;
