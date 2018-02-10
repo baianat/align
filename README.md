@@ -73,9 +73,10 @@ You can choose what commands you'd like both of the stylers to include, by passi
 
 ```js
 new Align('.editor', {
-  shortcuts: true, // enable or disable keyboard shortcuts default (false)
+  shortcuts: true, // enable or disable keyboard shortcuts, default is (false)
+  postTitle: 'title placeholder', // add title post placeholder, default is (false)
   toolbar: {
-    tooltip: true, // show or hide commands tooltip default (false)
+    tooltip: true, // show or hide commands tooltip, default is (false)
     commands: [
       {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
       {'fontName': ['Raleway', 'Roboto', 'Poppins']},
@@ -162,7 +163,7 @@ Align.extend('addImage', {
   element: 'custom',
   data() {
     return {
-      button: document.createElement('button'),
+      button: document.createElement('div'),
       input: document.createElement('input'),
       icon:
         `<svg class="icon" viewBox="0 0 24 24">
@@ -214,9 +215,10 @@ If you want to change `Align`'s [icons](https://github.com/baianat/align/blob/ma
 Align.extendIcons('bold', 'M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z');
 ```
 
-### Getting the content
+### Getting the data
 
-Finally, to get `Align`'s content you can use `content` property
+To get `Align`'s content you can use `content` property
+To get `Align`'s post title you can use `title` property
 
 ```js
 saveToDatabase(myEditor.content);
