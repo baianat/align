@@ -1,4 +1,4 @@
-import { normalizeNumber, debounce } from './util';
+import { normalizeNumber, debounce, cloneObject } from './util';
 import { setElementsPrefix, button, select, input } from './elements';
 import cmdsSchemas from './cmdsSchemas';
 import icons from './icons';
@@ -26,7 +26,7 @@ class Styler {
    */
   init() {
     setElementsPrefix('styler-');
-    this.cmdsSchemas = cmdsSchemas;
+    this.cmdsSchemas = cloneObject(cmdsSchemas);
     this.styler = document.createElement('ul');
     this.styler.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
     this.cmds = {};

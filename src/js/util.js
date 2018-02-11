@@ -95,3 +95,12 @@ export function generateKeysSymbols() {
     tab: OS === 'Mac' ? '⇥' : 'Tab'
   }
 }
+
+export function cloneObject(object) {
+  let output = {};
+  Object.keys(object).forEach((key) => {
+    let tempValue = object[key];
+    output[key] = (typeof tempValue === 'object') ? cloneObject(tempValue) : tempValue;
+  });
+  return output;
+}
