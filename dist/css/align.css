@@ -287,6 +287,9 @@
 .align-title:focus {
   outline: 0;
 }
+.align-figure.is-active img {
+  border: 3px solid #000;
+}
 .styler {
   background-color: #fff;
   margin: 0;

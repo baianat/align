@@ -1130,7 +1130,8 @@ var colorpicker = createCommonjsModule(function (module, exports) {
   });
 });
 
-var SELECTED_RANGE = null;
+var TEXT_RANGE = null;
+var RANGE = null;
 
 var Selection = function () {
   function Selection() {
@@ -1138,18 +1139,27 @@ var Selection = function () {
   }
 
   createClass(Selection, [{
-    key: "selectedRange",
+    key: "textRange",
     set: function set$$1(range) {
       if (!range) return;
-      SELECTED_RANGE = range;
+      TEXT_RANGE = range;
     },
     get: function get$$1() {
-      return SELECTED_RANGE;
+      return TEXT_RANGE;
+    }
+  }, {
+    key: "range",
+    set: function set$$1(range) {
+      if (!range) return;
+      RANGE = range;
+    },
+    get: function get$$1() {
+      return RANGE;
     }
   }], [{
-    key: "updateSelection",
-    value: function updateSelection() {
-      var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.selectedRange;
+    key: "selectTextRange",
+    value: function selectTextRange() {
+      var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.textRange;
 
       if (!range) return;
       var sel = window.getSelection();
@@ -1161,7 +1171,10 @@ var Selection = function () {
     value: function updateSelectedRange() {
       var sel = window.getSelection();
       if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
-        Selection.selectedRange = sel.getRangeAt(0);
+        Selection.textRange = sel.getRangeAt(0);
+      }
+      if (sel.rangeCount) {
+        Selection.range = sel.getRangeAt(0);
       }
     }
   }]);
@@ -1370,7 +1383,7 @@ var cmdsSchemas = {
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
-          Selection.updateSelection();
+          Selection.selectTextRange();
         },
         afterOpen: function afterOpen() {
           Selection.updateSelectedRange();
@@ -1395,7 +1408,7 @@ var cmdsSchemas = {
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path style="fill: currentColor" d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/>\n          <path d="M0 20h24v4H0z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
-          Selection.updateSelection();
+          Selection.selectTextRange();
         },
         afterOpen: function afterOpen() {
           Selection.updateSelectedRange();
@@ -1413,15 +1426,16 @@ var cmdsSchemas = {
       return {
         button: document.createElement('div'),
         input: document.createElement('input'),
+        reader: new FileReader(), // eslint-disable-line
         icon: '<svg class="icon" viewBox="0 0 24 24">\n              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>\n            </svg>'
       };
     },
-    create: function create() {
-      this.$data = this.data;
-      this.data = this.$data();
-      var button = this.data.button;
-      var input = this.data.input;
-      var icon = this.data.icon;
+    create: function create(Styler) {
+      this.$styler = Styler;
+      this.$data = this.data();
+      var button = this.$data.button;
+      var input = this.$data.input;
+      var icon = this.$data.icon;
 
       button.classList.add('styler-button');
       button.appendChild(input);
@@ -1434,22 +1448,20 @@ var cmdsSchemas = {
       return button;
     },
     action: function action() {
-      var file = this.data.input.files[0];
-      if (!file) return;
-      if (!window.getSelection().rangeCount) return;
-      var img = document.createElement('img');
+      var _this = this;
 
-      var reader = new FileReader(); // eslint-disable-line
-      reader.addEventListener('load', function () {
-        img.src = reader.result;
-        img.classList.add('align-image');
+      var file = this.$data.input.files[0];
+      if (!file || !window.getSelection().rangeCount) return;
+      var img = document.createElement('img');
+      img.classList.add('align-image');
+
+      this.$data.reader.addEventListener('load', function () {
+        img.src = _this.$data.reader.result;
         img.dataset.alignFilename = file.name;
       });
-      reader.readAsDataURL(file);
-      Selection.selectedRange = window.getSelection().getRangeAt(0);
-      Selection.selectedRange.insertNode(img);
-      document.execCommand('enableObjectResizing', false, true);
-      this.data.input.value = null;
+      this.$data.reader.readAsDataURL(file);
+      Selection.textRange.insertNode(img);
+      this.$data.input.value = null;
     }
   }
 };
@@ -1586,7 +1598,7 @@ var Styler = function () {
 
     classCallCheck(this, Styler);
 
-    this.align = align;
+    this.$align = align;
     this.settings = {
       mode: mode,
       commands: commands,
@@ -1654,7 +1666,7 @@ var Styler = function () {
             break;
 
           case 'custom':
-            var markup = cmdSchema.create();
+            var markup = cmdSchema.create(_this);
             li.appendChild(markup);
             break;
 
@@ -1667,13 +1679,13 @@ var Styler = function () {
         }
 
         if (typeof cmdSchema.init === 'string') {
-          _this.align[cmdSchema.init](cmdSchema, el);
+          _this.$align[cmdSchema.init](cmdSchema, el);
           cmdSchema.init = null;
         }
 
         _this.styler.appendChild(li);
       });
-      this.align.el.appendChild(this.styler);
+      this.$align.el.appendChild(this.styler);
       if (this.settings.mode === 'bubble') this.initBubble();
     }
   }, {
@@ -1683,7 +1695,7 @@ var Styler = function () {
         this.execute(cmdSchema.command, value, cmdSchema.useCSS);
       }
       if (typeof cmdSchema.func === 'string') {
-        this.align[cmdSchema.func](this, value);
+        this.$align[cmdSchema.func](this, value);
       }
       if (typeof cmdSchema.func === 'function') {
         cmdSchema.func(this, value);
@@ -1705,17 +1717,17 @@ var Styler = function () {
   }, {
     key: 'execute',
     value: function execute(cmd, value) {
-      var _align;
+      var _$align;
 
-      (_align = this.align).execute.apply(_align, arguments);
+      (_$align = this.$align).execute.apply(_$align, arguments);
     }
   }, {
     key: 'updateBubblePosition',
     value: function updateBubblePosition() {
-      if (!Selection.selectedRange) return;
+      if (!Selection.textRange) return;
       var marginRatio = 10;
-      var selectionRect = Selection.selectedRange.getBoundingClientRect();
-      var editorRect = this.align.el.getBoundingClientRect();
+      var selectionRect = Selection.textRange.getBoundingClientRect();
+      var editorRect = this.$align.el.getBoundingClientRect();
       var stylerRect = this.styler.getBoundingClientRect();
 
       var scrolled = window.scrollY;
@@ -1743,12 +1755,13 @@ var Styler = function () {
       this.styler.classList.add('is-hidden');
     }
   }, {
-    key: 'updateStylerStates',
-    value: function updateStylerStates() {
-      this.updateStylerCommands();
+    key: 'updateStyler',
+    value: function updateStyler() {
+      this.updateStylerCommandsStates();
       if (this.settings.mode !== 'bubble') return;
 
-      if (Selection.selectedRange.collapsed) {
+      console.log(Selection.range.collapsed);
+      if (Selection.textRange.collapsed || Selection.range.collapsed) {
         this.hideStyler();
         return;
       }
@@ -1760,7 +1773,7 @@ var Styler = function () {
       if (!schema.tooltip || !this.settings.tooltip) {
         return false;
       }
-      return this.align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
+      return this.$align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
     }
 
     /**
@@ -1768,8 +1781,8 @@ var Styler = function () {
      */
 
   }, {
-    key: 'updateStylerCommands',
-    value: function updateStylerCommands() {
+    key: 'updateStylerCommandsStates',
+    value: function updateStylerCommandsStates() {
       var _this2 = this;
 
       Object.keys(this.cmds).forEach(function (cmd) {
@@ -1789,7 +1802,9 @@ var Styler = function () {
           return;
         }
         if (init) {
-          init.selectColor(document.queryCommandValue(command), true);
+          if (Selection.range === Selection.textRange) {
+            init.selectColor(document.queryCommandValue(command), true);
+          }
           return;
         }
         if (document.queryCommandValue(command)) {
@@ -1894,14 +1909,13 @@ var Align = function () {
         _this.highlight();
       });
 
-      window.addEventListener('mouseup', this.updateStylers.bind(this));
+      this.el.addEventListener('mouseup', this.updateStylers.bind(this));
 
-      window.addEventListener('keydown', function (event) {
+      document.addEventListener('keydown', function (event) {
         // Do nothing if the event was already processed
         if (event.defaultPrevented) {
           return;
         }
-        _this.updateStylers();
 
         if (event[_this.cmdKey] && _this.settings.shortcuts) {
           switch (event.key.toUpperCase()) {
@@ -1956,6 +1970,14 @@ var Align = function () {
               _this.execute('outdent', false, true);break;
             }
             _this.execute('indent', false, true);break;
+          case 'ArrowDown':
+          case 'ArrowUp':
+          case 'ArrowLeft':
+          case 'ArrowRight':
+          case 'Enter':
+          case 'Escape':
+            _this.updateStylers();
+            break;
           default:
             break;
         }
@@ -2010,10 +2032,10 @@ var Align = function () {
       Selection.updateSelectedRange();
       setTimeout(function () {
         if (_this2.settings.toolbar) {
-          _this2.toolbar.updateStylerStates();
+          _this2.toolbar.updateStyler();
         }
         if (_this2.settings.bubble) {
-          _this2.bubble.updateStylerStates();
+          _this2.bubble.updateStyler();
         }
       }, 16);
     }

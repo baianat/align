@@ -209,7 +209,7 @@ const cmdsSchemas = {
       `,
       events: {
         beforeSubmit() {
-          Selection.updateSelection();
+          Selection.selectTextRange();
         },
         afterOpen() {
           Selection.updateSelectedRange();
@@ -239,7 +239,7 @@ const cmdsSchemas = {
       `,
       events: {
         beforeSubmit() {
-          Selection.updateSelection();
+          Selection.selectTextRange();
         },
         afterOpen() {
           Selection.updateSelectedRange();
@@ -257,18 +257,19 @@ const cmdsSchemas = {
       return {
         button: document.createElement('div'),
         input: document.createElement('input'),
+        reader: new FileReader(), // eslint-disable-line
         icon:
           `<svg class="icon" viewBox="0 0 24 24">
               <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>
             </svg>`
       }
     },
-    create() {
-      this.$data = this.data;
-      this.data = this.$data();
-      const button = this.data.button;
-      const input = this.data.input;
-      const icon = this.data.icon;
+    create(Styler) {
+      this.$styler = Styler;
+      this.$data = this.data();
+      const button = this.$data.button;
+      const input = this.$data.input;
+      const icon = this.$data.icon;
 
       button.classList.add('styler-button');
       button.appendChild(input);
@@ -281,22 +282,18 @@ const cmdsSchemas = {
       return button;
     },
     action() {
-      const file = this.data.input.files[0];
-      if (!file) return;
-      if (!window.getSelection().rangeCount) return;
+      const file = this.$data.input.files[0];
+      if (!file || !window.getSelection().rangeCount) return;
       const img = document.createElement('img');
+      img.classList.add('align-image');
 
-      const reader = new FileReader(); // eslint-disable-line
-      reader.addEventListener('load', () => {
-        img.src = reader.result;
-        img.classList.add('align-image');
+      this.$data.reader.addEventListener('load', () => {
+        img.src = this.$data.reader.result;
         img.dataset.alignFilename = file.name;
       });
-      reader.readAsDataURL(file);
-      Selection.selectedRange = window.getSelection().getRangeAt(0);
-      Selection.selectedRange.insertNode(img);
-      document.execCommand('enableObjectResizing', false, true);
-      this.data.input.value = null;
+      this.$data.reader.readAsDataURL(file);
+      Selection.textRange.insertNode(img);
+      this.$data.input.value = null;
     }
   }
 }

@@ -94,14 +94,13 @@ class Align {
       this.highlight();
     });
 
-    window.addEventListener('mouseup', this.updateStylers.bind(this));
+    this.el.addEventListener('mouseup', this.updateStylers.bind(this));
 
-    window.addEventListener('keydown', (event) => {
+    document.addEventListener('keydown', (event) => {
       // Do nothing if the event was already processed
       if (event.defaultPrevented) {
         return;
       }
-      this.updateStylers();
 
       if (event[this.cmdKey] && this.settings.shortcuts) {
         switch (event.key.toUpperCase()) {
@@ -156,6 +155,14 @@ class Align {
             this.execute('outdent', false, true); break;
           }
           this.execute('indent', false, true); break;
+        case 'ArrowDown':
+        case 'ArrowUp':
+        case 'ArrowLeft':
+        case 'ArrowRight':
+        case 'Enter':
+        case 'Escape':
+          this.updateStylers();
+          break;
         default:
           break;
       }
@@ -201,10 +208,10 @@ class Align {
     Selection.updateSelectedRange();
     setTimeout(() => {
       if (this.settings.toolbar) {
-        this.toolbar.updateStylerStates();
+        this.toolbar.updateStyler();
       }
       if (this.settings.bubble) {
-        this.bubble.updateStylerStates();
+        this.bubble.updateStyler();
       }
     }, 16);
   }

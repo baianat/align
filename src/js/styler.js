@@ -11,7 +11,7 @@ class Styler {
     tooltip = false,
     theme = 'light'
   } = {}) {
-    this.align = align;
+    this.$align = align;
     this.settings = {
       mode,
       commands,
@@ -71,7 +71,7 @@ class Styler {
           break;
 
         case 'custom':
-          const markup = cmdSchema.create();
+          const markup = cmdSchema.create(this);
           li.appendChild(markup);
           break;
 
@@ -84,13 +84,13 @@ class Styler {
       }
 
       if (typeof cmdSchema.init === 'string') {
-        this.align[cmdSchema.init](cmdSchema, el);
+        this.$align[cmdSchema.init](cmdSchema, el);
         cmdSchema.init = null;
       }
 
       this.styler.appendChild(li);
     })
-    this.align.el.appendChild(this.styler);
+    this.$align.el.appendChild(this.styler);
     if (this.settings.mode === 'bubble') this.initBubble();
   }
 
@@ -99,7 +99,7 @@ class Styler {
       this.execute(cmdSchema.command, value, cmdSchema.useCSS);
     }
     if (typeof cmdSchema.func === 'string') {
-      this.align[cmdSchema.func](this, value);
+      this.$align[cmdSchema.func](this, value);
     }
     if (typeof cmdSchema.func === 'function') {
       cmdSchema.func(this, value);
@@ -117,14 +117,14 @@ class Styler {
    * @param {String|Number} value
    */
   execute(cmd, value, useCSS = false) {
-    this.align.execute(...arguments);
+    this.$align.execute(...arguments);
   }
 
   updateBubblePosition() {
-    if (!Selection.selectedRange) return;
+    if (!Selection.textRange) return;
     const marginRatio = 10;
-    const selectionRect = Selection.selectedRange.getBoundingClientRect();
-    const editorRect = this.align.el.getBoundingClientRect();
+    const selectionRect = Selection.textRange.getBoundingClientRect();
+    const editorRect = this.$align.el.getBoundingClientRect();
     const stylerRect = this.styler.getBoundingClientRect();
 
     const scrolled = window.scrollY;
@@ -152,11 +152,12 @@ class Styler {
     this.styler.classList.add('is-hidden');
   }
 
-  updateStylerStates() {
-    this.updateStylerCommands();
+  updateStyler() {
+    this.updateStylerCommandsStates();
     if (this.settings.mode !== 'bubble') return;
 
-    if (Selection.selectedRange.collapsed) {
+    console.log(Selection.range.collapsed)
+    if (Selection.textRange.collapsed || Selection.range.collapsed) {
       this.hideStyler();
       return;
     }
@@ -167,13 +168,13 @@ class Styler {
     if (!schema.tooltip || !this.settings.tooltip) {
       return false;
     }
-    return this.align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
+    return this.$align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
   }
 
   /**
    * Update the state of the active style
    */
-  updateStylerCommands() {
+  updateStylerCommandsStates() {
     Object.keys(this.cmds).forEach((cmd) => {
       const currentCmd = this.cmds[cmd];
       const command = currentCmd.schema.command;
@@ -191,7 +192,9 @@ class Styler {
         return;
       }
       if (init) {
-        init.selectColor(document.queryCommandValue(command), true);
+        if (Selection.range === Selection.textRange) {
+          init.selectColor(document.queryCommandValue(command), true);
+        }
         return;
       }
       if (document.queryCommandValue(command)) {

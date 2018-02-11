@@ -104,3 +104,11 @@ export function cloneObject(object) {
   });
   return output;
 }
+
+export function isElementClosest(element, wrapper) {
+  while (element !== document && element !== null) {
+    if (element === wrapper) return true;
+    element = element.parentNode;
+  }
+  return false;
+}
