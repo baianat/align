@@ -3,12 +3,14 @@ import { select, userOS } from './util';
 import cmdsSchemas from './cmdsSchemas';
 import icons from './icons';
 import Styler from './styler';
+import Creator from './creator';
 import Selection from './selection';
 
 class Align {
   constructor(selector, {
     toolbar = null,
     bubble = null,
+    creator = null,
     shortcuts = false,
     postTitle = false
   } = {}) {
@@ -17,6 +19,7 @@ class Align {
       defaultText: this.el.innerHTML,
       toolbar,
       bubble,
+      creator,
       shortcuts,
       postTitle
     };
@@ -57,6 +60,9 @@ class Align {
       this.settings.bubble.mode = 'bubble';
       this.settings.bubble.tooltip = false;
       this.bubble = new Styler(this, this.settings.bubble);
+    }
+    if (this.settings.creator) {
+      this.creator = new Creator(this, this.settings.creator);
     }
     this.initEditor();
     this.initEvents();
@@ -102,6 +108,7 @@ class Align {
         return;
       }
 
+      this.updateStylers();
       if (event[this.cmdKey] && this.settings.shortcuts) {
         switch (event.key.toUpperCase()) {
           case 'B':
@@ -155,14 +162,6 @@ class Align {
             this.execute('outdent', false, true); break;
           }
           this.execute('indent', false, true); break;
-        case 'ArrowDown':
-        case 'ArrowUp':
-        case 'ArrowLeft':
-        case 'ArrowRight':
-        case 'Enter':
-        case 'Escape':
-          this.updateStylers();
-          break;
         default:
           break;
       }
@@ -212,6 +211,9 @@ class Align {
       }
       if (this.settings.bubble) {
         this.bubble.updateStyler();
+      }
+      if (this.settings.creator) {
+        this.creator.updateVisibility();
       }
     }, 16);
   }

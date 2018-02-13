@@ -112,3 +112,7 @@ export function isElementClosest(element, wrapper) {
   }
   return false;
 }
+
+export function camelCase(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}

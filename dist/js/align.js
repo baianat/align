@@ -157,6 +157,56 @@ var createClass = function () {
   };
 }();
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
 /**
  * Utilities
  */
@@ -232,6 +282,18 @@ function cloneObject(object) {
     output[key] = (typeof tempValue === 'undefined' ? 'undefined' : _typeof(tempValue)) === 'object' ? cloneObject(tempValue) : tempValue;
   });
   return output;
+}
+
+function isElementClosest(element, wrapper) {
+  while (element !== document && element !== null) {
+    if (element === wrapper) return true;
+    element = element.parentNode;
+  }
+  return false;
+}
+
+function camelCase(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -1130,6 +1192,7 @@ var colorpicker = createCommonjsModule(function (module, exports) {
   });
 });
 
+var CURRENT_SELECTION = null;
 var TEXT_RANGE = null;
 var RANGE = null;
 
@@ -1156,20 +1219,28 @@ var Selection = function () {
     get: function get$$1() {
       return RANGE;
     }
+  }, {
+    key: "current",
+    set: function set$$1(selection) {
+      CURRENT_SELECTION = selection;
+    },
+    get: function get$$1() {
+      return CURRENT_SELECTION;
+    }
   }], [{
     key: "selectTextRange",
     value: function selectTextRange() {
       var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.textRange;
 
       if (!range) return;
-      var sel = window.getSelection();
+      var sel = Selection.current = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
     }
   }, {
     key: "updateSelectedRange",
     value: function updateSelectedRange() {
-      var sel = window.getSelection();
+      var sel = Selection.current = window.getSelection();
       if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
         Selection.textRange = sel.getRangeAt(0);
       }
@@ -1370,6 +1441,11 @@ var cmdsSchemas = {
     class: 'styler-separator'
   },
 
+  addClasses: {
+    element: 'buttons',
+    func: 'addClass'
+  },
+
   color: {
     element: 'input',
     type: 'text',
@@ -1525,7 +1601,18 @@ var icons = {
 
   undo: 'M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z',
 
-  redo: 'M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z'
+  redo: 'M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z',
+
+  plus: 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
+
+  figure: 'M3 4V1h2v3h3v2H5v3H3V6H0V4h3zm3 6V7h3V4h7l1.83 2H21c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V10h3zm7 9c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-3.2-5c0 1.77 1.43 3.2 3.2 3.2s3.2-1.43 3.2-3.2-1.43-3.2-3.2-3.2-3.2 1.43-3.2 3.2z',
+
+  figureFloat: 'M21 15h2v2h-2v-2zm0-4h2v2h-2v-2zm2 8h-2v2c1 0 2-1 2-2zM13 3h2v2h-2V3zm8 4h2v2h-2V7zm0-4v2h2c0-1-1-2-2-2zM1 7h2v2H1V7zm16-4h2v2h-2V3zm0 16h2v2h-2v-2zM3 3C2 3 1 4 1 5h2V3zm6 0h2v2H9V3zM5 3h2v2H5V3zm-4 8v8c0 1.1.9 2 2 2h12V11H1zm2 8l2.5-3.21 1.79 2.15 2.5-3.22L13 19H3z',
+
+  figureFull: 'M23 18V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zM8.5 12.5l2.5 3.01L14.5 11l4.5 6H5l3.5-4.5z',
+
+  figureNormal: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'
+
 };
 
 var NAMING_PREFIX = '';
@@ -1584,6 +1671,25 @@ function input(name, type) {
   return input;
 }
 
+/**
+ * Create input HTML element
+ * @param {String} name
+ * @param {String} type
+ */
+function fileButton(name, icon) {
+  var wrapper = document.createElement('div');
+  var input = document.createElement('input');
+
+  wrapper.classList.add(NAMING_PREFIX + 'button');
+  wrapper.id = name;
+  wrapper.appendChild(input);
+  wrapper.insertAdjacentHTML('afterbegin', '\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="' + icon + '"/>\n      </svg>\n    ');
+  input.classList.add(NAMING_PREFIX + 'input');
+  input.id = name;
+  input.type = 'file';
+  return { input: input, el: wrapper };
+}
+
 var Styler = function () {
   function Styler(align) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
@@ -1624,9 +1730,9 @@ var Styler = function () {
       this.styler.classList.add('styler', 'is-' + this.settings.mode, 'is-' + this.settings.theme);
       this.cmds = {};
 
-      this.settings.commands.forEach(function (el) {
+      this.settings.commands.forEach(function (command) {
         var li = document.createElement('li');
-        var cmd = typeof el === 'string' ? el : Object.keys(el)[0];
+        var cmd = typeof command === 'string' ? command : Object.keys(command)[0];
         var cmdSchema = _this.cmdsSchemas[cmd];
         if (!cmdSchema) {
           console.warn(cmd + ' is not found');
@@ -1645,7 +1751,7 @@ var Styler = function () {
             break;
 
           case 'select':
-            var selectWrapper = select$1(cmd, el[cmd]);
+            var selectWrapper = select$1(cmd, command[cmd]);
             var temp = currentCmd.el = selectWrapper.querySelector('select');
             temp.addEventListener('change', function () {
               return _this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value);
@@ -1679,7 +1785,7 @@ var Styler = function () {
         }
 
         if (typeof cmdSchema.init === 'string') {
-          _this.$align[cmdSchema.init](cmdSchema, el);
+          _this.$align[cmdSchema.init](cmdSchema, command);
           cmdSchema.init = null;
         }
 
@@ -1726,18 +1832,23 @@ var Styler = function () {
     value: function updateBubblePosition() {
       if (!Selection.textRange) return;
       var marginRatio = 10;
+      var threshold = 70;
       var selectionRect = Selection.textRange.getBoundingClientRect();
       var editorRect = this.$align.el.getBoundingClientRect();
       var stylerRect = this.styler.getBoundingClientRect();
 
-      var scrolled = window.scrollY;
-      var deltaY = selectionRect.top + scrolled - stylerRect.height - marginRatio;
+      var deltaY = selectionRect.top - stylerRect.height - marginRatio;
       var deltaX = selectionRect.left + (selectionRect.width - stylerRect.width) / 2;
       var startBoundary = editorRect.left;
       var endBoundary = editorRect.left + editorRect.width - stylerRect.width;
       var xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
-      var yPosition = deltaY < scrolled + 50 ? selectionRect.top + selectionRect.height + marginRatio : selectionRect.top - stylerRect.height - marginRatio;
+      var yPosition = deltaY < threshold ? selectionRect.top + selectionRect.height + marginRatio : deltaY;
 
+      if (yPosition < threshold) {
+        this.styler.style.opacity = 0;
+        return;
+      }
+      this.styler.style.opacity = 1;
       this.styler.style.top = yPosition + 'px';
       this.styler.style.left = xPosition + 'px';
     }
@@ -1746,7 +1857,9 @@ var Styler = function () {
     value: function showStyler() {
       this.styler.classList.add('is-visible');
       this.styler.classList.remove('is-hidden');
-      this.updateBubblePosition();
+      if (this.settings.mode === 'bubble') {
+        this.updateBubblePosition();
+      }
     }
   }, {
     key: 'hideStyler',
@@ -1760,7 +1873,6 @@ var Styler = function () {
       this.updateStylerCommandsStates();
       if (this.settings.mode !== 'bubble') return;
 
-      console.log(Selection.range.collapsed);
       if (Selection.textRange.collapsed || Selection.range.collapsed) {
         this.hideStyler();
         return;
@@ -1817,6 +1929,179 @@ var Styler = function () {
   return Styler;
 }();
 
+var Creator = function () {
+  function Creator(align) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$mode = _ref.mode,
+        mode = _ref$mode === undefined ? 'default' : _ref$mode,
+        _ref$items = _ref.items,
+        items = _ref$items === undefined ? ['figure'] : _ref$items;
+
+    classCallCheck(this, Creator);
+
+    this.$align = align;
+    this.settings = {
+      mode: mode,
+      items: items
+    };
+    this._init();
+  }
+
+  createClass(Creator, [{
+    key: '_init',
+    value: function _init() {
+      var _this = this;
+
+      setElementsPrefix('creator-');
+      this.creator = document.createElement('div');
+      this.creator.classList.add('creator', 'is-hidden');
+      this.menu = document.createElement('ul');
+      this.menu.classList.add('creator-menu');
+      this.toggleButton = button('toggle', icons['plus']);
+      this.toggleButton.addEventListener('click', this.toggleState.bind(this));
+
+      this.settings.items.forEach(function (item) {
+        var menuItem = document.createElement('li');
+        var button$$1 = fileButton('figure', icons['figure']);
+        button$$1.input.addEventListener('change', _this['create' + camelCase(item)].bind(_this));
+        menuItem.appendChild(button$$1.el);
+        _this.menu.appendChild(menuItem);
+        _this._initOptionsBar();
+      });
+
+      this.creator.appendChild(this.toggleButton);
+      this.creator.appendChild(this.menu);
+      this.$align.el.appendChild(this.creator);
+    }
+  }, {
+    key: '_initOptionsBar',
+    value: function _initOptionsBar() {
+      var _this2 = this;
+
+      this.optionsBar = document.createElement('ul');
+      this.optionsBar.classList.add('creator-optionsBar', 'is-hidden');
+
+      var options = ['normal', 'full', 'float'];
+      options.forEach(function (option) {
+        var menuItem = document.createElement('li');
+        var currentButton = button(option, icons['figure' + camelCase(option)]);
+        currentButton.addEventListener('click', function () {
+          return _this2.toggleClass('is-' + option, options);
+        });
+        menuItem.appendChild(currentButton);
+        _this2.optionsBar.appendChild(menuItem);
+      });
+
+      this.$align.el.appendChild(this.optionsBar);
+    }
+  }, {
+    key: 'showOptionsBar',
+    value: function showOptionsBar(item) {
+      var _this3 = this;
+
+      this.currentItem = item;
+      this.currentItem.classList.add('is-active');
+      this.optionsBar.classList.add('is-visible');
+      this.optionsBar.classList.remove('is-hidden');
+      this.updatePosition(item, this.optionsBar, 'top');
+      this.optionsBarScroll = function () {
+        debounce(_this3.updatePosition(item, _this3.optionsBar, 'top'));
+      };
+      this.optionsBarHide = this.hideOptionsBar.bind(this);
+      window.addEventListener('scroll', this.optionsBarScroll);
+      document.addEventListener('click', this.optionsBarHide);
+    }
+  }, {
+    key: 'hideOptionsBar',
+    value: function hideOptionsBar(event, item) {
+      if (!isElementClosest(event.target, this.currentItem) && !isElementClosest(event.target, this.optionsBar)) {
+        this.currentItem.classList.remove('is-active');
+        this.currentItem = null;
+        this.optionsBar.classList.remove('is-visible');
+        this.optionsBar.classList.add('is-hidden');
+        window.removeEventListener('scroll', this.optionsBarScroll);
+        document.removeEventListener('click', this.optionsBarHide);
+      }
+    }
+  }, {
+    key: 'updateVisibility',
+    value: function updateVisibility() {
+      var _this4 = this;
+
+      if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1) {
+        this.creatorCallback = function () {
+          debounce(_this4.updatePosition(Selection.current.anchorNode, _this4.creator));
+        };
+        this.creator.classList.add('is-visible');
+        this.creator.classList.remove('is-hidden');
+        this.updatePosition(Selection.current.anchorNode, this.creator);
+        window.addEventListener('scroll', this.creatorCallback);
+        return;
+      }
+      this.creator.classList.remove('is-visible');
+      this.creator.classList.remove('is-active');
+      this.creator.classList.add('is-hidden');
+      window.removeEventListener('scroll', this.creatorCallback);
+    }
+  }, {
+    key: 'updatePosition',
+    value: function updatePosition(reference, element) {
+      var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'center';
+
+      var rect = reference.getBoundingClientRect();
+      element.style.top = mode === 'center' ? rect.top + rect.height / 2 + 'px' : rect.top - 40 + 'px';
+    }
+  }, {
+    key: 'toggleState',
+    value: function toggleState() {
+      this.creator.classList.toggle('is-active');
+    }
+  }, {
+    key: 'toggleClass',
+    value: function toggleClass(className, otherClasses) {
+      var _currentItem$classLis;
+
+      console.log(this.currentItem);
+      if (!this.currentItem) return;
+      var prefixedClasses = otherClasses.map(function (cls) {
+        return 'is-' + cls;
+      });
+      (_currentItem$classLis = this.currentItem.classList).remove.apply(_currentItem$classLis, toConsumableArray(prefixedClasses));
+      this.currentItem.classList.add(className);
+    }
+  }, {
+    key: 'createFigure',
+    value: function createFigure(event) {
+      var _this5 = this;
+
+      var input$$1 = event.target;
+      var file = input$$1.files[0];
+      if (!file || !Selection.range) return;
+      var reader = new FileReader();
+      var figure = document.createElement('figure');
+      var caption = document.createElement('figcaption');
+      var img = document.createElement('img');
+      img.classList.add('align-image');
+      caption.innerText = 'Caption here';
+      figure.classList.add('align-figure', 'is-normal');
+      figure.appendChild(img);
+      figure.appendChild(caption);
+      reader.addEventListener('load', function () {
+        img.src = reader.result;
+        img.dataset.alignFilename = file.name;
+      });
+      reader.readAsDataURL(file);
+      figure.addEventListener('click', function () {
+        return _this5.showOptionsBar(figure);
+      });
+      var selectedElement = Selection.current.anchorNode;
+      selectedElement.parentNode.insertBefore(figure, selectedElement);
+      input$$1.value = null;
+    }
+  }]);
+  return Creator;
+}();
+
 var Align = function () {
   function Align(selector) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
@@ -1824,6 +2109,8 @@ var Align = function () {
         toolbar = _ref$toolbar === undefined ? null : _ref$toolbar,
         _ref$bubble = _ref.bubble,
         bubble = _ref$bubble === undefined ? null : _ref$bubble,
+        _ref$creator = _ref.creator,
+        creator = _ref$creator === undefined ? null : _ref$creator,
         _ref$shortcuts = _ref.shortcuts,
         shortcuts = _ref$shortcuts === undefined ? false : _ref$shortcuts,
         _ref$postTitle = _ref.postTitle,
@@ -1836,6 +2123,7 @@ var Align = function () {
       defaultText: this.el.innerHTML,
       toolbar: toolbar,
       bubble: bubble,
+      creator: creator,
       shortcuts: shortcuts,
       postTitle: postTitle
     };
@@ -1864,6 +2152,9 @@ var Align = function () {
         this.settings.bubble.mode = 'bubble';
         this.settings.bubble.tooltip = false;
         this.bubble = new Styler(this, this.settings.bubble);
+      }
+      if (this.settings.creator) {
+        this.creator = new Creator(this, this.settings.creator);
       }
       this.initEditor();
       this.initEvents();
@@ -1917,6 +2208,7 @@ var Align = function () {
           return;
         }
 
+        _this.updateStylers();
         if (event[_this.cmdKey] && _this.settings.shortcuts) {
           switch (event.key.toUpperCase()) {
             case 'B':
@@ -1970,14 +2262,6 @@ var Align = function () {
               _this.execute('outdent', false, true);break;
             }
             _this.execute('indent', false, true);break;
-          case 'ArrowDown':
-          case 'ArrowUp':
-          case 'ArrowLeft':
-          case 'ArrowRight':
-          case 'Enter':
-          case 'Escape':
-            _this.updateStylers();
-            break;
           default:
             break;
         }
@@ -2036,6 +2320,9 @@ var Align = function () {
         }
         if (_this2.settings.bubble) {
           _this2.bubble.updateStyler();
+        }
+        if (_this2.settings.creator) {
+          _this2.creator.updateVisibility();
         }
       }, 16);
     }

@@ -31,9 +31,9 @@ class Styler {
     this.styler.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
     this.cmds = {};
 
-    this.settings.commands.forEach((el) => {
+    this.settings.commands.forEach((command) => {
       const li = document.createElement('li');
-      const cmd = typeof el === 'string' ? el : Object.keys(el)[0];
+      const cmd = typeof command === 'string' ? command : Object.keys(command)[0];
       const cmdSchema = this.cmdsSchemas[cmd];
       if (!cmdSchema) {
         console.warn(cmd + ' is not found');
@@ -50,7 +50,7 @@ class Styler {
           break;
 
         case 'select':
-          const selectWrapper = select(cmd, el[cmd]);
+          const selectWrapper = select(cmd, command[cmd]);
           const temp = currentCmd.el = selectWrapper.querySelector('select');
           temp.addEventListener('change',
             () => this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value)
@@ -84,7 +84,7 @@ class Styler {
       }
 
       if (typeof cmdSchema.init === 'string') {
-        this.$align[cmdSchema.init](cmdSchema, el);
+        this.$align[cmdSchema.init](cmdSchema, command);
         cmdSchema.init = null;
       }
 
@@ -123,20 +123,24 @@ class Styler {
   updateBubblePosition() {
     if (!Selection.textRange) return;
     const marginRatio = 10;
+    const threshold = 70;
     const selectionRect = Selection.textRange.getBoundingClientRect();
     const editorRect = this.$align.el.getBoundingClientRect();
     const stylerRect = this.styler.getBoundingClientRect();
 
-    const scrolled = window.scrollY;
-    const deltaY = selectionRect.top + scrolled - stylerRect.height - marginRatio;
+    const deltaY = selectionRect.top - stylerRect.height - marginRatio;
     const deltaX = selectionRect.left + ((selectionRect.width - stylerRect.width) / 2);
     const startBoundary = editorRect.left;
     const endBoundary = editorRect.left + editorRect.width - stylerRect.width;
     const xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
-    const yPosition = deltaY < scrolled + 50
-      ? selectionRect.top + selectionRect.height + marginRatio
-      : selectionRect.top - stylerRect.height - marginRatio;
+    const yPosition = deltaY < threshold
+      ? selectionRect.top + selectionRect.height + marginRatio : deltaY;
 
+    if (yPosition < threshold) {
+      this.styler.style.opacity = 0;
+      return;
+    }
+    this.styler.style.opacity = 1;
     this.styler.style.top = `${yPosition}px`;
     this.styler.style.left = `${xPosition}px`;
   }
@@ -144,7 +148,9 @@ class Styler {
   showStyler() {
     this.styler.classList.add('is-visible');
     this.styler.classList.remove('is-hidden');
-    this.updateBubblePosition();
+    if (this.settings.mode === 'bubble') {
+      this.updateBubblePosition();
+    }
   }
 
   hideStyler() {
@@ -156,7 +162,6 @@ class Styler {
     this.updateStylerCommandsStates();
     if (this.settings.mode !== 'bubble') return;
 
-    console.log(Selection.range.collapsed)
     if (Selection.textRange.collapsed || Selection.range.collapsed) {
       this.hideStyler();
       return;

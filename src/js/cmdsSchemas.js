@@ -191,6 +191,11 @@ const cmdsSchemas = {
     class: 'styler-separator'
   },
 
+  addClasses: {
+    element: 'buttons',
+    func: 'addClass'
+  },
+
   color: {
     element: 'input',
     type: 'text',
