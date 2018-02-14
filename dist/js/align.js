@@ -244,8 +244,8 @@ function debounce(callback) {
     if (callNow) callback.apply(undefined, arguments);
   };
 }
-/* eslint-enable */
 
+/* eslint-enable */
 
 
 
@@ -294,6 +294,14 @@ function isElementClosest(element, wrapper) {
 
 function camelCase(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function updatePosition(reference, element) {
+  var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'center';
+
+  if (typeof reference.getBoundingClientRect !== 'function') return;
+  var rect = reference.getBoundingClientRect();
+  element.style.top = mode === 'center' ? rect.top + rect.height / 2 + 'px' : rect.top - 40 + 'px';
 }
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -1692,6 +1700,209 @@ function fileButton(name, icon) {
   return { input: input, el: wrapper };
 }
 
+var optionsBar$1 = function () {
+  function optionsBar(align) {
+    classCallCheck(this, optionsBar);
+
+    this.$align = align;
+    this._init();
+  }
+
+  createClass(optionsBar, [{
+    key: '_init',
+    value: function _init() {
+      var _this = this;
+
+      setElementsPrefix('creator-');
+      this.el = document.createElement('ul');
+      this.el.classList.add('creator-optionsBar', 'is-hidden');
+
+      var options = ['normal', 'full', 'float'];
+      options.forEach(function (option) {
+        var menuItem = document.createElement('li');
+        var currentButton = button(option, icons['figure' + camelCase(option)]);
+        currentButton.addEventListener('click', function () {
+          return _this.toggleClass('is-' + option, options);
+        });
+        menuItem.appendChild(currentButton);
+        _this.el.appendChild(menuItem);
+      });
+
+      var menuItem = document.createElement('li');
+      var currentButton = button('delete', icons['delete']);
+      currentButton.addEventListener('click', this.removeCurrentItem.bind(this));
+      menuItem.appendChild(currentButton);
+      this.el.appendChild(menuItem);
+
+      this.$align.el.appendChild(this.el);
+    }
+  }, {
+    key: 'active',
+    value: function active(item) {
+      var _this2 = this;
+
+      if (this.el.classList.contains('is-visible')) return;
+
+      this.currentItem = item;
+      this.currentItem.classList.add('is-active');
+      this.el.classList.add('is-visible');
+      this.el.classList.remove('is-hidden');
+      updatePosition(this.currentItem, this.el, 'top');
+      this.scrollCallback = function () {
+        debounce(updatePosition(_this2.currentItem, _this2.el, 'top'));
+      };
+      this.clickCallback = this.deactivate.bind(this);
+      window.addEventListener('scroll', this.scrollCallback);
+      document.addEventListener('click', this.clickCallback);
+    }
+  }, {
+    key: 'deactivate',
+    value: function deactivate(event) {
+      if (event && (isElementClosest(event.target, this.currentItem) || isElementClosest(event.target, this.el))) return;
+
+      this.currentItem.classList.remove('is-active');
+      this.currentItem = null;
+      this.el.classList.remove('is-visible');
+      this.el.classList.add('is-hidden');
+      window.removeEventListener('scroll', this.elScroll);
+      document.removeEventListener('click', this.clickCallback);
+    }
+  }, {
+    key: 'toggleClass',
+    value: function toggleClass(className, otherClasses) {
+      var _currentItem$classLis;
+
+      if (!this.currentItem) return;
+      var prefixedClasses = otherClasses.map(function (cls) {
+        return 'is-' + cls;
+      });
+      (_currentItem$classLis = this.currentItem.classList).remove.apply(_currentItem$classLis, toConsumableArray(prefixedClasses));
+      this.currentItem.classList.add(className);
+      this.$align.update();
+    }
+  }, {
+    key: 'removeCurrentItem',
+    value: function removeCurrentItem() {
+      this.currentItem.remove();
+      this.deactivate();
+    }
+  }]);
+  return optionsBar;
+}();
+
+var Creator = function () {
+  function Creator(align) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$mode = _ref.mode,
+        mode = _ref$mode === undefined ? 'default' : _ref$mode,
+        _ref$items = _ref.items,
+        items = _ref$items === undefined ? ['figure'] : _ref$items;
+
+    classCallCheck(this, Creator);
+
+    this.$align = align;
+    this.settings = {
+      mode: mode,
+      items: items
+    };
+    this._init();
+  }
+
+  createClass(Creator, [{
+    key: '_init',
+    value: function _init() {
+      var _this = this;
+
+      setElementsPrefix('creator-');
+      this.creator = document.createElement('div');
+      this.creator.classList.add('creator', 'is-hidden');
+      this.menu = document.createElement('ul');
+      this.menu.classList.add('creator-menu');
+      this.toggleButton = button('toggle', icons['plus']);
+      this.toggleButton.addEventListener('click', this.toggleState.bind(this));
+
+      this.settings.items.forEach(function (item) {
+        var menuItem = document.createElement('li');
+        var button$$1 = fileButton('figure', icons['figure']);
+        button$$1.input.addEventListener('change', _this['create' + camelCase(item)].bind(_this));
+        menuItem.appendChild(button$$1.el);
+        _this.menu.appendChild(menuItem);
+        _this.optionsBar = new optionsBar$1(_this.$align);
+      });
+
+      this.creator.appendChild(this.toggleButton);
+      this.creator.appendChild(this.menu);
+      this.$align.el.appendChild(this.creator);
+    }
+  }, {
+    key: 'update',
+    value: function update() {
+      if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1) {
+        updatePosition(Selection.current.anchorNode, this.creator);
+        this.show();
+        return;
+      }
+      this.hide();
+    }
+  }, {
+    key: 'toggleState',
+    value: function toggleState() {
+      this.creator.classList.toggle('is-active');
+    }
+  }, {
+    key: 'show',
+    value: function show() {
+      var _this2 = this;
+
+      if (this.creator.classList.contains('is-visible')) return;
+      this.creatorCallback = function () {
+        debounce(updatePosition(Selection.current.anchorNode, _this2.creator));
+      };
+      this.creator.classList.add('is-visible');
+      this.creator.classList.remove('is-hidden');
+      window.addEventListener('scroll', this.creatorCallback);
+    }
+  }, {
+    key: 'hide',
+    value: function hide() {
+      this.creator.classList.remove('is-visible');
+      this.creator.classList.remove('is-active');
+      this.creator.classList.add('is-hidden');
+      window.removeEventListener('scroll', this.creatorCallback);
+    }
+  }, {
+    key: 'createFigure',
+    value: function createFigure(event) {
+      var _this3 = this;
+
+      var input$$1 = event.target;
+      var file = input$$1.files[0];
+      if (!file || !Selection.range) return;
+      var reader = new FileReader(); // eslint-disable-line
+      var figure = document.createElement('figure');
+      var caption = document.createElement('figcaption');
+      var img = document.createElement('img');
+      var selectedElement = Selection.current.anchorNode;
+      img.classList.add('align-image');
+      caption.innerText = 'Caption here';
+      figure.classList.add('align-figure', 'is-normal');
+      figure.appendChild(img);
+      figure.appendChild(caption);
+      figure.addEventListener('click', function () {
+        return _this3.optionsBar.active(figure);
+      });
+      reader.addEventListener('load', function () {
+        img.src = reader.result;
+        img.dataset.alignFilename = file.name;
+      });
+      selectedElement.parentNode.insertBefore(figure, selectedElement);
+      reader.readAsDataURL(file);
+      input$$1.value = null;
+    }
+  }]);
+  return Creator;
+}();
+
 var Styler = function () {
   function Styler(align) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
@@ -1931,195 +2142,6 @@ var Styler = function () {
   return Styler;
 }();
 
-var Creator = function () {
-  function Creator(align) {
-    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref$mode = _ref.mode,
-        mode = _ref$mode === undefined ? 'default' : _ref$mode,
-        _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure'] : _ref$items;
-
-    classCallCheck(this, Creator);
-
-    this.$align = align;
-    this.settings = {
-      mode: mode,
-      items: items
-    };
-    this._init();
-  }
-
-  createClass(Creator, [{
-    key: '_init',
-    value: function _init() {
-      var _this = this;
-
-      setElementsPrefix('creator-');
-      this.creator = document.createElement('div');
-      this.creator.classList.add('creator', 'is-hidden');
-      this.menu = document.createElement('ul');
-      this.menu.classList.add('creator-menu');
-      this.toggleButton = button('toggle', icons['plus']);
-      this.toggleButton.addEventListener('click', this.toggleState.bind(this));
-
-      this.settings.items.forEach(function (item) {
-        var menuItem = document.createElement('li');
-        var button$$1 = fileButton('figure', icons['figure']);
-        button$$1.input.addEventListener('change', _this['create' + camelCase(item)].bind(_this));
-        menuItem.appendChild(button$$1.el);
-        _this.menu.appendChild(menuItem);
-        _this._initOptionsBar();
-      });
-
-      this.creator.appendChild(this.toggleButton);
-      this.creator.appendChild(this.menu);
-      this.$align.el.appendChild(this.creator);
-    }
-  }, {
-    key: '_initOptionsBar',
-    value: function _initOptionsBar() {
-      var _this2 = this;
-
-      this.optionsBar = document.createElement('ul');
-      this.optionsBar.classList.add('creator-optionsBar', 'is-hidden');
-
-      var options = ['normal', 'full', 'float'];
-      options.forEach(function (option) {
-        var menuItem = document.createElement('li');
-        var currentButton = button(option, icons['figure' + camelCase(option)]);
-        currentButton.addEventListener('click', function () {
-          return _this2.toggleClass('is-' + option, options);
-        });
-        menuItem.appendChild(currentButton);
-        _this2.optionsBar.appendChild(menuItem);
-      });
-
-      var menuItem = document.createElement('li');
-      var currentButton = button('delete', icons['delete']);
-      currentButton.addEventListener('click', function () {
-        _this2.currentItem.remove();
-        _this2.hideOptionsBar();
-      });
-      menuItem.appendChild(currentButton);
-      this.optionsBar.appendChild(menuItem);
-
-      this.$align.el.appendChild(this.optionsBar);
-    }
-  }, {
-    key: 'showOptionsBar',
-    value: function showOptionsBar(item) {
-      var _this3 = this;
-
-      if (this.optionsBar.classList.contains('is-visible')) return;
-
-      this.currentItem = item;
-      this.currentItem.classList.add('is-active');
-      this.optionsBar.classList.add('is-visible');
-      this.optionsBar.classList.remove('is-hidden');
-      this.updatePosition(this.currentItem, this.optionsBar, 'top');
-      this.optionsBarScroll = function () {
-        _this3.updatePosition(_this3.currentItem, _this3.optionsBar, 'top');
-      };
-      this.optionsBarHide = this.hideOptionsBar.bind(this);
-      window.addEventListener('scroll', this.optionsBarScroll);
-      document.addEventListener('click', this.optionsBarHide);
-    }
-  }, {
-    key: 'hideOptionsBar',
-    value: function hideOptionsBar(event) {
-      if (event && (isElementClosest(event.target, this.currentItem) || isElementClosest(event.target, this.optionsBar))) return;
-
-      this.currentItem.classList.remove('is-active');
-      this.currentItem = null;
-      this.optionsBar.classList.remove('is-visible');
-      this.optionsBar.classList.add('is-hidden');
-      window.removeEventListener('scroll', this.optionsBarScroll);
-      document.removeEventListener('click', this.optionsBarHide);
-    }
-  }, {
-    key: 'updateVisibility',
-    value: function updateVisibility() {
-      var _this4 = this;
-
-      if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1) {
-        if (this.creator.classList.contains('is-visible')) return;
-        this.creatorCallback = function () {
-          _this4.updatePosition(Selection.current.anchorNode, _this4.creator);
-        };
-        this.creator.classList.add('is-visible');
-        this.creator.classList.remove('is-hidden');
-        this.updatePosition(Selection.current.anchorNode, this.creator);
-        window.addEventListener('scroll', this.creatorCallback);
-        return;
-      }
-      this.creator.classList.remove('is-visible');
-      this.creator.classList.remove('is-active');
-      this.creator.classList.add('is-hidden');
-      window.removeEventListener('scroll', this.creatorCallback);
-    }
-  }, {
-    key: 'updatePosition',
-    value: function updatePosition(reference, element) {
-      var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'center';
-
-      console.log(reference, element);
-      debounce(function () {
-        if (typeof reference.getBoundingClientRect !== 'function') return;
-        var rect = reference.getBoundingClientRect();
-        element.style.top = mode === 'center' ? rect.top + rect.height / 2 + 'px' : rect.top - 40 + 'px';
-      }());
-    }
-  }, {
-    key: 'toggleState',
-    value: function toggleState() {
-      this.creator.classList.toggle('is-active');
-    }
-  }, {
-    key: 'toggleClass',
-    value: function toggleClass(className, otherClasses) {
-      var _currentItem$classLis;
-
-      console.log(this.currentItem);
-      if (!this.currentItem) return;
-      var prefixedClasses = otherClasses.map(function (cls) {
-        return 'is-' + cls;
-      });
-      (_currentItem$classLis = this.currentItem.classList).remove.apply(_currentItem$classLis, toConsumableArray(prefixedClasses));
-      this.currentItem.classList.add(className);
-    }
-  }, {
-    key: 'createFigure',
-    value: function createFigure(event) {
-      var _this5 = this;
-
-      var input$$1 = event.target;
-      var file = input$$1.files[0];
-      if (!file || !Selection.range) return;
-      var reader = new FileReader(); // eslint-disable-line
-      var figure = document.createElement('figure');
-      var caption = document.createElement('figcaption');
-      var img = document.createElement('img');
-      var selectedElement = Selection.current.anchorNode;
-      img.classList.add('align-image');
-      caption.innerText = 'Caption here';
-      figure.classList.add('align-figure', 'is-normal');
-      figure.appendChild(img);
-      figure.appendChild(caption);
-      figure.addEventListener('click', function () {
-        return _this5.showOptionsBar(figure);
-      });
-      reader.addEventListener('load', function () {
-        img.src = reader.result;
-        img.dataset.alignFilename = file.name;
-      });
-      selectedElement.parentNode.insertBefore(figure, selectedElement);
-      reader.readAsDataURL(file);
-      input$$1.value = null;
-    }
-  }]);
-  return Creator;
-}();
-
 var Align = function () {
   function Align(selector) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
@@ -2218,7 +2240,7 @@ var Align = function () {
         _this.highlight();
       });
 
-      this.el.addEventListener('mouseup', this.updateStylers.bind(this));
+      document.addEventListener('mouseup', this.update.bind(this), true);
 
       document.addEventListener('keydown', function (event) {
         // Do nothing if the event was already processed
@@ -2226,7 +2248,7 @@ var Align = function () {
           return;
         }
 
-        _this.updateStylers();
+        _this.update();
         if (event[_this.cmdKey] && _this.settings.shortcuts) {
           switch (event.key.toUpperCase()) {
             case 'B':
@@ -2327,11 +2349,12 @@ var Align = function () {
       this.editor.focus();
     }
   }, {
-    key: 'updateStylers',
-    value: function updateStylers() {
+    key: 'update',
+    value: function update() {
       var _this2 = this;
 
       Selection.updateSelectedRange();
+      console.log('sss');
       setTimeout(function () {
         if (_this2.settings.toolbar) {
           _this2.toolbar.updateStyler();
@@ -2340,7 +2363,7 @@ var Align = function () {
           _this2.bubble.updateStyler();
         }
         if (_this2.settings.creator) {
-          _this2.creator.updateVisibility();
+          _this2.creator.update();
         }
       }, 16);
     }
@@ -2359,7 +2382,7 @@ var Align = function () {
       document.execCommand(cmd, false, value);
       document.execCommand('styleWithCSS', false, false);
       this.el.focus();
-      this.updateStylers();
+      this.update();
     }
   }, {
     key: 'content',

@@ -48,8 +48,8 @@ export function debounce(callback, immediate = false) {
     if (callNow) callback(...arguments);
   };
 }
-/* eslint-enable */
 
+/* eslint-enable */
 export function throttle(callback, limit) {
   let wait = false;
   return () => {
@@ -115,4 +115,12 @@ export function isElementClosest(element, wrapper) {
 
 export function camelCase(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export function updatePosition(reference, element, mode = 'center') {
+  if (typeof reference.getBoundingClientRect !== 'function') return;
+  const rect = reference.getBoundingClientRect();
+  element.style.top = mode === 'center'
+    ? `${rect.top + (rect.height / 2)}px`
+    : `${rect.top - 40}px`;
 }

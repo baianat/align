@@ -1,7 +1,7 @@
-import { normalizeNumber, debounce, cloneObject } from './util';
-import { setElementsPrefix, button, select, input } from './elements';
-import cmdsSchemas from './cmdsSchemas';
-import icons from './icons';
+import { normalizeNumber, debounce, cloneObject } from './partial/util';
+import { setElementsPrefix, button, select, input } from './partial/elements';
+import cmdsSchemas from './partial/cmdsSchemas';
+import icons from './partial/icons';
 import Selection from './selection';
 
 class Styler {

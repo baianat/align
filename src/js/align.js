@@ -1,10 +1,10 @@
 import hljs from 'highlight.js';
-import { select, userOS } from './util';
-import cmdsSchemas from './cmdsSchemas';
-import icons from './icons';
-import Styler from './styler';
-import Creator from './creator';
+import { select, userOS } from './partial/util';
+import cmdsSchemas from './partial/cmdsSchemas';
+import icons from './partial/icons';
 import Selection from './selection';
+import Creator from './creator';
+import Styler from './styler';
 
 class Align {
   constructor(selector, {
@@ -100,7 +100,7 @@ class Align {
       this.highlight();
     });
 
-    this.el.addEventListener('mouseup', this.updateStylers.bind(this));
+    document.addEventListener('mouseup', this.update.bind(this), true);
 
     document.addEventListener('keydown', (event) => {
       // Do nothing if the event was already processed
@@ -108,7 +108,7 @@ class Align {
         return;
       }
 
-      this.updateStylers();
+      this.update();
       if (event[this.cmdKey] && this.settings.shortcuts) {
         switch (event.key.toUpperCase()) {
           case 'B':
@@ -203,8 +203,9 @@ class Align {
     this.editor.focus();
   }
 
-  updateStylers() {
+  update() {
     Selection.updateSelectedRange();
+    console.log('sss');
     setTimeout(() => {
       if (this.settings.toolbar) {
         this.toolbar.updateStyler();
@@ -213,7 +214,7 @@ class Align {
         this.bubble.updateStyler();
       }
       if (this.settings.creator) {
-        this.creator.updateVisibility();
+        this.creator.update();
       }
     }, 16);
   }
@@ -228,7 +229,7 @@ class Align {
     document.execCommand(cmd, false, value);
     document.execCommand('styleWithCSS', false, false);
     this.el.focus();
-    this.updateStylers();
+    this.update();
   }
 }
 
