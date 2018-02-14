@@ -1611,7 +1611,9 @@ var icons = {
 
   figureFull: 'M23 18V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zM8.5 12.5l2.5 3.01L14.5 11l4.5 6H5l3.5-4.5z',
 
-  figureNormal: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'
+  figureNormal: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
+
+  delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z'
 
 };
 
@@ -1992,6 +1994,15 @@ var Creator = function () {
         _this2.optionsBar.appendChild(menuItem);
       });
 
+      var menuItem = document.createElement('li');
+      var currentButton = button('delete', icons['delete']);
+      currentButton.addEventListener('click', function () {
+        _this2.currentItem.remove();
+        _this2.hideOptionsBar();
+      });
+      menuItem.appendChild(currentButton);
+      this.optionsBar.appendChild(menuItem);
+
       this.$align.el.appendChild(this.optionsBar);
     }
   }, {
@@ -1999,13 +2010,15 @@ var Creator = function () {
     value: function showOptionsBar(item) {
       var _this3 = this;
 
+      if (this.optionsBar.classList.contains('is-visible')) return;
+
       this.currentItem = item;
       this.currentItem.classList.add('is-active');
       this.optionsBar.classList.add('is-visible');
       this.optionsBar.classList.remove('is-hidden');
-      this.updatePosition(item, this.optionsBar, 'top');
+      this.updatePosition(this.currentItem, this.optionsBar, 'top');
       this.optionsBarScroll = function () {
-        debounce(_this3.updatePosition(item, _this3.optionsBar, 'top'));
+        _this3.updatePosition(_this3.currentItem, _this3.optionsBar, 'top');
       };
       this.optionsBarHide = this.hideOptionsBar.bind(this);
       window.addEventListener('scroll', this.optionsBarScroll);
@@ -2013,15 +2026,15 @@ var Creator = function () {
     }
   }, {
     key: 'hideOptionsBar',
-    value: function hideOptionsBar(event, item) {
-      if (!isElementClosest(event.target, this.currentItem) && !isElementClosest(event.target, this.optionsBar)) {
-        this.currentItem.classList.remove('is-active');
-        this.currentItem = null;
-        this.optionsBar.classList.remove('is-visible');
-        this.optionsBar.classList.add('is-hidden');
-        window.removeEventListener('scroll', this.optionsBarScroll);
-        document.removeEventListener('click', this.optionsBarHide);
-      }
+    value: function hideOptionsBar(event) {
+      if (event && (isElementClosest(event.target, this.currentItem) || isElementClosest(event.target, this.optionsBar))) return;
+
+      this.currentItem.classList.remove('is-active');
+      this.currentItem = null;
+      this.optionsBar.classList.remove('is-visible');
+      this.optionsBar.classList.add('is-hidden');
+      window.removeEventListener('scroll', this.optionsBarScroll);
+      document.removeEventListener('click', this.optionsBarHide);
     }
   }, {
     key: 'updateVisibility',
@@ -2029,8 +2042,9 @@ var Creator = function () {
       var _this4 = this;
 
       if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1) {
+        if (this.creator.classList.contains('is-visible')) return;
         this.creatorCallback = function () {
-          debounce(_this4.updatePosition(Selection.current.anchorNode, _this4.creator));
+          _this4.updatePosition(Selection.current.anchorNode, _this4.creator);
         };
         this.creator.classList.add('is-visible');
         this.creator.classList.remove('is-hidden');
@@ -2048,8 +2062,12 @@ var Creator = function () {
     value: function updatePosition(reference, element) {
       var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'center';
 
-      var rect = reference.getBoundingClientRect();
-      element.style.top = mode === 'center' ? rect.top + rect.height / 2 + 'px' : rect.top - 40 + 'px';
+      console.log(reference, element);
+      debounce(function () {
+        if (typeof reference.getBoundingClientRect !== 'function') return;
+        var rect = reference.getBoundingClientRect();
+        element.style.top = mode === 'center' ? rect.top + rect.height / 2 + 'px' : rect.top - 40 + 'px';
+      }());
     }
   }, {
     key: 'toggleState',
@@ -2077,25 +2095,25 @@ var Creator = function () {
       var input$$1 = event.target;
       var file = input$$1.files[0];
       if (!file || !Selection.range) return;
-      var reader = new FileReader();
+      var reader = new FileReader(); // eslint-disable-line
       var figure = document.createElement('figure');
       var caption = document.createElement('figcaption');
       var img = document.createElement('img');
+      var selectedElement = Selection.current.anchorNode;
       img.classList.add('align-image');
       caption.innerText = 'Caption here';
       figure.classList.add('align-figure', 'is-normal');
       figure.appendChild(img);
       figure.appendChild(caption);
+      figure.addEventListener('click', function () {
+        return _this5.showOptionsBar(figure);
+      });
       reader.addEventListener('load', function () {
         img.src = reader.result;
         img.dataset.alignFilename = file.name;
       });
-      reader.readAsDataURL(file);
-      figure.addEventListener('click', function () {
-        return _this5.showOptionsBar(figure);
-      });
-      var selectedElement = Selection.current.anchorNode;
       selectedElement.parentNode.insertBefore(figure, selectedElement);
+      reader.readAsDataURL(file);
       input$$1.value = null;
     }
   }]);

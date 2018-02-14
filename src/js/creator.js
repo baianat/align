@@ -52,35 +52,47 @@ class Creator {
       this.optionsBar.appendChild(menuItem);
     })
 
+    const menuItem = document.createElement('li');
+    const currentButton = button('delete', icons[`delete`]);
+    currentButton.addEventListener('click', () => {
+      this.currentItem.remove();
+      this.hideOptionsBar();
+    });
+    menuItem.appendChild(currentButton);
+    this.optionsBar.appendChild(menuItem);
+
     this.$align.el.appendChild(this.optionsBar);
   }
 
   showOptionsBar(item) {
+    if (this.optionsBar.classList.contains('is-visible')) return;
+
     this.currentItem = item;
     this.currentItem.classList.add('is-active');
     this.optionsBar.classList.add('is-visible');
     this.optionsBar.classList.remove('is-hidden');
-    this.updatePosition(item, this.optionsBar, 'top');
+    this.updatePosition(this.currentItem, this.optionsBar, 'top');
     this.optionsBarScroll = () => {
-      debounce(this.updatePosition(item, this.optionsBar, 'top'));
+      this.updatePosition(this.currentItem, this.optionsBar, 'top');
     };
     this.optionsBarHide = this.hideOptionsBar.bind(this);
     window.addEventListener('scroll', this.optionsBarScroll);
     document.addEventListener('click', this.optionsBarHide);
   }
 
-  hideOptionsBar(event, item) {
+  hideOptionsBar(event) {
     if (
-      !isElementClosest(event.target, this.currentItem) &&
-      !isElementClosest(event.target, this.optionsBar)
-    ) {
-      this.currentItem.classList.remove('is-active');
-      this.currentItem = null;
-      this.optionsBar.classList.remove('is-visible');
-      this.optionsBar.classList.add('is-hidden');
-      window.removeEventListener('scroll', this.optionsBarScroll);
-      document.removeEventListener('click', this.optionsBarHide);
-    }
+      event &&
+      (isElementClosest(event.target, this.currentItem) ||
+      isElementClosest(event.target, this.optionsBar))
+    ) return;
+
+    this.currentItem.classList.remove('is-active');
+    this.currentItem = null;
+    this.optionsBar.classList.remove('is-visible');
+    this.optionsBar.classList.add('is-hidden');
+    window.removeEventListener('scroll', this.optionsBarScroll);
+    document.removeEventListener('click', this.optionsBarHide);
   }
 
   updateVisibility() {
@@ -89,8 +101,9 @@ class Creator {
       Selection.current.anchorNode.nodeType === 1 &&
       Selection.current.anchorNode.childNodes.length <= 1
     ) {
+      if (this.creator.classList.contains('is-visible')) return;
       this.creatorCallback = () => {
-        debounce(this.updatePosition(Selection.current.anchorNode, this.creator));
+        this.updatePosition(Selection.current.anchorNode, this.creator);
       };
       this.creator.classList.add('is-visible');
       this.creator.classList.remove('is-hidden');
@@ -105,10 +118,16 @@ class Creator {
   }
 
   updatePosition(reference, element, mode = 'center') {
-    const rect = reference.getBoundingClientRect();
-    element.style.top = mode === 'center'
-      ? `${rect.top + (rect.height / 2)}px`
-      : `${rect.top - 40}px`;
+    console.log(reference, element);
+    debounce(
+      (() => {
+        if (typeof reference.getBoundingClientRect !== 'function') return;
+        const rect = reference.getBoundingClientRect();
+        element.style.top = mode === 'center'
+          ? `${rect.top + (rect.height / 2)}px`
+          : `${rect.top - 40}px`;
+      })()
+    );
   }
 
   toggleState() {
@@ -131,19 +150,19 @@ class Creator {
     const figure = document.createElement('figure');
     const caption = document.createElement('figcaption');
     const img = document.createElement('img');
+    const selectedElement = Selection.current.anchorNode;
     img.classList.add('align-image');
     caption.innerText = 'Caption here';
     figure.classList.add('align-figure', 'is-normal');
     figure.appendChild(img);
     figure.appendChild(caption);
+    figure.addEventListener('click', () => this.showOptionsBar(figure));
     reader.addEventListener('load', () => {
       img.src = reader.result;
       img.dataset.alignFilename = file.name;
     });
-    reader.readAsDataURL(file);
-    figure.addEventListener('click', () => this.showOptionsBar(figure));
-    const selectedElement = Selection.current.anchorNode;
     selectedElement.parentNode.insertBefore(figure, selectedElement);
+    reader.readAsDataURL(file);
     input.value = null;
   }
 }
