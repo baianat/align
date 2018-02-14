@@ -1,4 +1,4 @@
-import { debounce, updatePosition, camelCase } from './partial/util';
+import { updatePosition, camelCase } from './partial/util';
 import { setElementsPrefix, button, fileButton } from './partial/elements';
 import icons from './partial/icons';
 import OptionsBar from './optionsBar';
@@ -59,19 +59,14 @@ class Creator {
 
   show() {
     if (this.creator.classList.contains('is-visible')) return;
-    this.creatorCallback = () => {
-      debounce(updatePosition(Selection.current.anchorNode, this.creator));
-    };
     this.creator.classList.add('is-visible');
     this.creator.classList.remove('is-hidden');
-    window.addEventListener('scroll', this.creatorCallback);
   }
 
   hide() {
     this.creator.classList.remove('is-visible');
     this.creator.classList.remove('is-active');
     this.creator.classList.add('is-hidden');
-    window.removeEventListener('scroll', this.creatorCallback);
   }
 
   createFigure(event) {
@@ -92,6 +87,7 @@ class Creator {
     reader.addEventListener('load', () => {
       img.src = reader.result;
       img.dataset.alignFilename = file.name;
+      this.$align.update();
     });
     selectedElement.parentNode.insertBefore(figure, selectedElement);
     reader.readAsDataURL(file);

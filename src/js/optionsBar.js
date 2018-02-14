@@ -1,4 +1,4 @@
-import { debounce, updatePosition, isElementClosest, camelCase } from './partial/util';
+import { updatePosition, isElementClosest, camelCase } from './partial/util';
 import { setElementsPrefix, button } from './partial/elements';
 import icons from './partial/icons';
 
@@ -32,18 +32,14 @@ class optionsBar {
   }
 
   active(item) {
-    if (this.el.classList.contains('is-visible')) return;
+    // if (this.el.classList.contains('is-visible')) return;
 
     this.currentItem = item;
     this.currentItem.classList.add('is-active');
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
     updatePosition(this.currentItem, this.el, 'top');
-    this.scrollCallback = () => {
-      debounce(updatePosition(this.currentItem, this.el, 'top'));
-    };
     this.clickCallback = this.deactivate.bind(this);
-    window.addEventListener('scroll', this.scrollCallback);
     document.addEventListener('click', this.clickCallback);
   }
 
@@ -58,7 +54,6 @@ class optionsBar {
     this.currentItem = null;
     this.el.classList.remove('is-visible');
     this.el.classList.add('is-hidden');
-    window.removeEventListener('scroll', this.elScroll);
     document.removeEventListener('click', this.clickCallback);
   }
 

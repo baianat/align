@@ -108,7 +108,7 @@ class Styler {
 
   initBubble() {
     this.styler.classList.add('is-hidden');
-    window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
+    this.bubbleScrollCallback = debounce(this.updateBubblePosition.bind(this));
   }
 
   /**
@@ -150,12 +150,16 @@ class Styler {
     this.styler.classList.remove('is-hidden');
     if (this.settings.mode === 'bubble') {
       this.updateBubblePosition();
+      window.addEventListener('scroll', this.bubbleScrollCallback);
     }
   }
 
   hideStyler() {
     this.styler.classList.remove('is-visible');
     this.styler.classList.add('is-hidden');
+    if (this.settings.mode === 'bubble') {
+      window.removeEventListener('scroll', this.bubbleScrollCallback);
+    }
   }
 
   updateStyler() {

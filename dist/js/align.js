@@ -301,7 +301,8 @@ function updatePosition(reference, element) {
 
   if (typeof reference.getBoundingClientRect !== 'function') return;
   var rect = reference.getBoundingClientRect();
-  element.style.top = mode === 'center' ? rect.top + rect.height / 2 + 'px' : rect.top - 40 + 'px';
+  var scrolled = window.scrollY;
+  element.style.top = mode === 'center' ? rect.top + scrolled + rect.height / 2 + 'px' : rect.top + scrolled - 40 + 'px';
 }
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -1389,6 +1390,7 @@ var cmdsSchemas = {
   insertLine: {
     element: 'button',
     command: 'insertHorizontalRule',
+    useCSS: true,
     tooltip: 'Insert line'
   },
 
@@ -1739,20 +1741,14 @@ var optionsBar$1 = function () {
   }, {
     key: 'active',
     value: function active(item) {
-      var _this2 = this;
-
-      if (this.el.classList.contains('is-visible')) return;
+      // if (this.el.classList.contains('is-visible')) return;
 
       this.currentItem = item;
       this.currentItem.classList.add('is-active');
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
       updatePosition(this.currentItem, this.el, 'top');
-      this.scrollCallback = function () {
-        debounce(updatePosition(_this2.currentItem, _this2.el, 'top'));
-      };
       this.clickCallback = this.deactivate.bind(this);
-      window.addEventListener('scroll', this.scrollCallback);
       document.addEventListener('click', this.clickCallback);
     }
   }, {
@@ -1764,7 +1760,6 @@ var optionsBar$1 = function () {
       this.currentItem = null;
       this.el.classList.remove('is-visible');
       this.el.classList.add('is-hidden');
-      window.removeEventListener('scroll', this.elScroll);
       document.removeEventListener('click', this.clickCallback);
     }
   }, {
@@ -1852,15 +1847,9 @@ var Creator = function () {
   }, {
     key: 'show',
     value: function show() {
-      var _this2 = this;
-
       if (this.creator.classList.contains('is-visible')) return;
-      this.creatorCallback = function () {
-        debounce(updatePosition(Selection.current.anchorNode, _this2.creator));
-      };
       this.creator.classList.add('is-visible');
       this.creator.classList.remove('is-hidden');
-      window.addEventListener('scroll', this.creatorCallback);
     }
   }, {
     key: 'hide',
@@ -1868,12 +1857,11 @@ var Creator = function () {
       this.creator.classList.remove('is-visible');
       this.creator.classList.remove('is-active');
       this.creator.classList.add('is-hidden');
-      window.removeEventListener('scroll', this.creatorCallback);
     }
   }, {
     key: 'createFigure',
     value: function createFigure(event) {
-      var _this3 = this;
+      var _this2 = this;
 
       var input$$1 = event.target;
       var file = input$$1.files[0];
@@ -1889,11 +1877,12 @@ var Creator = function () {
       figure.appendChild(img);
       figure.appendChild(caption);
       figure.addEventListener('click', function () {
-        return _this3.optionsBar.active(figure);
+        return _this2.optionsBar.active(figure);
       });
       reader.addEventListener('load', function () {
         img.src = reader.result;
         img.dataset.alignFilename = file.name;
+        _this2.$align.update();
       });
       selectedElement.parentNode.insertBefore(figure, selectedElement);
       reader.readAsDataURL(file);
@@ -2024,7 +2013,7 @@ var Styler = function () {
     key: 'initBubble',
     value: function initBubble() {
       this.styler.classList.add('is-hidden');
-      window.addEventListener('scroll', debounce(this.updateBubblePosition.bind(this)));
+      this.bubbleScrollCallback = debounce(this.updateBubblePosition.bind(this));
     }
 
     /**
@@ -2072,6 +2061,7 @@ var Styler = function () {
       this.styler.classList.remove('is-hidden');
       if (this.settings.mode === 'bubble') {
         this.updateBubblePosition();
+        window.addEventListener('scroll', this.bubbleScrollCallback);
       }
     }
   }, {
@@ -2079,6 +2069,9 @@ var Styler = function () {
     value: function hideStyler() {
       this.styler.classList.remove('is-visible');
       this.styler.classList.add('is-hidden');
+      if (this.settings.mode === 'bubble') {
+        window.removeEventListener('scroll', this.bubbleScrollCallback);
+      }
     }
   }, {
     key: 'updateStyler',

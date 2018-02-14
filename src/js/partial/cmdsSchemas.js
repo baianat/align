@@ -131,6 +131,7 @@ const cmdsSchemas = {
   insertLine: {
     element: 'button',
     command: 'insertHorizontalRule',
+    useCSS: true,
     tooltip: `Insert line`
   },
 

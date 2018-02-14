@@ -120,7 +120,8 @@ export function camelCase(string) {
 export function updatePosition(reference, element, mode = 'center') {
   if (typeof reference.getBoundingClientRect !== 'function') return;
   const rect = reference.getBoundingClientRect();
+  const scrolled = window.scrollY;
   element.style.top = mode === 'center'
-    ? `${rect.top + (rect.height / 2)}px`
-    : `${rect.top - 40}px`;
+    ? `${rect.top + scrolled + (rect.height / 2)}px`
+    : `${rect.top + scrolled - 40}px`;
 }

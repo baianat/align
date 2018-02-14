@@ -291,36 +291,6 @@
 .align-title:focus {
   outline: 0;
 }
-.align-figure {
-  text-align: center;
-}
-.align-figure.is-active img {
-  box-shadow: 0 0 25px rgba(0,0,0,0.05);
-}
-.align-figure.is-normal img {
-  width: 100%;
-  max-width: 500px;
-}
-.align-figure.is-float {
-  float: left;
-}
-.align-figure.is-float:after {
-  content: '';
-  display: block;
-  clear: both;
-}
-.align-figure.is-float img {
-  width: 50vw;
-  max-width: 500px;
-}
-.align-figure.is-full {
-  margin: auto -100px;
-  height: 500px;
-  overflow: hidden;
-}
-.align-figure.is-full img {
-  width: 100vw;
-}
 .styler {
   background-color: #fff;
   margin: 0;
@@ -386,12 +356,6 @@
   border-radius: 40px;
   box-shadow: 0 0 25px rgba(0,0,0,0.05);
   transition: opacity 0.2s;
-}
-.styler.is-figure {
-  position: fixed;
-  z-index: 30;
-  border-radius: 40px;
-  box-shadow: 0 0 25px rgba(0,0,0,0.05);
 }
 .styler li:not(last-child) {
   margin-right: 1px;
@@ -543,15 +507,15 @@
   margin: 0;
   padding: 10px;
   width: auto;
-  background-color: transparent;
+  background-color: #fff;
   list-style: none;
   transform: translate3d(0, -50%, 0);
-  position: fixed;
+  position: absolute;
   z-index: 30;
   border-radius: 40px;
 }
 .creator-optionsBar {
-  position: fixed;
+  position: absolute;
   z-index: 20;
   left: 50%;
   transform: translate3d(-50%, 0, 0);
@@ -583,7 +547,7 @@
 .creator-menu {
   list-style: none;
   padding: 0;
-  margin-left: 30px;
+  margin: 0 30px;
   display: none;
 }
 .creator-button {
@@ -630,4 +594,51 @@
 .creator.is-hidden {
   visibility: hidden;
   opacity: 0;
+}
+.align blockquote {
+  border-left: 5px solid #aaa;
+  padding: 10px 0 10px 20px;
+}
+.align hr {
+  border: 0;
+  text-align: center;
+  font-size: 2em;
+  line-height: 1;
+  margin: 20px 0;
+  vertical-align: text-top;
+  margin: 0;
+  letter-spacing: 0.5em;
+}
+.align hr:before {
+  display: block;
+  content: '...';
+}
+.align-figure {
+  text-align: center;
+}
+.align-figure.is-active img {
+  box-shadow: 0 0 25px rgba(0,0,0,0.05);
+}
+.align-figure.is-normal img {
+  max-width: 500px;
+  width: 100%;
+}
+.align-figure.is-float {
+  float: left;
+}
+.align-figure.is-float:after {
+  display: block;
+  clear: both;
+  content: '';
+}
+.align-figure.is-float img {
+  max-width: 500px;
+  width: 50vw;
+}
+.align-figure.is-full {
+  overflow: hidden;
+  margin: auto -100px;
+}
+.align-figure.is-full img {
+  width: 100vw;
 }
