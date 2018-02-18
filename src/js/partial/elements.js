@@ -1,3 +1,5 @@
+import icons from './icons';
+
 let NAMING_PREFIX = ''
 
 export function setElementsPrefix(prefix) {
@@ -7,18 +9,14 @@ export function setElementsPrefix(prefix) {
   * Create button HTML element
   * @param {String} name
   */
-export function button(name, icon, tooltip) {
+export function button(name, tooltip) {
   const button = document.createElement('button');
   button.classList.add(`${NAMING_PREFIX}button`);
   button.id = name;
   if (tooltip) {
     button.dataset.tooltip = tooltip;
   }
-  button.insertAdjacentHTML('afterbegin', `
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="${icon}"/>
-      </svg>
-    `);
+  button.insertAdjacentHTML('afterbegin', icons(name));
   return button;
 }
 
@@ -67,20 +65,24 @@ export function input(name, type) {
  * @param {String} name
  * @param {String} type
  */
-export function fileButton(name, icon) {
+export function fileButton(name) {
   const wrapper = document.createElement('div');
   const input = document.createElement('input');
 
   wrapper.classList.add(`${NAMING_PREFIX}button`);
   wrapper.id = name;
   wrapper.appendChild(input);
-  wrapper.insertAdjacentHTML('afterbegin', `
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="${icon}"/>
-      </svg>
-    `);
+  wrapper.insertAdjacentHTML('afterbegin', icons(name));
   input.classList.add(`${NAMING_PREFIX}input`);
   input.id = name;
   input.type = 'file';
   return { input: input, el: wrapper };
+}
+
+export function menuButton(name, func) {
+  const menuItem = document.createElement('li');
+  const currentButton = button(name);
+  currentButton.addEventListener('click', func);
+  menuItem.appendChild(currentButton);
+  return menuItem;
 }

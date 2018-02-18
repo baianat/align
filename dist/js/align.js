@@ -297,12 +297,35 @@ function camelCase(string) {
 }
 
 function updatePosition(reference, element) {
-  var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'center';
+  var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'middle-left';
 
   if (typeof reference.getBoundingClientRect !== 'function') return;
-  var rect = reference.getBoundingClientRect();
+  var modes = mode.split('-');
+  var elmRect = element.getBoundingClientRect();
+  var refRect = reference.getBoundingClientRect();
   var scrolled = window.scrollY;
-  element.style.top = mode === 'center' ? rect.top + scrolled + rect.height / 2 + 'px' : rect.top + scrolled - 40 + 'px';
+  modes.forEach(function (mode) {
+    switch (mode) {
+      case 'center':
+        element.style.left = refRect.left + refRect.width / 2 + 'px';
+        break;
+      case 'left':
+        element.style.left = refRect.left + 'px';
+        break;
+      case 'right':
+        element.style.left = refRect.left - refRect.width + 'px';
+        break;
+      case 'middle':
+        element.style.top = refRect.top + scrolled + refRect.height / 2 + 'px';
+        break;
+      case 'top':
+        element.style.top = refRect.top + scrolled - elmRect.height + 'px';
+        break;
+      case 'bottom':
+        element.style.top = refRect.bottom + scrolled + elmRect.height + 'px';
+        break;
+    }
+  });
 }
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -1242,6 +1265,7 @@ var Selection = function () {
       var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.textRange;
 
       if (!range) return;
+      console.log(range);
       var sel = Selection.current = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
@@ -1263,7 +1287,7 @@ var Selection = function () {
 
 var symbols = generateKeysSymbols();
 
-var cmdsSchemas = {
+var cmdsSchema = {
   bold: {
     element: 'button',
     command: 'bold',
@@ -1552,7 +1576,11 @@ var cmdsSchemas = {
   }
 };
 
-var icons = {
+function icons(name) {
+  return '\n    <svg class="icon" viewBox="0 0 24 24">\n      <path d="' + iconsPath[name] + '"/>\n    </svg>';
+}
+
+var iconsPath = {
   blockquote: 'M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z',
 
   bold: 'M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z',
@@ -1636,14 +1664,14 @@ function setElementsPrefix(prefix) {
   * Create button HTML element
   * @param {String} name
   */
-function button(name, icon, tooltip) {
+function button(name, tooltip) {
   var button = document.createElement('button');
   button.classList.add(NAMING_PREFIX + 'button');
   button.id = name;
   if (tooltip) {
     button.dataset.tooltip = tooltip;
   }
-  button.insertAdjacentHTML('afterbegin', '\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="' + icon + '"/>\n      </svg>\n    ');
+  button.insertAdjacentHTML('afterbegin', icons(name));
   return button;
 }
 
@@ -1688,18 +1716,26 @@ function input(name, type) {
  * @param {String} name
  * @param {String} type
  */
-function fileButton(name, icon) {
+function fileButton(name) {
   var wrapper = document.createElement('div');
   var input = document.createElement('input');
 
   wrapper.classList.add(NAMING_PREFIX + 'button');
   wrapper.id = name;
   wrapper.appendChild(input);
-  wrapper.insertAdjacentHTML('afterbegin', '\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="' + icon + '"/>\n      </svg>\n    ');
+  wrapper.insertAdjacentHTML('afterbegin', icons(name));
   input.classList.add(NAMING_PREFIX + 'input');
   input.id = name;
   input.type = 'file';
   return { input: input, el: wrapper };
+}
+
+function menuButton(name, func) {
+  var menuItem = document.createElement('li');
+  var currentButton = button(name);
+  currentButton.addEventListener('click', func);
+  menuItem.appendChild(currentButton);
+  return menuItem;
 }
 
 var optionsBar$1 = function () {
@@ -1720,22 +1756,16 @@ var optionsBar$1 = function () {
       this.el.classList.add('creator-optionsBar', 'is-hidden');
 
       var options = ['normal', 'full', 'float'];
-      options.forEach(function (option) {
-        var menuItem = document.createElement('li');
-        var currentButton = button(option, icons['figure' + camelCase(option)]);
-        currentButton.addEventListener('click', function () {
-          return _this.toggleClass('is-' + option, options);
-        });
-        menuItem.appendChild(currentButton);
-        _this.el.appendChild(menuItem);
-      });
-
-      var menuItem = document.createElement('li');
-      var currentButton = button('delete', icons['delete']);
-      currentButton.addEventListener('click', this.removeCurrentItem.bind(this));
-      menuItem.appendChild(currentButton);
-      this.el.appendChild(menuItem);
-
+      this.el.appendChild(menuButton('figureNormal', function () {
+        return _this.toggleClass('is-normal', options);
+      }));
+      this.el.appendChild(menuButton('figureFull', function () {
+        return _this.toggleClass('is-full', options);
+      }));
+      this.el.appendChild(menuButton('figureFloat', function () {
+        return _this.toggleClass('is-float', options);
+      }));
+      this.el.appendChild(menuButton('delete', this.removeCurrentItem.bind(this)));
       this.$align.el.appendChild(this.el);
     }
   }, {
@@ -1747,7 +1777,7 @@ var optionsBar$1 = function () {
       this.currentItem.classList.add('is-active');
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
-      updatePosition(this.currentItem, this.el, 'top');
+      updatePosition(this.currentItem, this.el, 'center-top');
       this.clickCallback = this.deactivate.bind(this);
       document.addEventListener('click', this.clickCallback);
     }
@@ -1773,6 +1803,7 @@ var optionsBar$1 = function () {
       });
       (_currentItem$classLis = this.currentItem.classList).remove.apply(_currentItem$classLis, toConsumableArray(prefixedClasses));
       this.currentItem.classList.add(className);
+      updatePosition(this.currentItem, this.el, 'center-top');
       this.$align.update();
     }
   }, {
@@ -1813,12 +1844,12 @@ var Creator = function () {
       this.creator.classList.add('creator', 'is-hidden');
       this.menu = document.createElement('ul');
       this.menu.classList.add('creator-menu');
-      this.toggleButton = button('toggle', icons['plus']);
+      this.toggleButton = button('plus');
       this.toggleButton.addEventListener('click', this.toggleState.bind(this));
 
       this.settings.items.forEach(function (item) {
         var menuItem = document.createElement('li');
-        var button$$1 = fileButton('figure', icons['figure']);
+        var button$$1 = fileButton('figure');
         button$$1.input.addEventListener('change', _this['create' + camelCase(item)].bind(_this));
         menuItem.appendChild(button$$1.el);
         _this.menu.appendChild(menuItem);
@@ -1833,7 +1864,7 @@ var Creator = function () {
     key: 'update',
     value: function update() {
       if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1) {
-        updatePosition(Selection.current.anchorNode, this.creator);
+        updatePosition(Selection.current.anchorNode, this.creator, 'middle-left');
         this.show();
         return;
       }
@@ -1871,8 +1902,8 @@ var Creator = function () {
       var caption = document.createElement('figcaption');
       var img = document.createElement('img');
       var selectedElement = Selection.current.anchorNode;
+      caption.dataset.defaultValue = 'Figure caption';
       img.classList.add('align-image');
-      caption.innerText = 'Caption here';
       figure.classList.add('align-figure', 'is-normal');
       figure.appendChild(img);
       figure.appendChild(caption);
@@ -1927,7 +1958,7 @@ var Styler = function () {
       var _this = this;
 
       setElementsPrefix('styler-');
-      this.cmdsSchemas = cloneObject(cmdsSchemas);
+      this.cmdsSchema = cloneObject(cmdsSchema);
       this.styler = document.createElement('ul');
       this.styler.classList.add('styler', 'is-' + this.settings.mode, 'is-' + this.settings.theme);
       this.cmds = {};
@@ -1935,7 +1966,7 @@ var Styler = function () {
       this.settings.commands.forEach(function (command) {
         var li = document.createElement('li');
         var cmd = typeof command === 'string' ? command : Object.keys(command)[0];
-        var cmdSchema = _this.cmdsSchemas[cmd];
+        var cmdSchema = _this.cmdsSchema[cmd];
         if (!cmdSchema) {
           console.warn(cmd + ' is not found');
           return;
@@ -1945,7 +1976,7 @@ var Styler = function () {
 
         switch (cmdSchema.element) {
           case 'button':
-            currentCmd.el = button(cmd, icons[cmd], _this.getTooltip(cmdSchema));
+            currentCmd.el = button(cmd, _this.getTooltip(cmdSchema));
             currentCmd.el.addEventListener('click', function () {
               return _this.cmdCallback(cmdSchema, cmdSchema.value);
             });
@@ -2347,7 +2378,6 @@ var Align = function () {
       var _this2 = this;
 
       Selection.updateSelectedRange();
-      console.log('sss');
       setTimeout(function () {
         if (_this2.settings.toolbar) {
           _this2.toolbar.updateStyler();
@@ -2392,7 +2422,7 @@ var Align = function () {
   }], [{
     key: 'extend',
     value: function extend(name, extension) {
-      cmdsSchemas[name] = extension;
+      cmdsSchema[name] = extension;
     }
   }, {
     key: 'extendIcons',

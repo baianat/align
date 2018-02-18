@@ -1,6 +1,6 @@
 import hljs from 'highlight.js';
 import { select, userOS } from './partial/util';
-import cmdsSchemas from './partial/cmdsSchemas';
+import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './selection';
 import Creator from './creator';
@@ -40,7 +40,7 @@ class Align {
   }
 
   static extend(name, extension) {
-    cmdsSchemas[name] = extension;
+    cmdsSchema[name] = extension;
   }
 
   static extendIcons(name, path) {
@@ -205,7 +205,6 @@ class Align {
 
   update() {
     Selection.updateSelectedRange();
-    console.log('sss');
     setTimeout(() => {
       if (this.settings.toolbar) {
         this.toolbar.updateStyler();

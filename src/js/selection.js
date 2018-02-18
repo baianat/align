@@ -31,6 +31,7 @@ class Selection {
 
   static selectTextRange(range = Selection.textRange) {
     if (!range) return;
+    console.log(range)
     const sel = Selection.current = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);

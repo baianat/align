@@ -1,6 +1,5 @@
-import { updatePosition, isElementClosest, camelCase } from './partial/util';
-import { setElementsPrefix, button } from './partial/elements';
-import icons from './partial/icons';
+import { updatePosition, isElementClosest } from './partial/util';
+import { setElementsPrefix, menuButton } from './partial/elements';
 
 class optionsBar {
   constructor(align) {
@@ -14,20 +13,16 @@ class optionsBar {
     this.el.classList.add('creator-optionsBar', 'is-hidden');
 
     const options = ['normal', 'full', 'float'];
-    options.forEach(option => {
-      const menuItem = document.createElement('li');
-      const currentButton = button(option, icons[`figure${camelCase(option)}`]);
-      currentButton.addEventListener('click', () => this.toggleClass(`is-${option}`, options));
-      menuItem.appendChild(currentButton);
-      this.el.appendChild(menuItem);
-    })
-
-    const menuItem = document.createElement('li');
-    const currentButton = button('delete', icons['delete']);
-    currentButton.addEventListener('click', this.removeCurrentItem.bind(this));
-    menuItem.appendChild(currentButton);
-    this.el.appendChild(menuItem);
-
+    this.el.appendChild(
+      menuButton('figureNormal', () => this.toggleClass('is-normal', options))
+    );
+    this.el.appendChild(
+      menuButton('figureFull', () => this.toggleClass('is-full', options))
+    );
+    this.el.appendChild(
+      menuButton('figureFloat', () => this.toggleClass('is-float', options))
+    );
+    this.el.appendChild(menuButton('delete', this.removeCurrentItem.bind(this)));
     this.$align.el.appendChild(this.el);
   }
 
@@ -38,7 +33,7 @@ class optionsBar {
     this.currentItem.classList.add('is-active');
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
-    updatePosition(this.currentItem, this.el, 'top');
+    updatePosition(this.currentItem, this.el, 'center-top');
     this.clickCallback = this.deactivate.bind(this);
     document.addEventListener('click', this.clickCallback);
   }
@@ -62,6 +57,7 @@ class optionsBar {
     const prefixedClasses = otherClasses.map(cls => `is-${cls}`);
     this.currentItem.classList.remove(...prefixedClasses);
     this.currentItem.classList.add(className);
+    updatePosition(this.currentItem, this.el, 'center-top');
     this.$align.update();
   }
 

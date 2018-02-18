@@ -1,4 +1,11 @@
 .align
+  &-content
+    white-space: normal
+    margin: 0 20vw
+    margin: 50px 20%
+    p
+      line-height: 2em
+      font-size: 18px
   blockquote
     border-left: 5px solid #AAAAAA
     padding: 10px 0 10px 20px
@@ -18,19 +25,21 @@
 
 
   &-figure
+    margin: 20px 0
     text-align: center
-
+    font-size: 12px
+    figcaption
+      margin-top: 20px
     &.is-active
       img
         box-shadow: 0 0 25px alpha($black, 5%)
-
     &.is-normal
       img
         max-width: 500px
         width: 100%
-
     &.is-float
       float: left
+      margin-right: 40px
       &:after
         display: block
         clear: both
@@ -38,9 +47,7 @@
       img
         max-width: 500px
         width: 50vw
-
     &.is-full
-      overflow: hidden
-      margin: auto -100px
+      width: 100%
       img
-        width: 100vw
+        width: 100%

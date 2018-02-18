@@ -117,11 +117,32 @@ export function camelCase(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function updatePosition(reference, element, mode = 'center') {
+export function updatePosition(reference, element, mode = 'middle-left') {
   if (typeof reference.getBoundingClientRect !== 'function') return;
-  const rect = reference.getBoundingClientRect();
+  const modes = mode.split('-');
+  const elmRect = element.getBoundingClientRect();
+  const refRect = reference.getBoundingClientRect();
   const scrolled = window.scrollY;
-  element.style.top = mode === 'center'
-    ? `${rect.top + scrolled + (rect.height / 2)}px`
-    : `${rect.top + scrolled - 40}px`;
+  modes.forEach(mode => {
+    switch (mode) {
+      case 'center':
+        element.style.left = `${refRect.left + (refRect.width / 2)}px`
+        break;
+      case 'left':
+        element.style.left = `${refRect.left}px`
+        break;
+      case 'right':
+        element.style.left = `${refRect.left - refRect.width}px`
+        break;
+      case 'middle':
+        element.style.top = `${refRect.top + scrolled + (refRect.height / 2)}px`
+        break;
+      case 'top':
+        element.style.top = `${refRect.top + scrolled - elmRect.height}px`;
+        break;
+      case 'bottom':
+        element.style.top = `${refRect.bottom + scrolled + elmRect.height}px`;
+        break;
+    }
+  })
 }

@@ -1,6 +1,5 @@
 import { updatePosition, camelCase } from './partial/util';
 import { setElementsPrefix, button, fileButton } from './partial/elements';
-import icons from './partial/icons';
 import OptionsBar from './optionsBar';
 import Selection from './selection';
 
@@ -23,12 +22,12 @@ class Creator {
     this.creator.classList.add('creator', 'is-hidden');
     this.menu = document.createElement('ul');
     this.menu.classList.add('creator-menu');
-    this.toggleButton = button('toggle', icons['plus']);
+    this.toggleButton = button('plus');
     this.toggleButton.addEventListener('click', this.toggleState.bind(this));
 
     this.settings.items.forEach(item => {
       const menuItem = document.createElement('li');
-      const button = fileButton('figure', icons['figure']);
+      const button = fileButton('figure');
       button.input.addEventListener('change', this[`create${camelCase(item)}`].bind(this));
       menuItem.appendChild(button.el);
       this.menu.appendChild(menuItem);
@@ -46,7 +45,7 @@ class Creator {
       Selection.current.anchorNode.nodeType === 1 &&
       Selection.current.anchorNode.childNodes.length <= 1
     ) {
-      updatePosition(Selection.current.anchorNode, this.creator);
+      updatePosition(Selection.current.anchorNode, this.creator, 'middle-left');
       this.show();
       return;
     }
@@ -78,8 +77,8 @@ class Creator {
     const caption = document.createElement('figcaption');
     const img = document.createElement('img');
     const selectedElement = Selection.current.anchorNode;
+    caption.dataset.defaultValue = 'Figure caption';
     img.classList.add('align-image');
-    caption.innerText = 'Caption here';
     figure.classList.add('align-figure', 'is-normal');
     figure.appendChild(img);
     figure.appendChild(caption);

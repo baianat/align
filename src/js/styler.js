@@ -1,7 +1,6 @@
 import { normalizeNumber, debounce, cloneObject } from './partial/util';
 import { setElementsPrefix, button, select, input } from './partial/elements';
-import cmdsSchemas from './partial/cmdsSchemas';
-import icons from './partial/icons';
+import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
 
 class Styler {
@@ -17,7 +16,7 @@ class Styler {
       commands,
       tooltip,
       theme
-    };
+    }
     this.init();
   }
 
@@ -26,7 +25,7 @@ class Styler {
    */
   init() {
     setElementsPrefix('styler-');
-    this.cmdsSchemas = cloneObject(cmdsSchemas);
+    this.cmdsSchema = cloneObject(cmdsSchema);
     this.styler = document.createElement('ul');
     this.styler.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
     this.cmds = {};
@@ -34,7 +33,7 @@ class Styler {
     this.settings.commands.forEach((command) => {
       const li = document.createElement('li');
       const cmd = typeof command === 'string' ? command : Object.keys(command)[0];
-      const cmdSchema = this.cmdsSchemas[cmd];
+      const cmdSchema = this.cmdsSchema[cmd];
       if (!cmdSchema) {
         console.warn(cmd + ' is not found');
         return;
@@ -44,7 +43,7 @@ class Styler {
 
       switch (cmdSchema.element) {
         case 'button':
-          currentCmd.el = button(cmd, icons[cmd], this.getTooltip(cmdSchema));
+          currentCmd.el = button(cmd, this.getTooltip(cmdSchema));
           currentCmd.el.addEventListener('click', () => this.cmdCallback(cmdSchema, cmdSchema.value));
           li.appendChild(currentCmd.el);
           break;

@@ -4,7 +4,7 @@ import { generateKeysSymbols } from './util';
 
 const symbols = generateKeysSymbols();
 
-const cmdsSchemas = {
+const cmdsSchema = {
   bold: {
     element: 'button',
     command: 'bold',
@@ -304,4 +304,4 @@ const cmdsSchemas = {
   }
 }
 
-export default cmdsSchemas;
+export default cmdsSchema;
