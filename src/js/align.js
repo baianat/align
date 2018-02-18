@@ -77,8 +77,10 @@ class Align {
     this.editor = document.createElement('div');
     this.editor.contentEditable = 'true';
     this.editor.classList.add('align-content');
-    this.editor.innerHTML = this.settings.defaultText + '\n';
-
+    const section = document.createElement('div');
+    section.innerHTML = this.settings.defaultText + '\n';
+    section.classList.add('align-section');
+    this.editor.appendChild(section);
     this.el.appendChild(this.editor);
     this.editor.focus();
     this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';

@@ -1,12 +1,12 @@
 import { updatePosition, camelCase } from './partial/util';
-import { setElementsPrefix, button, fileButton } from './partial/elements';
+import { setElementsPrefix, button, fileButton, menuButton } from './partial/elements';
 import OptionsBar from './optionsBar';
 import Selection from './selection';
 
 class Creator {
   constructor(align, {
     mode = 'default',
-    items = ['figure']
+    items = ['figure', 'section']
   } = {}) {
     this.$align = align;
     this.settings = {
@@ -24,14 +24,14 @@ class Creator {
     this.menu.classList.add('creator-menu');
     this.toggleButton = button('plus');
     this.toggleButton.addEventListener('click', this.toggleState.bind(this));
+    this.optionsBar = new OptionsBar(this.$align);
 
     this.settings.items.forEach(item => {
       const menuItem = document.createElement('li');
-      const button = fileButton('figure');
+      const button = fileButton(item);
       button.input.addEventListener('change', this[`create${camelCase(item)}`].bind(this));
       menuItem.appendChild(button.el);
       this.menu.appendChild(menuItem);
-      this.optionsBar = new OptionsBar(this.$align);
     })
 
     this.creator.appendChild(this.toggleButton);
@@ -88,9 +88,55 @@ class Creator {
       img.dataset.alignFilename = file.name;
       this.$align.update();
     });
-    selectedElement.parentNode.insertBefore(figure, selectedElement);
     reader.readAsDataURL(file);
     input.value = null;
+    selectedElement.parentNode.insertBefore(figure, selectedElement);
+  }
+
+  getPreviousSiblings(element) {
+    let results = []
+    while (element.previousSibling) {
+      element = element.previousSibling;
+      results.push(element);
+    }
+    return results;
+  }
+
+  getNextSiblings(element) {
+    let results = []
+    while (element.nextSibling) {
+      element = element.nextSibling;
+      results.push(element);
+    }
+    return results;
+  }
+
+  createSection(event) {
+    const input = event.target;
+    const file = input.files[0];
+    if (!file || !Selection.current) return;
+    const reader = new FileReader(); // eslint-disable-line
+
+    const selectedElement = Selection.current.anchorNode;
+    const nextDiv = document.createElement('div');
+    const section = document.createElement('div');
+    const sectionContent = document.createElement('p');
+    const next = this.getNextSiblings(selectedElement);
+
+    sectionContent.dataset.defaultValue = 'Write content';
+    section.classList.add('align-section', 'is-full', 'is-image');
+    nextDiv.classList.add('align-section');
+    section.appendChild(sectionContent);
+    nextDiv.append(...next);
+
+    reader.addEventListener('load', () => {
+      section.style.backgroundImage = `url(${reader.result})`;
+      this.$align.update();
+    });
+    reader.readAsDataURL(file);
+    input.value = null;
+    this.$align.editor.appendChild(section);
+    this.$align.editor.appendChild(nextDiv);
   }
 }
 

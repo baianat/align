@@ -582,7 +582,8 @@
   opacity: 1;
 }
 .creator.is-active .creator-menu {
-  display: block;
+  display: -ms-flexbox;
+  display: flex;
 }
 .creator.is-visible {
   visibility: visible;
@@ -594,11 +595,7 @@
 }
 .align-content {
   white-space: normal;
-  margin: 0 20vw;
-  margin: 50px 20%;
-}
-.align-content p {
-  line-height: 2em;
+  line-height: 2.5em;
   font-size: 18px;
 }
 .align blockquote {
@@ -652,4 +649,20 @@
 }
 .align-figure.is-full img {
   width: 100%;
+}
+.align-section {
+  margin: auto;
+  width: 80vw;
+  max-width: 1000px;
+}
+.align-section.is-full {
+  width: 100%;
+  max-width: 100%;
+}
+.align-section.is-image {
+  background-position: center center;
+  background-size: cover;
+  min-height: 300px;
+  margin: 20px 0;
+  padding: 20px;
 }

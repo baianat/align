@@ -1651,7 +1651,9 @@ var iconsPath = {
 
   figureNormal: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 
-  delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z'
+  delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
+
+  section: 'M2 21h19v-3H2v3zM20 8H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zM2 3v3h19V3H2z'
 
 };
 
@@ -1822,7 +1824,7 @@ var Creator = function () {
         _ref$mode = _ref.mode,
         mode = _ref$mode === undefined ? 'default' : _ref$mode,
         _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure'] : _ref$items;
+        items = _ref$items === undefined ? ['figure', 'section'] : _ref$items;
 
     classCallCheck(this, Creator);
 
@@ -1846,14 +1848,14 @@ var Creator = function () {
       this.menu.classList.add('creator-menu');
       this.toggleButton = button('plus');
       this.toggleButton.addEventListener('click', this.toggleState.bind(this));
+      this.optionsBar = new optionsBar$1(this.$align);
 
       this.settings.items.forEach(function (item) {
         var menuItem = document.createElement('li');
-        var button$$1 = fileButton('figure');
+        var button$$1 = fileButton(item);
         button$$1.input.addEventListener('change', _this['create' + camelCase(item)].bind(_this));
         menuItem.appendChild(button$$1.el);
         _this.menu.appendChild(menuItem);
-        _this.optionsBar = new optionsBar$1(_this.$align);
       });
 
       this.creator.appendChild(this.toggleButton);
@@ -1915,9 +1917,60 @@ var Creator = function () {
         img.dataset.alignFilename = file.name;
         _this2.$align.update();
       });
-      selectedElement.parentNode.insertBefore(figure, selectedElement);
       reader.readAsDataURL(file);
       input$$1.value = null;
+      selectedElement.parentNode.insertBefore(figure, selectedElement);
+    }
+  }, {
+    key: 'getPreviousSiblings',
+    value: function getPreviousSiblings(element) {
+      var results = [];
+      while (element.previousSibling) {
+        element = element.previousSibling;
+        results.push(element);
+      }
+      return results;
+    }
+  }, {
+    key: 'getNextSiblings',
+    value: function getNextSiblings(element) {
+      var results = [];
+      while (element.nextSibling) {
+        element = element.nextSibling;
+        results.push(element);
+      }
+      return results;
+    }
+  }, {
+    key: 'createSection',
+    value: function createSection(event) {
+      var _this3 = this;
+
+      var input$$1 = event.target;
+      var file = input$$1.files[0];
+      if (!file || !Selection.current) return;
+      var reader = new FileReader(); // eslint-disable-line
+
+      var selectedElement = Selection.current.anchorNode;
+      var nextDiv = document.createElement('div');
+      var section = document.createElement('div');
+      var sectionContent = document.createElement('p');
+      var next = this.getNextSiblings(selectedElement);
+
+      sectionContent.dataset.defaultValue = 'Write content';
+      section.classList.add('align-section', 'is-full', 'is-image');
+      nextDiv.classList.add('align-section');
+      section.appendChild(sectionContent);
+      nextDiv.append.apply(nextDiv, toConsumableArray(next));
+
+      reader.addEventListener('load', function () {
+        section.style.backgroundImage = 'url(' + reader.result + ')';
+        _this3.$align.update();
+      });
+      reader.readAsDataURL(file);
+      input$$1.value = null;
+      this.$align.editor.appendChild(section);
+      this.$align.editor.appendChild(nextDiv);
     }
   }]);
   return Creator;
@@ -2236,8 +2289,10 @@ var Align = function () {
       this.editor = document.createElement('div');
       this.editor.contentEditable = 'true';
       this.editor.classList.add('align-content');
-      this.editor.innerHTML = this.settings.defaultText + '\n';
-
+      var section = document.createElement('div');
+      section.innerHTML = this.settings.defaultText + '\n';
+      section.classList.add('align-section');
+      this.editor.appendChild(section);
       this.el.appendChild(this.editor);
       this.editor.focus();
       this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
