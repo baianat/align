@@ -511,6 +511,10 @@
   z-index: 30;
   border-radius: 40px;
 }
+.creator >button {
+  background: #aaa;
+  fill: #fff;
+}
 .creator-optionsBar {
   position: absolute;
   z-index: 20;
@@ -598,6 +602,10 @@
   line-height: 2.5em;
   font-size: 18px;
 }
+.align-image {
+  width: 100%;
+  max-width: 400px;
+}
 .align blockquote {
   border-left: 5px solid #aaa;
   padding: 10px 0 10px 20px;
@@ -662,6 +670,7 @@
 .align-section.is-image {
   background-position: center center;
   background-size: cover;
+  background-attachment: fixed;
   min-height: 300px;
   margin: 20px 0;
   padding: 20px;

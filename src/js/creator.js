@@ -1,5 +1,5 @@
 import { updatePosition, camelCase } from './partial/util';
-import { setElementsPrefix, button, fileButton, menuButton } from './partial/elements';
+import { setElementsPrefix, button, fileButton } from './partial/elements';
 import OptionsBar from './optionsBar';
 import Selection from './selection';
 

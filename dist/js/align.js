@@ -328,6 +328,28 @@ function updatePosition(reference, element) {
   });
 }
 
+function launchFullscreen(element) {
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen();
+  } else if (element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  }
+}
+
+function exitFullscreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+}
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -1475,9 +1497,10 @@ var cmdsSchema = {
     class: 'styler-separator'
   },
 
-  addClasses: {
-    element: 'buttons',
-    func: 'addClass'
+  fullscreen: {
+    element: 'button',
+    func: 'toggleFullScreen',
+    tooltip: 'Fullscreen (' + symbols.cmdKey + ' ' + symbols.shift + ' F)'
   },
 
   color: {
@@ -1570,7 +1593,7 @@ var cmdsSchema = {
         img.dataset.alignFilename = file.name;
       });
       this.$data.reader.readAsDataURL(file);
-      Selection.textRange.insertNode(img);
+      Selection.range.insertNode(img);
       this.$data.input.value = null;
     }
   }
@@ -1653,7 +1676,9 @@ var iconsPath = {
 
   delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
 
-  section: 'M2 21h19v-3H2v3zM20 8H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zM2 3v3h19V3H2z'
+  section: 'M2 21h19v-3H2v3zM20 8H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zM2 3v3h19V3H2z',
+
+  fullscreen: 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z'
 
 };
 
@@ -2284,7 +2309,7 @@ var Align = function () {
   }, {
     key: 'initEditor',
     value: function initEditor() {
-      document.execCommand('defaultParagraphSeparator', false, 'p');
+      document.execCommand('defaultParagraphSeparator', false, 'br');
 
       this.editor = document.createElement('div');
       this.editor.contentEditable = 'true';
@@ -2354,6 +2379,12 @@ var Align = function () {
             case 'A':
               event.preventDefault();
               _this.execute('selectAll');break;
+            case 'F':
+              event.preventDefault();
+              if (event.shiftKey) {
+                _this.toggleFullScreen();
+              }
+              break;
             case 'Z':
               event.preventDefault();
               if (event.shiftKey) {
@@ -2426,6 +2457,16 @@ var Align = function () {
       this.editor.innerHTML = this.editor.innerText;
       this.editor.contentEditable = true;
       this.editor.focus();
+    }
+  }, {
+    key: 'toggleFullScreen',
+    value: function toggleFullScreen() {
+      var state = document.fullscreenElement || document.webkitIsFullScreen;
+      if (!state) {
+        launchFullscreen(document.documentElement);
+        return;
+      }
+      exitFullscreen();
     }
   }, {
     key: 'update',

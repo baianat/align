@@ -192,9 +192,10 @@ const cmdsSchema = {
     class: 'styler-separator'
   },
 
-  addClasses: {
-    element: 'buttons',
-    func: 'addClass'
+  fullscreen: {
+    element: 'button',
+    func: 'toggleFullScreen',
+    tooltip: `Fullscreen (${symbols.cmdKey} ${symbols.shift} F)`
   },
 
   color: {
@@ -298,7 +299,7 @@ const cmdsSchema = {
         img.dataset.alignFilename = file.name;
       });
       this.$data.reader.readAsDataURL(file);
-      Selection.textRange.insertNode(img);
+      Selection.range.insertNode(img);
       this.$data.input.value = null;
     }
   }

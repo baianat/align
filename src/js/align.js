@@ -1,5 +1,5 @@
 import hljs from 'highlight.js';
-import { select, userOS } from './partial/util';
+import { select, userOS, launchFullscreen, exitFullscreen } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './selection';
@@ -72,7 +72,7 @@ class Align {
    * Create the editor
    */
   initEditor() {
-    document.execCommand('defaultParagraphSeparator', false, 'p');
+    document.execCommand('defaultParagraphSeparator', false, 'br');
 
     this.editor = document.createElement('div');
     this.editor.contentEditable = 'true';
@@ -137,6 +137,12 @@ class Align {
           case 'A':
             event.preventDefault();
             this.execute('selectAll'); break;
+          case 'F':
+            event.preventDefault();
+            if (event.shiftKey) {
+              this.toggleFullScreen();
+            }
+            break;
           case 'Z':
             event.preventDefault();
             if (event.shiftKey) {
@@ -203,6 +209,15 @@ class Align {
     this.editor.innerHTML = this.editor.innerText;
     this.editor.contentEditable = true;
     this.editor.focus();
+  }
+
+  toggleFullScreen() {
+    const state = document.fullscreenElement || document.webkitIsFullScreen;
+    if (!state) {
+      launchFullscreen(document.documentElement);
+      return;
+    }
+    exitFullscreen();
   }
 
   update() {
