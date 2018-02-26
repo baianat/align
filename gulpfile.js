@@ -55,6 +55,19 @@ gulp.task('styles', () => {
     .pipe(reload({ stream: true }));
 });
 
+gulp.task('theme', () => {
+  return gulp.src('src/stylus/theme.styl')
+    .pipe(plumber())
+    .pipe(stylus())
+    .pipe(autoprefixer('last 5 version'))
+    .pipe(rename({
+      basename: 'default-theme',
+      extname: '.css'
+    }))
+    .pipe(gulp.dest('dist/css'))
+    .pipe(reload({ stream: true }));
+});
+
 /**
  * Scripts task
  */
@@ -96,7 +109,7 @@ gulp.task('changeEnv', () => { env = 'production' });
 
 gulp.task('production', sequence(
   'clean',
-  ['styles', 'scripts', 'font'],
+  ['styles', 'theme', 'scripts', 'font'],
   'changeEnv',
   ['styles', 'scripts']
 ));
@@ -108,7 +121,6 @@ gulp.task('font', () => {
   gulp.src('src/font/*/**')
     .pipe(gulp.dest('./dist/font/'));
 });
-
 
 /**
  * Watch task
@@ -124,7 +136,4 @@ gulp.task('watch', () => {
 /**
  * Default task
  */
-gulp.task('default', ['styles', 'scripts', 'font', 'browser-sync', 'watch']);
-
-
-
+gulp.task('default', ['styles', 'theme', 'scripts', 'font', 'browser-sync', 'watch']);

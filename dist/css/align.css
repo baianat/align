@@ -275,6 +275,7 @@
 }
 .align.is-fullscreen {
   height: 100vh;
+  width: 100%;
   overflow: auto;
 }
 .align-title {

@@ -29,6 +29,8 @@ yarn add @baianat/align
 ``` html
 <head>
   <link rel="stylesheet" href="dist/css/align.css">
+  <!-- the editor's theme -->
+  <link rel="stylesheet" href="dist/css/default-theme.css">
 </head>
 <body>
     ...
