@@ -2344,9 +2344,9 @@ var Align = function () {
         _this.highlight();
       });
 
-      document.addEventListener('mouseup', this.update.bind(this), true);
+      this.editor.addEventListener('mouseup', this.update.bind(this), true);
 
-      document.addEventListener('keydown', function (event) {
+      this.editor.addEventListener('keydown', function (event) {
         // Do nothing if the event was already processed
         if (event.defaultPrevented) {
           return;
