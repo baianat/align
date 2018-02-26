@@ -266,12 +266,20 @@
 .align {
   position: relative;
 }
+.align-content {
+  padding: 50px 0;
+  background-color: #fff;
+}
 .align-content:focus {
   outline: none;
 }
+.align.is-fullscreen {
+  height: 100vh;
+  overflow: auto;
+}
 .align-title {
   border: 0;
-  margin: 50px auto 0;
+  margin: 0 auto;
   padding: 0.2em;
   font-size: 40px;
   height: 1.6em;

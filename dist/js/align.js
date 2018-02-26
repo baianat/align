@@ -2317,18 +2317,18 @@ var Align = function () {
       var section = document.createElement('div');
       section.innerHTML = this.settings.defaultText + '\n';
       section.classList.add('align-section');
-      this.editor.appendChild(section);
-      this.el.appendChild(this.editor);
-      this.editor.focus();
       this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
       this.cmdKeyPressed = false;
-      Selection.updateSelectedRange();
       if (this.settings.postTitle) {
         this.postTitle = document.createElement('textarea');
         this.postTitle.placeholder = this.settings.postTitle;
         this.postTitle.classList.add('align-title');
-        this.el.insertBefore(this.postTitle, this.editor);
+        this.editor.appendChild(this.postTitle);
       }
+      this.editor.appendChild(section);
+      this.el.appendChild(this.editor);
+      this.editor.focus();
+      Selection.updateSelectedRange();
     }
 
     /**
@@ -2412,6 +2412,10 @@ var Align = function () {
               _this.execute('outdent', false, true);break;
             }
             _this.execute('indent', false, true);break;
+          case 'Escape':
+            _this.el.classList.remove('is-fullscreen');
+            exitFullscreen();
+            break;
           default:
             break;
         }
@@ -2463,9 +2467,11 @@ var Align = function () {
     value: function toggleFullScreen() {
       var state = document.fullscreenElement || document.webkitIsFullScreen;
       if (!state) {
-        launchFullscreen(document.documentElement);
+        launchFullscreen(this.el);
+        this.el.classList.add('is-fullscreen');
         return;
       }
+      this.el.classList.remove('is-fullscreen');
       exitFullscreen();
     }
   }, {

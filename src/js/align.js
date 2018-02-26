@@ -80,18 +80,18 @@ class Align {
     const section = document.createElement('div');
     section.innerHTML = this.settings.defaultText + '\n';
     section.classList.add('align-section');
-    this.editor.appendChild(section);
-    this.el.appendChild(this.editor);
-    this.editor.focus();
     this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
     this.cmdKeyPressed = false;
-    Selection.updateSelectedRange();
     if (this.settings.postTitle) {
       this.postTitle = document.createElement('textarea');
       this.postTitle.placeholder = this.settings.postTitle;
       this.postTitle.classList.add('align-title');
-      this.el.insertBefore(this.postTitle, this.editor);
+      this.editor.appendChild(this.postTitle);
     }
+    this.editor.appendChild(section);
+    this.el.appendChild(this.editor);
+    this.editor.focus();
+    Selection.updateSelectedRange();
   }
 
   /**
@@ -170,6 +170,10 @@ class Align {
             this.execute('outdent', false, true); break;
           }
           this.execute('indent', false, true); break;
+        case 'Escape':
+          this.el.classList.remove('is-fullscreen');
+          exitFullscreen();
+          break;
         default:
           break;
       }
@@ -214,9 +218,11 @@ class Align {
   toggleFullScreen() {
     const state = document.fullscreenElement || document.webkitIsFullScreen;
     if (!state) {
-      launchFullscreen(document.documentElement);
+      launchFullscreen(this.el);
+      this.el.classList.add('is-fullscreen');
       return;
     }
+    this.el.classList.remove('is-fullscreen');
     exitFullscreen();
   }
 
