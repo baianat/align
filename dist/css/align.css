@@ -359,7 +359,7 @@
   z-index: 50;
 }
 .styler.is-bubble {
-  position: fixed;
+  position: absolute;
   z-index: 10;
   border-radius: 40px;
   box-shadow: 0 0 25px rgba(0,0,0,0.05);
@@ -449,7 +449,6 @@
 }
 [data-tooltip] {
   position: relative;
-  background: #f00;
 }
 [data-tooltip]:focus {
   outline: none;

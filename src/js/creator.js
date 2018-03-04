@@ -45,7 +45,7 @@ class Creator {
       Selection.current.anchorNode.nodeType === 1 &&
       Selection.current.anchorNode.childNodes.length <= 1
     ) {
-      updatePosition(Selection.current.anchorNode, this.creator, 'middle-left');
+      updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
       this.show();
       return;
     }

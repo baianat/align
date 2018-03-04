@@ -296,33 +296,35 @@ function camelCase(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function updatePosition(reference, element) {
-  var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'middle-left';
+function updatePosition(reference, element, align) {
+  var mode = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'middle-left';
 
   if (typeof reference.getBoundingClientRect !== 'function') return;
   var modes = mode.split('-');
   var elmRect = element.getBoundingClientRect();
   var refRect = reference.getBoundingClientRect();
-  var scrolled = window.scrollY;
+  var alignRect = align.getBoundingClientRect();
+
+  console.log(alignRect.top, refRect.top);
   modes.forEach(function (mode) {
     switch (mode) {
       case 'center':
-        element.style.left = refRect.left + refRect.width / 2 + 'px';
+        element.style.left = refRect.left - alignRect.left + refRect.width / 2 + 'px';
         break;
       case 'left':
-        element.style.left = refRect.left + 'px';
+        element.style.left = refRect.left - alignRect.left + 'px';
         break;
       case 'right':
-        element.style.left = refRect.left - refRect.width + 'px';
+        element.style.left = refRect.left - alignRect.left - refRect.width + 'px';
         break;
       case 'middle':
-        element.style.top = refRect.top + scrolled + refRect.height / 2 + 'px';
+        element.style.top = refRect.top - alignRect.top + refRect.height / 2 + 'px';
         break;
       case 'top':
-        element.style.top = refRect.top + scrolled - elmRect.height + 'px';
+        element.style.top = refRect.top - alignRect.top - elmRect.height + 'px';
         break;
       case 'bottom':
-        element.style.top = refRect.bottom + scrolled + elmRect.height + 'px';
+        element.style.top = alignRect.top - refRect.bottom + elmRect.height + 'px';
         break;
     }
   });
@@ -1804,7 +1806,7 @@ var optionsBar$1 = function () {
       this.currentItem.classList.add('is-active');
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
-      updatePosition(this.currentItem, this.el, 'center-top');
+      updatePosition(this.currentItem, this.el, this.$align.el, 'center-top');
       this.clickCallback = this.deactivate.bind(this);
       document.addEventListener('click', this.clickCallback);
     }
@@ -1891,7 +1893,7 @@ var Creator = function () {
     key: 'update',
     value: function update() {
       if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1) {
-        updatePosition(Selection.current.anchorNode, this.creator, 'middle-left');
+        updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
         this.show();
         return;
       }

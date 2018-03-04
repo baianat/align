@@ -117,31 +117,33 @@ export function camelCase(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function updatePosition(reference, element, mode = 'middle-left') {
+export function updatePosition(reference, element, align, mode = 'middle-left') {
   if (typeof reference.getBoundingClientRect !== 'function') return;
   const modes = mode.split('-');
   const elmRect = element.getBoundingClientRect();
   const refRect = reference.getBoundingClientRect();
-  const scrolled = window.scrollY;
+  const alignRect = align.getBoundingClientRect();
+
+  console.log(alignRect.top, refRect.top)
   modes.forEach(mode => {
     switch (mode) {
       case 'center':
-        element.style.left = `${refRect.left + (refRect.width / 2)}px`
+        element.style.left = `${refRect.left - alignRect.left + (refRect.width / 2)}px`
         break;
       case 'left':
-        element.style.left = `${refRect.left}px`
+        element.style.left = `${refRect.left - alignRect.left}px`
         break;
       case 'right':
-        element.style.left = `${refRect.left - refRect.width}px`
+        element.style.left = `${refRect.left - alignRect.left - refRect.width}px`
         break;
       case 'middle':
-        element.style.top = `${refRect.top + scrolled + (refRect.height / 2)}px`
+        element.style.top = `${refRect.top - alignRect.top + (refRect.height / 2)}px`
         break;
       case 'top':
-        element.style.top = `${refRect.top + scrolled - elmRect.height}px`;
+        element.style.top = `${refRect.top - alignRect.top - elmRect.height}px`;
         break;
       case 'bottom':
-        element.style.top = `${refRect.bottom + scrolled + elmRect.height}px`;
+        element.style.top = `${alignRect.top - refRect.bottom + elmRect.height}px`;
         break;
     }
   })

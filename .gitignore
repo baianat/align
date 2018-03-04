@@ -60,3 +60,5 @@ typings/
 # Editor workspace
 .vscode
 
+# folder icon
+Icon/r

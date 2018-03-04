@@ -33,7 +33,7 @@ class optionsBar {
     this.currentItem.classList.add('is-active');
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
-    updatePosition(this.currentItem, this.el, 'center-top');
+    updatePosition(this.currentItem, this.el, this.$align.el, 'center-top');
     this.clickCallback = this.deactivate.bind(this);
     document.addEventListener('click', this.clickCallback);
   }
