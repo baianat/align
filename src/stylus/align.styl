@@ -11,6 +11,19 @@
     width: 100%
     overflow: auto
 
+  &-section
+    overflow: hidden
+    position: relative
+    z-index: 1
+    &.is-active
+      outline: 2px solid $blue
+    &:empty
+      &::after
+        font-style: italic
+        color: $gray
+        content: 'your content here'
+        font-size: 50px
+
   &-title
     border: 0
     margin: 0 auto

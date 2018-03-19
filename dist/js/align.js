@@ -305,7 +305,6 @@ function updatePosition(reference, element, align) {
   var refRect = reference.getBoundingClientRect();
   var alignRect = align.getBoundingClientRect();
 
-  console.log(alignRect.top, refRect.top);
   modes.forEach(function (mode) {
     switch (mode) {
       case 'center':
@@ -362,7 +361,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var colorpicker = createCommonjsModule(function (module, exports) {
+var colorpicker$1 = createCommonjsModule(function (module, exports) {
   (function (global, factory) {
     module.exports = factory();
   })(commonjsGlobal, function () {
@@ -1510,7 +1509,7 @@ var cmdsSchema = {
     type: 'text',
     command: 'foreColor',
     useCSS: true,
-    init: colorpicker,
+    init: colorpicker$1,
     initConfig: {
       defaultColor: '#000000',
       mode: 'hex',
@@ -1535,7 +1534,7 @@ var cmdsSchema = {
     type: 'text',
     command: 'backColor',
     useCSS: true,
-    init: colorpicker,
+    init: colorpicker$1,
     initConfig: {
       defaultColor: '#fdfdfd',
       mode: 'hex',
@@ -1676,6 +1675,14 @@ var iconsPath = {
 
   figureNormal: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 
+  sectionNormal: 'M5.41,7.41L10,12L5.41,16.59L4,15.17L7.17,12L4,8.83L5.41,7.41M18.59,16.59L14,12L18.59,7.42L20,8.83L16.83,12L20,15.17L18.59,16.59Z',
+
+  sectionFull: 'M18.17,12L15,8.83L16.41,7.41L21,12L16.41,16.58L15,15.17L18.17,12M5.83,12L9,15.17L7.59,16.59L3,12L7.59,7.42L9,8.83L5.83,12Z',
+
+  arrowUp: 'M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z',
+
+  arrowDown: 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z',
+
   delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
 
   section: 'M2 21h19v-3H2v3zM20 8H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zM2 3v3h19V3H2z',
@@ -1767,46 +1774,114 @@ function menuButton(name, func) {
   return menuItem;
 }
 
-var optionsBar$1 = function () {
-  function optionsBar(align) {
-    classCallCheck(this, optionsBar);
+var OptionsBar = function () {
+  function OptionsBar(align) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$element = _ref.element,
+        element = _ref$element === undefined ? 'figure' : _ref$element,
+        _ref$options = _ref.options,
+        options = _ref$options === undefined ? ['normal', 'full', 'float'] : _ref$options,
+        _ref$position = _ref.position,
+        position = _ref$position === undefined ? 'center-top' : _ref$position,
+        _ref$afterDelete = _ref.afterDelete,
+        afterDelete = _ref$afterDelete === undefined ? null : _ref$afterDelete,
+        _ref$backgroundImage = _ref.backgroundImage,
+        backgroundImage = _ref$backgroundImage === undefined ? false : _ref$backgroundImage,
+        _ref$backgroundColor = _ref.backgroundColor,
+        backgroundColor = _ref$backgroundColor === undefined ? false : _ref$backgroundColor,
+        _ref$sorting = _ref.sorting,
+        sorting = _ref$sorting === undefined ? false : _ref$sorting,
+        _ref$allItems = _ref.allItems,
+        allItems = _ref$allItems === undefined ? null : _ref$allItems;
+
+    classCallCheck(this, OptionsBar);
 
     this.$align = align;
+    this.element = element;
+    this.options = options;
+    this.afterDelete = afterDelete;
+    this.allItems = allItems;
+    this.settings = {
+      position: position,
+      backgroundImage: backgroundImage,
+      backgroundColor: backgroundColor,
+      sorting: sorting
+    };
+    this.visiable = false;
     this._init();
   }
 
-  createClass(optionsBar, [{
+  createClass(OptionsBar, [{
     key: '_init',
     value: function _init() {
       var _this = this;
 
-      setElementsPrefix('creator-');
+      setElementsPrefix('optionsBar-');
       this.el = document.createElement('ul');
-      this.el.classList.add('creator-optionsBar', 'is-hidden');
+      this.el.classList.add('optionsBar', 'is-hidden');
 
-      var options = ['normal', 'full', 'float'];
-      this.el.appendChild(menuButton('figureNormal', function () {
-        return _this.toggleClass('is-normal', options);
-      }));
-      this.el.appendChild(menuButton('figureFull', function () {
-        return _this.toggleClass('is-full', options);
-      }));
-      this.el.appendChild(menuButton('figureFloat', function () {
-        return _this.toggleClass('is-float', options);
-      }));
+      if (this.settings.sorting) {
+        this.el.appendChild(menuButton('arrowUp', function () {
+          return _this.sectionUp();
+        }));
+        this.el.appendChild(menuButton('arrowDown', function () {
+          return _this.sectionDown();
+        }));
+      }
+
+      this.options.forEach(function (option) {
+        _this.el.appendChild(menuButton('' + _this.element + camelCase(option), function () {
+          return _this.toggleClass('is-' + option);
+        }));
+      });
+
+      if (this.settings.backgroundImage) {
+        var li = document.createElement('li');
+        var bgImage = fileButton('image');
+        bgImage.input.addEventListener('change', this.backgroundImage.bind(this));
+        li.appendChild(bgImage.el);
+        this.el.appendChild(li);
+      }
+      if (this.settings.backgroundColor) {
+        var _li = document.createElement('li');
+        var bgColor = input('bgColor', 'text');
+        var _self = this;
+        _li.appendChild(bgColor);
+        this.el.appendChild(_li);
+
+        this.picker = new colorpicker$1(bgColor, {
+          defaultColor: '#000000',
+          mode: 'hex',
+          disableLum: true,
+          guideIcon: '\n          <svg viewBox="0 0 24 24">\n            <path d="M0 20h24v4H0z"/>\n            <path style="fill: #000" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n          </svg>\n        ',
+          events: {
+            afterSelect: function afterSelect() {
+              if (!_self.currentItem) return;
+              _self.currentItem.style.backgroundColor = bgColor.value;
+            }
+          }
+        });
+      }
+
       this.el.appendChild(menuButton('delete', this.removeCurrentItem.bind(this)));
       this.$align.el.appendChild(this.el);
     }
   }, {
     key: 'active',
-    value: function active(item) {
-      // if (this.el.classList.contains('is-visible')) return;
-
+    value: function active(item, index) {
+      if (this.currentItem) {
+        this.currentItem.classList.remove('is-active');
+      }
       this.currentItem = item;
+      this.currentIndex = index || 0;
       this.currentItem.classList.add('is-active');
+
+      updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
+      this.$align.update();
+      if (this.visiable) return;
+      this.visiable = true;
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
-      updatePosition(this.currentItem, this.el, this.$align.el, 'center-top');
       this.clickCallback = this.deactivate.bind(this);
       document.addEventListener('click', this.clickCallback);
     }
@@ -1815,6 +1890,7 @@ var optionsBar$1 = function () {
     value: function deactivate(event) {
       if (event && (isElementClosest(event.target, this.currentItem) || isElementClosest(event.target, this.el))) return;
 
+      this.visiable = false;
       this.currentItem.classList.remove('is-active');
       this.currentItem = null;
       this.el.classList.remove('is-visible');
@@ -1823,26 +1899,64 @@ var optionsBar$1 = function () {
     }
   }, {
     key: 'toggleClass',
-    value: function toggleClass(className, otherClasses) {
+    value: function toggleClass(className) {
       var _currentItem$classLis;
 
       if (!this.currentItem) return;
-      var prefixedClasses = otherClasses.map(function (cls) {
+      var prefixedClasses = this.options.map(function (cls) {
         return 'is-' + cls;
       });
       (_currentItem$classLis = this.currentItem.classList).remove.apply(_currentItem$classLis, toConsumableArray(prefixedClasses));
       this.currentItem.classList.add(className);
-      updatePosition(this.currentItem, this.el, 'center-top');
+      updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
       this.$align.update();
+    }
+  }, {
+    key: 'backgroundImage',
+    value: function backgroundImage(event) {
+      var _this2 = this;
+
+      var input$$1 = event.target;
+      var file = input$$1.files[0];
+      if (!file) return;
+      var reader = new FileReader(); // eslint-disable-line
+
+      reader.addEventListener('load', function () {
+        var bg = document.createElement('div');
+        bg.classList.add('align-bgImage');
+        bg.style.backgroundImage = 'url(' + reader.result + ')';
+        _this2.currentItem.insertAdjacentElement('afterBegin', bg);
+        _this2.currentItem.classList.add('is-bgImage');
+        _this2.$align.update();
+      });
+      reader.readAsDataURL(file);
+      input$$1.value = null;
+    }
+  }, {
+    key: 'sectionUp',
+    value: function sectionUp() {
+      if (!this.currentItem.previousSibling.classList.contains('align-section')) return;
+      this.$align.editor.insertBefore(this.currentItem, this.currentItem.previousSibling);
+      updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
+    }
+  }, {
+    key: 'sectionDown',
+    value: function sectionDown() {
+      if (!this.currentItem.nextSibling) return;
+      this.$align.editor.insertBefore(this.currentItem, this.currentItem.nextSibling.nextSibling);
+      updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
     }
   }, {
     key: 'removeCurrentItem',
     value: function removeCurrentItem() {
       this.currentItem.remove();
+      if (this.allItems) {
+        this.allItems.splice(this.currentIndex, 1);
+      }
       this.deactivate();
     }
   }]);
-  return optionsBar;
+  return OptionsBar;
 }();
 
 var Creator = function () {
@@ -1851,7 +1965,7 @@ var Creator = function () {
         _ref$mode = _ref.mode,
         mode = _ref$mode === undefined ? 'default' : _ref$mode,
         _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure', 'section'] : _ref$items;
+        items = _ref$items === undefined ? ['figure'] : _ref$items;
 
     classCallCheck(this, Creator);
 
@@ -1875,7 +1989,7 @@ var Creator = function () {
       this.menu.classList.add('creator-menu');
       this.toggleButton = button('plus');
       this.toggleButton.addEventListener('click', this.toggleState.bind(this));
-      this.optionsBar = new optionsBar$1(this.$align);
+      this.optionsBar = new OptionsBar(this.$align);
 
       this.settings.items.forEach(function (item) {
         var menuItem = document.createElement('li');
@@ -1892,8 +2006,8 @@ var Creator = function () {
   }, {
     key: 'update',
     value: function update() {
-      if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1) {
-        updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
+      if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1 && Selection.current.anchorNode.parentNode.classList.contains('align-section')) {
+        updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-center');
         this.show();
         return;
       }
@@ -1931,6 +2045,8 @@ var Creator = function () {
       var caption = document.createElement('figcaption');
       var img = document.createElement('img');
       var selectedElement = Selection.current.anchorNode;
+      figure.contentEditable = false;
+      caption.contentEditable = true;
       caption.dataset.defaultValue = 'Figure caption';
       img.classList.add('align-image');
       figure.classList.add('align-figure', 'is-normal');
@@ -1947,57 +2063,6 @@ var Creator = function () {
       reader.readAsDataURL(file);
       input$$1.value = null;
       selectedElement.parentNode.insertBefore(figure, selectedElement);
-    }
-  }, {
-    key: 'getPreviousSiblings',
-    value: function getPreviousSiblings(element) {
-      var results = [];
-      while (element.previousSibling) {
-        element = element.previousSibling;
-        results.push(element);
-      }
-      return results;
-    }
-  }, {
-    key: 'getNextSiblings',
-    value: function getNextSiblings(element) {
-      var results = [];
-      while (element.nextSibling) {
-        element = element.nextSibling;
-        results.push(element);
-      }
-      return results;
-    }
-  }, {
-    key: 'createSection',
-    value: function createSection(event) {
-      var _this3 = this;
-
-      var input$$1 = event.target;
-      var file = input$$1.files[0];
-      if (!file || !Selection.current) return;
-      var reader = new FileReader(); // eslint-disable-line
-
-      var selectedElement = Selection.current.anchorNode;
-      var nextDiv = document.createElement('div');
-      var section = document.createElement('div');
-      var sectionContent = document.createElement('p');
-      var next = this.getNextSiblings(selectedElement);
-
-      sectionContent.dataset.defaultValue = 'Write content';
-      section.classList.add('align-section', 'is-full', 'is-image');
-      nextDiv.classList.add('align-section');
-      section.appendChild(sectionContent);
-      nextDiv.append.apply(nextDiv, toConsumableArray(next));
-
-      reader.addEventListener('load', function () {
-        section.style.backgroundImage = 'url(' + reader.result + ')';
-        _this3.$align.update();
-      });
-      reader.readAsDataURL(file);
-      input$$1.value = null;
-      this.$align.editor.appendChild(section);
-      this.$align.editor.appendChild(nextDiv);
     }
   }]);
   return Creator;
@@ -2264,14 +2329,13 @@ var Align = function () {
 
     this.el = select(selector);
     this.settings = {
-      defaultText: this.el.innerHTML,
       toolbar: toolbar,
       bubble: bubble,
       creator: creator,
       shortcuts: shortcuts,
       postTitle: postTitle
     };
-    this.init();
+    this._init();
   }
 
   /**
@@ -2280,14 +2344,16 @@ var Align = function () {
 
 
   createClass(Align, [{
-    key: 'init',
+    key: '_init',
 
     /**
      * Create all editor elements
      */
-    value: function init() {
+    value: function _init() {
       this.HTML = false;
+      this.startContent = Array.from(this.el.children);
       this.el.innerText = '';
+
       if (this.settings.toolbar) {
         this.settings.toolbar.mode = 'toolbar';
         this.toolbar = new Styler(this, this.settings.toolbar);
@@ -2300,8 +2366,9 @@ var Align = function () {
       if (this.settings.creator) {
         this.creator = new Creator(this, this.settings.creator);
       }
-      this.initEditor();
-      this.initEvents();
+      this._initEditor();
+      this._initSections();
+      this._initEvents();
     }
 
     /**
@@ -2309,16 +2376,12 @@ var Align = function () {
      */
 
   }, {
-    key: 'initEditor',
-    value: function initEditor() {
-      document.execCommand('defaultParagraphSeparator', false, 'br');
+    key: '_initEditor',
+    value: function _initEditor() {
+      // document.execCommand('defaultParagraphSeparator', false, 'br');
 
       this.editor = document.createElement('div');
-      this.editor.contentEditable = 'true';
       this.editor.classList.add('align-content');
-      var section = document.createElement('div');
-      section.innerHTML = this.settings.defaultText + '\n';
-      section.classList.add('align-section');
       this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
       this.cmdKeyPressed = false;
       if (this.settings.postTitle) {
@@ -2327,10 +2390,45 @@ var Align = function () {
         this.postTitle.classList.add('align-title');
         this.editor.appendChild(this.postTitle);
       }
-      this.editor.appendChild(section);
       this.el.appendChild(this.editor);
       this.editor.focus();
       Selection.updateSelectedRange();
+    }
+  }, {
+    key: '_initSections',
+    value: function _initSections() {
+      var _this = this;
+
+      this.sections = [];
+      this.startContent.forEach(function (e) {
+        if (!e.classList.contains('align-section')) {
+          var section = document.createElement('div');
+          section.appendChild(e);
+          section.classList.add('align-section');
+          section.contentEditable = true;
+          _this.sections.push(section);
+          _this.editor.appendChild(section);
+          return;
+        }
+        _this.sections.push(e);
+        e.contentEditable = true;
+        _this.editor.appendChild(e);
+      });
+      this.optionsBar = new OptionsBar(this, {
+        element: 'section',
+        options: ['normal', 'full'],
+        position: 'center-top',
+        backgroundImage: true,
+        backgroundColor: true,
+        sorting: true,
+        allItems: this.sections
+      });
+
+      this.sections.forEach(function (sec, index) {
+        sec.addEventListener('focus', function () {
+          _this.optionsBar.active(sec, index);
+        });
+      });
     }
 
     /**
@@ -2338,12 +2436,12 @@ var Align = function () {
      */
 
   }, {
-    key: 'initEvents',
-    value: function initEvents() {
-      var _this = this;
+    key: '_initEvents',
+    value: function _initEvents() {
+      var _this2 = this;
 
       this.editor.addEventListener('focus', function () {
-        _this.highlight();
+        _this2.highlight();
       });
 
       this.editor.addEventListener('mouseup', this.update.bind(this), true);
@@ -2354,54 +2452,54 @@ var Align = function () {
           return;
         }
 
-        _this.update();
-        if (event[_this.cmdKey] && _this.settings.shortcuts) {
+        _this2.update();
+        if (event[_this2.cmdKey] && _this2.settings.shortcuts) {
           switch (event.key.toUpperCase()) {
             case 'B':
               event.preventDefault();
-              _this.execute('bold');break;
+              _this2.execute('bold');break;
             case 'I':
               event.preventDefault();
-              _this.execute('italic');break;
+              _this2.execute('italic');break;
             case 'U':
               event.preventDefault();
-              _this.execute('underline');break;
+              _this2.execute('underline');break;
             case 'E':
               event.preventDefault();
-              _this.execute('justifyCenter');break;
+              _this2.execute('justifyCenter');break;
             case 'R':
               event.preventDefault();
-              _this.execute('justifyRight');break;
+              _this2.execute('justifyRight');break;
             case 'L':
               event.preventDefault();
-              _this.execute('justifyLeft');break;
+              _this2.execute('justifyLeft');break;
             case 'J':
               event.preventDefault();
-              _this.execute('justifyFull');break;
+              _this2.execute('justifyFull');break;
             case 'A':
               event.preventDefault();
-              _this.execute('selectAll');break;
+              _this2.execute('selectAll');break;
             case 'F':
               event.preventDefault();
               if (event.shiftKey) {
-                _this.toggleFullScreen();
+                _this2.toggleFullScreen();
               }
               break;
             case 'Z':
               event.preventDefault();
               if (event.shiftKey) {
-                _this.execute('redo');break;
+                _this2.execute('redo');break;
               }
-              _this.execute('undo');break;
+              _this2.execute('undo');break;
             case '\\':
               event.preventDefault();
-              _this.execute('removeFormat');break;
+              _this2.execute('removeFormat');break;
             case '=':
               event.preventDefault();
               if (event.shiftKey) {
-                _this.execute('superscript');break;
+                _this2.execute('superscript');break;
               }
-              _this.execute('subscript');break;
+              _this2.execute('subscript');break;
             default:
               break;
           }
@@ -2411,11 +2509,11 @@ var Align = function () {
           case 'Tab':
             event.preventDefault();
             if (event.shiftKey) {
-              _this.execute('outdent', false, true);break;
+              _this2.execute('outdent', false, true);break;
             }
-            _this.execute('indent', false, true);break;
+            _this2.execute('indent', false, true);break;
           case 'Escape':
-            _this.el.classList.remove('is-fullscreen');
+            _this2.el.classList.remove('is-fullscreen');
             exitFullscreen();
             break;
           default:
@@ -2479,18 +2577,18 @@ var Align = function () {
   }, {
     key: 'update',
     value: function update() {
-      var _this2 = this;
+      var _this3 = this;
 
       Selection.updateSelectedRange();
       setTimeout(function () {
-        if (_this2.settings.toolbar) {
-          _this2.toolbar.updateStyler();
+        if (_this3.settings.toolbar) {
+          _this3.toolbar.updateStyler();
         }
-        if (_this2.settings.bubble) {
-          _this2.bubble.updateStyler();
+        if (_this3.settings.bubble) {
+          _this3.bubble.updateStyler();
         }
-        if (_this2.settings.creator) {
-          _this2.creator.update();
+        if (_this3.settings.creator) {
+          _this3.creator.update();
         }
       }, 16);
     }

@@ -124,7 +124,6 @@ export function updatePosition(reference, element, align, mode = 'middle-left') 
   const refRect = reference.getBoundingClientRect();
   const alignRect = align.getBoundingClientRect();
 
-  console.log(alignRect.top, refRect.top)
   modes.forEach(mode => {
     switch (mode) {
       case 'center':

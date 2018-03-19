@@ -1,39 +1,104 @@
-import { updatePosition, isElementClosest } from './partial/util';
-import { setElementsPrefix, menuButton } from './partial/elements';
+import Colorpicker from '@baianat/colorpicker';
+import { updatePosition, isElementClosest, camelCase, call } from './partial/util';
+import { setElementsPrefix, menuButton, fileButton, input } from './partial/elements';
 
-class optionsBar {
-  constructor(align) {
+class OptionsBar {
+  constructor(align, {
+    element = 'figure',
+    options = ['normal', 'full', 'float'],
+    position = 'center-top',
+    afterDelete = null,
+    backgroundImage = false,
+    backgroundColor = false,
+    sorting = false,
+    allItems = null
+  } = {}) {
     this.$align = align;
+    this.element = element;
+    this.options = options;
+    this.afterDelete = afterDelete;
+    this.allItems = allItems;
+    this.settings = {
+      position,
+      backgroundImage,
+      backgroundColor,
+      sorting
+    }
+    this.visiable = false;
     this._init();
   }
 
   _init() {
-    setElementsPrefix('creator-');
+    setElementsPrefix('optionsBar-');
     this.el = document.createElement('ul');
-    this.el.classList.add('creator-optionsBar', 'is-hidden');
+    this.el.classList.add('optionsBar', 'is-hidden');
 
-    const options = ['normal', 'full', 'float'];
-    this.el.appendChild(
-      menuButton('figureNormal', () => this.toggleClass('is-normal', options))
-    );
-    this.el.appendChild(
-      menuButton('figureFull', () => this.toggleClass('is-full', options))
-    );
-    this.el.appendChild(
-      menuButton('figureFloat', () => this.toggleClass('is-float', options))
-    );
+    if (this.settings.sorting) {
+      this.el.appendChild(
+        menuButton('arrowUp', () => this.sectionUp())
+      );
+      this.el.appendChild(
+        menuButton('arrowDown', () => this.sectionDown())
+      );
+    }
+
+    this.options.forEach(option => {
+      this.el.appendChild(
+        menuButton(`${this.element}${camelCase(option)}`, () => this.toggleClass(`is-${option}`))
+      );
+    });
+    
+    if (this.settings.backgroundImage) {
+      const li = document.createElement('li');
+      const bgImage = fileButton('image');
+      bgImage.input.addEventListener('change', this.backgroundImage.bind(this));
+      li.appendChild(bgImage.el)
+      this.el.appendChild(li);
+    }
+    if (this.settings.backgroundColor) {
+      const li = document.createElement('li');
+      const bgColor = input('bgColor', 'text');
+      const _self = this;
+      li.appendChild(bgColor);
+      this.el.appendChild(li);
+    
+      this.picker = new Colorpicker(bgColor, {
+        defaultColor: '#000000',
+        mode: 'hex',
+        disableLum: true,
+        guideIcon: `
+          <svg viewBox="0 0 24 24">
+            <path d="M0 20h24v4H0z"/>
+            <path style="fill: #000" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>
+          </svg>
+        `,
+        events: {
+          afterSelect() {
+            if (!_self.currentItem) return;
+            _self.currentItem.style.backgroundColor = bgColor.value;
+          }
+        }
+      })
+    }
+    
     this.el.appendChild(menuButton('delete', this.removeCurrentItem.bind(this)));
     this.$align.el.appendChild(this.el);
   }
 
-  active(item) {
-    // if (this.el.classList.contains('is-visible')) return;
-
+  active(item, index) {
+    if (this.currentItem) {
+      this.currentItem.classList.remove('is-active');
+    }
     this.currentItem = item;
+    this.currentIndex = index || 0;
     this.currentItem.classList.add('is-active');
+    
+    updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
+    this.$align.update();
+    if (this.visiable) return
+    this.visiable = true;
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
-    updatePosition(this.currentItem, this.el, this.$align.el, 'center-top');
     this.clickCallback = this.deactivate.bind(this);
     document.addEventListener('click', this.clickCallback);
   }
@@ -45,6 +110,7 @@ class optionsBar {
        isElementClosest(event.target, this.el))
     ) return;
 
+    this.visiable = false;
     this.currentItem.classList.remove('is-active');
     this.currentItem = null;
     this.el.classList.remove('is-visible');
@@ -52,19 +118,51 @@ class optionsBar {
     document.removeEventListener('click', this.clickCallback);
   }
 
-  toggleClass(className, otherClasses) {
+  toggleClass(className) {
     if (!this.currentItem) return;
-    const prefixedClasses = otherClasses.map(cls => `is-${cls}`);
+    const prefixedClasses = this.options.map(cls => `is-${cls}`);
     this.currentItem.classList.remove(...prefixedClasses);
     this.currentItem.classList.add(className);
-    updatePosition(this.currentItem, this.el, 'center-top');
+    updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
     this.$align.update();
   }
 
-  removeCurrentItem() {
+  backgroundImage (event) {
+    const input = event.target;
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader(); // eslint-disable-line
+
+    reader.addEventListener('load', () => {
+      const bg = document.createElement('div');
+      bg.classList.add('align-bgImage');
+      bg.style.backgroundImage = `url(${reader.result})`;
+      this.currentItem.insertAdjacentElement('afterBegin', bg);
+      this.currentItem.classList.add('is-bgImage');
+      this.$align.update();
+    });
+    reader.readAsDataURL(file);
+    input.value = null;
+  }
+
+  sectionUp () {
+    if (!this.currentItem.previousSibling.classList.contains('align-section')) return;
+    this.$align.editor.insertBefore(this.currentItem, this.currentItem.previousSibling);
+    updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
+  }
+
+  sectionDown () {
+    if (!this.currentItem.nextSibling) return;
+    this.$align.editor.insertBefore(this.currentItem, this.currentItem.nextSibling.nextSibling);
+    updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
+  }
+  removeCurrentItem () {
     this.currentItem.remove();
+    if (this.allItems) {
+      this.allItems.splice(this.currentIndex, 1);
+    }
     this.deactivate();
   }
 }
 
-export default optionsBar;
+export default OptionsBar;

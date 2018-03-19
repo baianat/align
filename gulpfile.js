@@ -127,7 +127,7 @@ gulp.task('font', () => {
  */
 gulp.task('watch', () => {
   gulp.watch('./src/js/**/*.js', ['scripts']);
-  gulp.watch('./src/stylus/**/*.styl', ['styles']);
+  gulp.watch('./src/stylus/**/*.styl', ['styles', 'theme']);
   gulp.watch('./**/*.html', () => {
     gulp.src('./**/*.html').pipe(reload({ stream: true }));
   });

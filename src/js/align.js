@@ -2,6 +2,7 @@ import hljs from 'highlight.js';
 import { select, userOS, launchFullscreen, exitFullscreen } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
+import OptionsBar from './optionsBar';
 import Selection from './selection';
 import Creator from './creator';
 import Styler from './styler';
@@ -16,14 +17,13 @@ class Align {
   } = {}) {
     this.el = select(selector);
     this.settings = {
-      defaultText: this.el.innerHTML,
       toolbar,
       bubble,
       creator,
       shortcuts,
       postTitle
     };
-    this.init();
+    this._init();
   }
 
   /**
@@ -49,9 +49,11 @@ class Align {
   /**
    * Create all editor elements
    */
-  init() {
+  _init() {
     this.HTML = false;
+    this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
+
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';
       this.toolbar = new Styler(this, this.settings.toolbar);
@@ -64,22 +66,19 @@ class Align {
     if (this.settings.creator) {
       this.creator = new Creator(this, this.settings.creator);
     }
-    this.initEditor();
-    this.initEvents();
+    this._initEditor();
+    this._initSections();
+    this._initEvents();
   }
 
   /**
    * Create the editor
    */
-  initEditor() {
-    document.execCommand('defaultParagraphSeparator', false, 'br');
+  _initEditor () {
+    // document.execCommand('defaultParagraphSeparator', false, 'br');
 
     this.editor = document.createElement('div');
-    this.editor.contentEditable = 'true';
     this.editor.classList.add('align-content');
-    const section = document.createElement('div');
-    section.innerHTML = this.settings.defaultText + '\n';
-    section.classList.add('align-section');
     this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
     this.cmdKeyPressed = false;
     if (this.settings.postTitle) {
@@ -88,16 +87,48 @@ class Align {
       this.postTitle.classList.add('align-title');
       this.editor.appendChild(this.postTitle);
     }
-    this.editor.appendChild(section);
     this.el.appendChild(this.editor);
     this.editor.focus();
     Selection.updateSelectedRange();
   }
 
+  _initSections () {
+    this.sections = [];
+    this.startContent.forEach(e => {
+      if (!e.classList.contains('align-section')) {
+        const section = document.createElement('div');
+        section.appendChild(e);
+        section.classList.add('align-section');
+        section.contentEditable = true;
+        this.sections.push(section);
+        this.editor.appendChild(section);
+        return;
+      }
+      this.sections.push(e);
+      e.contentEditable = true;
+      this.editor.appendChild(e);
+    });
+    this.optionsBar = new OptionsBar(this, {
+      element: 'section',
+      options: ['normal', 'full'],
+      position: 'center-top',
+      backgroundImage: true,
+      backgroundColor: true,
+      sorting: true,
+      allItems: this.sections
+    });
+
+    this.sections.forEach((sec, index) => {
+      sec.addEventListener('focus', () => {
+        this.optionsBar.active(sec, index);
+      });
+    });
+  }
+
   /**
    * Add all events listeners
    */
-  initEvents() {
+  _initEvents () {
     this.editor.addEventListener('focus', () => {
       this.highlight();
     });

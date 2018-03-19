@@ -6,7 +6,7 @@ import Selection from './selection';
 class Creator {
   constructor(align, {
     mode = 'default',
-    items = ['figure', 'section']
+    items = ['figure']
   } = {}) {
     this.$align = align;
     this.settings = {
@@ -43,9 +43,10 @@ class Creator {
     if (
       Selection.current.isCollapsed &&
       Selection.current.anchorNode.nodeType === 1 &&
-      Selection.current.anchorNode.childNodes.length <= 1
+      Selection.current.anchorNode.childNodes.length <= 1 &&
+      Selection.current.anchorNode.parentNode.classList.contains('align-section')
     ) {
-      updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
+      updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-center');
       this.show();
       return;
     }
@@ -77,6 +78,8 @@ class Creator {
     const caption = document.createElement('figcaption');
     const img = document.createElement('img');
     const selectedElement = Selection.current.anchorNode;
+    figure.contentEditable = false
+    caption.contentEditable = true
     caption.dataset.defaultValue = 'Figure caption';
     img.classList.add('align-image');
     figure.classList.add('align-figure', 'is-normal');
@@ -91,52 +94,6 @@ class Creator {
     reader.readAsDataURL(file);
     input.value = null;
     selectedElement.parentNode.insertBefore(figure, selectedElement);
-  }
-
-  getPreviousSiblings(element) {
-    let results = []
-    while (element.previousSibling) {
-      element = element.previousSibling;
-      results.push(element);
-    }
-    return results;
-  }
-
-  getNextSiblings(element) {
-    let results = []
-    while (element.nextSibling) {
-      element = element.nextSibling;
-      results.push(element);
-    }
-    return results;
-  }
-
-  createSection(event) {
-    const input = event.target;
-    const file = input.files[0];
-    if (!file || !Selection.current) return;
-    const reader = new FileReader(); // eslint-disable-line
-
-    const selectedElement = Selection.current.anchorNode;
-    const nextDiv = document.createElement('div');
-    const section = document.createElement('div');
-    const sectionContent = document.createElement('p');
-    const next = this.getNextSiblings(selectedElement);
-
-    sectionContent.dataset.defaultValue = 'Write content';
-    section.classList.add('align-section', 'is-full', 'is-image');
-    nextDiv.classList.add('align-section');
-    section.appendChild(sectionContent);
-    nextDiv.append(...next);
-
-    reader.addEventListener('load', () => {
-      section.style.backgroundImage = `url(${reader.result})`;
-      this.$align.update();
-    });
-    reader.readAsDataURL(file);
-    input.value = null;
-    this.$align.editor.appendChild(section);
-    this.$align.editor.appendChild(nextDiv);
   }
 }
 

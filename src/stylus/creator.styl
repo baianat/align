@@ -1,9 +1,9 @@
 .creator
   left: 20px
   display: flex
+  flex-direction: column
   justify-content: center
   align-items: center
-  margin: 0 0 0 -55px
   width: auto
   list-style: none
   transform: translate3d(0, -50%, 0)
@@ -14,35 +14,10 @@
     background: $gray
     fill: $white
 
-  &-optionsBar
-    position: absolute
-    z-index: 20
-    left: 50%
-    transform: translate3d(-50%, 0, 0)
-    display: flex
-    flex-wrap: wrap
-    justify-content: center
-    align-items: center
-    margin: 0
-    padding: 10px
-    width: auto
-    border-radius: 40px
-    background-color: $white
-    box-shadow: 0 0 25px alpha($black, 5%)
-    list-style: none
-    transition: opacity 0.2s
-    &.is-visible
-      visibility: visible
-      opacity: 1
-
-    &.is-hidden
-      visibility: hidden
-      opacity: 0
 
   &-menu
     list-style: none
     padding: 0
-    margin: 0 20px
     display: none
  
   &-button
