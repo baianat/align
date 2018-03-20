@@ -31,7 +31,18 @@ class Align {
    * Get editor's content
    */
   get content() {
-    return this.editor.innerHTML;
+    const output = this.editor.cloneNode(true);
+    const newSectionButtons = Array.from(output.querySelectorAll('.align-newSection'));
+    const sectionsContent = Array.from(output.querySelectorAll('.align-content'));
+    const title = output.querySelector('.align-title');
+    title.remove();
+    newSectionButtons.forEach((btn) => {
+      btn.remove();
+    })
+    sectionsContent.forEach((section) => {
+      section.contentEditable = 'inherit';
+    })
+    return output.innerHTML;
   }
 
   get title() {
@@ -243,6 +254,7 @@ class Align {
     this.el.focus();
     this.update();
   }
+
 }
 
 export default Align;

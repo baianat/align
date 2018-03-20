@@ -1949,7 +1949,11 @@ var OptionsBar = function () {
       reader.addEventListener('load', function () {
         _this2.currentItem.classList.add('is-bgImage');
         bg.style.backgroundImage = 'url(' + reader.result + ')';
+        var update = function update(src) {
+          bg.style.backgroundImage = 'url(' + src + ')';
+        };
         _this2.$align.update();
+        _this2.$align.$bus.emit('imageAdded', { file: file, update: update });
       });
       reader.readAsDataURL(file);
       input$$1.value = null;
@@ -2161,6 +2165,11 @@ var Creator = function () {
         img.src = reader.result;
         img.dataset.alignFilename = file.name;
         _this2.$align.update();
+        var update = function update(src) {
+          img.src = src;
+        };
+
+        _this2.$align.$bus.emit('imageAdded', { file: file, update: update });
       });
       reader.readAsDataURL(file);
       input$$1.value = null;
@@ -2413,6 +2422,61 @@ var Styler = function () {
   return Styler;
 }();
 
+var EventBus = function () {
+  function EventBus() {
+    classCallCheck(this, EventBus);
+
+    this.events = {};
+  }
+
+  createClass(EventBus, [{
+    key: "on",
+    value: function on(eventName, callback) {
+      var _this = this;
+
+      if (!this.events[eventName]) {
+        this.events[eventName] = [];
+      }
+
+      var idx = this.events[eventName].length;
+      this.events[eventName].push(callback);
+
+      return function () {
+        _this.events[eventName].splice(idx, 1);
+      };
+    }
+  }, {
+    key: "once",
+    value: function once(eventName, callback) {
+      var _this2 = this;
+
+      var idx = this.events.eventName ? this.events[eventName].length : 0;
+      var cb = function cb() {
+        callback.apply(undefined, arguments);
+        _this2.events[eventName].splice(idx, 1);
+      };
+
+      this.on(eventName, cb);
+    }
+  }, {
+    key: "emit",
+    value: function emit(eventName, args) {
+      var _this3 = this;
+
+      if (!this.events[eventName] || !this.events[eventName].length) {
+        return;
+      }
+
+      setTimeout(function () {
+        _this3.events[eventName].forEach(function (cb) {
+          return cb(args);
+        });
+      }, 0);
+    }
+  }]);
+  return EventBus;
+}();
+
 var Align = function () {
   function Align(selector) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
@@ -2452,6 +2516,7 @@ var Align = function () {
      * Create all editor elements
      */
     value: function _init() {
+      this.$bus = new EventBus();
       this.startContent = Array.from(this.el.children);
       this.el.innerText = '';
 
@@ -2671,7 +2736,18 @@ var Align = function () {
   }, {
     key: 'content',
     get: function get$$1() {
-      return this.editor.innerHTML;
+      var output = this.editor.cloneNode(true);
+      var newSectionButtons = Array.from(output.querySelectorAll('.align-newSection'));
+      var sectionsContent = Array.from(output.querySelectorAll('.align-content'));
+      var title = output.querySelector('.align-title');
+      title.remove();
+      newSectionButtons.forEach(function (btn) {
+        btn.remove();
+      });
+      sectionsContent.forEach(function (section) {
+        section.contentEditable = 'inherit';
+      });
+      return output.innerHTML;
     }
   }, {
     key: 'title',
