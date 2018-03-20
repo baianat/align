@@ -1,5 +1,5 @@
 import Colorpicker from '@baianat/colorpicker';
-import { updatePosition, isElementClosest, camelCase, call } from './partial/util';
+import { updatePosition, isElementClosest, camelCase } from './partial/util';
 import { setElementsPrefix, menuButton, fileButton, input } from './partial/elements';
 
 class OptionsBar {
@@ -10,18 +10,18 @@ class OptionsBar {
     afterDelete = null,
     backgroundImage = false,
     backgroundColor = false,
-    sorting = false,
-    allItems = null
+    toggleHTML = false,
+    sorting = false
   } = {}) {
     this.$align = align;
     this.element = element;
     this.options = options;
     this.afterDelete = afterDelete;
-    this.allItems = allItems;
     this.settings = {
       position,
       backgroundImage,
       backgroundColor,
+      toggleHTML,
       sorting
     }
     this.visiable = false;
@@ -55,6 +55,7 @@ class OptionsBar {
       li.appendChild(bgImage.el)
       this.el.appendChild(li);
     }
+
     if (this.settings.backgroundColor) {
       const li = document.createElement('li');
       const bgColor = input('bgColor', 'text');
@@ -74,11 +75,17 @@ class OptionsBar {
         `,
         events: {
           afterSelect() {
-            if (!_self.currentItem) return;
-            _self.currentItem.style.backgroundColor = bgColor.value;
+            if (!_self.currentContent) return;
+            _self.currentContent.style.backgroundColor = bgColor.value;
           }
         }
       })
+    }
+  
+    if (this.settings.toggleHTML) {
+      this.el.appendChild(
+        menuButton(`html`, () => this.toggleHTML())
+      );
     }
     
     this.el.appendChild(menuButton('delete', this.removeCurrentItem.bind(this)));
@@ -91,6 +98,7 @@ class OptionsBar {
     }
     this.currentItem = item;
     this.currentIndex = index || 0;
+    this.currentContent = item.querySelector('.align-content');
     this.currentItem.classList.add('is-active');
     
     updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
@@ -127,18 +135,38 @@ class OptionsBar {
     this.$align.update();
   }
 
+  toggleHTML() {
+    if (this.currentContent.firstElementChild.tagName !== 'PRE') {
+      const content = document.createTextNode(this.currentContent.innerHTML);
+      const pre = document.createElement('pre');
+
+      this.currentContent.innerHTML = '';
+      pre.id = 'content';
+      pre.style.whiteSpace = 'pre-wrap';
+      pre.appendChild(content);
+      this.currentContent.appendChild(pre);
+      this.$align.highlight();
+      return;
+    }
+    this.currentContent.innerHTML = this.currentContent.innerText;
+    this.currentContent.contentEditable = true;
+    this.currentContent.focus();
+  }
+
   backgroundImage (event) {
     const input = event.target;
     const file = input.files[0];
     if (!file) return;
     const reader = new FileReader(); // eslint-disable-line
-
-    reader.addEventListener('load', () => {
-      const bg = document.createElement('div');
+    const bg = this.currentContent.querySelector('.align-bgImage') ||
+              document.createElement('div');
+    if (!this.currentContent.querySelector('.align-bgImage')) {
       bg.classList.add('align-bgImage');
-      bg.style.backgroundImage = `url(${reader.result})`;
-      this.currentItem.insertAdjacentElement('afterBegin', bg);
+      this.currentContent.insertAdjacentElement('afterBegin', bg);
+    }
+    reader.addEventListener('load', () => {
       this.currentItem.classList.add('is-bgImage');
+      bg.style.backgroundImage = `url(${reader.result})`;
       this.$align.update();
     });
     reader.readAsDataURL(file);
@@ -158,9 +186,6 @@ class OptionsBar {
   }
   removeCurrentItem () {
     this.currentItem.remove();
-    if (this.allItems) {
-      this.allItems.splice(this.currentIndex, 1);
-    }
     this.deactivate();
   }
 }

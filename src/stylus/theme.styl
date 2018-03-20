@@ -1,9 +1,9 @@
 @import 'variables'
 
 .align
-  &-content
+  &-editor
     white-space: normal
-    line-height: 2.5em
+    line-height: 2em
     font-size: 18px
 
   &-image
@@ -37,6 +37,7 @@
         outline: none
     img
       width: 100%
+      max-width: 100%
     &.is-active
       img
         box-shadow: 0 0 25px alpha($black, 5%)
@@ -56,10 +57,12 @@
       max-width: 100%
       
 
+  &-content
+    padding: 20px
+
   &-section
     margin: auto
-    width: 80vw
-    padding: 20px
+    width: 70vw
     &.is-full
       width: 100%
       max-width: 100%
@@ -80,4 +83,5 @@
     bottom: 0
     background-repeat: no-repeat
     background-size: cover
+    background-position: center center
     opacity: 0.5

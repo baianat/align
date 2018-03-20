@@ -2,8 +2,8 @@ import hljs from 'highlight.js';
 import { select, userOS, launchFullscreen, exitFullscreen } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
-import OptionsBar from './optionsBar';
 import Selection from './selection';
+import Section from './section';
 import Creator from './creator';
 import Styler from './styler';
 
@@ -50,7 +50,6 @@ class Align {
    * Create all editor elements
    */
   _init() {
-    this.HTML = false;
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
 
@@ -78,7 +77,7 @@ class Align {
     // document.execCommand('defaultParagraphSeparator', false, 'br');
 
     this.editor = document.createElement('div');
-    this.editor.classList.add('align-content');
+    this.editor.classList.add('align-editor');
     this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
     this.cmdKeyPressed = false;
     if (this.settings.postTitle) {
@@ -93,36 +92,13 @@ class Align {
   }
 
   _initSections () {
-    this.sections = [];
-    this.startContent.forEach(e => {
-      if (!e.classList.contains('align-section')) {
-        const section = document.createElement('div');
-        section.appendChild(e);
-        section.classList.add('align-section');
-        section.contentEditable = true;
-        this.sections.push(section);
-        this.editor.appendChild(section);
-        return;
-      }
-      this.sections.push(e);
-      e.contentEditable = true;
-      this.editor.appendChild(e);
-    });
-    this.optionsBar = new OptionsBar(this, {
-      element: 'section',
-      options: ['normal', 'full'],
-      position: 'center-top',
-      backgroundImage: true,
-      backgroundColor: true,
-      sorting: true,
-      allItems: this.sections
-    });
+    Section.config(this);
 
-    this.sections.forEach((sec, index) => {
-      sec.addEventListener('focus', () => {
-        this.optionsBar.active(sec, index);
-      });
-    });
+    this.startContent.forEach(e => new Section(e));
+    this.newSectionButton = document.createElement('button');
+    this.newSectionButton.classList.add('align-addButton');
+    this.el.appendChild(this.newSectionButton);
+    this.newSectionButton.addEventListener('click', () => new Section());
   }
 
   /**
@@ -227,24 +203,6 @@ class Align {
   /**
    * Toggle on/off HTML
    */
-  toggleHTML() {
-    this.HTML = !this.HTML;
-    if (this.HTML) {
-      const content = document.createTextNode(this.editor.innerHTML);
-      const pre = document.createElement('pre');
-
-      this.editor.innerHTML = '';
-      pre.id = 'content';
-      pre.style.whiteSpace = 'pre-wrap';
-      pre.appendChild(content);
-      this.editor.appendChild(pre);
-      this.highlight();
-      return;
-    }
-    this.editor.innerHTML = this.editor.innerText;
-    this.editor.contentEditable = true;
-    this.editor.focus();
-  }
 
   toggleFullScreen() {
     const state = document.fullscreenElement || document.webkitIsFullScreen;
@@ -277,7 +235,6 @@ class Align {
   }
 
   execute(cmd, value, useCSS = false) {
-    if (this.HTML) return;
     document.execCommand('styleWithCSS', false, useCSS);
     document.execCommand(cmd, false, value);
     document.execCommand('styleWithCSS', false, false);

@@ -1475,12 +1475,6 @@ var cmdsSchema = {
     tooltip: 'Script'
   },
 
-  html: {
-    element: 'button',
-    func: 'toggleHTML',
-    tooltip: 'Show HTML'
-  },
-
   fontSize: {
     element: 'select',
     command: 'fontSize'
@@ -1789,10 +1783,10 @@ var OptionsBar = function () {
         backgroundImage = _ref$backgroundImage === undefined ? false : _ref$backgroundImage,
         _ref$backgroundColor = _ref.backgroundColor,
         backgroundColor = _ref$backgroundColor === undefined ? false : _ref$backgroundColor,
+        _ref$toggleHTML = _ref.toggleHTML,
+        toggleHTML = _ref$toggleHTML === undefined ? false : _ref$toggleHTML,
         _ref$sorting = _ref.sorting,
-        sorting = _ref$sorting === undefined ? false : _ref$sorting,
-        _ref$allItems = _ref.allItems,
-        allItems = _ref$allItems === undefined ? null : _ref$allItems;
+        sorting = _ref$sorting === undefined ? false : _ref$sorting;
 
     classCallCheck(this, OptionsBar);
 
@@ -1800,11 +1794,11 @@ var OptionsBar = function () {
     this.element = element;
     this.options = options;
     this.afterDelete = afterDelete;
-    this.allItems = allItems;
     this.settings = {
       position: position,
       backgroundImage: backgroundImage,
       backgroundColor: backgroundColor,
+      toggleHTML: toggleHTML,
       sorting: sorting
     };
     this.visiable = false;
@@ -1842,6 +1836,7 @@ var OptionsBar = function () {
         li.appendChild(bgImage.el);
         this.el.appendChild(li);
       }
+
       if (this.settings.backgroundColor) {
         var _li = document.createElement('li');
         var bgColor = input('bgColor', 'text');
@@ -1856,11 +1851,17 @@ var OptionsBar = function () {
           guideIcon: '\n          <svg viewBox="0 0 24 24">\n            <path d="M0 20h24v4H0z"/>\n            <path style="fill: #000" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n          </svg>\n        ',
           events: {
             afterSelect: function afterSelect() {
-              if (!_self.currentItem) return;
-              _self.currentItem.style.backgroundColor = bgColor.value;
+              if (!_self.currentContent) return;
+              _self.currentContent.style.backgroundColor = bgColor.value;
             }
           }
         });
+      }
+
+      if (this.settings.toggleHTML) {
+        this.el.appendChild(menuButton('html', function () {
+          return _this.toggleHTML();
+        }));
       }
 
       this.el.appendChild(menuButton('delete', this.removeCurrentItem.bind(this)));
@@ -1874,6 +1875,7 @@ var OptionsBar = function () {
       }
       this.currentItem = item;
       this.currentIndex = index || 0;
+      this.currentContent = item.querySelector('.align-content');
       this.currentItem.classList.add('is-active');
 
       updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
@@ -1912,6 +1914,25 @@ var OptionsBar = function () {
       this.$align.update();
     }
   }, {
+    key: 'toggleHTML',
+    value: function toggleHTML() {
+      if (this.currentContent.firstElementChild.tagName !== 'PRE') {
+        var content = document.createTextNode(this.currentContent.innerHTML);
+        var pre = document.createElement('pre');
+
+        this.currentContent.innerHTML = '';
+        pre.id = 'content';
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.appendChild(content);
+        this.currentContent.appendChild(pre);
+        this.$align.highlight();
+        return;
+      }
+      this.currentContent.innerHTML = this.currentContent.innerText;
+      this.currentContent.contentEditable = true;
+      this.currentContent.focus();
+    }
+  }, {
     key: 'backgroundImage',
     value: function backgroundImage(event) {
       var _this2 = this;
@@ -1920,13 +1941,14 @@ var OptionsBar = function () {
       var file = input$$1.files[0];
       if (!file) return;
       var reader = new FileReader(); // eslint-disable-line
-
-      reader.addEventListener('load', function () {
-        var bg = document.createElement('div');
+      var bg = this.currentContent.querySelector('.align-bgImage') || document.createElement('div');
+      if (!this.currentContent.querySelector('.align-bgImage')) {
         bg.classList.add('align-bgImage');
-        bg.style.backgroundImage = 'url(' + reader.result + ')';
-        _this2.currentItem.insertAdjacentElement('afterBegin', bg);
+        this.currentContent.insertAdjacentElement('afterBegin', bg);
+      }
+      reader.addEventListener('load', function () {
         _this2.currentItem.classList.add('is-bgImage');
+        bg.style.backgroundImage = 'url(' + reader.result + ')';
         _this2.$align.update();
       });
       reader.readAsDataURL(file);
@@ -1950,13 +1972,93 @@ var OptionsBar = function () {
     key: 'removeCurrentItem',
     value: function removeCurrentItem() {
       this.currentItem.remove();
-      if (this.allItems) {
-        this.allItems.splice(this.currentIndex, 1);
-      }
       this.deactivate();
     }
   }]);
   return OptionsBar;
+}();
+
+var ID = 0;
+
+var Section = function () {
+  function Section(content, position) {
+    var _this = this;
+
+    classCallCheck(this, Section);
+
+    this.generateEl(content);
+    this.id = ID++;
+    this.el.addEventListener('click', function () {
+      Section.optionsBar.active(_this.el, _this.id);
+    });
+    if (position) {
+      Section.$align.editor.insertBefore(this.el, position);
+      return;
+    }
+    Section.$align.editor.appendChild(this.el);
+  }
+
+  createClass(Section, [{
+    key: 'generateEl',
+    value: function generateEl(content) {
+      if (content && content.classList.contains('align-section')) {
+        var _contentDiv = content.querySelector('.align-content') || document.createElement('div');
+        _contentDiv.classList.add('align-content');
+        _contentDiv.contentEditable = true;
+        this.el = content;
+        _contentDiv.innerHTML = this.el.innerHTML;
+        this.el.innerHTML = '';
+        this.el.appendChild(_contentDiv);
+        if (!content.querySelector('.align-newSection')) {
+          this.el.insertAdjacentElement('afterBegin', this.newSectionButton());
+        }
+        return;
+      }
+
+      var contentDiv = document.createElement('div');
+      contentDiv.classList.add('align-content');
+      contentDiv.contentEditable = true;
+
+      this.el = document.createElement('div');
+      this.el.classList.add('align-section');
+      this.el.appendChild(this.newSectionButton());
+      this.el.appendChild(contentDiv);
+      if (content) {
+        contentDiv.appendChild(content);
+      }
+      if (!content) {
+        contentDiv.insertAdjacentHTML('afterBegin', '<p></p>');
+      }
+    }
+  }, {
+    key: 'newSectionButton',
+    value: function newSectionButton() {
+      var _this2 = this;
+
+      var btn = document.createElement('button');
+      btn.classList.add('align-newSection');
+      btn.addEventListener('click', function () {
+        return new Section('', _this2.el);
+      });
+      btn.contentEditable = false;
+      return btn;
+    }
+  }], [{
+    key: 'config',
+    value: function config(align, optionsBar) {
+      this.$align = align;
+      this.optionsBar = new OptionsBar(align, {
+        element: 'section',
+        options: ['normal', 'full'],
+        position: 'center-top',
+        backgroundImage: true,
+        backgroundColor: true,
+        sorting: true,
+        toggleHTML: true
+      });
+    }
+  }]);
+  return Section;
 }();
 
 var Creator = function () {
@@ -2006,7 +2108,7 @@ var Creator = function () {
   }, {
     key: 'update',
     value: function update() {
-      if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1 && Selection.current.anchorNode.parentNode.classList.contains('align-section')) {
+      if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1 && Selection.current.anchorNode.parentNode.classList.contains('align-content')) {
         updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-center');
         this.show();
         return;
@@ -2350,7 +2452,6 @@ var Align = function () {
      * Create all editor elements
      */
     value: function _init() {
-      this.HTML = false;
       this.startContent = Array.from(this.el.children);
       this.el.innerText = '';
 
@@ -2381,7 +2482,7 @@ var Align = function () {
       // document.execCommand('defaultParagraphSeparator', false, 'br');
 
       this.editor = document.createElement('div');
-      this.editor.classList.add('align-content');
+      this.editor.classList.add('align-editor');
       this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
       this.cmdKeyPressed = false;
       if (this.settings.postTitle) {
@@ -2397,37 +2498,16 @@ var Align = function () {
   }, {
     key: '_initSections',
     value: function _initSections() {
-      var _this = this;
+      Section.config(this);
 
-      this.sections = [];
       this.startContent.forEach(function (e) {
-        if (!e.classList.contains('align-section')) {
-          var section = document.createElement('div');
-          section.appendChild(e);
-          section.classList.add('align-section');
-          section.contentEditable = true;
-          _this.sections.push(section);
-          _this.editor.appendChild(section);
-          return;
-        }
-        _this.sections.push(e);
-        e.contentEditable = true;
-        _this.editor.appendChild(e);
+        return new Section(e);
       });
-      this.optionsBar = new OptionsBar(this, {
-        element: 'section',
-        options: ['normal', 'full'],
-        position: 'center-top',
-        backgroundImage: true,
-        backgroundColor: true,
-        sorting: true,
-        allItems: this.sections
-      });
-
-      this.sections.forEach(function (sec, index) {
-        sec.addEventListener('focus', function () {
-          _this.optionsBar.active(sec, index);
-        });
+      this.newSectionButton = document.createElement('button');
+      this.newSectionButton.classList.add('align-addButton');
+      this.el.appendChild(this.newSectionButton);
+      this.newSectionButton.addEventListener('click', function () {
+        return new Section();
       });
     }
 
@@ -2438,10 +2518,10 @@ var Align = function () {
   }, {
     key: '_initEvents',
     value: function _initEvents() {
-      var _this2 = this;
+      var _this = this;
 
       this.editor.addEventListener('focus', function () {
-        _this2.highlight();
+        _this.highlight();
       });
 
       this.editor.addEventListener('mouseup', this.update.bind(this), true);
@@ -2452,54 +2532,54 @@ var Align = function () {
           return;
         }
 
-        _this2.update();
-        if (event[_this2.cmdKey] && _this2.settings.shortcuts) {
+        _this.update();
+        if (event[_this.cmdKey] && _this.settings.shortcuts) {
           switch (event.key.toUpperCase()) {
             case 'B':
               event.preventDefault();
-              _this2.execute('bold');break;
+              _this.execute('bold');break;
             case 'I':
               event.preventDefault();
-              _this2.execute('italic');break;
+              _this.execute('italic');break;
             case 'U':
               event.preventDefault();
-              _this2.execute('underline');break;
+              _this.execute('underline');break;
             case 'E':
               event.preventDefault();
-              _this2.execute('justifyCenter');break;
+              _this.execute('justifyCenter');break;
             case 'R':
               event.preventDefault();
-              _this2.execute('justifyRight');break;
+              _this.execute('justifyRight');break;
             case 'L':
               event.preventDefault();
-              _this2.execute('justifyLeft');break;
+              _this.execute('justifyLeft');break;
             case 'J':
               event.preventDefault();
-              _this2.execute('justifyFull');break;
+              _this.execute('justifyFull');break;
             case 'A':
               event.preventDefault();
-              _this2.execute('selectAll');break;
+              _this.execute('selectAll');break;
             case 'F':
               event.preventDefault();
               if (event.shiftKey) {
-                _this2.toggleFullScreen();
+                _this.toggleFullScreen();
               }
               break;
             case 'Z':
               event.preventDefault();
               if (event.shiftKey) {
-                _this2.execute('redo');break;
+                _this.execute('redo');break;
               }
-              _this2.execute('undo');break;
+              _this.execute('undo');break;
             case '\\':
               event.preventDefault();
-              _this2.execute('removeFormat');break;
+              _this.execute('removeFormat');break;
             case '=':
               event.preventDefault();
               if (event.shiftKey) {
-                _this2.execute('superscript');break;
+                _this.execute('superscript');break;
               }
-              _this2.execute('subscript');break;
+              _this.execute('subscript');break;
             default:
               break;
           }
@@ -2509,11 +2589,11 @@ var Align = function () {
           case 'Tab':
             event.preventDefault();
             if (event.shiftKey) {
-              _this2.execute('outdent', false, true);break;
+              _this.execute('outdent', false, true);break;
             }
-            _this2.execute('indent', false, true);break;
+            _this.execute('indent', false, true);break;
           case 'Escape':
-            _this2.el.classList.remove('is-fullscreen');
+            _this.el.classList.remove('is-fullscreen');
             exitFullscreen();
             break;
           default:
@@ -2543,26 +2623,6 @@ var Align = function () {
      */
 
   }, {
-    key: 'toggleHTML',
-    value: function toggleHTML() {
-      this.HTML = !this.HTML;
-      if (this.HTML) {
-        var content = document.createTextNode(this.editor.innerHTML);
-        var pre = document.createElement('pre');
-
-        this.editor.innerHTML = '';
-        pre.id = 'content';
-        pre.style.whiteSpace = 'pre-wrap';
-        pre.appendChild(content);
-        this.editor.appendChild(pre);
-        this.highlight();
-        return;
-      }
-      this.editor.innerHTML = this.editor.innerText;
-      this.editor.contentEditable = true;
-      this.editor.focus();
-    }
-  }, {
     key: 'toggleFullScreen',
     value: function toggleFullScreen() {
       var state = document.fullscreenElement || document.webkitIsFullScreen;
@@ -2577,18 +2637,18 @@ var Align = function () {
   }, {
     key: 'update',
     value: function update() {
-      var _this3 = this;
+      var _this2 = this;
 
       Selection.updateSelectedRange();
       setTimeout(function () {
-        if (_this3.settings.toolbar) {
-          _this3.toolbar.updateStyler();
+        if (_this2.settings.toolbar) {
+          _this2.toolbar.updateStyler();
         }
-        if (_this3.settings.bubble) {
-          _this3.bubble.updateStyler();
+        if (_this2.settings.bubble) {
+          _this2.bubble.updateStyler();
         }
-        if (_this3.settings.creator) {
-          _this3.creator.update();
+        if (_this2.settings.creator) {
+          _this2.creator.update();
         }
       }, 16);
     }
@@ -2602,7 +2662,6 @@ var Align = function () {
     value: function execute(cmd, value) {
       var useCSS = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-      if (this.HTML) return;
       document.execCommand('styleWithCSS', false, useCSS);
       document.execCommand(cmd, false, value);
       document.execCommand('styleWithCSS', false, false);

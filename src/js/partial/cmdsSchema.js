@@ -169,12 +169,6 @@ const cmdsSchema = {
     tooltip: 'Script'
   },
 
-  html: {
-    element: 'button',
-    func: 'toggleHTML',
-    tooltip: 'Show HTML'
-  },
-
   fontSize: {
     element: 'select',
     command: 'fontSize'

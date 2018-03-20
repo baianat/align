@@ -1,30 +1,30 @@
 /**
  * Utilities
  */
-export function select(element) {
+export function select (element) {
   if (typeof element === 'string') {
     return document.querySelector(element);
   }
   return element;
 }
 
-export function css(element, styles) {
+export function css (element, styles) {
   Object.keys(styles).forEach((key) => {
     element.style[key] = styles[key];
   });
 }
 
-export function sync(callback) {
+export function sync (callback) {
   setTimeout(() => callback(), 1000 / 60);
 }
 
-export function callable(func) {
+export function callable (func) {
   if (typeof func === 'function') {
     func();
   }
 }
 
-export function getAverage(array, length) {
+export function getAverage (array, length) {
   let sum = 0;
   const elements = array.slice(Math.max(array.length - length, 1));
   elements.forEach((value) => { sum = sum + value });
@@ -36,7 +36,7 @@ export function getArray(length, value) {
 }
 
 /* eslint-disable */
-export function debounce(callback, immediate = false) {
+export function debounce (callback, immediate = false) {
   let timeout;
   return function () {
     let later = () => {
@@ -50,7 +50,7 @@ export function debounce(callback, immediate = false) {
 }
 
 /* eslint-enable */
-export function throttle(callback, limit) {
+export function throttle (callback, limit) {
   let wait = false;
   return () => {
     if (!wait) {
@@ -63,7 +63,7 @@ export function throttle(callback, limit) {
   };
 }
 
-export function wrap(el, wrapper) {
+export function wrap (el, wrapper) {
   // insert wrapper before el in the DOM tree
   el.parentNode.insertBefore(wrapper, el);
 
@@ -75,7 +75,7 @@ export function normalizeNumber(number, min, max) {
   return Math.round(Math.max(Math.min(Number(number), max), min));
 }
 
-export function userOS() {
+export function userOS () {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
   const appVersion = navigator.appVersion;
   if (appVersion.indexOf('Win') !== -1) return 'Win';
@@ -85,7 +85,7 @@ export function userOS() {
   return 'Other';
 }
 
-export function generateKeysSymbols() {
+export function generateKeysSymbols () {
   const OS = userOS();
   return {
     cmdKey: OS === 'Mac' ? '⌘' : 'Ctrl',
@@ -96,7 +96,7 @@ export function generateKeysSymbols() {
   }
 }
 
-export function cloneObject(object) {
+export function cloneObject (object) {
   let output = {};
   Object.keys(object).forEach((key) => {
     let tempValue = object[key];
@@ -105,7 +105,7 @@ export function cloneObject(object) {
   return output;
 }
 
-export function isElementClosest(element, wrapper) {
+export function isElementClosest (element, wrapper) {
   while (element !== document && element !== null) {
     if (element === wrapper) return true;
     element = element.parentNode;
@@ -113,11 +113,11 @@ export function isElementClosest(element, wrapper) {
   return false;
 }
 
-export function camelCase(string) {
+export function camelCase (string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function updatePosition(reference, element, align, mode = 'middle-left') {
+export function updatePosition (reference, element, align, mode = 'middle-left') {
   if (typeof reference.getBoundingClientRect !== 'function') return;
   const modes = mode.split('-');
   const elmRect = element.getBoundingClientRect();
@@ -148,7 +148,7 @@ export function updatePosition(reference, element, align, mode = 'middle-left') 
   })
 }
 
-export function launchFullscreen(element) {
+export function launchFullscreen (element) {
   if (element.requestFullscreen) {
     element.requestFullscreen();
   } else if (element.mozRequestFullScreen) {
@@ -160,7 +160,7 @@ export function launchFullscreen(element) {
   }
 }
 
-export function exitFullscreen() {
+export function exitFullscreen () {
   if (document.exitFullscreen) {
     document.exitFullscreen();
   } else if (document.mozCancelFullScreen) {
@@ -168,4 +168,16 @@ export function exitFullscreen() {
   } else if (document.webkitExitFullscreen) {
     document.webkitExitFullscreen();
   }
+}
+
+export function uploadeImage (input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader(); // eslint-disable-line
+  reader.readAsDataURL(file);
+  return new Promise(resolve => {
+    reader.addEventListener('load', () => {
+      resolve(reader.result);
+    });
+  });
 }

@@ -44,7 +44,7 @@ class Creator {
       Selection.current.isCollapsed &&
       Selection.current.anchorNode.nodeType === 1 &&
       Selection.current.anchorNode.childNodes.length <= 1 &&
-      Selection.current.anchorNode.parentNode.classList.contains('align-section')
+      Selection.current.anchorNode.parentNode.classList.contains('align-content')
     ) {
       updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-center');
       this.show();

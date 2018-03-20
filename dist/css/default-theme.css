@@ -1,6 +1,6 @@
-.align-content {
+.align-editor {
   white-space: normal;
-  line-height: 2.5em;
+  line-height: 2em;
   font-size: 18px;
 }
 .align-image {
@@ -35,6 +35,7 @@
 }
 .align-figure img {
   width: 100%;
+  max-width: 100%;
 }
 .align-figure.is-active img {
   box-shadow: 0 0 25px rgba(0,0,0,0.05);
@@ -57,10 +58,12 @@
   width: 100%;
   max-width: 100%;
 }
+.align-content {
+  padding: 20px;
+}
 .align-section {
   margin: auto;
-  width: 80vw;
-  padding: 20px;
+  width: 70vw;
 }
 .align-section.is-full {
   width: 100%;
@@ -83,5 +86,6 @@
   bottom: 0;
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center center;
   opacity: 0.5;
 }
