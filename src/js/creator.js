@@ -90,6 +90,11 @@ class Creator {
       img.src = reader.result;
       img.dataset.alignFilename = file.name;
       this.$align.update();
+      const update = (src) => {
+        img.src = src;
+      };
+
+      this.$align.$bus.emit('imageAdded', { file, update });
     });
     reader.readAsDataURL(file);
     input.value = null;

@@ -6,6 +6,7 @@ import Selection from './selection';
 import Section from './section';
 import Creator from './creator';
 import Styler from './styler';
+import EventBus from './events';
 
 class Align {
   constructor(selector, {
@@ -50,6 +51,7 @@ class Align {
    * Create all editor elements
    */
   _init() {
+    this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
 

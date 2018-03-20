@@ -47,7 +47,7 @@ class OptionsBar {
         menuButton(`${this.element}${camelCase(option)}`, () => this.toggleClass(`is-${option}`))
       );
     });
-    
+
     if (this.settings.backgroundImage) {
       const li = document.createElement('li');
       const bgImage = fileButton('image');
@@ -62,7 +62,7 @@ class OptionsBar {
       const _self = this;
       li.appendChild(bgColor);
       this.el.appendChild(li);
-    
+
       this.picker = new Colorpicker(bgColor, {
         defaultColor: '#000000',
         mode: 'hex',
@@ -81,13 +81,13 @@ class OptionsBar {
         }
       })
     }
-  
+
     if (this.settings.toggleHTML) {
       this.el.appendChild(
         menuButton(`html`, () => this.toggleHTML())
       );
     }
-    
+
     this.el.appendChild(menuButton('delete', this.removeCurrentItem.bind(this)));
     this.$align.el.appendChild(this.el);
   }
@@ -100,7 +100,7 @@ class OptionsBar {
     this.currentIndex = index || 0;
     this.currentContent = item.querySelector('.align-content');
     this.currentItem.classList.add('is-active');
-    
+
     updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
     this.$align.update();
     if (this.visiable) return
@@ -167,7 +167,11 @@ class OptionsBar {
     reader.addEventListener('load', () => {
       this.currentItem.classList.add('is-bgImage');
       bg.style.backgroundImage = `url(${reader.result})`;
+      const update = (src) => {
+        bg.style.backgroundImage = `url(${src})`;
+      };
       this.$align.update();
+      this.$align.$bus.emit('imageAdded', { file, update });
     });
     reader.readAsDataURL(file);
     input.value = null;
