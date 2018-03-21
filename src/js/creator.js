@@ -1,12 +1,12 @@
-import { updatePosition, camelCase } from './partial/util';
-import { setElementsPrefix, button, fileButton } from './partial/elements';
+import { updatePosition, camelCase, getYoutubeVideoId } from './partial/util';
+import { setElementsPrefix, button, fileButton, menuButton } from './partial/elements';
 import OptionsBar from './optionsBar';
 import Selection from './selection';
 
 class Creator {
   constructor(align, {
     mode = 'default',
-    items = ['figure']
+    items = ['figure', 'video']
   } = {}) {
     this.$align = align;
     this.settings = {
@@ -26,13 +26,20 @@ class Creator {
     this.toggleButton.addEventListener('click', this.toggleState.bind(this));
     this.optionsBar = new OptionsBar(this.$align);
 
-    this.settings.items.forEach(item => {
+    {
       const menuItem = document.createElement('li');
-      const button = fileButton(item);
-      button.input.addEventListener('change', this[`create${camelCase(item)}`].bind(this));
+      const button = fileButton('figure');
+      button.input.addEventListener('change', this.createFigure.bind(this));
       menuItem.appendChild(button.el);
       this.menu.appendChild(menuItem);
-    })
+    }
+
+    {
+      const button = menuButton('video');
+      button.addEventListener('click', this.createVideo.bind(this));
+      this.menu.appendChild(button);
+    }
+
 
     this.creator.appendChild(this.toggleButton);
     this.creator.appendChild(this.menu);
@@ -46,7 +53,7 @@ class Creator {
       Selection.current.anchorNode.childNodes.length <= 1 &&
       Selection.current.anchorNode.parentNode.classList.contains('align-content')
     ) {
-      updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-center');
+      updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
       this.show();
       return;
     }
@@ -93,12 +100,28 @@ class Creator {
       const update = (src) => {
         img.src = src;
       };
-
       this.$align.$bus.emit('imageAdded', { file, update });
     });
     reader.readAsDataURL(file);
     input.value = null;
     selectedElement.parentNode.insertBefore(figure, selectedElement);
+  }
+
+  createVideo () {
+  
+    let link = prompt('Write video URL here', ''); // eslint-disable-line
+    if (!link && link === '') return;
+    console.log(link)
+    const videoId = getYoutubeVideoId(link);
+    const iframe = document.createElement('iframe');
+    const selectedElement = Selection.current.anchorNode;
+
+    iframe.width = 560;
+    iframe.height = 315;
+    iframe.allowfullscreen = true;
+    iframe.contentEditable = false
+    iframe.src = `//www.youtube.com/embed/${videoId}`;
+    selectedElement.parentNode.insertBefore(iframe, selectedElement);
   }
 }
 

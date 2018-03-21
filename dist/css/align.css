@@ -567,11 +567,8 @@
   font-size: 14px;
 }
 .creator {
-  left: 20px;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: column;
-      flex-direction: column;
   -ms-flex-pack: center;
       justify-content: center;
   -ms-flex-align: center;
@@ -581,19 +578,22 @@
   position: absolute;
   z-index: 30;
   border-radius: 40px;
+  -ms-transform: translate(-1em, -1.1em);
+      transform: translate(-1em, -1.1em);
 }
 .creator >button {
   background: rgba(170,170,170,0.5);
   fill: #fff;
 }
 .creator-menu {
+  margin: 0 20px;
   list-style: none;
   padding: 0;
   display: none;
 }
 .creator-button {
   position: relative;
-  margin: 0;
+  margin: 0.1em 0;
   padding: 5px;
   width: 30px;
   height: 30px;

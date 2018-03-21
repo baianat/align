@@ -351,6 +351,18 @@ function exitFullscreen() {
   }
 }
 
+
+
+function getYoutubeVideoId(url) {
+  var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  var match = url.match(regExp);
+
+  if (match && match[2].length === 11) {
+    return match[2];
+  }
+  return '';
+}
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -1681,7 +1693,9 @@ var iconsPath = {
 
   section: 'M2 21h19v-3H2v3zM20 8H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zM2 3v3h19V3H2z',
 
-  fullscreen: 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z'
+  fullscreen: 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z',
+
+  video: 'M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z'
 
 };
 
@@ -2071,7 +2085,7 @@ var Creator = function () {
         _ref$mode = _ref.mode,
         mode = _ref$mode === undefined ? 'default' : _ref$mode,
         _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure'] : _ref$items;
+        items = _ref$items === undefined ? ['figure', 'video'] : _ref$items;
 
     classCallCheck(this, Creator);
 
@@ -2086,8 +2100,6 @@ var Creator = function () {
   createClass(Creator, [{
     key: '_init',
     value: function _init() {
-      var _this = this;
-
       setElementsPrefix('creator-');
       this.creator = document.createElement('div');
       this.creator.classList.add('creator', 'is-hidden');
@@ -2097,13 +2109,19 @@ var Creator = function () {
       this.toggleButton.addEventListener('click', this.toggleState.bind(this));
       this.optionsBar = new OptionsBar(this.$align);
 
-      this.settings.items.forEach(function (item) {
+      {
         var menuItem = document.createElement('li');
-        var button$$1 = fileButton(item);
-        button$$1.input.addEventListener('change', _this['create' + camelCase(item)].bind(_this));
-        menuItem.appendChild(button$$1.el);
-        _this.menu.appendChild(menuItem);
-      });
+        var _button = fileButton('figure');
+        _button.input.addEventListener('change', this.createFigure.bind(this));
+        menuItem.appendChild(_button.el);
+        this.menu.appendChild(menuItem);
+      }
+
+      {
+        var _button2 = menuButton('video');
+        _button2.addEventListener('click', this.createVideo.bind(this));
+        this.menu.appendChild(_button2);
+      }
 
       this.creator.appendChild(this.toggleButton);
       this.creator.appendChild(this.menu);
@@ -2113,7 +2131,7 @@ var Creator = function () {
     key: 'update',
     value: function update() {
       if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1 && Selection.current.anchorNode.parentNode.classList.contains('align-content')) {
-        updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-center');
+        updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
         this.show();
         return;
       }
@@ -2141,7 +2159,7 @@ var Creator = function () {
   }, {
     key: 'createFigure',
     value: function createFigure(event) {
-      var _this2 = this;
+      var _this = this;
 
       var input$$1 = event.target;
       var file = input$$1.files[0];
@@ -2159,21 +2177,38 @@ var Creator = function () {
       figure.appendChild(img);
       figure.appendChild(caption);
       figure.addEventListener('click', function () {
-        return _this2.optionsBar.active(figure);
+        return _this.optionsBar.active(figure);
       });
       reader.addEventListener('load', function () {
         img.src = reader.result;
         img.dataset.alignFilename = file.name;
-        _this2.$align.update();
+        _this.$align.update();
         var update = function update(src) {
           img.src = src;
         };
-
-        _this2.$align.$bus.emit('imageAdded', { file: file, update: update });
+        _this.$align.$bus.emit('imageAdded', { file: file, update: update });
       });
       reader.readAsDataURL(file);
       input$$1.value = null;
       selectedElement.parentNode.insertBefore(figure, selectedElement);
+    }
+  }, {
+    key: 'createVideo',
+    value: function createVideo() {
+
+      var link = prompt('Write video URL here', ''); // eslint-disable-line
+      if (!link && link === '') return;
+      console.log(link);
+      var videoId = getYoutubeVideoId(link);
+      var iframe = document.createElement('iframe');
+      var selectedElement = Selection.current.anchorNode;
+
+      iframe.width = 560;
+      iframe.height = 315;
+      iframe.allowfullscreen = true;
+      iframe.contentEditable = false;
+      iframe.src = '//www.youtube.com/embed/' + videoId;
+      selectedElement.parentNode.insertBefore(iframe, selectedElement);
     }
   }]);
   return Creator;
@@ -2544,7 +2579,7 @@ var Align = function () {
   }, {
     key: '_initEditor',
     value: function _initEditor() {
-      // document.execCommand('defaultParagraphSeparator', false, 'br');
+      document.execCommand('defaultParagraphSeparator', false, 'p');
 
       this.editor = document.createElement('div');
       this.editor.classList.add('align-editor');

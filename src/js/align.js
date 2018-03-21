@@ -87,7 +87,7 @@ class Align {
    * Create the editor
    */
   _initEditor () {
-    // document.execCommand('defaultParagraphSeparator', false, 'br');
+    document.execCommand('defaultParagraphSeparator', false, 'p');
 
     this.editor = document.createElement('div');
     this.editor.classList.add('align-editor');

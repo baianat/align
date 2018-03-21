@@ -81,7 +81,7 @@ const cmdsSchema = {
     element: 'button',
     tooltip: 'Hyperlink',
     func(styler) {
-      var link = prompt('Write the URL here', ''); // eslint-disable-line
+      let link = prompt('Write the URL here', ''); // eslint-disable-line
       if (link && link !== '') {
         styler.align.execute('createLink', link);
       }

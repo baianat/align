@@ -1,7 +1,5 @@
 .creator
-  left: 20px
   display: flex
-  flex-direction: column
   justify-content: center
   align-items: center
   width: auto
@@ -9,19 +7,21 @@
   position: absolute
   z-index: 30
   border-radius: 40px
+  transform: translate(-1em, -1.1em)
   >button
     background: alpha($gray, 0.5)
     fill: $white
 
 
   &-menu
+    margin: 0 20px
     list-style: none
     padding: 0
     display: none
  
   &-button
     position: relative
-    margin: 0
+    margin: 0.1em 0
     padding: 5px
     width: 30px
     height: 30px

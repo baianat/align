@@ -7,6 +7,9 @@
   width: 100%;
   max-width: 400px;
 }
+.align iframe {
+  border: 0;
+}
 .align blockquote {
   border-left: 5px solid #aaa;
   padding: 10px 0 10px 20px;
