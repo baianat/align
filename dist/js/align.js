@@ -353,14 +353,12 @@ function exitFullscreen() {
 
 
 
-function getYoutubeVideoId(url) {
-  var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  var match = url.match(regExp);
+function getVideoId(url, hoster) {
+  var regExp = hoster === 'youtube' ? /(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/ : hoster === 'vimeo' ? /vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/ : null;
 
-  if (match && match[2].length === 11) {
-    return match[2];
-  }
-  return '';
+  if (!regExp) return;
+  var match = url.match(regExp);
+  return match[1];
 }
 
 function stringToDOM(string) {
@@ -1992,12 +1990,10 @@ var OptionsBar = function () {
     value: function backgroundVideo(event) {
       var input$$1 = event.target;
       var file = input$$1.files[0];
-      console.log(input$$1.value.webkitRelativePath);
       if (!file) return;
       var video = this.currentContent.querySelector('.align-bgVideo');
       var source = null;
       var url = URL.createObjectURL(event.target.files[0]);
-      console.log(url);
       if (!video) {
         var _video = stringToDOM('<video autoplay muted loop class="align-bgVideo"></video>');
         source = document.createElement('source');
@@ -2014,8 +2010,7 @@ var OptionsBar = function () {
       };
       this.$align.update();
       this.$align.$bus.emit('videoAdded', { file: file, update: update });
-
-      // input.value = null;
+      input$$1.value = null;
     }
   }, {
     key: 'sectionUp',
@@ -2241,11 +2236,11 @@ var Creator = function () {
   }, {
     key: 'createVideo',
     value: function createVideo() {
-
       var link = prompt('Write video URL here', ''); // eslint-disable-line
       if (!link && link === '') return;
-      console.log(link);
-      var videoId = getYoutubeVideoId(link);
+      var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : 'invalid';
+      console.log(videoHoster);
+      var videoId = getVideoId(link, videoHoster);
       var iframe = document.createElement('iframe');
       var selectedElement = Selection.current.anchorNode;
 
@@ -2253,7 +2248,7 @@ var Creator = function () {
       iframe.height = 315;
       iframe.allowfullscreen = true;
       iframe.contentEditable = false;
-      iframe.src = '//www.youtube.com/embed/' + videoId;
+      iframe.src = videoHoster === 'youtube' ? '//www.youtube.com/embed/' + videoId : videoHoster === 'vimeo' ? '//player.vimeo.com/video/' + videoId : '';
       selectedElement.parentNode.insertBefore(iframe, selectedElement);
     }
   }]);

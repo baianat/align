@@ -1,4 +1,4 @@
-import { updatePosition, camelCase, getYoutubeVideoId } from './partial/util';
+import { updatePosition, camelCase, getVideoId } from './partial/util';
 import { setElementsPrefix, button, fileButton, menuButton } from './partial/elements';
 import OptionsBar from './optionsBar';
 import Selection from './selection';
@@ -108,11 +108,13 @@ class Creator {
   }
 
   createVideo () {
-  
     let link = prompt('Write video URL here', ''); // eslint-disable-line
     if (!link && link === '') return;
-    console.log(link)
-    const videoId = getYoutubeVideoId(link);
+    const videoHoster = link.includes('yout')
+      ? 'youtube' : link.includes('vimeo')
+      ? 'vimeo' : 'invalid';
+    console.log(videoHoster)
+    const videoId = getVideoId(link, videoHoster);
     const iframe = document.createElement('iframe');
     const selectedElement = Selection.current.anchorNode;
 
@@ -120,7 +122,11 @@ class Creator {
     iframe.height = 315;
     iframe.allowfullscreen = true;
     iframe.contentEditable = false
-    iframe.src = `//www.youtube.com/embed/${videoId}`;
+    iframe.src = videoHoster === 'youtube'
+      ? `//www.youtube.com/embed/${videoId}`
+      : videoHoster === 'vimeo'
+      ? `//player.vimeo.com/video/${videoId}`
+      : ''
     selectedElement.parentNode.insertBefore(iframe, selectedElement);
   }
 }

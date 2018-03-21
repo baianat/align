@@ -182,14 +182,16 @@ export function uploadeImage (input) {
   });
 }
 
-export function getYoutubeVideoId (url) {
-  let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  let match = url.match(regExp);
+export function getVideoId (url, hoster) {
+  let regExp = hoster === 'youtube'
+    ? /(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+    : hoster === 'vimeo'
+    ? /vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/
+    : null
 
-  if (match && match[2].length === 11) {
-    return match[2];
-  }
-  return '';
+  if (!regExp) return;
+  let match = url.match(regExp);
+  return match[1];
 }
 
 export function stringToDOM(string) {

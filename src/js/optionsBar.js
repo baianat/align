@@ -190,15 +190,12 @@ class OptionsBar {
   backgroundVideo (event) {
     const input = event.target;
     const file = input.files[0];
-    console.log(input.value.webkitRelativePath)
     if (!file) return;
     let video = this.currentContent.querySelector('.align-bgVideo');
     let source = null;
     let blob = null;
 
-
     const url = URL.createObjectURL(event.target.files[0]);
-    console.log(url)
     if (!video) {
       const video = stringToDOM(`<video autoplay muted loop class="align-bgVideo"></video>`);
       source = document.createElement('source');
@@ -215,8 +212,7 @@ class OptionsBar {
     };
     this.$align.update();
     this.$align.$bus.emit('videoAdded', { file, update });
-
-    // input.value = null;
+    input.value = null;
   }
 
   sectionUp () {
