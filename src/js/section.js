@@ -24,6 +24,7 @@ class Section {
       position: 'center-top',
       backgroundImage: true,
       backgroundColor: true,
+      backgroundViedo: true,
       sorting: true,
       toggleHTML: true
     });

@@ -191,3 +191,7 @@ export function getYoutubeVideoId (url) {
   }
   return '';
 }
+
+export function stringToDOM(string) {
+  return document.createRange().createContextualFragment(string).firstElementChild;
+}

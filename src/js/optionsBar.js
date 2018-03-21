@@ -1,5 +1,5 @@
 import Colorpicker from '@baianat/colorpicker';
-import { updatePosition, isElementClosest, camelCase } from './partial/util';
+import { updatePosition, isElementClosest, camelCase, stringToDOM } from './partial/util';
 import { setElementsPrefix, menuButton, fileButton, input } from './partial/elements';
 
 class OptionsBar {
@@ -9,6 +9,7 @@ class OptionsBar {
     position = 'center-top',
     afterDelete = null,
     backgroundImage = false,
+    backgroundVideo = true,
     backgroundColor = false,
     toggleHTML = false,
     sorting = false
@@ -21,6 +22,7 @@ class OptionsBar {
       position,
       backgroundImage,
       backgroundColor,
+      backgroundVideo,
       toggleHTML,
       sorting
     }
@@ -53,6 +55,14 @@ class OptionsBar {
       const bgImage = fileButton('image');
       bgImage.input.addEventListener('change', this.backgroundImage.bind(this));
       li.appendChild(bgImage.el)
+      this.el.appendChild(li);
+    }
+
+    if (this.settings.backgroundVideo) {
+      const li = document.createElement('li');
+      const bgVideo = fileButton('video');
+      bgVideo.input.addEventListener('change', this.backgroundVideo.bind(this));
+      li.appendChild(bgVideo.el)
       this.el.appendChild(li);
     }
 
@@ -175,6 +185,38 @@ class OptionsBar {
     });
     reader.readAsDataURL(file);
     input.value = null;
+  }
+
+  backgroundVideo (event) {
+    const input = event.target;
+    const file = input.files[0];
+    console.log(input.value.webkitRelativePath)
+    if (!file) return;
+    let video = this.currentContent.querySelector('.align-bgVideo');
+    let source = null;
+    let blob = null;
+
+
+    const url = URL.createObjectURL(event.target.files[0]);
+    console.log(url)
+    if (!video) {
+      const video = stringToDOM(`<video autoplay muted loop class="align-bgVideo"></video>`);
+      source = document.createElement('source');
+      video.appendChild(source);
+      this.currentContent.insertAdjacentElement('afterBegin', video);
+    }
+    if (video) {
+      source = video.querySelector('source');
+    }
+    this.currentItem.classList.add('is-bgVideo');
+    source.src = url;
+    const update = (src) => {
+      source.src = src;
+    };
+    this.$align.update();
+    this.$align.$bus.emit('videoAdded', { file, update });
+
+    // input.value = null;
   }
 
   sectionUp () {

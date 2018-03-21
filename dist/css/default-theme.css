@@ -80,6 +80,7 @@
   margin: 20px 0;
   padding: 20px;
 }
+.align-bgVideo,
 .align-bgImage {
   position: absolute;
   z-index: -1;
@@ -90,5 +91,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+  min-width: 100%;
+  min-height: 100%;
   opacity: 0.5;
 }

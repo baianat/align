@@ -363,6 +363,10 @@ function getYoutubeVideoId(url) {
   return '';
 }
 
+function stringToDOM(string) {
+  return document.createRange().createContextualFragment(string).firstElementChild;
+}
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -1795,6 +1799,8 @@ var OptionsBar = function () {
         afterDelete = _ref$afterDelete === undefined ? null : _ref$afterDelete,
         _ref$backgroundImage = _ref.backgroundImage,
         backgroundImage = _ref$backgroundImage === undefined ? false : _ref$backgroundImage,
+        _ref$backgroundVideo = _ref.backgroundVideo,
+        backgroundVideo = _ref$backgroundVideo === undefined ? true : _ref$backgroundVideo,
         _ref$backgroundColor = _ref.backgroundColor,
         backgroundColor = _ref$backgroundColor === undefined ? false : _ref$backgroundColor,
         _ref$toggleHTML = _ref.toggleHTML,
@@ -1812,6 +1818,7 @@ var OptionsBar = function () {
       position: position,
       backgroundImage: backgroundImage,
       backgroundColor: backgroundColor,
+      backgroundVideo: backgroundVideo,
       toggleHTML: toggleHTML,
       sorting: sorting
     };
@@ -1851,12 +1858,20 @@ var OptionsBar = function () {
         this.el.appendChild(li);
       }
 
-      if (this.settings.backgroundColor) {
+      if (this.settings.backgroundVideo) {
         var _li = document.createElement('li');
+        var bgVideo = fileButton('video');
+        bgVideo.input.addEventListener('change', this.backgroundVideo.bind(this));
+        _li.appendChild(bgVideo.el);
+        this.el.appendChild(_li);
+      }
+
+      if (this.settings.backgroundColor) {
+        var _li2 = document.createElement('li');
         var bgColor = input('bgColor', 'text');
         var _self = this;
-        _li.appendChild(bgColor);
-        this.el.appendChild(_li);
+        _li2.appendChild(bgColor);
+        this.el.appendChild(_li2);
 
         this.picker = new colorpicker$1(bgColor, {
           defaultColor: '#000000',
@@ -1973,6 +1988,36 @@ var OptionsBar = function () {
       input$$1.value = null;
     }
   }, {
+    key: 'backgroundVideo',
+    value: function backgroundVideo(event) {
+      var input$$1 = event.target;
+      var file = input$$1.files[0];
+      console.log(input$$1.value.webkitRelativePath);
+      if (!file) return;
+      var video = this.currentContent.querySelector('.align-bgVideo');
+      var source = null;
+      var url = URL.createObjectURL(event.target.files[0]);
+      console.log(url);
+      if (!video) {
+        var _video = stringToDOM('<video autoplay muted loop class="align-bgVideo"></video>');
+        source = document.createElement('source');
+        _video.appendChild(source);
+        this.currentContent.insertAdjacentElement('afterBegin', _video);
+      }
+      if (video) {
+        source = video.querySelector('source');
+      }
+      this.currentItem.classList.add('is-bgVideo');
+      source.src = url;
+      var update = function update(src) {
+        source.src = src;
+      };
+      this.$align.update();
+      this.$align.$bus.emit('videoAdded', { file: file, update: update });
+
+      // input.value = null;
+    }
+  }, {
     key: 'sectionUp',
     value: function sectionUp() {
       if (!this.currentItem.previousSibling.classList.contains('align-section')) return;
@@ -2071,6 +2116,7 @@ var Section = function () {
         position: 'center-top',
         backgroundImage: true,
         backgroundColor: true,
+        backgroundViedo: true,
         sorting: true,
         toggleHTML: true
       });
