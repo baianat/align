@@ -375,7 +375,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var colorpicker$1 = createCommonjsModule(function (module, exports) {
+var colorpicker = createCommonjsModule(function (module, exports) {
   (function (global, factory) {
     module.exports = factory();
   })(commonjsGlobal, function () {
@@ -1517,7 +1517,7 @@ var cmdsSchema = {
     type: 'text',
     command: 'foreColor',
     useCSS: true,
-    init: colorpicker$1,
+    init: colorpicker,
     initConfig: {
       defaultColor: '#000000',
       mode: 'hex',
@@ -1542,7 +1542,7 @@ var cmdsSchema = {
     type: 'text',
     command: 'backColor',
     useCSS: true,
-    init: colorpicker$1,
+    init: colorpicker,
     initConfig: {
       defaultColor: '#fdfdfd',
       mode: 'hex',
@@ -1562,48 +1562,53 @@ var cmdsSchema = {
     }
   },
 
-  addImage: {
-    element: 'custom',
-    data: function data() {
-      return {
-        button: document.createElement('div'),
-        input: document.createElement('input'),
-        reader: new FileReader(), // eslint-disable-line
-        icon: '<svg class="icon" viewBox="0 0 24 24">\n              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>\n            </svg>'
-      };
-    },
-    create: function create(Styler) {
-      this.$styler = Styler;
-      this.$data = this.data();
-      var button = this.$data.button;
-      var input = this.$data.input;
-      var icon = this.$data.icon;
+  // internal functions don't use it
 
-      button.classList.add('styler-button');
-      button.appendChild(input);
-      button.insertAdjacentHTML('beforeend', icon);
-      input.classList.add('styler-input');
-      input.type = 'file';
-      input.id = 'addImage';
-      input.addEventListener('change', this.action.bind(this));
+  _sectionClasses: {
+    element: 'classes',
+    command: 'section'
+  },
 
-      return button;
-    },
-    action: function action() {
-      var _this = this;
+  _figureClasses: {
+    element: 'classes',
+    command: 'figure'
+  },
 
-      var file = this.$data.input.files[0];
-      if (!file || !window.getSelection().rangeCount) return;
-      var img = document.createElement('img');
-      img.classList.add('align-image');
+  _remove: {
+    element: 'button',
+    func: 'remove'
+  },
 
-      this.$data.reader.addEventListener('load', function () {
-        img.src = _this.$data.reader.result;
-        img.dataset.alignFilename = file.name;
-      });
-      this.$data.reader.readAsDataURL(file);
-      Selection.range.insertNode(img);
-      this.$data.input.value = null;
+  _sectionUp: {
+    element: 'button',
+    func: 'moveUp'
+  },
+
+  _sectionDown: {
+    element: 'button',
+    func: 'moveDown'
+  },
+
+  _sectionImage: {
+    element: 'file',
+    func: 'backgroundImage'
+  },
+
+  _sectionVideo: {
+    element: 'file',
+    func: 'backgroundVideo'
+  },
+
+  _sectionColor: {
+    element: 'input',
+    type: 'text',
+    func: 'backgroundColor',
+    init: colorpicker,
+    initConfig: {
+      defaultColor: '#000000',
+      mode: 'hex',
+      disableLum: true,
+      guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: #fff" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n        </svg>\n      '
     }
   }
 };
@@ -1687,18 +1692,23 @@ var iconsPath = {
 
   sectionFull: 'M18.17,12L15,8.83L16.41,7.41L21,12L16.41,16.58L15,15.17L18.17,12M5.83,12L9,15.17L7.59,16.59L3,12L7.59,7.42L9,8.83L5.83,12Z',
 
-  arrowUp: 'M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z',
-
-  arrowDown: 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z',
-
-  delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
-
   section: 'M2 21h19v-3H2v3zM20 8H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zM2 3v3h19V3H2z',
 
   fullscreen: 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z',
 
-  video: 'M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z'
+  video: 'M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z',
 
+  delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
+
+  _remove: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
+
+  _sectionUp: 'M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z',
+
+  _sectionDown: 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z',
+
+  _sectionImage: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
+
+  _sectionVideo: 'M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z'
 };
 
 var NAMING_PREFIX = '';
@@ -1784,259 +1794,326 @@ function menuButton(name, func) {
   return menuItem;
 }
 
-var OptionsBar = function () {
-  function OptionsBar(align) {
+var Styler = function () {
+  function Styler(align) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref$element = _ref.element,
-        element = _ref$element === undefined ? 'figure' : _ref$element,
-        _ref$options = _ref.options,
-        options = _ref$options === undefined ? ['normal', 'full', 'float'] : _ref$options,
-        _ref$position = _ref.position,
-        position = _ref$position === undefined ? 'center-top' : _ref$position,
-        _ref$afterDelete = _ref.afterDelete,
-        afterDelete = _ref$afterDelete === undefined ? null : _ref$afterDelete,
-        _ref$backgroundImage = _ref.backgroundImage,
-        backgroundImage = _ref$backgroundImage === undefined ? false : _ref$backgroundImage,
-        _ref$backgroundVideo = _ref.backgroundVideo,
-        backgroundVideo = _ref$backgroundVideo === undefined ? true : _ref$backgroundVideo,
-        _ref$backgroundColor = _ref.backgroundColor,
-        backgroundColor = _ref$backgroundColor === undefined ? false : _ref$backgroundColor,
-        _ref$toggleHTML = _ref.toggleHTML,
-        toggleHTML = _ref$toggleHTML === undefined ? false : _ref$toggleHTML,
-        _ref$sorting = _ref.sorting,
-        sorting = _ref$sorting === undefined ? false : _ref$sorting;
+        _ref$mode = _ref.mode,
+        mode = _ref$mode === undefined ? 'default' : _ref$mode,
+        _ref$commands = _ref.commands,
+        commands = _ref$commands === undefined ? ['bold', 'italic', 'underline'] : _ref$commands,
+        _ref$hideWhenClickOut = _ref.hideWhenClickOut,
+        hideWhenClickOut = _ref$hideWhenClickOut === undefined ? false : _ref$hideWhenClickOut,
+        _ref$tooltip = _ref.tooltip,
+        tooltip = _ref$tooltip === undefined ? false : _ref$tooltip,
+        _ref$theme = _ref.theme,
+        theme = _ref$theme === undefined ? 'light' : _ref$theme;
 
-    classCallCheck(this, OptionsBar);
+    classCallCheck(this, Styler);
 
     this.$align = align;
-    this.element = element;
-    this.options = options;
-    this.afterDelete = afterDelete;
     this.settings = {
-      position: position,
-      backgroundImage: backgroundImage,
-      backgroundColor: backgroundColor,
-      backgroundVideo: backgroundVideo,
-      toggleHTML: toggleHTML,
-      sorting: sorting
+      mode: mode,
+      commands: commands,
+      hideWhenClickOut: hideWhenClickOut,
+      tooltip: tooltip,
+      theme: theme
     };
-    this.visiable = false;
     this._init();
   }
 
-  createClass(OptionsBar, [{
+  /**
+   * Create the styler toolbar
+   */
+
+
+  createClass(Styler, [{
     key: '_init',
     value: function _init() {
       var _this = this;
 
-      setElementsPrefix('optionsBar-');
-      this.el = document.createElement('ul');
-      this.el.classList.add('optionsBar', 'is-hidden');
+      setElementsPrefix('styler-');
+      this.cmdsSchema = cloneObject(cmdsSchema);
+      this.styler = document.createElement('ul');
+      this.styler.classList.add('styler', 'is-' + this.settings.mode, 'is-' + this.settings.theme);
+      this.cmds = {};
+      this.visiable = false;
 
-      if (this.settings.sorting) {
-        this.el.appendChild(menuButton('arrowUp', function () {
-          return _this.sectionUp();
-        }));
-        this.el.appendChild(menuButton('arrowDown', function () {
-          return _this.sectionDown();
-        }));
-      }
-
-      this.options.forEach(function (option) {
-        _this.el.appendChild(menuButton('' + _this.element + camelCase(option), function () {
-          return _this.toggleClass('is-' + option);
-        }));
+      this.settings.commands.forEach(function (command) {
+        _this.generateCmdElement(command);
       });
-
-      if (this.settings.backgroundImage) {
-        var li = document.createElement('li');
-        var bgImage = fileButton('image');
-        bgImage.input.addEventListener('change', this.backgroundImage.bind(this));
-        li.appendChild(bgImage.el);
-        this.el.appendChild(li);
-      }
-
-      if (this.settings.backgroundVideo) {
-        var _li = document.createElement('li');
-        var bgVideo = fileButton('video');
-        bgVideo.input.addEventListener('change', this.backgroundVideo.bind(this));
-        _li.appendChild(bgVideo.el);
-        this.el.appendChild(_li);
-      }
-
-      if (this.settings.backgroundColor) {
-        var _li2 = document.createElement('li');
-        var bgColor = input('bgColor', 'text');
-        var _self = this;
-        _li2.appendChild(bgColor);
-        this.el.appendChild(_li2);
-
-        this.picker = new colorpicker$1(bgColor, {
-          defaultColor: '#000000',
-          mode: 'hex',
-          disableLum: true,
-          guideIcon: '\n          <svg viewBox="0 0 24 24">\n            <path d="M0 20h24v4H0z"/>\n            <path style="fill: #000" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n          </svg>\n        ',
-          events: {
-            afterSelect: function afterSelect() {
-              if (!_self.currentContent) return;
-              _self.currentContent.style.backgroundColor = bgColor.value;
-            }
-          }
-        });
-      }
-
-      if (this.settings.toggleHTML) {
-        this.el.appendChild(menuButton('html', function () {
-          return _this.toggleHTML();
-        }));
-      }
-
-      this.el.appendChild(menuButton('delete', this.removeCurrentItem.bind(this)));
-      this.$align.el.appendChild(this.el);
+      this.$align.el.appendChild(this.styler);
+      if (this.settings.mode === 'bubble') this._initBubble();
     }
   }, {
-    key: 'active',
-    value: function active(item, index) {
-      if (this.currentItem) {
-        this.currentItem.classList.remove('is-active');
-      }
-      this.currentItem = item;
-      this.currentIndex = index || 0;
-      this.currentContent = item.querySelector('.align-content');
-      this.currentItem.classList.add('is-active');
+    key: '_initBubble',
+    value: function _initBubble() {
+      this.styler.classList.add('is-hidden');
+      this.bubbleScrollCallback = debounce(this.updateBubblePosition.bind(this));
+    }
+  }, {
+    key: 'generateCmdElement',
+    value: function generateCmdElement(command) {
+      var _this2 = this;
 
-      updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
-      this.$align.update();
+      var li = document.createElement('li');
+      var cmd = typeof command === 'string' ? command : Object.keys(command)[0];
+      var cmdSchema = this.cmdsSchema[cmd];
+      if (!cmdSchema) {
+        console.warn(cmd + ' is not found');
+        return;
+      }
+
+      var currentCmd = this.cmds[cmd] = { schema: cmdSchema };
+
+      switch (cmdSchema.element) {
+        case 'button':
+          currentCmd.el = button(cmd, this.getTooltip(cmdSchema));
+          currentCmd.el.addEventListener('click', function () {
+            return _this2.cmdCallback(cmdSchema, cmdSchema.value);
+          });
+          li.appendChild(currentCmd.el);
+          break;
+
+        case 'classes':
+          currentCmd.el = document.createElement('ul');
+          command[cmd].forEach(function (className) {
+            var li = menuButton('' + cmdSchema.command + camelCase(className), function () {
+              _this2.toggleClass('is-' + className, command[cmd]);
+            });
+            currentCmd.el.appendChild(li);
+          });
+          li.appendChild(currentCmd.el);
+          break;
+
+        case 'file':
+          var fileBtn = fileButton(cmd);
+          currentCmd.el = fileBtn.input;
+          currentCmd.el.addEventListener('change', function (event) {
+            _this2.cmdCallback(cmdSchema, event);
+          });
+          li.appendChild(fileBtn.el);
+          break;
+
+        case 'select':
+          var selectWrapper = select$1(cmd, command[cmd]);
+          var temp = currentCmd.el = selectWrapper.querySelector('select');
+          temp.addEventListener('change', function () {
+            return _this2.cmdCallback(cmdSchema, temp[temp.selectedIndex].value);
+          });
+          li.appendChild(selectWrapper);
+          break;
+
+        case 'input':
+          currentCmd.el = input(cmd, cmdSchema.type);
+          currentCmd.el.addEventListener('change', function () {
+            _this2.cmdCallback(cmdSchema, currentCmd.el.value);
+          });
+          li.appendChild(currentCmd.el);
+          break;
+
+        case 'styling':
+          li.classList.add(cmdSchema.class);
+          break;
+
+        case 'custom':
+          var markup = cmdSchema.create(this);
+          li.appendChild(markup);
+          break;
+
+        default:
+          console.warn(cmd + ' element not found');
+      }
+
+      if (typeof cmdSchema.init === 'function') {
+        cmdSchema.init = new cmdSchema.init(currentCmd.el, cmdSchema.initConfig); // eslint-disable-line
+      }
+
+      if (typeof cmdSchema.init === 'string') {
+        this.$align[cmdSchema.init](cmdSchema, command);
+        cmdSchema.init = null;
+      }
+
+      this.styler.appendChild(li);
+    }
+  }, {
+    key: 'cmdCallback',
+    value: function cmdCallback(cmdSchema, value) {
+      if (cmdSchema.command) {
+        this.execute(cmdSchema.command, value, cmdSchema.useCSS);
+      }
+      if (typeof cmdSchema.func === 'string') {
+        var callback = this.$align[cmdSchema.func] || this.currentItem[cmdSchema.func].bind(this.currentItem);
+        callback(this, value);
+      }
+      if (typeof cmdSchema.func === 'function') {
+        cmdSchema.func(this, value);
+      }
+      if (this.settings.mode === 'bubble') {
+        this.updateBubblePosition();
+      }
+    }
+
+    /**
+     * Execute command for the selected button
+     * @param {String} cmd
+     * @param {String|Number} value
+     */
+
+  }, {
+    key: 'execute',
+    value: function execute(cmd, value) {
+      var _$align;
+
+      (_$align = this.$align).execute.apply(_$align, arguments);
+    }
+  }, {
+    key: 'updateBubblePosition',
+    value: function updateBubblePosition() {
+      if (!Selection.textRange && !this.currentItem) return;
+      var marginRatio = 10;
+      var threshold = 70;
+      var element = this.currentItem ? this.currentItem.el : Selection.textRange;
+      var elementRect = element.getBoundingClientRect();
+      var editorRect = this.$align.el.getBoundingClientRect();
+      var stylerRect = this.styler.getBoundingClientRect();
+
+      var deltaY = elementRect.top - stylerRect.height - marginRatio;
+      var deltaX = elementRect.left + (elementRect.width - stylerRect.width) / 2;
+      var startBoundary = editorRect.left;
+      var endBoundary = editorRect.left + editorRect.width - stylerRect.width;
+      var xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
+      var yPosition = deltaY < threshold ? elementRect.top + elementRect.height + marginRatio : deltaY;
+
+      if (yPosition < threshold) {
+        this.styler.style.opacity = 0;
+        return;
+      }
+      this.styler.style.opacity = 1;
+      this.styler.style.top = yPosition + 'px';
+      this.styler.style.left = xPosition + 'px';
+    }
+  }, {
+    key: 'show',
+    value: function show(item) {
+      var _this3 = this;
+
+      if (this.currentItem) {
+        this.currentItem.el.classList.remove('is-active');
+      }
+      if (item) {
+        this.currentItem = item;
+        this.currentContent = item.contentDiv;
+        this.currentItem.el.classList.add('is-active');
+      }
+      if (this.settings.mode === 'bubble') {
+        this.updateBubblePosition();
+      }
       if (this.visiable) return;
       this.visiable = true;
-      this.el.classList.add('is-visible');
-      this.el.classList.remove('is-hidden');
-      this.clickCallback = this.deactivate.bind(this);
-      document.addEventListener('click', this.clickCallback);
+      this.styler.classList.add('is-visible');
+      this.styler.classList.remove('is-hidden');
+      if (this.settings.mode === 'bubble') {
+        window.addEventListener('scroll', this.bubbleScrollCallback);
+      }
+      if (this.settings.hideWhenClickOut) {
+        document.addEventListener('click', function (event) {
+          if (isElementClosest(event.target, _this3.currentItem.el) || isElementClosest(event.target, _this3.styler)) return;
+          _this3.hide();
+        });
+      }
     }
   }, {
-    key: 'deactivate',
-    value: function deactivate(event) {
-      if (event && (isElementClosest(event.target, this.currentItem) || isElementClosest(event.target, this.el))) return;
-
+    key: 'hide',
+    value: function hide() {
+      this.styler.classList.remove('is-visible');
+      this.styler.classList.add('is-hidden');
       this.visiable = false;
-      this.currentItem.classList.remove('is-active');
-      this.currentItem = null;
-      this.el.classList.remove('is-visible');
-      this.el.classList.add('is-hidden');
-      document.removeEventListener('click', this.clickCallback);
+      if (this.settings.mode === 'bubble') {
+        window.removeEventListener('scroll', this.bubbleScrollCallback);
+      }
+      if (this.settings.hideWhenClickOut) {
+        document.removeEventListener('click', this.clickCallback);
+      }
+    }
+  }, {
+    key: 'update',
+    value: function update() {
+      this.updateCommandsStates();
+      if (this.settings.mode !== 'bubble') return;
+
+      if (Selection.textRange.collapsed || Selection.range.collapsed) {
+        this.hide();
+        return;
+      }
+      this.show();
+    }
+  }, {
+    key: 'getTooltip',
+    value: function getTooltip(schema) {
+      if (!schema.tooltip || !this.settings.tooltip) {
+        return false;
+      }
+      return this.$align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
+    }
+
+    /**
+     * Update the state of the active style
+     */
+
+  }, {
+    key: 'updateCommandsStates',
+    value: function updateCommandsStates() {
+      var _this4 = this;
+
+      Object.keys(this.cmds).forEach(function (cmd) {
+        var currentCmd = _this4.cmds[cmd];
+        var command = currentCmd.schema.command;
+        var value = currentCmd.schema.value;
+        var init = currentCmd.schema.init;
+        if (!command) {
+          return;
+        }
+        if (document.queryCommandState(command)) {
+          currentCmd.el.classList.add('is-active');
+          return;
+        }
+        if (document.queryCommandValue(command) === value) {
+          currentCmd.el.classList.add('is-active');
+          return;
+        }
+        if (init) {
+          if (Selection.range === Selection.textRange) {
+            init.selectColor(document.queryCommandValue(command), true);
+          }
+          return;
+        }
+        if (document.queryCommandValue(command)) {
+          currentCmd.el.value = document.queryCommandValue(command);
+        }
+        currentCmd.el.classList.remove('is-active');
+      });
     }
   }, {
     key: 'toggleClass',
-    value: function toggleClass(className) {
-      var _currentItem$classLis;
+    value: function toggleClass(currentClass, allClasses) {
+      var _currentItem$el$class;
 
       if (!this.currentItem) return;
-      var prefixedClasses = this.options.map(function (cls) {
+      var prefixedClasses = allClasses.map(function (cls) {
         return 'is-' + cls;
       });
-      (_currentItem$classLis = this.currentItem.classList).remove.apply(_currentItem$classLis, toConsumableArray(prefixedClasses));
-      this.currentItem.classList.add(className);
-      updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
-      this.$align.update();
-    }
-  }, {
-    key: 'toggleHTML',
-    value: function toggleHTML() {
-      if (this.currentContent.firstElementChild.tagName !== 'PRE') {
-        var content = document.createTextNode(this.currentContent.innerHTML);
-        var pre = document.createElement('pre');
-
-        this.currentContent.innerHTML = '';
-        pre.id = 'content';
-        pre.style.whiteSpace = 'pre-wrap';
-        pre.appendChild(content);
-        this.currentContent.appendChild(pre);
-        this.$align.highlight();
-        return;
+      (_currentItem$el$class = this.currentItem.el.classList).remove.apply(_currentItem$el$class, toConsumableArray(prefixedClasses));
+      this.currentItem.el.classList.add(currentClass);
+      if (this.settings.mode === 'bubble') {
+        this.updateBubblePosition();
       }
-      this.currentContent.innerHTML = this.currentContent.innerText;
-      this.currentContent.contentEditable = true;
-      this.currentContent.focus();
-    }
-  }, {
-    key: 'backgroundImage',
-    value: function backgroundImage(event) {
-      var _this2 = this;
-
-      var input$$1 = event.target;
-      var file = input$$1.files[0];
-      if (!file) return;
-      var reader = new FileReader(); // eslint-disable-line
-      var bg = this.currentContent.querySelector('.align-bgImage') || document.createElement('div');
-      if (!this.currentContent.querySelector('.align-bgImage')) {
-        bg.classList.add('align-bgImage');
-        this.currentContent.insertAdjacentElement('afterBegin', bg);
-      }
-      reader.addEventListener('load', function () {
-        _this2.currentItem.classList.add('is-bgImage');
-        bg.style.backgroundImage = 'url(' + reader.result + ')';
-        var update = function update(src) {
-          bg.style.backgroundImage = 'url(' + src + ')';
-        };
-        _this2.$align.update();
-        _this2.$align.$bus.emit('imageAdded', { file: file, update: update });
-      });
-      reader.readAsDataURL(file);
-      input$$1.value = null;
-    }
-  }, {
-    key: 'backgroundVideo',
-    value: function backgroundVideo(event) {
-      var input$$1 = event.target;
-      var file = input$$1.files[0];
-      if (!file) return;
-      var video = this.currentContent.querySelector('.align-bgVideo');
-      var source = null;
-      var url = URL.createObjectURL(event.target.files[0]);
-      if (!video) {
-        var _video = stringToDOM('<video autoplay muted loop class="align-bgVideo"></video>');
-        source = document.createElement('source');
-        _video.appendChild(source);
-        this.currentContent.insertAdjacentElement('afterBegin', _video);
-      }
-      if (video) {
-        source = video.querySelector('source');
-      }
-      this.currentItem.classList.add('is-bgVideo');
-      source.src = url;
-      var update = function update(src) {
-        source.src = src;
-      };
-      this.$align.update();
-      this.$align.$bus.emit('videoAdded', { file: file, update: update });
-      input$$1.value = null;
-    }
-  }, {
-    key: 'sectionUp',
-    value: function sectionUp() {
-      if (!this.currentItem.previousSibling.classList.contains('align-section')) return;
-      this.$align.editor.insertBefore(this.currentItem, this.currentItem.previousSibling);
-      updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
-    }
-  }, {
-    key: 'sectionDown',
-    value: function sectionDown() {
-      if (!this.currentItem.nextSibling) return;
-      this.$align.editor.insertBefore(this.currentItem, this.currentItem.nextSibling.nextSibling);
-      updatePosition(this.currentItem, this.el, this.$align.el, this.settings.position);
-    }
-  }, {
-    key: 'removeCurrentItem',
-    value: function removeCurrentItem() {
-      this.currentItem.remove();
-      this.deactivate();
     }
   }]);
-  return OptionsBar;
+  return Styler;
 }();
 
 var ID = 0;
+var ALL_SECTIONS = [];
 
 var Section = function () {
   function Section(content, position) {
@@ -2047,45 +2124,46 @@ var Section = function () {
     this.generateEl(content);
     this.id = ID++;
     this.el.addEventListener('click', function () {
-      Section.optionsBar.active(_this.el, _this.id);
+      Section.optionsBar.show(_this);
     });
     if (position) {
       Section.$align.editor.insertBefore(this.el, position);
       return;
     }
     Section.$align.editor.appendChild(this.el);
+    ALL_SECTIONS.push(this);
   }
 
   createClass(Section, [{
     key: 'generateEl',
     value: function generateEl(content) {
       if (content && content.classList.contains('align-section')) {
-        var _contentDiv = content.querySelector('.align-content') || document.createElement('div');
-        _contentDiv.classList.add('align-content');
-        _contentDiv.contentEditable = true;
+        this.contentDiv = content.querySelector('.align-content') || document.createElement('div');
+        this.contentDiv.classList.add('align-content');
+        this.contentDiv.contentEditable = true;
         this.el = content;
-        _contentDiv.innerHTML = this.el.innerHTML;
+        this.contentDiv.innerHTML = this.el.innerHTML;
         this.el.innerHTML = '';
-        this.el.appendChild(_contentDiv);
+        this.el.appendChild(this.contentDiv);
         if (!content.querySelector('.align-newSection')) {
           this.el.insertAdjacentElement('afterBegin', this.newSectionButton());
         }
         return;
       }
 
-      var contentDiv = document.createElement('div');
-      contentDiv.classList.add('align-content');
-      contentDiv.contentEditable = true;
+      this.contentDiv = document.createElement('div');
+      this.contentDiv.classList.add('align-content');
+      this.contentDiv.contentEditable = true;
 
       this.el = document.createElement('div');
       this.el.classList.add('align-section');
       this.el.appendChild(this.newSectionButton());
-      this.el.appendChild(contentDiv);
+      this.el.appendChild(this.contentDiv);
       if (content) {
-        contentDiv.appendChild(content);
+        this.contentDiv.appendChild(content);
       }
       if (!content) {
-        contentDiv.insertAdjacentHTML('afterBegin', '<p></p>');
+        this.contentDiv.insertAdjacentHTML('afterBegin', '<p></p>');
       }
     }
   }, {
@@ -2101,19 +2179,115 @@ var Section = function () {
       btn.contentEditable = false;
       return btn;
     }
+  }, {
+    key: 'toggleHTML',
+    value: function toggleHTML() {
+      if (this.contentDiv.firstElementChild.tagName !== 'PRE') {
+        var content = document.createTextNode(this.contentDiv.innerHTML);
+        var pre = document.createElement('pre');
+
+        this.contentDiv.innerHTML = '';
+        pre.id = 'content';
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.appendChild(content);
+        this.contentDiv.appendChild(pre);
+        Section.$align.highlight();
+        return;
+      }
+      this.contentDiv.innerHTML = this.contentDiv.innerText;
+      this.contentDiv.contentEditable = true;
+      this.contentDiv.focus();
+    }
+  }, {
+    key: 'backgroundColor',
+    value: function backgroundColor(cmdSchema, color) {
+      this.contentDiv.style.backgroundColor = color;
+    }
+  }, {
+    key: 'backgroundImage',
+    value: function backgroundImage(cmdSchema, event) {
+      var _this3 = this;
+
+      var input = event.target;
+      var file = input.files[0];
+      if (!file) return;
+      var reader = new FileReader(); // eslint-disable-line
+      var bg = this.contentDiv.querySelector('.align-bgImage') || document.createElement('div');
+      if (!this.contentDiv.querySelector('.align-bgImage')) {
+        bg.classList.add('align-bgImage');
+        this.contentDiv.insertAdjacentElement('afterBegin', bg);
+      }
+      reader.addEventListener('load', function () {
+        _this3.el.classList.add('is-bgImage');
+        bg.style.backgroundImage = 'url(' + reader.result + ')';
+        var update = function update(src) {
+          bg.style.backgroundImage = 'url(' + src + ')';
+        };
+        Section.$align.update();
+        Section.$align.$bus.emit('imageAdded', { file: file, update: update });
+      });
+      reader.readAsDataURL(file);
+      input.value = null;
+    }
+  }, {
+    key: 'backgroundVideo',
+    value: function backgroundVideo(cmdSchema, event) {
+      var input = event.target;
+      var file = input.files[0];
+      if (!file) return;
+      var video = this.contentDiv.querySelector('.align-bgVideo');
+      var source = null;
+      var url = URL.createObjectURL(event.target.files[0]);
+      if (!video) {
+        var _video = stringToDOM('<video autoplay muted loop class="align-bgVideo"></video>');
+        source = document.createElement('source');
+        _video.appendChild(source);
+        this.contentDiv.insertAdjacentElement('afterBegin', _video);
+      }
+      if (video) {
+        source = video.querySelector('source');
+      }
+      this.el.classList.add('is-bgVideo');
+      source.src = url;
+      var update = function update(src) {
+        source.src = src;
+      };
+      Section.$align.update();
+      Section.$align.$bus.emit('videoAdded', { file: file, update: update });
+      input.value = null;
+    }
+  }, {
+    key: 'moveUp',
+    value: function moveUp() {
+      if (!this.el.previousSibling.classList.contains('align-section')) return;
+      Section.$align.editor.insertBefore(this.el, this.el.previousSibling);
+    }
+  }, {
+    key: 'moveDown',
+    value: function moveDown() {
+      if (!this.el.nextSibling) return;
+      Section.$align.editor.insertBefore(this.el, this.el.nextSibling.nextSibling);
+    }
+  }, {
+    key: 'remove',
+    value: function remove() {
+      this.el.remove();
+    }
+  }, {
+    key: 'allsections',
+    get: function get$$1() {
+      return ALL_SECTIONS;
+    }
   }], [{
     key: 'config',
-    value: function config(align, optionsBar) {
+    value: function config(align) {
       this.$align = align;
-      this.optionsBar = new OptionsBar(align, {
-        element: 'section',
-        options: ['normal', 'full'],
-        position: 'center-top',
-        backgroundImage: true,
-        backgroundColor: true,
-        backgroundViedo: true,
-        sorting: true,
-        toggleHTML: true
+      this.optionsBar = new Styler(align, {
+        mode: 'bubble',
+        hideWhenClickOut: true,
+        commands: ['_sectionUp', '_sectionDown', '_sectionColor', '_sectionImage', '_sectionVideo', { '_sectionClasses': ['normal', 'full'] }, '_remove'],
+        tooltip: false,
+        theme: 'dark'
       });
     }
   }]);
@@ -2148,7 +2322,13 @@ var Creator = function () {
       this.menu.classList.add('creator-menu');
       this.toggleButton = button('plus');
       this.toggleButton.addEventListener('click', this.toggleState.bind(this));
-      this.optionsBar = new OptionsBar(this.$align);
+      this.optionsBar = new Styler(this.$align, {
+        mode: 'bubble',
+        hideWhenClickOut: true,
+        commands: [{ '_figureClasses': ['normal', 'full', 'float'] }, '_remove'],
+        tooltip: false,
+        theme: 'dark'
+      });
 
       {
         var menuItem = document.createElement('li');
@@ -2218,8 +2398,13 @@ var Creator = function () {
       figure.appendChild(img);
       figure.appendChild(caption);
       figure.addEventListener('click', function () {
-        return _this.optionsBar.active(figure);
-      });
+        return _this.optionsBar.show({
+          el: figure,
+          remove: function remove() {
+            figure.remove();
+          }
+        });
+      }, false);
       reader.addEventListener('load', function () {
         img.src = reader.result;
         img.dataset.alignFilename = file.name;
@@ -2238,8 +2423,11 @@ var Creator = function () {
     value: function createVideo() {
       var link = prompt('Write video URL here', ''); // eslint-disable-line
       if (!link && link === '') return;
-      var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : 'invalid';
-      console.log(videoHoster);
+      var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
+
+      if (!videoHoster) {
+        return;
+      }
       var videoId = getVideoId(link, videoHoster);
       var iframe = document.createElement('iframe');
       var selectedElement = Selection.current.anchorNode;
@@ -2253,249 +2441,6 @@ var Creator = function () {
     }
   }]);
   return Creator;
-}();
-
-var Styler = function () {
-  function Styler(align) {
-    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref$mode = _ref.mode,
-        mode = _ref$mode === undefined ? 'default' : _ref$mode,
-        _ref$commands = _ref.commands,
-        commands = _ref$commands === undefined ? ['bold', 'italic', 'underline'] : _ref$commands,
-        _ref$tooltip = _ref.tooltip,
-        tooltip = _ref$tooltip === undefined ? false : _ref$tooltip,
-        _ref$theme = _ref.theme,
-        theme = _ref$theme === undefined ? 'light' : _ref$theme;
-
-    classCallCheck(this, Styler);
-
-    this.$align = align;
-    this.settings = {
-      mode: mode,
-      commands: commands,
-      tooltip: tooltip,
-      theme: theme
-    };
-    this.init();
-  }
-
-  /**
-   * Create the styler toolbar
-   */
-
-
-  createClass(Styler, [{
-    key: 'init',
-    value: function init() {
-      var _this = this;
-
-      setElementsPrefix('styler-');
-      this.cmdsSchema = cloneObject(cmdsSchema);
-      this.styler = document.createElement('ul');
-      this.styler.classList.add('styler', 'is-' + this.settings.mode, 'is-' + this.settings.theme);
-      this.cmds = {};
-
-      this.settings.commands.forEach(function (command) {
-        var li = document.createElement('li');
-        var cmd = typeof command === 'string' ? command : Object.keys(command)[0];
-        var cmdSchema = _this.cmdsSchema[cmd];
-        if (!cmdSchema) {
-          console.warn(cmd + ' is not found');
-          return;
-        }
-
-        var currentCmd = _this.cmds[cmd] = { schema: cmdSchema };
-
-        switch (cmdSchema.element) {
-          case 'button':
-            currentCmd.el = button(cmd, _this.getTooltip(cmdSchema));
-            currentCmd.el.addEventListener('click', function () {
-              return _this.cmdCallback(cmdSchema, cmdSchema.value);
-            });
-            li.appendChild(currentCmd.el);
-            break;
-
-          case 'select':
-            var selectWrapper = select$1(cmd, command[cmd]);
-            var temp = currentCmd.el = selectWrapper.querySelector('select');
-            temp.addEventListener('change', function () {
-              return _this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value);
-            });
-            li.appendChild(selectWrapper);
-            break;
-
-          case 'input':
-            currentCmd.el = input(cmd, cmdSchema.type);
-            currentCmd.el.addEventListener('change', function () {
-              _this.cmdCallback(cmdSchema, currentCmd.el.value);
-            });
-            li.appendChild(currentCmd.el);
-            break;
-
-          case 'styling':
-            li.classList.add(cmdSchema.class);
-            break;
-
-          case 'custom':
-            var markup = cmdSchema.create(_this);
-            li.appendChild(markup);
-            break;
-
-          default:
-            console.warn(cmd + ' element not found');
-        }
-
-        if (typeof cmdSchema.init === 'function') {
-          cmdSchema.init = new cmdSchema.init(currentCmd.el, cmdSchema.initConfig); // eslint-disable-line
-        }
-
-        if (typeof cmdSchema.init === 'string') {
-          _this.$align[cmdSchema.init](cmdSchema, command);
-          cmdSchema.init = null;
-        }
-
-        _this.styler.appendChild(li);
-      });
-      this.$align.el.appendChild(this.styler);
-      if (this.settings.mode === 'bubble') this.initBubble();
-    }
-  }, {
-    key: 'cmdCallback',
-    value: function cmdCallback(cmdSchema, value) {
-      if (cmdSchema.command) {
-        this.execute(cmdSchema.command, value, cmdSchema.useCSS);
-      }
-      if (typeof cmdSchema.func === 'string') {
-        this.$align[cmdSchema.func](this, value);
-      }
-      if (typeof cmdSchema.func === 'function') {
-        cmdSchema.func(this, value);
-      }
-    }
-  }, {
-    key: 'initBubble',
-    value: function initBubble() {
-      this.styler.classList.add('is-hidden');
-      this.bubbleScrollCallback = debounce(this.updateBubblePosition.bind(this));
-    }
-
-    /**
-     * Execute command for the selected button
-     * @param {String} cmd
-     * @param {String|Number} value
-     */
-
-  }, {
-    key: 'execute',
-    value: function execute(cmd, value) {
-      var _$align;
-
-      (_$align = this.$align).execute.apply(_$align, arguments);
-    }
-  }, {
-    key: 'updateBubblePosition',
-    value: function updateBubblePosition() {
-      if (!Selection.textRange) return;
-      var marginRatio = 10;
-      var threshold = 70;
-      var selectionRect = Selection.textRange.getBoundingClientRect();
-      var editorRect = this.$align.el.getBoundingClientRect();
-      var stylerRect = this.styler.getBoundingClientRect();
-
-      var deltaY = selectionRect.top - stylerRect.height - marginRatio;
-      var deltaX = selectionRect.left + (selectionRect.width - stylerRect.width) / 2;
-      var startBoundary = editorRect.left;
-      var endBoundary = editorRect.left + editorRect.width - stylerRect.width;
-      var xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
-      var yPosition = deltaY < threshold ? selectionRect.top + selectionRect.height + marginRatio : deltaY;
-
-      if (yPosition < threshold) {
-        this.styler.style.opacity = 0;
-        return;
-      }
-      this.styler.style.opacity = 1;
-      this.styler.style.top = yPosition + 'px';
-      this.styler.style.left = xPosition + 'px';
-    }
-  }, {
-    key: 'showStyler',
-    value: function showStyler() {
-      this.styler.classList.add('is-visible');
-      this.styler.classList.remove('is-hidden');
-      if (this.settings.mode === 'bubble') {
-        this.updateBubblePosition();
-        window.addEventListener('scroll', this.bubbleScrollCallback);
-      }
-    }
-  }, {
-    key: 'hideStyler',
-    value: function hideStyler() {
-      this.styler.classList.remove('is-visible');
-      this.styler.classList.add('is-hidden');
-      if (this.settings.mode === 'bubble') {
-        window.removeEventListener('scroll', this.bubbleScrollCallback);
-      }
-    }
-  }, {
-    key: 'updateStyler',
-    value: function updateStyler() {
-      this.updateStylerCommandsStates();
-      if (this.settings.mode !== 'bubble') return;
-
-      if (Selection.textRange.collapsed || Selection.range.collapsed) {
-        this.hideStyler();
-        return;
-      }
-      this.showStyler();
-    }
-  }, {
-    key: 'getTooltip',
-    value: function getTooltip(schema) {
-      if (!schema.tooltip || !this.settings.tooltip) {
-        return false;
-      }
-      return this.$align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
-    }
-
-    /**
-     * Update the state of the active style
-     */
-
-  }, {
-    key: 'updateStylerCommandsStates',
-    value: function updateStylerCommandsStates() {
-      var _this2 = this;
-
-      Object.keys(this.cmds).forEach(function (cmd) {
-        var currentCmd = _this2.cmds[cmd];
-        var command = currentCmd.schema.command;
-        var value = currentCmd.schema.value;
-        var init = currentCmd.schema.init;
-        if (!command) {
-          return;
-        }
-        if (document.queryCommandState(command)) {
-          currentCmd.el.classList.add('is-active');
-          return;
-        }
-        if (document.queryCommandValue(command) === value) {
-          currentCmd.el.classList.add('is-active');
-          return;
-        }
-        if (init) {
-          if (Selection.range === Selection.textRange) {
-            init.selectColor(document.queryCommandValue(command), true);
-          }
-          return;
-        }
-        if (document.queryCommandValue(command)) {
-          currentCmd.el.value = document.queryCommandValue(command);
-        }
-        currentCmd.el.classList.remove('is-active');
-      });
-    }
-  }]);
-  return Styler;
 }();
 
 var EventBus = function () {
@@ -2783,10 +2728,10 @@ var Align = function () {
       Selection.updateSelectedRange();
       setTimeout(function () {
         if (_this2.settings.toolbar) {
-          _this2.toolbar.updateStyler();
+          _this2.toolbar.update();
         }
         if (_this2.settings.bubble) {
-          _this2.bubble.updateStyler();
+          _this2.bubble.update();
         }
         if (_this2.settings.creator) {
           _this2.creator.update();

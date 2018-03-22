@@ -232,10 +232,10 @@ class Align {
     Selection.updateSelectedRange();
     setTimeout(() => {
       if (this.settings.toolbar) {
-        this.toolbar.updateStyler();
+        this.toolbar.update();
       }
       if (this.settings.bubble) {
-        this.bubble.updateStyler();
+        this.bubble.update();
       }
       if (this.settings.creator) {
         this.creator.update();

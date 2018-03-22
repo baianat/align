@@ -252,51 +252,61 @@ const cmdsSchema = {
     }
   },
 
-  addImage: {
-    element: 'custom',
-    data() {
-      return {
-        button: document.createElement('div'),
-        input: document.createElement('input'),
-        reader: new FileReader(), // eslint-disable-line
-        icon:
-          `<svg class="icon" viewBox="0 0 24 24">
-              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>
-            </svg>`
-      }
-    },
-    create(Styler) {
-      this.$styler = Styler;
-      this.$data = this.data();
-      const button = this.$data.button;
-      const input = this.$data.input;
-      const icon = this.$data.icon;
 
-      button.classList.add('styler-button');
-      button.appendChild(input);
-      button.insertAdjacentHTML('beforeend', icon);
-      input.classList.add('styler-input');
-      input.type = 'file';
-      input.id = 'addImage';
-      input.addEventListener('change', this.action.bind(this));
+  // internal functions don't use it
 
-      return button;
-    },
-    action() {
-      const file = this.$data.input.files[0];
-      if (!file || !window.getSelection().rangeCount) return;
-      const img = document.createElement('img');
-      img.classList.add('align-image');
+  _sectionClasses: {
+    element: 'classes',
+    command: 'section'
+  },
 
-      this.$data.reader.addEventListener('load', () => {
-        img.src = this.$data.reader.result;
-        img.dataset.alignFilename = file.name;
-      });
-      this.$data.reader.readAsDataURL(file);
-      Selection.range.insertNode(img);
-      this.$data.input.value = null;
+  _figureClasses: {
+    element: 'classes',
+    command: 'figure'
+  },
+
+  _remove: {
+    element: 'button',
+    func: 'remove'
+  },
+
+  _sectionUp: {
+    element: 'button',
+    func: 'moveUp'
+  },
+
+  _sectionDown: {
+    element: 'button',
+    func: 'moveDown'
+  },
+
+  _sectionImage: {
+    element: 'file',
+    func: 'backgroundImage',
+  },
+
+  _sectionVideo: {
+    element: 'file',
+    func: 'backgroundVideo',
+  },
+
+  _sectionColor: {
+    element: 'input',
+    type: 'text',
+    func: 'backgroundColor',
+    init: Colorpicker,
+    initConfig: {
+      defaultColor: '#000000',
+      mode: 'hex',
+      disableLum: true,
+      guideIcon: `
+        <svg viewBox="0 0 24 24">
+          <path d="M0 20h24v4H0z"/>
+          <path style="fill: #fff" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>
+        </svg>
+      `,
     }
-  }
+  },
 }
 
 export default cmdsSchema;

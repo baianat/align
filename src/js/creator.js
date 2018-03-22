@@ -1,6 +1,6 @@
 import { updatePosition, camelCase, getVideoId } from './partial/util';
 import { setElementsPrefix, button, fileButton, menuButton } from './partial/elements';
-import OptionsBar from './optionsBar';
+import Styler from './styler';
 import Selection from './selection';
 
 class Creator {
@@ -24,7 +24,16 @@ class Creator {
     this.menu.classList.add('creator-menu');
     this.toggleButton = button('plus');
     this.toggleButton.addEventListener('click', this.toggleState.bind(this));
-    this.optionsBar = new OptionsBar(this.$align);
+    this.optionsBar = new Styler(this.$align, {
+      mode: 'bubble',
+      hideWhenClickOut: true,
+      commands: [
+        { '_figureClasses': ['normal', 'full', 'float'] },
+        '_remove'
+      ],
+      tooltip: false,
+      theme: 'dark'
+    });
 
     {
       const menuItem = document.createElement('li');
@@ -92,7 +101,12 @@ class Creator {
     figure.classList.add('align-figure', 'is-normal');
     figure.appendChild(img);
     figure.appendChild(caption);
-    figure.addEventListener('click', () => this.optionsBar.active(figure));
+    figure.addEventListener('click', () => this.optionsBar.show({ 
+      el: figure,
+      remove() {
+        figure.remove();
+      }
+    }), false);
     reader.addEventListener('load', () => {
       img.src = reader.result;
       img.dataset.alignFilename = file.name;
@@ -112,8 +126,11 @@ class Creator {
     if (!link && link === '') return;
     const videoHoster = link.includes('yout')
       ? 'youtube' : link.includes('vimeo')
-      ? 'vimeo' : 'invalid';
-    console.log(videoHoster)
+      ? 'vimeo' : '';
+
+    if (!videoHoster) {
+      return;
+    }
     const videoId = getVideoId(link, videoHoster);
     const iframe = document.createElement('iframe');
     const selectedElement = Selection.current.anchorNode;
