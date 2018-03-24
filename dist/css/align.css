@@ -324,11 +324,11 @@
   height: 100%;
   overflow: hidden;
 }
-.align-content:focus {
-  outline: none;
-}
 .align-section {
   position: relative;
+}
+.align-section *:focus {
+  outline: none;
 }
 .align-section.is-active {
   outline: 2px solid #1700ff;
@@ -336,21 +336,13 @@
 .align p:empty::after {
   font-style: italic;
   color: #aaa;
-  content: 'your awesome content here!';
+  content: 'Your awesome content here!';
   font-size: 20px;
 }
-.align-title {
-  border: 0;
-  margin: 0 auto;
-  padding: 0.2em;
-  font-size: 40px;
-  height: 1.6em;
-  vertical-align: middle;
-  display: block;
-  resize: none;
-}
-.align-title:focus {
-  outline: 0;
+.align-title:empty::after {
+  font-style: italic;
+  color: #aaa;
+  content: 'Post Title Here';
 }
 .align [data-default-value]:empty::after {
   font-style: italic;

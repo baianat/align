@@ -5,18 +5,21 @@ let ID = 0;
 let ALL_SECTIONS = [];
 
 class Section {
-  constructor (content, position) {
-    this.generateEl(content);
+  constructor (content, position, type = 'text') {
     this.id = ID++;
-    this.el.addEventListener('click', () => {
-      Section.optionsBar.show(this);
-    });
-    if (position) {
+    this.type = type;
+    this.generateEl(content);
+    if (type === 'text') {
+      this.el.addEventListener('click', () => {
+        Section.optionsBar.show(this);
+      });
+    }
+    if (typeof position === 'object') {
       Section.$align.editor.insertBefore(this.el, position)
       return;
     }
     Section.$align.editor.appendChild(this.el);
-    ALL_SECTIONS.push(this)
+    ALL_SECTIONS.push(this);
   }
 
   static config (align) {
@@ -35,40 +38,54 @@ class Section {
     });
   }
 
-  get allsections () {
+  static get allSections () {
     return ALL_SECTIONS;
   }
 
-  generateEl (content) {
-    if (content && content.classList.contains('align-section')) {
-      this.contentDiv = content.querySelector('.align-content') || document.createElement('div')
-      this.contentDiv.classList.add('align-content');
-      this.contentDiv.contentEditable = true;
-      this.el = content;
-      this.contentDiv.innerHTML = this.el.innerHTML;
-      this.el.innerHTML = '';
-      this.el.appendChild(this.contentDiv);
-      if (!content.querySelector('.align-newSection')) {
-        this.el.insertAdjacentElement('afterBegin', this.newSectionButton());
-      }
-      return;
+  get content () {
+    let output;
+    if (this.type === 'text') {
+      output = this.contentDiv.cloneNode(true);
+      output.classList.remove('align-content');
+      output.classList.add('align-section');
+      output.contentEditable = 'inherit';
     }
-    
-    this.contentDiv = document.createElement('div');
-    this.contentDiv.classList.add('align-content');
-    this.contentDiv.contentEditable = true;
+    if (this.type === 'title') {
+      return this.title.innerText;
+    }
+    return output.outerHTML;
+  }
 
-    this.el = document.createElement('div');
+  generateEl (content) {
+    this.el = (content && content.nodeName === 'DIV') ? content : document.createElement('div');
     this.el.classList.add('align-section');
-    this.el.appendChild(this.newSectionButton());
-    this.el.appendChild(this.contentDiv);
-    if (content) {
-      this.contentDiv.appendChild(content);
+    
+    switch (this.type) {
+      case 'text':
+        this.contentDiv = this.el.querySelector('.align-content') || document.createElement('div');
+        this.contentDiv.classList.add('align-content');
+        this.contentDiv.contentEditable = true;
+        content = content ? this.contentDiv.innerHTML || this.el.innerHTML || content.outerHTML : '<p></p>';
+
+        this.el.innerHTML = '';
+        this.el.appendChild(this.contentDiv);
+        this.contentDiv.innerHTML = content;
+        this.el.insertAdjacentElement('afterBegin', this.newSectionButton());
+        break;
+    
+      case 'title':
+        this.titleDiv = this.el.querySelector('.align-title') || document.createElement('div');
+        this.titleDiv.classList.add('align-title');
+        this.titleDiv.contentEditable = true;
+        this.title = document.createElement('h1');
+        this.title.innerHTML = content;
+        this.titleDiv.appendChild(this.title);
+        this.el.appendChild(this.titleDiv);
+        break;
+
+      default:
+        break;
     }
-    if (!content) {
-      this.contentDiv.insertAdjacentHTML('afterBegin', '<p></p>');
-    }
-   
   }
 
   newSectionButton () {

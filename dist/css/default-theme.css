@@ -64,6 +64,9 @@
 .align-content {
   padding: 20px;
 }
+.align-title {
+  text-align: center;
+}
 .align-section {
   margin: auto;
   width: 70vw;

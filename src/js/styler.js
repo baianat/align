@@ -208,6 +208,9 @@ class Styler {
   }
 
   hide () {
+    if (this.currentItem) {
+      this.currentItem.el.classList.remove('is-active');
+    }
     this.styler.classList.remove('is-visible');
     this.styler.classList.add('is-hidden');
     this.visiable = false;

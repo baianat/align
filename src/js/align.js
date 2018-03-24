@@ -9,7 +9,7 @@ import Styler from './styler';
 import EventBus from './events';
 
 class Align {
-  constructor(selector, {
+  constructor (selector, {
     toolbar = null,
     bubble = null,
     creator = null,
@@ -30,38 +30,33 @@ class Align {
   /**
    * Get editor's content
    */
-  get content() {
-    const output = this.editor.cloneNode(true);
-    const newSectionButtons = Array.from(output.querySelectorAll('.align-newSection'));
-    const sectionsContent = Array.from(output.querySelectorAll('.align-content'));
-    const title = output.querySelector('.align-title');
-    title.remove();
-    newSectionButtons.forEach((btn) => {
-      btn.remove();
-    })
-    sectionsContent.forEach((section) => {
-      section.contentEditable = 'inherit';
-    })
-    return output.innerHTML;
+  get content () {
+    return Section.allSections.reduce((acc, section) => {
+      if (section.type !== 'text') {
+        return acc;
+      }
+      return acc += section.content;
+    }, '')
   }
 
-  get title() {
+  get title () {
     if (this.postTitle) {
-      return this.postTitle.value;
+      const title = Section.allSections.find((sec) => sec.type === 'title');
+      return title.content;
     }
   }
 
-  static extend(name, extension) {
+  static extend (name, extension) {
     cmdsSchema[name] = extension;
   }
 
-  static extendIcons(name, path) {
+  static extendIcons (name, path) {
     icons[name] = path;
   }
   /**
    * Create all editor elements
    */
-  _init() {
+  _init () {
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
@@ -93,12 +88,6 @@ class Align {
     this.editor.classList.add('align-editor');
     this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
     this.cmdKeyPressed = false;
-    if (this.settings.postTitle) {
-      this.postTitle = document.createElement('textarea');
-      this.postTitle.placeholder = this.settings.postTitle;
-      this.postTitle.classList.add('align-title');
-      this.editor.appendChild(this.postTitle);
-    }
     this.el.appendChild(this.editor);
     this.editor.focus();
     Selection.updateSelectedRange();
@@ -107,6 +96,9 @@ class Align {
   _initSections () {
     Section.config(this);
 
+    if (this.settings.postTitle !== false) {
+      this.postTitle = new Section(this.settings.postTitle, '', 'title');
+    }
     this.startContent.forEach(e => new Section(e));
     this.newSectionButton = document.createElement('button');
     this.newSectionButton.classList.add('align-addButton');

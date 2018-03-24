@@ -2056,6 +2056,9 @@ var Styler = function () {
   }, {
     key: 'hide',
     value: function hide() {
+      if (this.currentItem) {
+        this.currentItem.el.classList.remove('is-active');
+      }
       this.styler.classList.remove('is-visible');
       this.styler.classList.add('is-hidden');
       this.visiable = false;
@@ -2150,14 +2153,18 @@ var Section = function () {
   function Section(content, position) {
     var _this = this;
 
+    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'text';
     classCallCheck(this, Section);
 
-    this.generateEl(content);
     this.id = ID++;
-    this.el.addEventListener('click', function () {
-      Section.optionsBar.show(_this);
-    });
-    if (position) {
+    this.type = type;
+    this.generateEl(content);
+    if (type === 'text') {
+      this.el.addEventListener('click', function () {
+        Section.optionsBar.show(_this);
+      });
+    }
+    if ((typeof position === 'undefined' ? 'undefined' : _typeof(position)) === 'object') {
       Section.$align.editor.insertBefore(this.el, position);
       return;
     }
@@ -2168,33 +2175,34 @@ var Section = function () {
   createClass(Section, [{
     key: 'generateEl',
     value: function generateEl(content) {
-      if (content && content.classList.contains('align-section')) {
-        this.contentDiv = content.querySelector('.align-content') || document.createElement('div');
-        this.contentDiv.classList.add('align-content');
-        this.contentDiv.contentEditable = true;
-        this.el = content;
-        this.contentDiv.innerHTML = this.el.innerHTML;
-        this.el.innerHTML = '';
-        this.el.appendChild(this.contentDiv);
-        if (!content.querySelector('.align-newSection')) {
-          this.el.insertAdjacentElement('afterBegin', this.newSectionButton());
-        }
-        return;
-      }
-
-      this.contentDiv = document.createElement('div');
-      this.contentDiv.classList.add('align-content');
-      this.contentDiv.contentEditable = true;
-
-      this.el = document.createElement('div');
+      this.el = content && content.nodeName === 'DIV' ? content : document.createElement('div');
       this.el.classList.add('align-section');
-      this.el.appendChild(this.newSectionButton());
-      this.el.appendChild(this.contentDiv);
-      if (content) {
-        this.contentDiv.appendChild(content);
-      }
-      if (!content) {
-        this.contentDiv.insertAdjacentHTML('afterBegin', '<p></p>');
+
+      switch (this.type) {
+        case 'text':
+          this.contentDiv = this.el.querySelector('.align-content') || document.createElement('div');
+          this.contentDiv.classList.add('align-content');
+          this.contentDiv.contentEditable = true;
+          content = content ? this.contentDiv.innerHTML || this.el.innerHTML || content.outerHTML : '<p></p>';
+
+          this.el.innerHTML = '';
+          this.el.appendChild(this.contentDiv);
+          this.contentDiv.innerHTML = content;
+          this.el.insertAdjacentElement('afterBegin', this.newSectionButton());
+          break;
+
+        case 'title':
+          this.titleDiv = this.el.querySelector('.align-title') || document.createElement('div');
+          this.titleDiv.classList.add('align-title');
+          this.titleDiv.contentEditable = true;
+          this.title = document.createElement('h1');
+          this.title.innerHTML = content;
+          this.titleDiv.appendChild(this.title);
+          this.el.appendChild(this.titleDiv);
+          break;
+
+        default:
+          break;
       }
     }
   }, {
@@ -2305,9 +2313,19 @@ var Section = function () {
       this.el.remove();
     }
   }, {
-    key: 'allsections',
+    key: 'content',
     get: function get$$1() {
-      return ALL_SECTIONS;
+      var output = void 0;
+      if (this.type === 'text') {
+        output = this.contentDiv.cloneNode(true);
+        output.classList.remove('align-content');
+        output.classList.add('align-section');
+        output.contentEditable = 'inherit';
+      }
+      if (this.type === 'title') {
+        return this.title.innerText;
+      }
+      return output.outerHTML;
     }
   }], [{
     key: 'config',
@@ -2320,6 +2338,11 @@ var Section = function () {
         tooltip: false,
         theme: 'dark'
       });
+    }
+  }, {
+    key: 'allSections',
+    get: function get$$1() {
+      return ALL_SECTIONS;
     }
   }]);
   return Section;
@@ -2649,12 +2672,6 @@ var Align = function () {
       this.editor.classList.add('align-editor');
       this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
       this.cmdKeyPressed = false;
-      if (this.settings.postTitle) {
-        this.postTitle = document.createElement('textarea');
-        this.postTitle.placeholder = this.settings.postTitle;
-        this.postTitle.classList.add('align-title');
-        this.editor.appendChild(this.postTitle);
-      }
       this.el.appendChild(this.editor);
       this.editor.focus();
       Selection.updateSelectedRange();
@@ -2664,6 +2681,9 @@ var Align = function () {
     value: function _initSections() {
       Section.config(this);
 
+      if (this.settings.postTitle !== false) {
+        this.postTitle = new Section(this.settings.postTitle, '', 'title');
+      }
       this.startContent.forEach(function (e) {
         return new Section(e);
       });
@@ -2835,24 +2855,21 @@ var Align = function () {
   }, {
     key: 'content',
     get: function get$$1() {
-      var output = this.editor.cloneNode(true);
-      var newSectionButtons = Array.from(output.querySelectorAll('.align-newSection'));
-      var sectionsContent = Array.from(output.querySelectorAll('.align-content'));
-      var title = output.querySelector('.align-title');
-      title.remove();
-      newSectionButtons.forEach(function (btn) {
-        btn.remove();
-      });
-      sectionsContent.forEach(function (section) {
-        section.contentEditable = 'inherit';
-      });
-      return output.innerHTML;
+      return Section.allSections.reduce(function (acc, section) {
+        if (section.type !== 'text') {
+          return acc;
+        }
+        return acc += section.content;
+      }, '');
     }
   }, {
     key: 'title',
     get: function get$$1() {
       if (this.postTitle) {
-        return this.postTitle.value;
+        var title = Section.allSections.find(function (sec) {
+          return sec.type === 'title';
+        });
+        return title.content;
       }
     }
   }], [{
