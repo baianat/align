@@ -102,6 +102,20 @@ const cmdsSchema = {
     tooltip: 'Heading 2'
   },
 
+  h3: {
+    element: 'button',
+    command: 'formatblock',
+    value: 'h3',
+    tooltip: 'Heading 3'
+  },
+
+  h4: {
+    element: 'button',
+    command: 'formatblock',
+    value: 'h4',
+    tooltip: 'Heading 4'
+  },
+
   blockquote: {
     element: 'button',
     command: 'formatblock',
@@ -255,14 +269,19 @@ const cmdsSchema = {
 
   // internal functions don't use it
 
+  _figureClasses: {
+    element: 'classes',
+    command: 'figure'
+  },
+
   _sectionClasses: {
     element: 'classes',
     command: 'section'
   },
 
-  _figureClasses: {
-    element: 'classes',
-    command: 'figure'
+  _sectionToggleHTML: {
+    element: 'button',
+    func: 'toggleHTML'
   },
 
   _remove: {

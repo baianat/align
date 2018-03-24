@@ -26,7 +26,7 @@ class Section {
       hideWhenClickOut: true,
       commands:  [
         '_sectionUp', '_sectionDown',
-        '_sectionColor', '_sectionImage', '_sectionVideo',
+        '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML',
         {'_sectionClasses': ['normal', 'full']},
         '_remove'
       ],

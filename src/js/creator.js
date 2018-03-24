@@ -49,6 +49,17 @@ class Creator {
       this.menu.appendChild(button);
     }
 
+    {
+      const button = menuButton('facebook');
+      button.addEventListener('click', this.embedPost.bind(this));
+      this.menu.appendChild(button);
+    }
+
+    {
+      const button = menuButton('embed');
+      button.addEventListener('click', this.embed.bind(this));
+      this.menu.appendChild(button);
+    }
 
     this.creator.appendChild(this.toggleButton);
     this.creator.appendChild(this.menu);
@@ -146,6 +157,40 @@ class Creator {
       : ''
     selectedElement.parentNode.insertBefore(iframe, selectedElement);
   }
+
+  embedPost () {
+    let link = prompt('Write post URL here', ''); // eslint-disable-line
+    if (!link && link === '') return;
+    const postUrl = link
+    const iframe = document.createElement('iframe');
+    const selectedElement = Selection.current.anchorNode;
+
+    iframe.width = 500;
+    iframe.height = 548;
+    iframe.scrolling = 'no';
+    iframe.contentEditable = false;
+    iframe.allowTransparency = true;
+    iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
+    selectedElement.parentNode.insertBefore(iframe, selectedElement);
+  }
+
+  embed () {
+    let data = prompt('Add embeded element here, Do not write any code from untrusted sources', ''); // eslint-disable-line
+    if (!data && data === '') return;
+    const div = document.createElement('div');
+    const selectedElement = Selection.current.anchorNode;
+
+    selectedElement.parentNode.insertBefore(div, selectedElement);
+    div.insertAdjacentHTML('afterbegin', data);
+  }
+
+  embedTweet () {
+    let link = prompt('Write video URL here', ''); // eslint-disable-line
+    if (!link && link === '') return;
+    const postUrl = link
+  }
+
 }
+
 
 export default Creator;
