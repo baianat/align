@@ -280,19 +280,23 @@
 }
 .align-addButton {
   display: block;
-  margin: auto;
   font-size: 20px;
-  padding: 5px 20px;
-  background: rgba(0,0,0,0.5);
-  border: 0;
-  color: #fff;
+  padding: 30px;
+  width: 70vw;
+  margin: 20px auto;
+  border: 2px dashed #aaa;
+  color: #aaa;
+  background: #fff;
 }
 .align-addButton:after {
   display: block;
-  content: '+';
+  content: 'Your awesome content here!';
+}
+.align-addButton:active {
+  outline: 0;
 }
 .align-addButton:hover {
-  background: #000;
+  color: #000;
 }
 .align-newSection {
   position: absolute;
@@ -304,7 +308,7 @@
   width: 70vw;
   max-width: 600px;
   height: 6px;
-  background-color: #000;
+  background-color: #808080;
   border: 0;
   opacity: 0.01;
   transition: 0.5s 0.2s;
@@ -331,7 +335,7 @@
   outline: none;
 }
 .align-section.is-active {
-  outline: 2px solid #1700ff;
+  outline: 2px solid #aaa;
 }
 .align p:empty::after {
   font-style: italic;

@@ -365,6 +365,13 @@ function stringToDOM(string) {
   return document.createRange().createContextualFragment(string).firstElementChild;
 }
 
+function swapArrayItems(array, index1, index2) {
+  var temp = array[index1];
+  array[index1] = array[index2];
+  array[index2] = temp;
+  return array;
+}
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -2222,6 +2229,15 @@ var Section = function () {
       return btn;
     }
   }, {
+    key: 'getIndex',
+    value: function getIndex() {
+      var _this3 = this;
+
+      return ALL_SECTIONS.findIndex(function (el) {
+        return el === _this3;
+      });
+    }
+  }, {
     key: 'toggleHTML',
     value: function toggleHTML() {
       if (this.contentDiv.firstElementChild.tagName !== 'PRE') {
@@ -2248,7 +2264,7 @@ var Section = function () {
   }, {
     key: 'backgroundImage',
     value: function backgroundImage(cmdSchema, event) {
-      var _this3 = this;
+      var _this4 = this;
 
       var input = event.target;
       var file = input.files[0];
@@ -2260,7 +2276,7 @@ var Section = function () {
         this.contentDiv.insertAdjacentElement('afterBegin', bg);
       }
       reader.addEventListener('load', function () {
-        _this3.el.classList.add('is-bgImage');
+        _this4.el.classList.add('is-bgImage');
         bg.style.backgroundImage = 'url(' + reader.result + ')';
         var update = function update(src) {
           bg.style.backgroundImage = 'url(' + src + ')';
@@ -2301,14 +2317,20 @@ var Section = function () {
   }, {
     key: 'moveUp',
     value: function moveUp() {
-      if (!this.el.previousSibling || !this.el.previousSibling.classList.contains('align-section')) return;
-      Section.$align.editor.insertBefore(this.el, this.el.previousSibling);
+      var index = this.getIndex();
+      if (!this.el.previousSibling || ALL_SECTIONS[index - 1].type === 'title') return;
+
+      Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index - 1].el);
+      swapArrayItems(ALL_SECTIONS, index, index - 1);
     }
   }, {
     key: 'moveDown',
     value: function moveDown() {
+      var index = this.getIndex();
       if (!this.el.nextSibling) return;
-      Section.$align.editor.insertBefore(this.el, this.el.nextSibling.nextSibling);
+      Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index + 1].el.nextSibling);
+      swapArrayItems(ALL_SECTIONS, index, index + 1);
+      console.log(ALL_SECTIONS);
     }
   }, {
     key: 'active',
@@ -2320,6 +2342,7 @@ var Section = function () {
     key: 'remove',
     value: function remove() {
       this.el.remove();
+      ALL_SECTIONS.splice(this.getIndex(), 1);
     }
   }, {
     key: 'content',

@@ -1,4 +1,4 @@
-import { stringToDOM } from './partial/util'
+import { stringToDOM, swapArrayItems } from './partial/util'
 import Styler from './styler';
 
 let ID = 0;
@@ -97,6 +97,10 @@ class Section {
     return btn
   }
 
+  getIndex () {
+    return ALL_SECTIONS.findIndex(el => el === this);
+  }
+
   toggleHTML () {
     if (this.contentDiv.firstElementChild.tagName !== 'PRE') {
       const content = document.createTextNode(this.contentDiv.innerHTML);
@@ -172,16 +176,21 @@ class Section {
   }
 
   moveUp () {
+    const index = this.getIndex();
     if (
       !this.el.previousSibling ||
-      !this.el.previousSibling.classList.contains('align-section')
+      ALL_SECTIONS[index - 1].type === 'title'
     ) return;
-    Section.$align.editor.insertBefore(this.el, this.el.previousSibling);
+
+    Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index - 1].el);
+    swapArrayItems(ALL_SECTIONS, index, index - 1);
   }
 
   moveDown () {
+    const index = this.getIndex();
     if (!this.el.nextSibling) return;
-    Section.$align.editor.insertBefore(this.el, this.el.nextSibling.nextSibling);
+    Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index + 1].el.nextSibling);
+    swapArrayItems(ALL_SECTIONS, index, index + 1);
   }
   
   active () {
@@ -191,6 +200,7 @@ class Section {
 
   remove () {
     this.el.remove();
+    ALL_SECTIONS.splice(this.getIndex(), 1)
   }
 }
 

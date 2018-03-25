@@ -197,3 +197,10 @@ export function getVideoId (url, hoster) {
 export function stringToDOM(string) {
   return document.createRange().createContextualFragment(string).firstElementChild;
 }
+
+export function swapArrayItems(array, index1, index2) {
+  let temp = array[index1];
+  array[index1] = array[index2];
+  array[index2] = temp;
+  return array;
+}

@@ -13,17 +13,20 @@
 
   &-addButton
     display: block
-    margin: auto
     font-size: 20px
-    padding: 5px 20px
-    background: alpha($black, 0.5)
-    border: 0
-    color: $white
+    padding: 30px
+    width: 70vw
+    margin: 20px auto
+    border: 2px dashed $gray
+    color: $gray
+    background: $white
     &:after
       display: block
-      content: '+'
+      content: 'Your awesome content here!'
+    &:active
+      outline: 0
     &:hover
-      background: $black
+      color: $black
 
   &-newSection
     position: absolute
@@ -34,7 +37,7 @@
     width: 70vw
     max-width: 600px
     height: 6px
-    background-color: black
+    background-color: gray
     border: 0
     opacity: 0.01
     transition: 0.5s 0.2s
@@ -56,7 +59,7 @@
     *:focus
       outline: none
     &.is-active
-      outline: 2px solid $blue
+      outline: 2px solid $gray
 
   p:empty
     &::after
