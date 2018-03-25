@@ -1,5 +1,6 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from '../selection';
+import Prompt from '../prompt';
 import { generateKeysSymbols } from './util';
 
 const symbols = generateKeysSymbols();
@@ -81,10 +82,17 @@ const cmdsSchema = {
     element: 'button',
     tooltip: 'Hyperlink',
     func(styler) {
-      let link = prompt('Write the URL here', ''); // eslint-disable-line
-      if (link && link !== '') {
-        styler.align.execute('createLink', link);
-      }
+      console.log(Selection.current.toString())
+      new Prompt(
+        'Enter link:',
+        Selection.current.toString(),
+        Selection.textRange.getBoundingClientRect()
+      ).onSubmit(function () {
+        const link = this.input.value;
+        if (!link) return;
+        Selection.selectTextRange();
+        styler.$align.execute('createLink', link);
+      }, [styler]);
     }
   },
 

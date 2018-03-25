@@ -123,29 +123,33 @@ export function updatePosition (reference, element, align, mode = 'middle-left')
   const elmRect = element.getBoundingClientRect();
   const refRect = reference.getBoundingClientRect();
   const alignRect = align.getBoundingClientRect();
+  const positon = {left: 0, top: 0}
 
   modes.forEach(mode => {
     switch (mode) {
       case 'center':
-        element.style.left = `${refRect.left - alignRect.left + (refRect.width / 2)}px`
+        positon.left = refRect.left - alignRect.left + (refRect.width / 2);
         break;
       case 'left':
-        element.style.left = `${refRect.left - alignRect.left}px`
+        positon.left = refRect.left - alignRect.left
         break;
       case 'right':
-        element.style.left = `${refRect.left - alignRect.left - refRect.width}px`
+        positon.left = refRect.left - alignRect.left - refRect.width
         break;
       case 'middle':
-        element.style.top = `${refRect.top - alignRect.top + (refRect.height / 2)}px`
+        positon.top = refRect.top - alignRect.top + (refRect.height / 2)
         break;
       case 'top':
-        element.style.top = `${refRect.top - alignRect.top - elmRect.height}px`;
+        positon.top = refRect.top - alignRect.top - elmRect.height;
         break;
       case 'bottom':
-        element.style.top = `${alignRect.top - refRect.bottom + elmRect.height}px`;
+        positon.top = alignRect.top - refRect.bottom + elmRect.height;
         break;
     }
   })
+  element.style.left = `${positon.left}px`;
+  element.style.top = `${positon.top}px`;
+  return positon;
 }
 
 export function launchFullscreen (element) {

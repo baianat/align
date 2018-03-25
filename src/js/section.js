@@ -4,7 +4,7 @@ import Styler from './styler';
 let ID = 0;
 let ALL_SECTIONS = [];
 
-class Section {
+export default class Section {
   constructor (content, position, type = 'text') {
     this.id = ID++;
     this.type = type;
@@ -204,4 +204,3 @@ class Section {
   }
 }
 
-export default Section;

@@ -304,29 +304,33 @@ function updatePosition(reference, element, align) {
   var elmRect = element.getBoundingClientRect();
   var refRect = reference.getBoundingClientRect();
   var alignRect = align.getBoundingClientRect();
+  var positon = { left: 0, top: 0 };
 
   modes.forEach(function (mode) {
     switch (mode) {
       case 'center':
-        element.style.left = refRect.left - alignRect.left + refRect.width / 2 + 'px';
+        positon.left = refRect.left - alignRect.left + refRect.width / 2;
         break;
       case 'left':
-        element.style.left = refRect.left - alignRect.left + 'px';
+        positon.left = refRect.left - alignRect.left;
         break;
       case 'right':
-        element.style.left = refRect.left - alignRect.left - refRect.width + 'px';
+        positon.left = refRect.left - alignRect.left - refRect.width;
         break;
       case 'middle':
-        element.style.top = refRect.top - alignRect.top + refRect.height / 2 + 'px';
+        positon.top = refRect.top - alignRect.top + refRect.height / 2;
         break;
       case 'top':
-        element.style.top = refRect.top - alignRect.top - elmRect.height + 'px';
+        positon.top = refRect.top - alignRect.top - elmRect.height;
         break;
       case 'bottom':
-        element.style.top = alignRect.top - refRect.bottom + elmRect.height + 'px';
+        positon.top = alignRect.top - refRect.bottom + elmRect.height;
         break;
     }
   });
+  element.style.left = positon.left + 'px';
+  element.style.top = positon.top + 'px';
+  return positon;
 }
 
 function launchFullscreen(element) {
@@ -1277,7 +1281,29 @@ var Selection = function () {
     classCallCheck(this, Selection);
   }
 
-  createClass(Selection, [{
+  createClass(Selection, null, [{
+    key: "selectTextRange",
+    value: function selectTextRange() {
+      var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.textRange;
+
+      if (!range) return;
+      console.log(range);
+      var sel = Selection.current = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }, {
+    key: "updateSelectedRange",
+    value: function updateSelectedRange() {
+      var sel = Selection.current = window.getSelection();
+      if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
+        Selection.textRange = sel.getRangeAt(0);
+      }
+      if (sel.rangeCount) {
+        Selection.range = sel.getRangeAt(0);
+      }
+    }
+  }, {
     key: "textRange",
     set: function set$$1(range) {
       if (!range) return;
@@ -1303,30 +1329,74 @@ var Selection = function () {
     get: function get$$1() {
       return CURRENT_SELECTION;
     }
-  }], [{
-    key: "selectTextRange",
-    value: function selectTextRange() {
-      var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.textRange;
-
-      if (!range) return;
-      console.log(range);
-      var sel = Selection.current = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  }, {
-    key: "updateSelectedRange",
-    value: function updateSelectedRange() {
-      var sel = Selection.current = window.getSelection();
-      if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
-        Selection.textRange = sel.getRangeAt(0);
-      }
-      if (sel.rangeCount) {
-        Selection.range = sel.getRangeAt(0);
-      }
-    }
   }]);
   return Selection;
+}();
+
+var Prompt = function () {
+  function Prompt() {
+    var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    var positon = arguments[2];
+    classCallCheck(this, Prompt);
+
+    console.log(positon.left);
+    this._init(message, data, positon);
+  }
+
+  createClass(Prompt, [{
+    key: '_init',
+    value: function _init(message, data, positon) {
+      var _this = this;
+
+      this.el = document.createElement('div');
+      this.message = document.createElement('label');
+      this.input = document.createElement('input');
+      this.submit = document.createElement('button');
+
+      this.el.classList.add('prompt');
+      this.message.classList.add('prompt-message');
+      this.input.classList.add('prompt-input');
+      this.submit.classList.add('prompt-submit');
+
+      this.el.style.left = positon.left + 'px';
+      this.el.style.top = positon.top + 'px';
+      this.message.innerText = message;
+      this.input.value = data;
+      this.submit.innerText = 'Submit';
+
+      this.el.appendChild(this.message);
+      this.el.appendChild(this.input);
+      this.el.appendChild(this.submit);
+
+      document.body.appendChild(this.el);
+      setTimeout(function () {
+        document.addEventListener('click', function (event) {
+          if (isElementClosest(event.target, _this.el)) return;
+          _this.remove();
+        });
+      }, 16);
+    }
+  }, {
+    key: 'onSubmit',
+    value: function onSubmit(func, args) {
+      var _this2 = this;
+
+      this.submit.addEventListener('click', function () {
+        return func.call(_this2, args);
+      });
+      this.submit.addEventListener('click', function () {
+        return setTimeout(_this2.remove.bind(_this2), 16);
+      });
+      return this;
+    }
+  }, {
+    key: 'remove',
+    value: function remove() {
+      this.el.remove();
+    }
+  }]);
+  return Prompt;
 }();
 
 var symbols = generateKeysSymbols();
@@ -1408,10 +1478,13 @@ var cmdsSchema = {
     element: 'button',
     tooltip: 'Hyperlink',
     func: function func(styler) {
-      var link = prompt('Write the URL here', ''); // eslint-disable-line
-      if (link && link !== '') {
-        styler.align.execute('createLink', link);
-      }
+      console.log(Selection.current.toString());
+      new Prompt('Enter link:', Selection.current.toString(), Selection.textRange.getBoundingClientRect()).onSubmit(function () {
+        var link = this.input.value;
+        if (!link) return;
+        Selection.selectTextRange();
+        styler.$align.execute('createLink', link);
+      }, [styler]);
     }
   },
 
@@ -2330,7 +2403,6 @@ var Section = function () {
       if (!this.el.nextSibling) return;
       Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index + 1].el.nextSibling);
       swapArrayItems(ALL_SECTIONS, index, index + 1);
-      console.log(ALL_SECTIONS);
     }
   }, {
     key: 'active',
@@ -2450,7 +2522,7 @@ var Creator = function () {
     key: 'update',
     value: function update() {
       if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1 && Selection.current.anchorNode.parentNode.classList.contains('align-content')) {
-        updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
+        this.positon = updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
         this.show();
         return;
       }
@@ -2519,59 +2591,62 @@ var Creator = function () {
   }, {
     key: 'createVideo',
     value: function createVideo() {
-      var link = prompt('Write video URL here', ''); // eslint-disable-line
-      if (!link && link === '') return;
-      var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
-
-      if (!videoHoster) {
-        return;
-      }
-      var videoId = getVideoId(link, videoHoster);
-      var iframe = document.createElement('iframe');
       var selectedElement = Selection.current.anchorNode;
+      new Prompt('Enter video link:', '', this.positon).onSubmit(function () {
+        var link = this.input.value;
+        console.log(link);
+        if (!link) return;
+        var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
 
-      iframe.width = 560;
-      iframe.height = 315;
-      iframe.allowfullscreen = true;
-      iframe.contentEditable = false;
-      iframe.src = videoHoster === 'youtube' ? '//www.youtube.com/embed/' + videoId : videoHoster === 'vimeo' ? '//player.vimeo.com/video/' + videoId : '';
-      selectedElement.parentNode.insertBefore(iframe, selectedElement);
+        if (!videoHoster) {
+          return;
+        }
+
+        var videoId = getVideoId(link, videoHoster);
+        var iframe = document.createElement('iframe');
+
+        iframe.width = 560;
+        iframe.height = 315;
+        iframe.allowfullscreen = true;
+        iframe.contentEditable = false;
+        iframe.src = videoHoster === 'youtube' ? '//www.youtube.com/embed/' + videoId : videoHoster === 'vimeo' ? '//player.vimeo.com/video/' + videoId : '';
+        selectedElement.parentNode.insertBefore(iframe, selectedElement);
+      });
     }
   }, {
     key: 'embedPost',
     value: function embedPost() {
-      var link = prompt('Write post URL here', ''); // eslint-disable-line
-      if (!link && link === '') return;
-      var postUrl = link;
-      var iframe = document.createElement('iframe');
       var selectedElement = Selection.current.anchorNode;
+      new Prompt('Enter post link:', '', this.positon).onSubmit(function () {
+        var postUrl = this.input.value;
+        if (!postUrl) return;
+        var iframe = document.createElement('iframe');
 
-      iframe.width = 500;
-      iframe.height = 548;
-      iframe.scrolling = 'no';
-      iframe.contentEditable = false;
-      iframe.allowTransparency = true;
-      iframe.src = '//www.facebook.com/plugins/post.php?href=' + postUrl;
-      selectedElement.parentNode.insertBefore(iframe, selectedElement);
+        iframe.width = 500;
+        iframe.height = 200;
+        iframe.scrolling = 'no';
+        iframe.contentEditable = false;
+        iframe.allowTransparency = true;
+        iframe.src = '//www.facebook.com/plugins/post.php?href=' + postUrl;
+        selectedElement.parentNode.insertBefore(iframe, selectedElement);
+      });
     }
   }, {
     key: 'embed',
     value: function embed() {
-      var data = prompt('Add embeded element here, Do not write any code from untrusted sources', ''); // eslint-disable-line
-      if (!data && data === '') return;
-      var div = document.createElement('div');
       var selectedElement = Selection.current.anchorNode;
+      new Prompt('Add embeded:', '', this.positon).onSubmit(function () {
+        var data = this.input.value;
+        if (!data) return;
+        var div = document.createElement('div');
 
-      selectedElement.parentNode.insertBefore(div, selectedElement);
-      div.insertAdjacentHTML('afterbegin', data);
+        selectedElement.parentNode.insertBefore(div, selectedElement);
+        div.insertAdjacentHTML('afterbegin', data);
+      });
     }
   }, {
     key: 'embedTweet',
-    value: function embedTweet() {
-      var link = prompt('Write video URL here', ''); // eslint-disable-line
-      if (!link && link === '') return;
-      
-    }
+    value: function embedTweet() {}
   }]);
   return Creator;
 }();

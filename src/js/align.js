@@ -8,7 +8,7 @@ import Creator from './creator';
 import Styler from './styler';
 import EventBus from './events';
 
-class Align {
+export default class Align {
   constructor (selector, {
     toolbar = null,
     bubble = null,
@@ -249,5 +249,3 @@ class Align {
   }
 
 }
-
-export default Align;

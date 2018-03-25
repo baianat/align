@@ -3,7 +3,7 @@ import { setElementsPrefix, button, select, input, menuButton, fileButton } from
 import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
 
-class Styler {
+export default class Styler {
   constructor(align, {
     mode = 'default',
     commands = ['bold', 'italic', 'underline'],
@@ -284,4 +284,3 @@ class Styler {
   }
 }
 
-export default Styler;

@@ -2,8 +2,9 @@ import { updatePosition, camelCase, getVideoId } from './partial/util';
 import { setElementsPrefix, button, fileButton, menuButton } from './partial/elements';
 import Styler from './styler';
 import Selection from './selection';
+import Prompt from './prompt';
 
-class Creator {
+export default  class Creator {
   constructor(align, {
     mode = 'default',
     items = ['figure', 'video']
@@ -73,7 +74,7 @@ class Creator {
       Selection.current.anchorNode.childNodes.length <= 1 &&
       Selection.current.anchorNode.parentNode.classList.contains('align-content')
     ) {
-      updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
+      this.positon = updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
       this.show();
       return;
     }
@@ -133,64 +134,69 @@ class Creator {
   }
 
   createVideo () {
-    let link = prompt('Write video URL here', ''); // eslint-disable-line
-    if (!link && link === '') return;
-    const videoHoster = link.includes('yout')
-      ? 'youtube' : link.includes('vimeo')
-      ? 'vimeo' : '';
-
-    if (!videoHoster) {
-      return;
-    }
-    const videoId = getVideoId(link, videoHoster);
-    const iframe = document.createElement('iframe');
     const selectedElement = Selection.current.anchorNode;
+    new Prompt('Enter video link:', '', this.positon)
+      .onSubmit(function () {
+        const link = this.input.value
+        console.log(link)
+        if (!link) return;
+        const videoHoster = link.includes('yout')
+          ? 'youtube' : link.includes('vimeo')
+          ? 'vimeo' : '';
+        
+          if (!videoHoster) {
+            return;
+          }
+          
+        const videoId = getVideoId(link, videoHoster);
+        const iframe = document.createElement('iframe');
 
-    iframe.width = 560;
-    iframe.height = 315;
-    iframe.allowfullscreen = true;
-    iframe.contentEditable = false
-    iframe.src = videoHoster === 'youtube'
-      ? `//www.youtube.com/embed/${videoId}`
-      : videoHoster === 'vimeo'
-      ? `//player.vimeo.com/video/${videoId}`
-      : ''
-    selectedElement.parentNode.insertBefore(iframe, selectedElement);
+        iframe.width = 560;
+        iframe.height = 315;
+        iframe.allowfullscreen = true;
+        iframe.contentEditable = false
+        iframe.src = videoHoster === 'youtube'
+          ? `//www.youtube.com/embed/${videoId}`
+          : videoHoster === 'vimeo'
+            ? `//player.vimeo.com/video/${videoId}`
+            : ''
+        selectedElement.parentNode.insertBefore(iframe, selectedElement);
+      });
   }
 
   embedPost () {
-    let link = prompt('Write post URL here', ''); // eslint-disable-line
-    if (!link && link === '') return;
-    const postUrl = link
-    const iframe = document.createElement('iframe');
     const selectedElement = Selection.current.anchorNode;
-
-    iframe.width = 500;
-    iframe.height = 548;
-    iframe.scrolling = 'no';
-    iframe.contentEditable = false;
-    iframe.allowTransparency = true;
-    iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
-    selectedElement.parentNode.insertBefore(iframe, selectedElement);
+    new Prompt('Enter post link:', '', this.positon)
+      .onSubmit(function () {
+        const postUrl = this.input.value
+        if (!postUrl) return;
+        const iframe = document.createElement('iframe');
+    
+        iframe.width = 500;
+        iframe.height = 200;
+        iframe.scrolling = 'no';
+        iframe.contentEditable = false;
+        iframe.allowTransparency = true;
+        iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
+        selectedElement.parentNode.insertBefore(iframe, selectedElement);
+      });
   }
 
   embed () {
-    let data = prompt('Add embeded element here, Do not write any code from untrusted sources', ''); // eslint-disable-line
-    if (!data && data === '') return;
-    const div = document.createElement('div');
     const selectedElement = Selection.current.anchorNode;
+    new Prompt('Add embeded:', '', this.positon)
+      .onSubmit(function () {
+        const data = this.input.value
+        if (!data) return;
+        const div = document.createElement('div');
 
-    selectedElement.parentNode.insertBefore(div, selectedElement);
-    div.insertAdjacentHTML('afterbegin', data);
+        selectedElement.parentNode.insertBefore(div, selectedElement);
+        div.insertAdjacentHTML('afterbegin', data);
+      });
   }
 
   embedTweet () {
-    let link = prompt('Write video URL here', ''); // eslint-disable-line
-    if (!link && link === '') return;
-    const postUrl = link
   }
 
 }
 
-
-export default Creator;

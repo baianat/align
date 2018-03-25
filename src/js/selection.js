@@ -2,30 +2,30 @@ let CURRENT_SELECTION = null;
 let TEXT_RANGE = null;
 let RANGE = null;
 
-class Selection {
-  set textRange(range) {
+export default class Selection {
+  static set textRange(range) {
     if (!range) return;
     TEXT_RANGE = range;
   }
 
-  get textRange() {
+  static get textRange() {
     return TEXT_RANGE;
   }
 
-  set range(range) {
+  static set range(range) {
     if (!range) return;
     RANGE = range;
   }
 
-  get range() {
+  static get range() {
     return RANGE;
   }
 
-  set current(selection) {
+  static set current(selection) {
     CURRENT_SELECTION = selection;
   }
 
-  get current() {
+  static get current() {
     return CURRENT_SELECTION;
   }
 
@@ -47,5 +47,3 @@ class Selection {
     }
   }
 }
-
-export default Selection;
