@@ -44,9 +44,9 @@
     &.is-active
       img
         box-shadow: 0 0 25px alpha($black, 5%)
-    &.is-normal
+    &.is-center
       max-width: 500px
-    &.is-float
+    &.is-floatLeft
       float: left
       margin-right: 40px
       max-width: 500px
@@ -54,7 +54,16 @@
       &:after
         display: block
         clear: both
-        content: ' '
+        content: ''
+    &.is-floatRight
+      float: right
+      margin-left: 40px
+      max-width: 500px
+      width: 50vw
+      &:after
+        display: block
+        clear: both
+        content: ''
     &.is-full
       width: 100%
       max-width: 100%

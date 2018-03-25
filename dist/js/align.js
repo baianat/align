@@ -1705,11 +1705,13 @@ var iconsPath = {
 
   figure: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 
-  figureFloat: 'M21 15h2v2h-2v-2zm0-4h2v2h-2v-2zm2 8h-2v2c1 0 2-1 2-2zM13 3h2v2h-2V3zm8 4h2v2h-2V7zm0-4v2h2c0-1-1-2-2-2zM1 7h2v2H1V7zm16-4h2v2h-2V3zm0 16h2v2h-2v-2zM3 3C2 3 1 4 1 5h2V3zm6 0h2v2H9V3zM5 3h2v2H5V3zm-4 8v8c0 1.1.9 2 2 2h12V11H1zm2 8l2.5-3.21 1.79 2.15 2.5-3.22L13 19H3z',
+  figureFloatRight: 'M15,7H21V13H15V7M3,3H21V5H3V3M13,7V9H3V7H13M9,11V13H3V11H9M3,15H17V17H3V15M3,19H21V21H3V19Z',
+
+  figureCenter: 'M9,7H15V13H9V7M3,3H21V5H3V3M3,15H21V17H3V15M3,19H17V21H3V19Z',
+
+  figureFloatLeft: 'M3,7H9V13H3V7M3,3H21V5H3V3M21,7V9H11V7H21M21,11V13H11V11H21M3,15H17V17H3V15M3,19H21V21H3V19Z',
 
   figureFull: 'M23 18V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zM8.5 12.5l2.5 3.01L14.5 11l4.5 6H5l3.5-4.5z',
-
-  figureNormal: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 
   sectionNormal: 'M12.5,19.5V3.47H14.53V19.5H12.5M9.5,19.5V3.47H11.53V19.5H9.5M4.5,7.5L8.53,11.5L4.5,15.47V12.47H1.5V10.5H4.5V7.5M19.5,15.47L15.5,11.5L19.5,7.5V10.5H22.5V12.47H19.5V15.47Z',
 
@@ -2137,7 +2139,7 @@ var Styler = function () {
         return 'is-' + cls;
       });
       (_currentItem$el$class = this.currentItem.el.classList).remove.apply(_currentItem$el$class, toConsumableArray(prefixedClasses));
-      this.currentItem.el.classList.add(currentClass);
+      this.currentItem.el.classList.toggle(currentClass);
       if (this.settings.mode === 'bubble') {
         this.updateBubblePosition();
       }
@@ -2161,7 +2163,8 @@ var Section = function () {
     this.generateEl(content);
     if (type === 'text') {
       this.el.addEventListener('click', function () {
-        Section.optionsBar.show(_this);
+        Section.$align.activeSection = _this.el;
+        Section.$optionsBar.show(_this);
       });
     }
     if ((typeof position === 'undefined' ? 'undefined' : _typeof(position)) === 'object') {
@@ -2298,7 +2301,7 @@ var Section = function () {
   }, {
     key: 'moveUp',
     value: function moveUp() {
-      if (!this.el.previousSibling.classList.contains('align-section')) return;
+      if (!this.el.previousSibling || !this.el.previousSibling.classList.contains('align-section')) return;
       Section.$align.editor.insertBefore(this.el, this.el.previousSibling);
     }
   }, {
@@ -2306,6 +2309,12 @@ var Section = function () {
     value: function moveDown() {
       if (!this.el.nextSibling) return;
       Section.$align.editor.insertBefore(this.el, this.el.nextSibling.nextSibling);
+    }
+  }, {
+    key: 'active',
+    value: function active() {
+      Section.$optionsBar.show(this);
+      this.contentDiv.focus();
     }
   }, {
     key: 'remove',
@@ -2331,7 +2340,7 @@ var Section = function () {
     key: 'config',
     value: function config(align) {
       this.$align = align;
-      this.optionsBar = new Styler(align, {
+      this.$optionsBar = new Styler(align, {
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_sectionUp', '_sectionDown', '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML', { '_sectionClasses': ['normal', 'full'] }, '_remove'],
@@ -2379,7 +2388,7 @@ var Creator = function () {
       this.optionsBar = new Styler(this.$align, {
         mode: 'bubble',
         hideWhenClickOut: true,
-        commands: [{ '_figureClasses': ['normal', 'full', 'float'] }, '_remove'],
+        commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
         tooltip: false,
         theme: 'dark'
       });
@@ -2460,7 +2469,7 @@ var Creator = function () {
       caption.contentEditable = true;
       caption.dataset.defaultValue = 'Figure caption';
       img.classList.add('align-image');
-      figure.classList.add('align-figure', 'is-normal');
+      figure.classList.add('align-figure', 'is-center');
       figure.appendChild(img);
       figure.appendChild(caption);
       figure.addEventListener('click', function () {
@@ -2679,6 +2688,7 @@ var Align = function () {
   }, {
     key: '_initSections',
     value: function _initSections() {
+      this.activeSection = '';
       Section.config(this);
 
       if (this.settings.postTitle !== false) {
@@ -2691,7 +2701,7 @@ var Align = function () {
       this.newSectionButton.classList.add('align-addButton');
       this.el.appendChild(this.newSectionButton);
       this.newSectionButton.addEventListener('click', function () {
-        return new Section();
+        return new Section().active();
       });
     }
 

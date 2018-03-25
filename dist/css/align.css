@@ -296,7 +296,7 @@
 }
 .align-newSection {
   position: absolute;
-  z-index: 40;
+  z-index: 30;
   top: -3px;
   left: 50%;
   -ms-transform: translateX(-50%);
@@ -429,7 +429,7 @@
 .styler.is-bubble {
   padding: 10px;
   position: fixed;
-  z-index: 20;
+  z-index: 40;
   border-radius: 40px;
   box-shadow: 0 0 25px rgba(0,0,0,0.05);
   transition: opacity 0.2s;

@@ -273,11 +273,11 @@ class Styler {
     })
   }
 
-  toggleClass(currentClass, allClasses) {
+  toggleClass (currentClass, allClasses) {
     if (!this.currentItem) return;
     const prefixedClasses = allClasses.map(cls => `is-${cls}`);
     this.currentItem.el.classList.remove(...prefixedClasses);
-    this.currentItem.el.classList.add(currentClass);
+    this.currentItem.el.classList.toggle(currentClass);
     if (this.settings.mode === 'bubble') {
       this.updateBubblePosition();
     }

@@ -94,6 +94,7 @@ class Align {
   }
 
   _initSections () {
+    this.activeSection = '';
     Section.config(this);
 
     if (this.settings.postTitle !== false) {
@@ -103,7 +104,7 @@ class Align {
     this.newSectionButton = document.createElement('button');
     this.newSectionButton.classList.add('align-addButton');
     this.el.appendChild(this.newSectionButton);
-    this.newSectionButton.addEventListener('click', () => new Section());
+    this.newSectionButton.addEventListener('click', () => new Section().active());
   }
 
   /**

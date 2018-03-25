@@ -28,7 +28,7 @@ class Creator {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: [
-        { '_figureClasses': ['normal', 'full', 'float'] },
+        { '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] },
         '_remove'
       ],
       tooltip: false,
@@ -109,7 +109,7 @@ class Creator {
     caption.contentEditable = true
     caption.dataset.defaultValue = 'Figure caption';
     img.classList.add('align-image');
-    figure.classList.add('align-figure', 'is-normal');
+    figure.classList.add('align-figure', 'is-center');
     figure.appendChild(img);
     figure.appendChild(caption);
     figure.addEventListener('click', () => this.optionsBar.show({ 

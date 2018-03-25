@@ -43,19 +43,30 @@
 .align-figure.is-active img {
   box-shadow: 0 0 25px rgba(0,0,0,0.05);
 }
-.align-figure.is-normal {
+.align-figure.is-center {
   max-width: 500px;
 }
-.align-figure.is-float {
+.align-figure.is-floatLeft {
   float: left;
   margin-right: 40px;
   max-width: 500px;
   width: 50vw;
 }
-.align-figure.is-float:after {
+.align-figure.is-floatLeft:after {
   display: block;
   clear: both;
-  content: ' ';
+  content: '';
+}
+.align-figure.is-floatRight {
+  float: right;
+  margin-left: 40px;
+  max-width: 500px;
+  width: 50vw;
+}
+.align-figure.is-floatRight:after {
+  display: block;
+  clear: both;
+  content: '';
 }
 .align-figure.is-full {
   width: 100%;

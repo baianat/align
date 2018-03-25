@@ -11,7 +11,8 @@ class Section {
     this.generateEl(content);
     if (type === 'text') {
       this.el.addEventListener('click', () => {
-        Section.optionsBar.show(this);
+        Section.$align.activeSection = this.el;
+        Section.$optionsBar.show(this);
       });
     }
     if (typeof position === 'object') {
@@ -24,7 +25,7 @@ class Section {
 
   static config (align) {
     this.$align = align;
-    this.optionsBar = new Styler(align, {
+    this.$optionsBar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands:  [
@@ -171,7 +172,10 @@ class Section {
   }
 
   moveUp () {
-    if (!this.el.previousSibling.classList.contains('align-section')) return;
+    if (
+      !this.el.previousSibling ||
+      !this.el.previousSibling.classList.contains('align-section')
+    ) return;
     Section.$align.editor.insertBefore(this.el, this.el.previousSibling);
   }
 
@@ -180,6 +184,11 @@ class Section {
     Section.$align.editor.insertBefore(this.el, this.el.nextSibling.nextSibling);
   }
   
+  active () {
+    Section.$optionsBar.show(this);
+    this.contentDiv.focus();
+  }
+
   remove () {
     this.el.remove();
   }
