@@ -225,8 +225,7 @@ export default class Styler {
 
   update () {
     this.updateCommandsStates();
-    if (this.settings.mode !== 'bubble') return;
-
+    if (this.settings.mode !== 'bubble' || !Selection.textRange) return;
     if (Selection.textRange.collapsed || Selection.range.collapsed) {
       this.hide();
       return;

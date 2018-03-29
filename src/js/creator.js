@@ -7,7 +7,7 @@ import Prompt from './prompt';
 export default  class Creator {
   constructor(align, {
     theme = 'light',
-    items = ['figure', 'video', 'facebook', 'embed']
+    items = ['figure', 'video', 'facebook', 'embed', 'table']
   } = {}) {
     this.$align = align;
     this.settings = {
@@ -51,7 +51,12 @@ export default  class Creator {
             el = button('video');
             el.addEventListener('click', this.createVideo.bind(this));
             break;
-                    
+
+          case 'Table':
+            el = button('Table');
+            el.addEventListener('click', this.createTable.bind(this));
+            break;
+
           case 'facebook':
             el = button('facebook');
             el.addEventListener('click', this.embedPost.bind(this));

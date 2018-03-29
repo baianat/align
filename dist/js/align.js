@@ -2174,8 +2174,7 @@ var Styler = function () {
     key: 'update',
     value: function update() {
       this.updateCommandsStates();
-      if (this.settings.mode !== 'bubble') return;
-
+      if (this.settings.mode !== 'bubble' || !Selection.textRange) return;
       if (Selection.textRange.collapsed || Selection.range.collapsed) {
         this.hide();
         return;
@@ -2484,7 +2483,7 @@ var Creator = function () {
         _ref$theme = _ref.theme,
         theme = _ref$theme === undefined ? 'light' : _ref$theme,
         _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'embed'] : _ref$items;
+        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'embed', 'table'] : _ref$items;
 
     classCallCheck(this, Creator);
 
@@ -2530,6 +2529,11 @@ var Creator = function () {
           case 'video':
             el = button('video');
             el.addEventListener('click', _this.createVideo.bind(_this));
+            break;
+
+          case 'Table':
+            el = button('Table');
+            el.addEventListener('click', _this.createTable.bind(_this));
             break;
 
           case 'facebook':
