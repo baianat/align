@@ -52,8 +52,9 @@ export default class Section {
       output = this.el.cloneNode(true);
       const addButton = output.querySelector('.align-newSection');
       const contentDiv = output.querySelector('.align-content');
-      addButton.remove();
       output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
+      contentDiv.remove();
+      addButton.remove();
     }
     if (this.type === 'title') {
       return this.title.innerText;

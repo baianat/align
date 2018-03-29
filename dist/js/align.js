@@ -2429,8 +2429,9 @@ var Section = function () {
         output = this.el.cloneNode(true);
         var addButton = output.querySelector('.align-newSection');
         var contentDiv = output.querySelector('.align-content');
-        addButton.remove();
         output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
+        contentDiv.remove();
+        addButton.remove();
       }
       if (this.type === 'title') {
         return this.title.innerText;
