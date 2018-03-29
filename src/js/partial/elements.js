@@ -79,9 +79,9 @@ export function fileButton(name) {
   return { input: input, el: wrapper };
 }
 
-export function menuButton(name, func) {
+export function menuButton(name, func, tooltip) {
   const menuItem = document.createElement('li');
-  const currentButton = button(name);
+  const currentButton = button(name, tooltip);
   currentButton.addEventListener('click', func);
   menuItem.appendChild(currentButton);
   return menuItem;

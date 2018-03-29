@@ -12,6 +12,7 @@ export default class Align {
     toolbar = null,
     bubble = null,
     creator = null,
+    section = null, 
     shortcuts = false,
     postTitle = false
   } = {}) {
@@ -20,6 +21,7 @@ export default class Align {
       toolbar,
       bubble,
       creator,
+      section,
       shortcuts,
       postTitle
     };
@@ -94,7 +96,7 @@ export default class Align {
 
   _initSections () {
     this.activeSection = '';
-    Section.config(this);
+    Section.config(this, this.settings.section);
 
     if (this.settings.postTitle !== false) {
       this.postTitle = new Section(this.settings.postTitle, '', 'title');

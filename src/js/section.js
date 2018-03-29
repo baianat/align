@@ -26,20 +26,20 @@ export default class Section {
     ALL_SECTIONS.push(this);
   }
 
-  static config (align) {
-    this.$align = align;
-    this.$optionsBar = new Styler(align, {
+  static config (align, settings) {
+    const config = Object.assign({
       mode: 'bubble',
       hideWhenClickOut: true,
-      commands:  [
-        '_sectionUp', '_sectionDown',
+      commands: ['_sectionUp', '_sectionDown',
         '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML',
-        {'_sectionClasses': ['normal', 'full']},
+        { '_sectionClasses': ['normal', 'full'] },
         '_remove'
       ],
-      tooltip:  false,
-      theme:  'dark'
-    });
+      tooltip: true,
+      theme: 'dark'
+    }, settings);
+    this.$align = align;
+    this.$optionsBar = new Styler(align, config);
   }
 
   static get allSections () {

@@ -290,38 +290,45 @@ const cmdsSchema = {
 
   _sectionToggleHTML: {
     element: 'button',
-    func: 'toggleHTML'
+    func: 'toggleHTML',
+    tooltip: 'Edit as HTMl'
   },
 
   _remove: {
     element: 'button',
-    func: 'remove'
+    func: 'remove',
+    tooltip: 'Remove section'
   },
 
   _sectionUp: {
     element: 'button',
-    func: 'moveUp'
+    func: 'moveUp',
+    tooltip: 'Move section up'
   },
 
   _sectionDown: {
     element: 'button',
-    func: 'moveDown'
+    func: 'moveDown',
+    tooltip: 'Move section down'
   },
 
   _sectionImage: {
     element: 'file',
     func: 'backgroundImage',
+    tooltip: 'Add background image'
   },
 
   _sectionVideo: {
     element: 'file',
     func: 'backgroundVideo',
+    tooltip: 'Add background video'
   },
 
   _sectionColor: {
     element: 'input',
     type: 'text',
     func: 'backgroundColor',
+    tooltip: 'Change background color',
     init: Colorpicker,
     initConfig: {
       defaultColor: '#000000',

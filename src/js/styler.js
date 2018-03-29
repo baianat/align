@@ -66,9 +66,10 @@ export default class Styler {
       case 'classes':
         currentCmd.el = document.createElement('ul');
         command[cmd].forEach(className => {
-          const li = menuButton(`${cmdSchema.command}${camelCase(className)}`, () => {
-            this.toggleClass(`is-${className}`, command[cmd]);
-          })
+          const li = menuButton(`${cmdSchema.command}${camelCase(className)}`,
+            () => { this.toggleClass(`is-${className}`, command[cmd]) },
+            `${camelCase(cmdSchema.command)} ${className}`
+          )
           currentCmd.el.appendChild(li);
         });
         li.appendChild(currentCmd.el);

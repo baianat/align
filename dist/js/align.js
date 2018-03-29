@@ -1678,38 +1678,45 @@ var cmdsSchema = {
 
   _sectionToggleHTML: {
     element: 'button',
-    func: 'toggleHTML'
+    func: 'toggleHTML',
+    tooltip: 'Edit as HTMl'
   },
 
   _remove: {
     element: 'button',
-    func: 'remove'
+    func: 'remove',
+    tooltip: 'Remove section'
   },
 
   _sectionUp: {
     element: 'button',
-    func: 'moveUp'
+    func: 'moveUp',
+    tooltip: 'Move section up'
   },
 
   _sectionDown: {
     element: 'button',
-    func: 'moveDown'
+    func: 'moveDown',
+    tooltip: 'Move section down'
   },
 
   _sectionImage: {
     element: 'file',
-    func: 'backgroundImage'
+    func: 'backgroundImage',
+    tooltip: 'Add background image'
   },
 
   _sectionVideo: {
     element: 'file',
-    func: 'backgroundVideo'
+    func: 'backgroundVideo',
+    tooltip: 'Add background video'
   },
 
   _sectionColor: {
     element: 'input',
     type: 'text',
     func: 'backgroundColor',
+    tooltip: 'Change background color',
     init: colorpicker,
     initConfig: {
       defaultColor: '#000000',
@@ -1907,9 +1914,9 @@ function fileButton(name) {
   return { input: input, el: wrapper };
 }
 
-function menuButton(name, func) {
+function menuButton(name, func, tooltip) {
   var menuItem = document.createElement('li');
-  var currentButton = button(name);
+  var currentButton = button(name, tooltip);
   currentButton.addEventListener('click', func);
   menuItem.appendChild(currentButton);
   return menuItem;
@@ -2000,7 +2007,7 @@ var Styler = function () {
           command[cmd].forEach(function (className) {
             var li = menuButton('' + cmdSchema.command + camelCase(className), function () {
               _this2.toggleClass('is-' + className, command[cmd]);
-            });
+            }, camelCase(cmdSchema.command) + ' ' + className);
             currentCmd.el.appendChild(li);
           });
           li.appendChild(currentCmd.el);
@@ -2447,15 +2454,16 @@ var Section = function () {
     }
   }], [{
     key: 'config',
-    value: function config(align) {
-      this.$align = align;
-      this.$optionsBar = new Styler(align, {
+    value: function config(align, settings) {
+      var config = Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_sectionUp', '_sectionDown', '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML', { '_sectionClasses': ['normal', 'full'] }, '_remove'],
-        tooltip: false,
+        tooltip: true,
         theme: 'dark'
-      });
+      }, settings);
+      this.$align = align;
+      this.$optionsBar = new Styler(align, config);
     }
   }, {
     key: 'allSections',
@@ -2729,6 +2737,8 @@ var Align = function () {
         bubble = _ref$bubble === undefined ? null : _ref$bubble,
         _ref$creator = _ref.creator,
         creator = _ref$creator === undefined ? null : _ref$creator,
+        _ref$section = _ref.section,
+        section = _ref$section === undefined ? null : _ref$section,
         _ref$shortcuts = _ref.shortcuts,
         shortcuts = _ref$shortcuts === undefined ? false : _ref$shortcuts,
         _ref$postTitle = _ref.postTitle,
@@ -2741,6 +2751,7 @@ var Align = function () {
       toolbar: toolbar,
       bubble: bubble,
       creator: creator,
+      section: section,
       shortcuts: shortcuts,
       postTitle: postTitle
     };
@@ -2803,7 +2814,7 @@ var Align = function () {
       var _this = this;
 
       this.activeSection = '';
-      Section.config(this);
+      Section.config(this, this.settings.section);
 
       if (this.settings.postTitle !== false) {
         this.postTitle = new Section(this.settings.postTitle, '', 'title');
