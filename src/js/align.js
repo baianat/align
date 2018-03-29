@@ -82,7 +82,7 @@ export default class Align {
    * Create the editor
    */
   _initEditor () {
-    document.execCommand('defaultParagraphSeparator', false, 'p');
+    document.execCommand('defaultParagraphSeparator', false, 'div');
 
     this.editor = document.createElement('div');
     this.editor.classList.add('align-editor');
@@ -117,6 +117,19 @@ export default class Align {
 
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
 
+    document.addEventListener('keydown', (event) => {
+      // Do nothing if the event was already processed
+      if (event.defaultPrevented) {
+        return;
+      }
+      if (event[this.cmdKey] && this.settings.shortcuts) {
+        switch (event.key.toUpperCase()) {
+          case 'A':
+            event.preventDefault();
+          break;
+        }
+      }
+    });
     this.editor.addEventListener('keydown', (event) => {
       // Do nothing if the event was already processed
       if (event.defaultPrevented) {

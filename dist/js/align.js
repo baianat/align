@@ -2332,7 +2332,7 @@ var Section = function () {
   }, {
     key: 'backgroundColor',
     value: function backgroundColor(cmdSchema, color) {
-      this.contentDiv.style.backgroundColor = color;
+      this.el.style.backgroundColor = color;
     }
   }, {
     key: 'backgroundImage',
@@ -2343,10 +2343,10 @@ var Section = function () {
       var file = input.files[0];
       if (!file) return;
       var reader = new FileReader(); // eslint-disable-line
-      var bg = this.contentDiv.querySelector('.align-bgImage') || document.createElement('div');
-      if (!this.contentDiv.querySelector('.align-bgImage')) {
+      var bg = this.el.querySelector('.align-bgImage') || document.createElement('div');
+      if (!this.el.querySelector('.align-bgImage')) {
         bg.classList.add('align-bgImage');
-        this.contentDiv.insertAdjacentElement('afterBegin', bg);
+        this.el.insertAdjacentElement('afterBegin', bg);
       }
       reader.addEventListener('load', function () {
         _this4.el.classList.add('is-bgImage');
@@ -2366,14 +2366,14 @@ var Section = function () {
       var input = event.target;
       var file = input.files[0];
       if (!file) return;
-      var video = this.contentDiv.querySelector('.align-bgVideo');
+      var video = this.el.querySelector('.align-bgVideo');
       var source = null;
       var url = URL.createObjectURL(event.target.files[0]);
       if (!video) {
         var _video = stringToDOM('<video autoplay muted loop class="align-bgVideo"></video>');
         source = document.createElement('source');
         _video.appendChild(source);
-        this.contentDiv.insertAdjacentElement('afterBegin', _video);
+        this.el.insertAdjacentElement('afterBegin', _video);
       }
       if (video) {
         source = video.querySelector('source');
@@ -2408,7 +2408,8 @@ var Section = function () {
     key: 'active',
     value: function active() {
       Section.$optionsBar.show(this);
-      this.contentDiv.focus();
+      console.log(this.contentDiv.querySelector('p'));
+      this.contentDiv.querySelector('p').focus();
     }
   }, {
     key: 'remove',
@@ -2773,7 +2774,7 @@ var Align = function () {
   }, {
     key: '_initEditor',
     value: function _initEditor() {
-      document.execCommand('defaultParagraphSeparator', false, 'p');
+      document.execCommand('defaultParagraphSeparator', false, 'div');
 
       this.editor = document.createElement('div');
       this.editor.classList.add('align-editor');
@@ -2818,6 +2819,19 @@ var Align = function () {
 
       this.editor.addEventListener('mouseup', this.update.bind(this), true);
 
+      document.addEventListener('keydown', function (event) {
+        // Do nothing if the event was already processed
+        if (event.defaultPrevented) {
+          return;
+        }
+        if (event[_this.cmdKey] && _this.settings.shortcuts) {
+          switch (event.key.toUpperCase()) {
+            case 'A':
+              event.preventDefault();
+              break;
+          }
+        }
+      });
       this.editor.addEventListener('keydown', function (event) {
         // Do nothing if the event was already processed
         if (event.defaultPrevented) {

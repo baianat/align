@@ -120,7 +120,7 @@ export default class Section {
   }
 
   backgroundColor (cmdSchema, color) {
-    this.contentDiv.style.backgroundColor = color;
+    this.el.style.backgroundColor = color;
   }
 
   backgroundImage (cmdSchema, event) {
@@ -128,11 +128,11 @@ export default class Section {
     const file = input.files[0];
     if (!file) return;
     const reader = new FileReader(); // eslint-disable-line
-    const bg = this.contentDiv.querySelector('.align-bgImage') ||
+    const bg = this.el.querySelector('.align-bgImage') ||
               document.createElement('div');
-    if (!this.contentDiv.querySelector('.align-bgImage')) {
+    if (!this.el.querySelector('.align-bgImage')) {
       bg.classList.add('align-bgImage');
-      this.contentDiv.insertAdjacentElement('afterBegin', bg);
+      this.el.insertAdjacentElement('afterBegin', bg);
     }
     reader.addEventListener('load', () => {
       this.el.classList.add('is-bgImage');
@@ -151,7 +151,7 @@ export default class Section {
     const input = event.target;
     const file = input.files[0];
     if (!file) return;
-    let video = this.contentDiv.querySelector('.align-bgVideo');
+    let video = this.el.querySelector('.align-bgVideo');
     let source = null;
     let blob = null;
 
@@ -160,7 +160,7 @@ export default class Section {
       const video = stringToDOM(`<video autoplay muted loop class="align-bgVideo"></video>`);
       source = document.createElement('source');
       video.appendChild(source);
-      this.contentDiv.insertAdjacentElement('afterBegin', video);
+      this.el.insertAdjacentElement('afterBegin', video);
     }
     if (video) {
       source = video.querySelector('source');
@@ -195,7 +195,8 @@ export default class Section {
   
   active () {
     Section.$optionsBar.show(this);
-    this.contentDiv.focus();
+    console.log(this.contentDiv.querySelector('p'))
+    this.contentDiv.querySelector('p').focus();
   }
 
   remove () {

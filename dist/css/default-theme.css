@@ -73,14 +73,15 @@
   max-width: 100%;
 }
 .align-content {
-  padding: 20px;
+  padding: 0;
 }
 .align-title {
   text-align: center;
 }
 .align-section {
   margin: auto;
-  width: 70vw;
+  width: 70%;
+  padding: 20px;
 }
 .align-section.is-full {
   width: 100%;
