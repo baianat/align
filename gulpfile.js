@@ -78,10 +78,6 @@ gulp.task('scripts', () => {
       input: 'src/js/align.js',
       format: 'umd',
       name: 'Align',
-      external: ['highlight.js'],
-      globals: {
-        'highlight.js': 'hljs'
-      },
       allowRealFiles: true,
       plugins: [
         nodeResolve(),

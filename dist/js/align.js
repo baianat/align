@@ -2905,7 +2905,6 @@ var Align = function () {
   }, {
     key: 'highlight',
     value: function highlight() {
-
       if (typeof hljs === 'undefined') {
         return;
       }
