@@ -2,11 +2,13 @@ import { isElementClosest } from "./partial/util";
 
 export default class Prompt {
   constructor (message = '', data = '', {
+    wrapper = document.body,
     position = {left: 0, top: 0},
     inputsCount = 1,
     inputsPlaceholders = []
   } = {}) {
     this.settings = {
+      wrapper,
       position,
       inputsCount,
       inputsPlaceholders
@@ -43,7 +45,7 @@ export default class Prompt {
     this.inputs[0].value = data;
     this.el.appendChild(this.submit);
 
-    document.body.appendChild(this.el);
+    this.settings.wrapper.appendChild(this.el);
     setTimeout(() => {
       document.addEventListener('click', (event) => {
         if (

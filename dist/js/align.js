@@ -1346,6 +1346,8 @@ var Prompt = function () {
     var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
     var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        _ref$wrapper = _ref.wrapper,
+        wrapper = _ref$wrapper === undefined ? document.body : _ref$wrapper,
         _ref$position = _ref.position,
         position = _ref$position === undefined ? { left: 0, top: 0 } : _ref$position,
         _ref$inputsCount = _ref.inputsCount,
@@ -1356,6 +1358,7 @@ var Prompt = function () {
     classCallCheck(this, Prompt);
 
     this.settings = {
+      wrapper: wrapper,
       position: position,
       inputsCount: inputsCount,
       inputsPlaceholders: inputsPlaceholders
@@ -1396,7 +1399,7 @@ var Prompt = function () {
       this.inputs[0].value = data;
       this.el.appendChild(this.submit);
 
-      document.body.appendChild(this.el);
+      this.settings.wrapper.appendChild(this.el);
       setTimeout(function () {
         document.addEventListener('click', function (event) {
           if (isElementClosest(event.target, _this.el)) return;
@@ -1507,7 +1510,10 @@ var cmdsSchema = {
     element: 'button',
     tooltip: 'Hyperlink',
     func: function func(styler) {
-      new Prompt('Enter link:', Selection.current.toString(), { position: Selection.textRange.getBoundingClientRect() }).onSubmit(function () {
+      new Prompt('Enter link:', Selection.current.toString(), {
+        wrapper: styler.$align,
+        position: Selection.textRange.getBoundingClientRect()
+      }).onSubmit(function () {
         var link = this.input.value;
         if (!link) return;
         Selection.selectTextRange();
@@ -2530,11 +2536,11 @@ var Creator = function () {
       this.menu.classList.add('creator-menu');
       this.toggleButton = button('plus');
       this.toggleButton.addEventListener('click', this.toggleState.bind(this));
-      this.optionsBar = new Styler(this.$align, {
+      this.figureOptions = new Styler(this.$align, {
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
-        tooltip: false,
+        tooltip: true,
         theme: 'dark'
       });
 
@@ -2629,7 +2635,7 @@ var Creator = function () {
       figure.appendChild(img);
       figure.appendChild(caption);
       figure.addEventListener('click', function () {
-        return _this2.optionsBar.show({
+        return _this2.figureOptions.show({
           el: figure,
           remove: function remove() {
             figure.remove();
@@ -2653,7 +2659,10 @@ var Creator = function () {
     key: 'createVideo',
     value: function createVideo() {
       var selectedElement = Selection.current.anchorNode;
-      new Prompt('Enter video link:', '', { position: this.position }).onSubmit(function () {
+      new Prompt('Enter video link:', '', {
+        wrapper: this.$align,
+        position: this.position
+      }).onSubmit(function () {
         var link = this.inputs[0].value;
         console.log(link);
         if (!link) return;
@@ -2679,6 +2688,7 @@ var Creator = function () {
     value: function createTable() {
       var selectedElement = Selection.current.anchorNode;
       new Prompt('Enter post link:', '', {
+        wrapper: this.$align,
         position: this.position,
         inputsCount: 2,
         inputsPlaceholders: ['rows', 'columns']
@@ -2696,7 +2706,10 @@ var Creator = function () {
     key: 'embedPost',
     value: function embedPost() {
       var selectedElement = Selection.current.anchorNode;
-      new Prompt('Enter post link:', '', { position: this.position }).onSubmit(function () {
+      new Prompt('Enter post link:', '', {
+        wrapper: this.$align,
+        position: this.position
+      }).onSubmit(function () {
         var postUrl = this.inputs[0].value;
         if (!postUrl) return;
         var iframe = document.createElement('iframe');
@@ -2714,7 +2727,10 @@ var Creator = function () {
     key: 'embed',
     value: function embed() {
       var selectedElement = Selection.current.anchorNode;
-      new Prompt('Add embeded:', '', { position: this.position }).onSubmit(function () {
+      new Prompt('Add embeded:', '', {
+        wrapper: this.$align,
+        position: this.position
+      }).onSubmit(function () {
         var data = this.inputs[0].value;
         if (!data) return;
         var div = document.createElement('div');

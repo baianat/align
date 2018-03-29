@@ -87,7 +87,10 @@ const cmdsSchema = {
       new Prompt(
         'Enter link:',
         Selection.current.toString(),
-        { position: Selection.textRange.getBoundingClientRect() }
+        { 
+          wrapper: styler.$align,
+          position: Selection.textRange.getBoundingClientRect() 
+        }
       ).onSubmit(function () {
         const link = this.input.value;
         if (!link) return;

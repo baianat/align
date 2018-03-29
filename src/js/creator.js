@@ -25,17 +25,18 @@ export default  class Creator {
     this.menu.classList.add('creator-menu');
     this.toggleButton = button('plus');
     this.toggleButton.addEventListener('click', this.toggleState.bind(this));
-    this.optionsBar = new Styler(this.$align, {
+    this.figureOptions = new Styler(this.$align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: [
         { '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] },
         '_remove'
       ],
-      tooltip: false,
+      tooltip: true,
       theme: 'dark'
     });
 
+    
     this.settings.items.forEach((item) => {
       const li = document.createElement('li');
       let el = null;
@@ -124,7 +125,7 @@ export default  class Creator {
     figure.classList.add('align-figure', 'is-center');
     figure.appendChild(img);
     figure.appendChild(caption);
-    figure.addEventListener('click', () => this.optionsBar.show({ 
+    figure.addEventListener('click', () => this.figureOptions.show({ 
       el: figure,
       remove() {
         figure.remove();
@@ -146,7 +147,10 @@ export default  class Creator {
 
   createVideo () {
     const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter video link:', '', { position: this.position })
+    new Prompt('Enter video link:', '', {
+      wrapper: this.$align,
+      position: this.position
+    })
       .onSubmit(function () {
         const link = this.inputs[0].value
         console.log(link)
@@ -178,6 +182,7 @@ export default  class Creator {
   createTable () {
     const selectedElement = Selection.current.anchorNode;
     new Prompt('Enter post link:', '', { 
+      wrapper: this.$align,
       position: this.position,
       inputsCount: 2,
       inputsPlaceholders: ['rows', 'columns']
@@ -198,7 +203,10 @@ export default  class Creator {
 
   embedPost () {
     const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter post link:', '', { position: this.position })
+    new Prompt('Enter post link:', '', {
+      wrapper: this.$align,
+      position: this.position
+    })
       .onSubmit(function () {
         const postUrl = this.inputs[0].value
         if (!postUrl) return;
@@ -216,7 +224,10 @@ export default  class Creator {
 
   embed () {
     const selectedElement = Selection.current.anchorNode;
-    new Prompt('Add embeded:', '', { position: this.position })
+    new Prompt('Add embeded:', '', {
+      wrapper: this.$align,
+      position: this.position
+    })
       .onSubmit(function () {
         const data = this.inputs[0].value
         if (!data) return;
