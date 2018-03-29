@@ -116,7 +116,7 @@ export default class Align {
 
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
 
-    this.editor.addEventListener('keydown', (event) => {
+    window.addEventListener('keydown', (event) => {
       // Do nothing if the event was already processed
       if (event.defaultPrevented) {
         return;
@@ -147,8 +147,11 @@ export default class Align {
             event.preventDefault();
             this.execute('justifyFull'); break;
           case 'A':
-            event.preventDefault();
-            this.execute('selectAll'); break;
+            if (event.shiftKey) {
+              event.preventDefault();
+              Selection.selectElement(this.editor);
+            }
+            break;
           case 'F':
             event.preventDefault();
             if (event.shiftKey) {

@@ -31,11 +31,20 @@ export default class Selection {
 
   static selectTextRange(range = Selection.textRange) {
     if (!range) return;
-    console.log(range)
     const sel = Selection.current = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
   }
+
+  static selectElement(el) {
+    if (!el) return;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = Selection.current = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
 
   static updateSelectedRange() {
     const sel = Selection.current = window.getSelection();

@@ -1285,7 +1285,16 @@ var Selection = function () {
       var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.textRange;
 
       if (!range) return;
-      console.log(range);
+      var sel = Selection.current = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }, {
+    key: "selectElement",
+    value: function selectElement(el) {
+      if (!el) return;
+      var range = document.createRange();
+      range.selectNodeContents(el);
       var sel = Selection.current = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
@@ -1460,10 +1469,12 @@ var cmdsSchema = {
     tooltip: 'Align right (' + symbols.cmdKey + ' R)'
   },
 
-  selectAll: {
+  selectContent: {
     element: 'button',
-    command: 'selectAll',
-    tooltip: 'Select all (' + symbols.cmdKey + ' A)'
+    tooltip: 'Select all content (' + symbols.cmdKey + ' ' + symbols.shift + ' A)',
+    func: function func(styler) {
+      Selection.selectElement(styler.$align.editor);
+    }
   },
 
   justifyFull: {
@@ -1476,7 +1487,6 @@ var cmdsSchema = {
     element: 'button',
     tooltip: 'Hyperlink',
     func: function func(styler) {
-      console.log(Selection.current.toString());
       new Prompt('Enter link:', Selection.current.toString(), Selection.textRange.getBoundingClientRect()).onSubmit(function () {
         var link = this.input.value;
         if (!link) return;
@@ -1771,7 +1781,7 @@ var iconsPath = {
 
   createLink: 'M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z',
 
-  selectAll: 'M19.51 3.08L3.08 19.51c.09.34.27.65.51.9.25.24.56.42.9.51L20.93 4.49c-.19-.69-.73-1.23-1.42-1.41zM11.88 3L3 11.88v2.83L14.71 3h-2.83zM5 3c-1.1 0-2 .9-2 2v2l4-4H5zm14 18c.55 0 1.05-.22 1.41-.59.37-.36.59-.86.59-1.41v-2l-4 4h2zm-9.71 0h2.83L21 12.12V9.29L9.29 21z',
+  selectContent: 'M19.51 3.08L3.08 19.51c.09.34.27.65.51.9.25.24.56.42.9.51L20.93 4.49c-.19-.69-.73-1.23-1.42-1.41zM11.88 3L3 11.88v2.83L14.71 3h-2.83zM5 3c-1.1 0-2 .9-2 2v2l4-4H5zm14 18c.55 0 1.05-.22 1.41-.59.37-.36.59-.86.59-1.41v-2l-4 4h2zm-9.71 0h2.83L21 12.12V9.29L9.29 21z',
 
   insertLine: 'M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3 3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z',
 
@@ -2822,7 +2832,7 @@ var Align = function () {
 
       this.editor.addEventListener('mouseup', this.update.bind(this), true);
 
-      this.editor.addEventListener('keydown', function (event) {
+      window.addEventListener('keydown', function (event) {
         // Do nothing if the event was already processed
         if (event.defaultPrevented) {
           return;
@@ -2853,8 +2863,11 @@ var Align = function () {
               event.preventDefault();
               _this.execute('justifyFull');break;
             case 'A':
-              event.preventDefault();
-              _this.execute('selectAll');break;
+              if (event.shiftKey) {
+                event.preventDefault();
+                Selection.selectElement(_this.editor);
+              }
+              break;
             case 'F':
               event.preventDefault();
               if (event.shiftKey) {

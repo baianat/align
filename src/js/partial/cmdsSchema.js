@@ -66,10 +66,12 @@ const cmdsSchema = {
     tooltip: `Align right (${symbols.cmdKey} R)`
   },
 
-  selectAll: {
+  selectContent: {
     element: 'button',
-    command: 'selectAll',
-    tooltip: `Select all (${symbols.cmdKey} A)`
+    tooltip: `Select all content (${symbols.cmdKey} ${symbols.shift} A)`,
+    func(styler) {
+      Selection.selectElement(styler.$align.editor);
+    }
   },
 
   justifyFull: {
@@ -82,7 +84,6 @@ const cmdsSchema = {
     element: 'button',
     tooltip: 'Hyperlink',
     func(styler) {
-      console.log(Selection.current.toString())
       new Prompt(
         'Enter link:',
         Selection.current.toString(),
