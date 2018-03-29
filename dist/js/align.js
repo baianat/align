@@ -1347,7 +1347,6 @@ var Prompt = function () {
     var positon = arguments[2];
     classCallCheck(this, Prompt);
 
-    console.log(positon.left);
     this._init(message, data, positon);
   }
 
@@ -2482,16 +2481,16 @@ var Section = function () {
 var Creator = function () {
   function Creator(align) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref$mode = _ref.mode,
-        mode = _ref$mode === undefined ? 'default' : _ref$mode,
+        _ref$theme = _ref.theme,
+        theme = _ref$theme === undefined ? 'light' : _ref$theme,
         _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure', 'video'] : _ref$items;
+        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'embed'] : _ref$items;
 
     classCallCheck(this, Creator);
 
     this.$align = align;
     this.settings = {
-      mode: mode,
+      theme: theme,
       items: items
     };
     this._init();
@@ -2500,9 +2499,11 @@ var Creator = function () {
   createClass(Creator, [{
     key: '_init',
     value: function _init() {
+      var _this = this;
+
       setElementsPrefix('creator-');
       this.creator = document.createElement('div');
-      this.creator.classList.add('creator', 'is-hidden');
+      this.creator.classList.add('creator', 'is-hidden', this.settings.theme);
       this.menu = document.createElement('ul');
       this.menu.classList.add('creator-menu');
       this.toggleButton = button('plus');
@@ -2515,31 +2516,37 @@ var Creator = function () {
         theme: 'dark'
       });
 
-      {
-        var menuItem = document.createElement('li');
-        var _button = fileButton('figure');
-        _button.input.addEventListener('change', this.createFigure.bind(this));
-        menuItem.appendChild(_button.el);
-        this.menu.appendChild(menuItem);
-      }
+      this.settings.items.forEach(function (item) {
+        var li = document.createElement('li');
+        var el = null;
 
-      {
-        var _button2 = menuButton('video');
-        _button2.addEventListener('click', this.createVideo.bind(this));
-        this.menu.appendChild(_button2);
-      }
+        switch (item) {
+          case 'figure':
+            var btn = fileButton('figure');
+            btn.input.addEventListener('change', _this.createFigure.bind(_this));
+            el = btn.el;
+            break;
 
-      {
-        var _button3 = menuButton('facebook');
-        _button3.addEventListener('click', this.embedPost.bind(this));
-        this.menu.appendChild(_button3);
-      }
+          case 'video':
+            el = button('video');
+            el.addEventListener('click', _this.createVideo.bind(_this));
+            break;
 
-      {
-        var _button4 = menuButton('embed');
-        _button4.addEventListener('click', this.embed.bind(this));
-        this.menu.appendChild(_button4);
-      }
+          case 'facebook':
+            el = button('facebook');
+            el.addEventListener('click', _this.embedPost.bind(_this));
+            break;
+
+          case 'embed':
+            el = button('embed');
+            el.addEventListener('click', _this.embed.bind(_this));
+            break;
+          default:
+            return;
+        }
+        li.appendChild(el);
+        _this.menu.appendChild(li);
+      });
 
       this.creator.appendChild(this.toggleButton);
       this.creator.appendChild(this.menu);
@@ -2577,7 +2584,7 @@ var Creator = function () {
   }, {
     key: 'createFigure',
     value: function createFigure(event) {
-      var _this = this;
+      var _this2 = this;
 
       var input$$1 = event.target;
       var file = input$$1.files[0];
@@ -2595,7 +2602,7 @@ var Creator = function () {
       figure.appendChild(img);
       figure.appendChild(caption);
       figure.addEventListener('click', function () {
-        return _this.optionsBar.show({
+        return _this2.optionsBar.show({
           el: figure,
           remove: function remove() {
             figure.remove();
@@ -2605,11 +2612,11 @@ var Creator = function () {
       reader.addEventListener('load', function () {
         img.src = reader.result;
         img.dataset.alignFilename = file.name;
-        _this.$align.update();
+        _this2.$align.update();
         var update = function update(src) {
           img.src = src;
         };
-        _this.$align.$bus.emit('imageAdded', { file: file, update: update });
+        _this2.$align.$bus.emit('imageAdded', { file: file, update: update });
       });
       reader.readAsDataURL(file);
       input$$1.value = null;

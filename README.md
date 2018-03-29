@@ -81,30 +81,38 @@ new Align('.editor', {
     tooltip: true, // show or hide commands tooltip, default is (false)
     commands: [
       {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
-      {'fontName': ['Raleway', 'Roboto', 'Poppins']},
+      {'fontName': ['Poppins', 'Raleway', 'Roboto']},
+      'separator', 
+      'bold', 'italic', 'underline', 'strikeThrough', 
+      'separator', 
+      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 
+      'separator', 
+      'h2', 'h3', 'h4', 'p', 'blockquote', 'pre', 'createLink', 'insertLine',
       'separator',
-      'bold', 'italic', 'underline', 'strikeThrough',
+      'orderedList', 'unorderedList', 'indent', 'outdent',
+      'superscript', 'subscript',
       'separator',
-      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
+      'color', 'backColor',
       'separator',
-      'h1', 'h2', 'p', 'blockquote', 'pre',
-      'separator',
-      'addImage', 'html',
-      'separator',
-      'color'
+      'selectContent', 'removeFormat', 'undo', 'redo', 'fullscreen'
     ]
   },
   bubble: {
+    theme: 'dark',
     commands: [
       'bold', 'italic', 'underline', 'strikeThrough',
       'separator',
-      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'
+      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
     ]
+  },
+  creator: {
+    theme: 'light',
+    items: ['figure', 'video', 'facebook', 'embed']
   }
 });
 ```
 
-List of all available commands
+#### List of all available styler commands
 
 | COMMAND       | SHORTCUT | DESCRIPTION |
 |---------------|----------| ----------- |
@@ -124,7 +132,7 @@ List of all available commands
 | subscript     | Mac: ⌘ = <br/> Win: Ctrl = | toggles subscript on/off for the selection or at the insertion point. |
 | indent        | Mac: ⇥ <br/> Win: Tab | indents the line containing the selection or insertion point. |
 | outdent       | Mac: ⇧ ⇥ <br/> Win: Shift Tab | outdents the line containing the selection or insertion point. |
-| selectAll     | Mac: ⌘ A <br/> Win: Ctrl A | selects all of the content of the editor region. |
+| selectContent | Mac: ⌘ ⇧ A <br/> Win: Ctrl Shift A | selects all of the content of the editor region. |
 | removeFormat  | Mac: ⌘ \ <br/> Win: Ctrl \ | removes all formatting from the current selection. |
 | h1            | | adds an HTML h1 tag around the line containing the current selection. |
 | h2            | | adds an HTML h2 tag around the line containing the current selection. |
@@ -137,6 +145,15 @@ List of all available commands
 | createLink    | | creates an anchor link from the selection text. |
 | html          | | toggles HTML on/off for all text. |
 | sperator      | | used for decoration to separate commands. |
+
+#### List of all available creator items
+
+| ITEM      | DESCRIPTION |
+|-----------| ----------- |
+| figure    | uploades an image figure and inseart it in the selected place |
+| video     | embed a video for youtube/vimeo url in the selected place |
+| facebook  | embed a facebook post from url in the selected place |
+| embed     | embed any embed iframe script in the selected place |
 
 ### Adding new custom commands
 
@@ -158,7 +175,7 @@ Align.extend('commandName', {
 })
 ```
 
-A full working example on how to overwrite the current `addImage` command
+A full working example on how to add `addImage` command
 
 ```javaScript
 Align.extend('addImage', {
@@ -185,7 +202,6 @@ Align.extend('addImage', {
     button.insertAdjacentHTML('beforeend', icon);
     input.classList.add('styler-input');
     input.type = 'file';
-    input.id = 'addImage';
     input.addEventListener('change', this.action.bind(this));
 
     return button;
@@ -226,7 +242,7 @@ To get `Align`'s post title you can use `title` property
 saveToDatabase(myEditor.content);
 ```
 
-### highlight 
+### highlight
 
 We using [highlight.js](https://highlightjs.org/) plug-in to highlight pre tags.
 To enable syntax highlighting you have to include `highlight.js` as external dependence before `Align`

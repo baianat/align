@@ -2,7 +2,6 @@ import { isElementClosest } from "./partial/util";
 
 export default class Prompt {
   constructor (message = '', data = '', positon) {
-    console.log(positon.left)
     this._init(message, data, positon);
   }
 

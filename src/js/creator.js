@@ -1,17 +1,17 @@
 import { updatePosition, camelCase, getVideoId } from './partial/util';
-import { setElementsPrefix, button, fileButton, menuButton } from './partial/elements';
+import { setElementsPrefix, button, fileButton } from './partial/elements';
 import Styler from './styler';
 import Selection from './selection';
 import Prompt from './prompt';
 
 export default  class Creator {
   constructor(align, {
-    mode = 'default',
-    items = ['figure', 'video']
+    theme = 'light',
+    items = ['figure', 'video', 'facebook', 'embed']
   } = {}) {
     this.$align = align;
     this.settings = {
-      mode,
+      theme,
       items
     };
     this._init();
@@ -20,7 +20,7 @@ export default  class Creator {
   _init() {
     setElementsPrefix('creator-');
     this.creator = document.createElement('div');
-    this.creator.classList.add('creator', 'is-hidden');
+    this.creator.classList.add('creator', 'is-hidden', this.settings.theme);
     this.menu = document.createElement('ul');
     this.menu.classList.add('creator-menu');
     this.toggleButton = button('plus');
@@ -36,31 +36,37 @@ export default  class Creator {
       theme: 'dark'
     });
 
-    {
-      const menuItem = document.createElement('li');
-      const button = fileButton('figure');
-      button.input.addEventListener('change', this.createFigure.bind(this));
-      menuItem.appendChild(button.el);
-      this.menu.appendChild(menuItem);
-    }
+    this.settings.items.forEach((item) => {
+      const li = document.createElement('li');
+      let el = null;
 
-    {
-      const button = menuButton('video');
-      button.addEventListener('click', this.createVideo.bind(this));
-      this.menu.appendChild(button);
-    }
+        switch (item) {
+          case 'figure': 
+            const btn = fileButton('figure');
+            btn.input.addEventListener('change', this.createFigure.bind(this));
+            el = btn.el;
+            break;
+          
+          case 'video': 
+            el = button('video');
+            el.addEventListener('click', this.createVideo.bind(this));
+            break;
+                    
+          case 'facebook':
+            el = button('facebook');
+            el.addEventListener('click', this.embedPost.bind(this));
+            break;
 
-    {
-      const button = menuButton('facebook');
-      button.addEventListener('click', this.embedPost.bind(this));
-      this.menu.appendChild(button);
-    }
-
-    {
-      const button = menuButton('embed');
-      button.addEventListener('click', this.embed.bind(this));
-      this.menu.appendChild(button);
-    }
+          case 'embed':
+            el = button('embed');
+            el.addEventListener('click', this.embed.bind(this));
+            break;
+          default:
+            return;
+        }
+        li.appendChild(el);
+        this.menu.appendChild(li);
+      })
 
     this.creator.appendChild(this.toggleButton);
     this.creator.appendChild(this.menu);
