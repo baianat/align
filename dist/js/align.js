@@ -2274,7 +2274,8 @@ var Section = function () {
           this.el.innerHTML = '';
           this.el.appendChild(this.contentDiv);
           this.contentDiv.innerHTML = content;
-          this.el.insertAdjacentElement('afterBegin', this.newSectionButton());
+          this.generateAddSectionButton();
+          this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
           break;
 
         case 'title':
@@ -2292,17 +2293,17 @@ var Section = function () {
       }
     }
   }, {
-    key: 'newSectionButton',
-    value: function newSectionButton() {
+    key: 'generateAddSectionButton',
+    value: function generateAddSectionButton() {
       var _this2 = this;
 
-      var btn = document.createElement('button');
-      btn.classList.add('align-newSection');
-      btn.addEventListener('click', function () {
+      this.addSectionButton = document.createElement('button');
+      this.addSectionButton.classList.add('align-newSection');
+      this.addSectionButton.addEventListener('click', function () {
         return new Section('', _this2.el);
       });
-      btn.contentEditable = false;
-      return btn;
+      this.addSectionButton.contentEditable = false;
+      return this.addSectionButton;
     }
   }, {
     key: 'getIndex',
@@ -2425,10 +2426,11 @@ var Section = function () {
     get: function get$$1() {
       var output = void 0;
       if (this.type === 'text') {
-        output = this.contentDiv.cloneNode(true);
-        output.classList.remove('align-content');
-        output.classList.add('align-section');
-        output.contentEditable = 'inherit';
+        output = this.el.cloneNode(true);
+        var addButton = output.querySelector('.align-newSection');
+        var contentDiv = output.querySelector('.align-content');
+        addButton.remove();
+        output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
       }
       if (this.type === 'title') {
         return this.title.innerText;
@@ -2777,7 +2779,7 @@ var Align = function () {
   }, {
     key: '_initEditor',
     value: function _initEditor() {
-      document.execCommand('defaultParagraphSeparator', false, 'div');
+      document.execCommand('defaultParagraphSeparator', false, 'p');
 
       this.editor = document.createElement('div');
       this.editor.classList.add('align-editor');

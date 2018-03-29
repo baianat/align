@@ -49,10 +49,11 @@ export default class Section {
   get content () {
     let output;
     if (this.type === 'text') {
-      output = this.contentDiv.cloneNode(true);
-      output.classList.remove('align-content');
-      output.classList.add('align-section');
-      output.contentEditable = 'inherit';
+      output = this.el.cloneNode(true);
+      const addButton = output.querySelector('.align-newSection');
+      const contentDiv = output.querySelector('.align-content');
+      addButton.remove();
+      output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
     }
     if (this.type === 'title') {
       return this.title.innerText;
@@ -74,7 +75,8 @@ export default class Section {
         this.el.innerHTML = '';
         this.el.appendChild(this.contentDiv);
         this.contentDiv.innerHTML = content;
-        this.el.insertAdjacentElement('afterBegin', this.newSectionButton());
+        this.generateAddSectionButton();
+        this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
         break;
     
       case 'title':
@@ -92,12 +94,12 @@ export default class Section {
     }
   }
 
-  newSectionButton () {
-    const btn = document.createElement('button');
-    btn.classList.add('align-newSection');
-    btn.addEventListener('click', () => new Section('', this.el));
-    btn.contentEditable = false;
-    return btn
+  generateAddSectionButton () {
+    this.addSectionButton = document.createElement('button');
+    this.addSectionButton.classList.add('align-newSection');
+    this.addSectionButton.addEventListener('click', () => new Section('', this.el));
+    this.addSectionButton.contentEditable = false;
+    return this.addSectionButton
   }
 
   getIndex () {
