@@ -6,7 +6,7 @@ let ALL_SECTIONS = [];
 
 export default class Section {
   constructor (content, position, type = 'text') {
-    if (content.nodeName === 'BR') {
+    if (content && content.nodeName === 'BR') {
       return;
     }
     this.id = ID++;
@@ -201,7 +201,7 @@ export default class Section {
   
   active () {
     Section.$optionsBar.show(this);
-    this.contentDiv.querySelector('p').focus();
+    this.el.focus();
   }
 
   remove () {

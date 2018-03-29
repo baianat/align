@@ -103,7 +103,12 @@ export default class Align {
     this.newSectionButton = document.createElement('button');
     this.newSectionButton.classList.add('align-addButton');
     this.el.appendChild(this.newSectionButton);
-    this.newSectionButton.addEventListener('click', () => new Section().active());
+    this.newSectionButton.addEventListener('click', () => {
+      const newSection = new Section();
+      newSection.active();
+      Selection.selectElement(newSection.contentDiv.querySelector('p'));
+      this.update();
+    });
   }
 
   /**

@@ -280,8 +280,8 @@
 }
 .align-addButton {
   display: block;
-  font-size: 20px;
-  padding: 30px;
+  font-size: 18px;
+  padding: 10px;
   width: 70%;
   margin: 20px auto;
   border: 2px dashed #aaa;
@@ -290,7 +290,7 @@
 }
 .align-addButton:after {
   display: block;
-  content: 'Your awesome content here!';
+  content: 'Add section';
 }
 .align-addButton:active {
   outline: 0;
@@ -342,8 +342,9 @@
 .align p:empty::after {
   font-style: italic;
   color: #aaa;
-  content: 'Your awesome content here!';
+  content: 'Content here...';
   font-size: 20px;
+  z-index: -1;
 }
 .align-title:empty::after {
   font-style: italic;

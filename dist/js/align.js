@@ -2246,7 +2246,7 @@ var Section = function () {
     var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'text';
     classCallCheck(this, Section);
 
-    if (content.nodeName === 'BR') {
+    if (content && content.nodeName === 'BR') {
       return;
     }
     this.id = ID++;
@@ -2420,7 +2420,7 @@ var Section = function () {
     key: 'active',
     value: function active() {
       Section.$optionsBar.show(this);
-      this.contentDiv.querySelector('p').focus();
+      this.el.focus();
     }
   }, {
     key: 'remove',
@@ -2800,6 +2800,8 @@ var Align = function () {
   }, {
     key: '_initSections',
     value: function _initSections() {
+      var _this = this;
+
       this.activeSection = '';
       Section.config(this);
 
@@ -2813,7 +2815,10 @@ var Align = function () {
       this.newSectionButton.classList.add('align-addButton');
       this.el.appendChild(this.newSectionButton);
       this.newSectionButton.addEventListener('click', function () {
-        return new Section().active();
+        var newSection = new Section();
+        newSection.active();
+        Selection.selectElement(newSection.contentDiv.querySelector('p'));
+        _this.update();
       });
     }
 
@@ -2824,10 +2829,10 @@ var Align = function () {
   }, {
     key: '_initEvents',
     value: function _initEvents() {
-      var _this = this;
+      var _this2 = this;
 
       this.editor.addEventListener('focus', function () {
-        _this.highlight();
+        _this2.highlight();
       });
 
       this.editor.addEventListener('mouseup', this.update.bind(this), true);
@@ -2838,57 +2843,57 @@ var Align = function () {
           return;
         }
 
-        _this.update();
-        if (event[_this.cmdKey] && _this.settings.shortcuts) {
+        _this2.update();
+        if (event[_this2.cmdKey] && _this2.settings.shortcuts) {
           switch (event.key.toUpperCase()) {
             case 'B':
               event.preventDefault();
-              _this.execute('bold');break;
+              _this2.execute('bold');break;
             case 'I':
               event.preventDefault();
-              _this.execute('italic');break;
+              _this2.execute('italic');break;
             case 'U':
               event.preventDefault();
-              _this.execute('underline');break;
+              _this2.execute('underline');break;
             case 'E':
               event.preventDefault();
-              _this.execute('justifyCenter');break;
+              _this2.execute('justifyCenter');break;
             case 'R':
               event.preventDefault();
-              _this.execute('justifyRight');break;
+              _this2.execute('justifyRight');break;
             case 'L':
               event.preventDefault();
-              _this.execute('justifyLeft');break;
+              _this2.execute('justifyLeft');break;
             case 'J':
               event.preventDefault();
-              _this.execute('justifyFull');break;
+              _this2.execute('justifyFull');break;
             case 'A':
               if (event.shiftKey) {
                 event.preventDefault();
-                Selection.selectElement(_this.editor);
+                Selection.selectElement(_this2.editor);
               }
               break;
             case 'F':
               event.preventDefault();
               if (event.shiftKey) {
-                _this.toggleFullScreen();
+                _this2.toggleFullScreen();
               }
               break;
             case 'Z':
               event.preventDefault();
               if (event.shiftKey) {
-                _this.execute('redo');break;
+                _this2.execute('redo');break;
               }
-              _this.execute('undo');break;
+              _this2.execute('undo');break;
             case '\\':
               event.preventDefault();
-              _this.execute('removeFormat');break;
+              _this2.execute('removeFormat');break;
             case '=':
               event.preventDefault();
               if (event.shiftKey) {
-                _this.execute('superscript');break;
+                _this2.execute('superscript');break;
               }
-              _this.execute('subscript');break;
+              _this2.execute('subscript');break;
             default:
               break;
           }
@@ -2898,11 +2903,11 @@ var Align = function () {
           case 'Tab':
             event.preventDefault();
             if (event.shiftKey) {
-              _this.execute('outdent', false, true);break;
+              _this2.execute('outdent', false, true);break;
             }
-            _this.execute('indent', false, true);break;
+            _this2.execute('indent', false, true);break;
           case 'Escape':
-            _this.el.classList.remove('is-fullscreen');
+            _this2.el.classList.remove('is-fullscreen');
             exitFullscreen();
             break;
           default:
@@ -2946,18 +2951,18 @@ var Align = function () {
   }, {
     key: 'update',
     value: function update() {
-      var _this2 = this;
+      var _this3 = this;
 
       Selection.updateSelectedRange();
       setTimeout(function () {
-        if (_this2.settings.toolbar) {
-          _this2.toolbar.update();
+        if (_this3.settings.toolbar) {
+          _this3.toolbar.update();
         }
-        if (_this2.settings.bubble) {
-          _this2.bubble.update();
+        if (_this3.settings.bubble) {
+          _this3.bubble.update();
         }
-        if (_this2.settings.creator) {
-          _this2.creator.update();
+        if (_this3.settings.creator) {
+          _this3.creator.update();
         }
       }, 16);
     }

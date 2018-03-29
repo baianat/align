@@ -13,8 +13,8 @@
 
   &-addButton
     display: block
-    font-size: 20px
-    padding: 30px
+    font-size: 18px
+    padding: 10px
     width: 70%
     margin: 20px auto
     border: 2px dashed $gray
@@ -22,7 +22,7 @@
     background: $white
     &:after
       display: block
-      content: 'Your awesome content here!'
+      content: 'Add section'
     &:active
       outline: 0
     &:hover
@@ -66,8 +66,9 @@
     &::after
       font-style: italic
       color: $gray
-      content: 'Your awesome content here!'
+      content: 'Content here...'
       font-size: 20px
+      z-index: -1
 
   &-title
     &:empty::after
