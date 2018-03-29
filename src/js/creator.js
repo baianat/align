@@ -7,7 +7,7 @@ import Prompt from './prompt';
 export default  class Creator {
   constructor(align, {
     theme = 'light',
-    items = ['figure', 'video', 'facebook', 'embed', 'table']
+    items = ['figure', 'video', 'facebook', 'table', 'embed']
   } = {}) {
     this.$align = align;
     this.settings = {
@@ -52,8 +52,8 @@ export default  class Creator {
             el.addEventListener('click', this.createVideo.bind(this));
             break;
 
-          case 'Table':
-            el = button('Table');
+          case 'table':
+            el = button('table');
             el.addEventListener('click', this.createTable.bind(this));
             break;
 
@@ -85,7 +85,7 @@ export default  class Creator {
       Selection.current.anchorNode.childNodes.length <= 1 &&
       Selection.current.anchorNode.parentNode.classList.contains('align-content')
     ) {
-      this.positon = updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
+      this.position = updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
       this.show();
       return;
     }
@@ -146,9 +146,9 @@ export default  class Creator {
 
   createVideo () {
     const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter video link:', '', this.positon)
+    new Prompt('Enter video link:', '', { position: this.position })
       .onSubmit(function () {
-        const link = this.input.value
+        const link = this.inputs[0].value
         console.log(link)
         if (!link) return;
         const videoHoster = link.includes('yout')
@@ -175,11 +175,32 @@ export default  class Creator {
       });
   }
 
+  createTable () {
+    const selectedElement = Selection.current.anchorNode;
+    new Prompt('Enter post link:', '', { 
+      position: this.position,
+      inputsCount: 2,
+      inputsPlaceholders: ['rows', 'columns']
+    }).onSubmit(function () {
+      const rows = Number(this.inputs[0].value);
+      const columns = Number(this.inputs[1].value);
+      if (isNaN(rows) || isNaN(columns)) return;
+      const table = document.createElement('table');
+      table.classList.add('align-table')
+      table.insertAdjacentHTML('afterbegin', `
+        <tr>
+          ${'<td><br></td>'.repeat(columns)}
+        </tr>
+      `.repeat(rows))
+      selectedElement.parentNode.insertBefore(table, selectedElement);
+    });
+  }
+
   embedPost () {
     const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter post link:', '', this.positon)
+    new Prompt('Enter post link:', '', { position: this.position })
       .onSubmit(function () {
-        const postUrl = this.input.value
+        const postUrl = this.inputs[0].value
         if (!postUrl) return;
         const iframe = document.createElement('iframe');
     
@@ -195,9 +216,9 @@ export default  class Creator {
 
   embed () {
     const selectedElement = Selection.current.anchorNode;
-    new Prompt('Add embeded:', '', this.positon)
+    new Prompt('Add embeded:', '', { position: this.position })
       .onSubmit(function () {
-        const data = this.input.value
+        const data = this.inputs[0].value
         if (!data) return;
         const div = document.createElement('div');
 

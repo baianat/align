@@ -1344,35 +1344,56 @@ var Prompt = function () {
   function Prompt() {
     var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-    var positon = arguments[2];
+
+    var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        _ref$position = _ref.position,
+        position = _ref$position === undefined ? { left: 0, top: 0 } : _ref$position,
+        _ref$inputsCount = _ref.inputsCount,
+        inputsCount = _ref$inputsCount === undefined ? 1 : _ref$inputsCount,
+        _ref$inputsPlaceholde = _ref.inputsPlaceholders,
+        inputsPlaceholders = _ref$inputsPlaceholde === undefined ? [] : _ref$inputsPlaceholde;
+
     classCallCheck(this, Prompt);
 
-    this._init(message, data, positon);
+    this.settings = {
+      position: position,
+      inputsCount: inputsCount,
+      inputsPlaceholders: inputsPlaceholders
+    };
+    this._init(message, data);
   }
 
   createClass(Prompt, [{
     key: '_init',
-    value: function _init(message, data, positon) {
+    value: function _init(message, data) {
       var _this = this;
 
+      var position = this.settings.position;
       this.el = document.createElement('div');
       this.message = document.createElement('label');
-      this.input = document.createElement('input');
       this.submit = document.createElement('button');
+      this.inputs = [];
 
       this.el.classList.add('prompt');
       this.message.classList.add('prompt-message');
-      this.input.classList.add('prompt-input');
       this.submit.classList.add('prompt-submit');
 
-      this.el.style.left = positon.left + 'px';
-      this.el.style.top = positon.top + 'px';
+      this.el.style.left = position.left + 'px';
+      this.el.style.top = position.top + 'px';
       this.message.innerText = message;
-      this.input.value = data;
       this.submit.innerText = 'Submit';
 
       this.el.appendChild(this.message);
-      this.el.appendChild(this.input);
+      for (var i = 0; i < this.settings.inputsCount; i++) {
+        this.inputs[i] = document.createElement('input');
+        this.inputs[i].classList.add('prompt-input');
+        if (this.settings.inputsPlaceholders[i]) {
+          this.inputs[i].placeholder = this.settings.inputsPlaceholders[i];
+        }
+        this.el.appendChild(this.inputs[i]);
+      }
+
+      this.inputs[0].value = data;
       this.el.appendChild(this.submit);
 
       document.body.appendChild(this.el);
@@ -1486,7 +1507,7 @@ var cmdsSchema = {
     element: 'button',
     tooltip: 'Hyperlink',
     func: function func(styler) {
-      new Prompt('Enter link:', Selection.current.toString(), Selection.textRange.getBoundingClientRect()).onSubmit(function () {
+      new Prompt('Enter link:', Selection.current.toString(), { position: Selection.textRange.getBoundingClientRect() }).onSubmit(function () {
         var link = this.input.value;
         if (!link) return;
         Selection.selectTextRange();
@@ -1808,6 +1829,8 @@ var iconsPath = {
   figureFloatLeft: 'M3,7H9V13H3V7M3,3H21V5H3V3M21,7V9H11V7H21M21,11V13H11V11H21M3,15H17V17H3V15M3,19H21V21H3V19Z',
 
   figureFull: 'M23 18V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zM8.5 12.5l2.5 3.01L14.5 11l4.5 6H5l3.5-4.5z',
+
+  table: 'M4,3H20A2,2 0 0,1 22,5V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V5A2,2 0 0,1 4,3M4,7V10H8V7H4M10,7V10H14V7H10M20,10V7H16V10H20M4,12V15H8V12H4M4,20H8V17H4V20M10,12V15H14V12H10M10,20H14V17H10V20M20,20V17H16V20H20M20,12H16V15H20V12Z',
 
   sectionNormal: 'M12.5,19.5V3.47H14.53V19.5H12.5M9.5,19.5V3.47H11.53V19.5H9.5M4.5,7.5L8.53,11.5L4.5,15.47V12.47H1.5V10.5H4.5V7.5M19.5,15.47L15.5,11.5L19.5,7.5V10.5H22.5V12.47H19.5V15.47Z',
 
@@ -2483,7 +2506,7 @@ var Creator = function () {
         _ref$theme = _ref.theme,
         theme = _ref$theme === undefined ? 'light' : _ref$theme,
         _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'embed', 'table'] : _ref$items;
+        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'table', 'embed'] : _ref$items;
 
     classCallCheck(this, Creator);
 
@@ -2531,8 +2554,8 @@ var Creator = function () {
             el.addEventListener('click', _this.createVideo.bind(_this));
             break;
 
-          case 'Table':
-            el = button('Table');
+          case 'table':
+            el = button('table');
             el.addEventListener('click', _this.createTable.bind(_this));
             break;
 
@@ -2560,7 +2583,7 @@ var Creator = function () {
     key: 'update',
     value: function update() {
       if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1 && Selection.current.anchorNode.parentNode.classList.contains('align-content')) {
-        this.positon = updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
+        this.position = updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
         this.show();
         return;
       }
@@ -2630,8 +2653,8 @@ var Creator = function () {
     key: 'createVideo',
     value: function createVideo() {
       var selectedElement = Selection.current.anchorNode;
-      new Prompt('Enter video link:', '', this.positon).onSubmit(function () {
-        var link = this.input.value;
+      new Prompt('Enter video link:', '', { position: this.position }).onSubmit(function () {
+        var link = this.inputs[0].value;
         console.log(link);
         if (!link) return;
         var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
@@ -2652,11 +2675,29 @@ var Creator = function () {
       });
     }
   }, {
+    key: 'createTable',
+    value: function createTable() {
+      var selectedElement = Selection.current.anchorNode;
+      new Prompt('Enter post link:', '', {
+        position: this.position,
+        inputsCount: 2,
+        inputsPlaceholders: ['rows', 'columns']
+      }).onSubmit(function () {
+        var rows = Number(this.inputs[0].value);
+        var columns = Number(this.inputs[1].value);
+        if (isNaN(rows) || isNaN(columns)) return;
+        var table = document.createElement('table');
+        table.classList.add('align-table');
+        table.insertAdjacentHTML('afterbegin', ('\n        <tr>\n          ' + '<td><br></td>'.repeat(columns) + '\n        </tr>\n      ').repeat(rows));
+        selectedElement.parentNode.insertBefore(table, selectedElement);
+      });
+    }
+  }, {
     key: 'embedPost',
     value: function embedPost() {
       var selectedElement = Selection.current.anchorNode;
-      new Prompt('Enter post link:', '', this.positon).onSubmit(function () {
-        var postUrl = this.input.value;
+      new Prompt('Enter post link:', '', { position: this.position }).onSubmit(function () {
+        var postUrl = this.inputs[0].value;
         if (!postUrl) return;
         var iframe = document.createElement('iframe');
 
@@ -2673,8 +2714,8 @@ var Creator = function () {
     key: 'embed',
     value: function embed() {
       var selectedElement = Selection.current.anchorNode;
-      new Prompt('Add embeded:', '', this.positon).onSubmit(function () {
-        var data = this.input.value;
+      new Prompt('Add embeded:', '', { position: this.position }).onSubmit(function () {
+        var data = this.inputs[0].value;
         if (!data) return;
         var div = document.createElement('div');
 

@@ -1,29 +1,46 @@
 import { isElementClosest } from "./partial/util";
 
 export default class Prompt {
-  constructor (message = '', data = '', positon) {
-    this._init(message, data, positon);
+  constructor (message = '', data = '', {
+    position = {left: 0, top: 0},
+    inputsCount = 1,
+    inputsPlaceholders = []
+  } = {}) {
+    this.settings = {
+      position,
+      inputsCount,
+      inputsPlaceholders
+    };
+    this._init(message, data);
   }
 
-  _init (message, data, positon) {
+  _init (message, data) {
+    const position = this.settings.position;
     this.el = document.createElement('div');
     this.message = document.createElement('label');
-    this.input = document.createElement('input');
     this.submit = document.createElement('button');
-
+    this.inputs = []
+    
     this.el.classList.add('prompt');
     this.message.classList.add('prompt-message');
-    this.input.classList.add('prompt-input');
     this.submit.classList.add('prompt-submit');
 
-    this.el.style.left = `${positon.left}px`;
-    this.el.style.top = `${positon.top}px`;
+    this.el.style.left = `${position.left}px`;
+    this.el.style.top = `${position.top}px`;
     this.message.innerText = message;
-    this.input.value = data;
     this.submit.innerText = 'Submit';
-
+    
     this.el.appendChild(this.message);
-    this.el.appendChild(this.input);
+    for (let i = 0; i < this.settings.inputsCount; i++) {
+      this.inputs[i] = document.createElement('input');
+      this.inputs[i].classList.add('prompt-input');
+      if (this.settings.inputsPlaceholders[i]) {
+        this.inputs[i].placeholder = this.settings.inputsPlaceholders[i];
+      }
+      this.el.appendChild(this.inputs[i]);
+    }
+
+    this.inputs[0].value = data;
     this.el.appendChild(this.submit);
 
     document.body.appendChild(this.el);

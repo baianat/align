@@ -10,6 +10,28 @@
     width: 100%
     max-width: 400px
 
+  &-table
+    user-select: auto
+    width: 100%
+    border: 1px solid $gray
+    border-spacing: 0
+    border-collapse: separate
+    border-radius: 2px
+    color: $black
+    text-align: left
+
+    tr:not(:first-child)
+      border-top: 1px solid $gray
+
+    td
+      padding: $padding
+      border-top: 1px solid $gray
+      background-color: $white
+
+    th, td
+      &:not(:last-child)
+        border-right: 1px solid $gray
+
   iframe
     border: 0
 
