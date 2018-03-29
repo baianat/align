@@ -2238,6 +2238,9 @@ var Section = function () {
     var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'text';
     classCallCheck(this, Section);
 
+    if (content.nodeName === 'BR') {
+      return;
+    }
     this.id = ID++;
     this.type = type;
     this.generateEl(content);

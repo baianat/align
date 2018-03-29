@@ -6,6 +6,9 @@ let ALL_SECTIONS = [];
 
 export default class Section {
   constructor (content, position, type = 'text') {
+    if (content.nodeName === 'BR') {
+      return;
+    }
     this.id = ID++;
     this.type = type;
     this.generateEl(content);
