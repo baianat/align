@@ -1618,6 +1618,7 @@ var cmdsSchema = {
     element: 'input',
     type: 'text',
     command: 'foreColor',
+    tooltip: 'Font color',
     useCSS: true,
     init: colorpicker,
     initConfig: {
@@ -1643,6 +1644,7 @@ var cmdsSchema = {
     element: 'input',
     type: 'text',
     command: 'backColor',
+    tooltip: 'Hightlight color',
     useCSS: true,
     init: colorpicker,
     initConfig: {
@@ -1900,10 +1902,13 @@ function input(name, type) {
  * @param {String} name
  * @param {String} type
  */
-function fileButton(name) {
+function fileButton(name, tooltip) {
   var wrapper = document.createElement('div');
   var input = document.createElement('input');
 
+  if (tooltip) {
+    wrapper.dataset.tooltip = tooltip;
+  }
   wrapper.classList.add(NAMING_PREFIX + 'button');
   wrapper.id = name;
   wrapper.appendChild(input);
@@ -2014,7 +2019,7 @@ var Styler = function () {
           break;
 
         case 'file':
-          var fileBtn = fileButton(cmd);
+          var fileBtn = fileButton(cmd, this.getTooltip(cmdSchema));
           currentCmd.el = fileBtn.input;
           currentCmd.el.addEventListener('change', function (event) {
             _this2.cmdCallback(cmdSchema, event);
@@ -2032,7 +2037,7 @@ var Styler = function () {
           break;
 
         case 'input':
-          currentCmd.el = input(cmd, cmdSchema.type);
+          currentCmd.el = input(cmd, cmdSchema.type, this.getTooltip(cmdSchema));
           currentCmd.el.addEventListener('change', function () {
             _this2.cmdCallback(cmdSchema, currentCmd.el.value);
           });

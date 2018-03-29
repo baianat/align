@@ -65,10 +65,13 @@ export function input(name, type) {
  * @param {String} name
  * @param {String} type
  */
-export function fileButton(name) {
+export function fileButton(name, tooltip) {
   const wrapper = document.createElement('div');
   const input = document.createElement('input');
 
+  if (tooltip) {
+    wrapper.dataset.tooltip = tooltip;
+  }
   wrapper.classList.add(`${NAMING_PREFIX}button`);
   wrapper.id = name;
   wrapper.appendChild(input);

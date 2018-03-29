@@ -219,6 +219,7 @@ const cmdsSchema = {
     element: 'input',
     type: 'text',
     command: 'foreColor',
+    tooltip: 'Font color',
     useCSS: true,
     init: Colorpicker,
     initConfig: {
@@ -249,6 +250,7 @@ const cmdsSchema = {
     element: 'input',
     type: 'text',
     command: 'backColor',
+    tooltip: 'Hightlight color',
     useCSS: true,
     init: Colorpicker,
     initConfig: {

@@ -76,7 +76,7 @@ export default class Styler {
         break;
 
       case 'file':
-        const fileBtn = fileButton(cmd);
+        const fileBtn = fileButton(cmd, this.getTooltip(cmdSchema));
         currentCmd.el = fileBtn.input;
         currentCmd.el.addEventListener('change', (event) => {
           this.cmdCallback(cmdSchema, event);
@@ -94,7 +94,7 @@ export default class Styler {
         break;
 
       case 'input':
-        currentCmd.el = input(cmd, cmdSchema.type);
+        currentCmd.el = input(cmd, cmdSchema.type, this.getTooltip(cmdSchema));
         currentCmd.el.addEventListener('change', () => {
           this.cmdCallback(cmdSchema, currentCmd.el.value)
         });
