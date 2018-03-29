@@ -201,7 +201,6 @@ export default class Section {
   
   active () {
     Section.$optionsBar.show(this);
-    console.log(this.contentDiv.querySelector('p'))
     this.contentDiv.querySelector('p').focus();
   }
 

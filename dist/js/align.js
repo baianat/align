@@ -1,10 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('highlight.js')) :
-	typeof define === 'function' && define.amd ? define(['highlight.js'], factory) :
-	(global.Align = factory(global.hljs));
-}(this, (function (hljs) { 'use strict';
-
-hljs = hljs && hljs.hasOwnProperty('default') ? hljs['default'] : hljs;
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.Align = factory());
+}(this, (function () { 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -2412,7 +2410,6 @@ var Section = function () {
     key: 'active',
     value: function active() {
       Section.$optionsBar.show(this);
-      console.log(this.contentDiv.querySelector('p'));
       this.contentDiv.querySelector('p').focus();
     }
   }, {
@@ -2825,19 +2822,6 @@ var Align = function () {
 
       this.editor.addEventListener('mouseup', this.update.bind(this), true);
 
-      document.addEventListener('keydown', function (event) {
-        // Do nothing if the event was already processed
-        if (event.defaultPrevented) {
-          return;
-        }
-        if (event[_this.cmdKey] && _this.settings.shortcuts) {
-          switch (event.key.toUpperCase()) {
-            case 'A':
-              event.preventDefault();
-              break;
-          }
-        }
-      });
       this.editor.addEventListener('keydown', function (event) {
         // Do nothing if the event was already processed
         if (event.defaultPrevented) {
@@ -2921,7 +2905,8 @@ var Align = function () {
   }, {
     key: 'highlight',
     value: function highlight() {
-      if (!hljs) {
+
+      if (typeof hljs === 'undefined') {
         return;
       }
       var code = Array.from(this.editor.querySelectorAll('pre'));
@@ -2974,10 +2959,10 @@ var Align = function () {
     value: function execute(cmd, value) {
       var useCSS = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
+      this.editor.focus();
       document.execCommand('styleWithCSS', false, useCSS);
       document.execCommand(cmd, false, value);
       document.execCommand('styleWithCSS', false, false);
-      this.el.focus();
       this.update();
     }
   }, {

@@ -1,4 +1,3 @@
-import hljs from 'highlight.js';
 import { select, userOS, launchFullscreen, exitFullscreen } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
@@ -117,19 +116,6 @@ export default class Align {
 
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
 
-    document.addEventListener('keydown', (event) => {
-      // Do nothing if the event was already processed
-      if (event.defaultPrevented) {
-        return;
-      }
-      if (event[this.cmdKey] && this.settings.shortcuts) {
-        switch (event.key.toUpperCase()) {
-          case 'A':
-            event.preventDefault();
-          break;
-        }
-      }
-    });
     this.editor.addEventListener('keydown', (event) => {
       // Do nothing if the event was already processed
       if (event.defaultPrevented) {
@@ -210,7 +196,7 @@ export default class Align {
    * Hight light code text
    */
   highlight() {
-    if (!hljs) {
+    if (typeof hljs === 'undefined') {
       return;
     }
     const code = Array.from(this.editor.querySelectorAll('pre'));
@@ -254,10 +240,10 @@ export default class Align {
   }
 
   execute(cmd, value, useCSS = false) {
+    this.editor.focus();
     document.execCommand('styleWithCSS', false, useCSS);
     document.execCommand(cmd, false, value);
     document.execCommand('styleWithCSS', false, false);
-    this.el.focus();
     this.update();
   }
 
