@@ -33,7 +33,13 @@ export default class Prompt {
       this.el.style.top = `${position.top}px`;
     }
     if (!position) {
-      updatePosition(Selection.range, this.el, this.settings.wrapper, 'left-middle')
+      if (myEditor.sel.range.startContainer.nodeType === 3) {
+        this.selectionRefrance = Selection.range;
+      }
+      if (myEditor.sel.range.startContainer.nodeType === 1) {
+        this.selectionRefrance = Selection.current.anchorNode;
+      }
+      updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-middle');
     }
     this.message.innerText = message;
     this.submit.innerText = 'Submit';
