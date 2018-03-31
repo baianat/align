@@ -7,11 +7,13 @@ import Table from './table';
 
 export default  class Creator {
   constructor(align, {
+    mode = 'toolbar',
     theme = 'light',
     items = ['figure', 'video', 'facebook', 'table', 'embed']
   } = {}) {
     this.$align = align;
     this.settings = {
+      mode,
       theme,
       items
     };
@@ -20,12 +22,11 @@ export default  class Creator {
 
   _init() {
     setElementsPrefix('creator-');
-    this.creator = document.createElement('div');
-    this.creator.classList.add('creator', 'is-hidden', this.settings.theme);
+    this.el = document.createElement('div');
+    this.el.classList.add('creator', `is-${this.settings.theme}`, `is-${this.settings.mode}`);
     this.menu = document.createElement('ul');
     this.menu.classList.add('creator-menu');
-    this.toggleButton = button('plus');
-    this.toggleButton.addEventListener('click', this.toggleState.bind(this));
+
     this.figureOptions = new Styler(this.$align, {
       mode: 'bubble',
       hideWhenClickOut: true,
@@ -75,42 +76,60 @@ export default  class Creator {
         this.menu.appendChild(li);
       })
 
-    this.creator.appendChild(this.toggleButton);
-    this.creator.appendChild(this.menu);
-    this.$align.el.appendChild(this.creator);
+    this.el.appendChild(this.menu);
+    if (this.settings.mode === 'inline') {
+      this.toggleButton = button('plus');
+      this.toggleButton.addEventListener('click', this.toggleState.bind(this));
+      this.el.appendChild(this.toggleButton);
+      this.$align.el.appendChild(this.el);
+    }
+    if (this.settings.mode === 'toolbar' && this.$align.toolbar) {
+      this.$align.toolbar.el.appendChild(this.el);
+    }
+    if (this.settings.mode === 'toolbar' && !this.$align.toolbar) {
+      this.$align.toolbar = new Styler(this.$align, {
+        mode: 'toolbar',
+        commands: []
+      });
+      this.$align.toolbar.el.appendChild(this.el);
+    }
   }
 
-  update() {
+  update () {
+    if (this.settings.mode !== 'inline') { 
+      this.position = null;
+      return;
+    }
     if (
       Selection.current.isCollapsed &&
       Selection.current.anchorNode.nodeType === 1 &&
       Selection.current.anchorNode.childNodes.length <= 1 &&
       Selection.current.anchorNode.parentNode.classList.contains('align-content')
     ) {
-      this.position = updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
+      this.position = updatePosition(Selection.current.anchorNode, this.el, this.$align.el, 'middle-left');
       this.show();
       return;
     }
     this.hide();
   }
 
-  toggleState() {
-    this.creator.classList.toggle('is-active');
+  toggleState () {
+    this.el.classList.toggle('is-active');
   }
 
-  show() {
-    if (this.creator.classList.contains('is-visible')) return;
-    this.creator.classList.add('is-visible');
-    this.creator.classList.remove('is-hidden');
+  show () {
+    if (this.el.classList.contains('is-visible')) return;
+    this.el.classList.add('is-visible');
+    this.el.classList.remove('is-hidden');
   }
 
-  hide() {
-    this.creator.classList.remove('is-visible');
-    this.creator.classList.remove('is-active');
-    this.creator.classList.add('is-hidden');
+  hide () {
+    this.el.classList.remove('is-visible');
+    this.el.classList.remove('is-active');
+    this.el.classList.add('is-hidden');
   }
 
-  createFigure(event) {
+  createFigure (event) {
     const input = event.target;
     const file = input.files[0];
     if (!file || !Selection.range) return;
@@ -143,7 +162,7 @@ export default  class Creator {
     });
     reader.readAsDataURL(file);
     input.value = null;
-    selectedElement.parentNode.insertBefore(figure, selectedElement);
+    selectedElement.parentNode.insertBefore(figure, selectedElement.nextSibling);
   }
 
   createVideo () {
@@ -175,7 +194,7 @@ export default  class Creator {
           : videoHoster === 'vimeo'
             ? `//player.vimeo.com/video/${videoId}`
             : ''
-        selectedElement.parentNode.insertBefore(iframe, selectedElement);
+        selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
       });
   }
 
@@ -192,7 +211,7 @@ export default  class Creator {
           rows: this.inputs[0].value,
           columns: this.inputs[1].value
         }).el,
-        selectedElement
+        selectedElement.nextSibling
       );
     });
   }
@@ -214,7 +233,7 @@ export default  class Creator {
         iframe.contentEditable = false;
         iframe.allowTransparency = true;
         iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
-        selectedElement.parentNode.insertBefore(iframe, selectedElement);
+        selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
       });
   }
 
@@ -229,7 +248,7 @@ export default  class Creator {
         if (!data) return;
         const div = document.createElement('div');
 
-        selectedElement.parentNode.insertBefore(div, selectedElement);
+        selectedElement.parentNode.insertBefore(div, selectedElement.nextSibling);
         div.insertAdjacentHTML('afterbegin', data);
       });
   }

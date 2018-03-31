@@ -5,7 +5,7 @@ import Selection from './selection';
 
 export default class Styler {
   constructor(align, {
-    mode = 'default',
+    mode = 'toolbar',
     commands = ['bold', 'italic', 'underline'],
     hideWhenClickOut = false,
     tooltip = false,
@@ -28,20 +28,20 @@ export default class Styler {
   _init () {
     setElementsPrefix('styler-');
     this.cmdsSchema = cloneObject(cmdsSchema);
-    this.styler = document.createElement('ul');
-    this.styler.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
+    this.el = document.createElement('ul');
+    this.el.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
     this.cmds = {};
     this.visiable = false;
 
     this.settings.commands.forEach((command) => {
       this.generateCmdElement(command);
     })
-    this.$align.el.appendChild(this.styler);
+    this.$align.el.appendChild(this.el);
     if (this.settings.mode === 'bubble') this._initBubble();
   }
 
   _initBubble () {
-    this.styler.classList.add('is-hidden');
+    this.el.classList.add('is-hidden');
     this.bubbleScrollCallback = debounce(this.updateBubblePosition.bind(this));
   }
 
@@ -124,7 +124,7 @@ export default class Styler {
       cmdSchema.init = null;
     }
 
-    this.styler.appendChild(li);
+    this.el.appendChild(li);
   }
 
   cmdCallback(cmdSchema, value) {
@@ -159,7 +159,7 @@ export default class Styler {
     const element = this.currentItem ? this.currentItem.el : Selection.textRange;
     const elementRect = element.getBoundingClientRect();
     const editorRect = this.$align.el.getBoundingClientRect();
-    const stylerRect = this.styler.getBoundingClientRect();
+    const stylerRect = this.el.getBoundingClientRect();
 
     const deltaY = elementRect.top - stylerRect.height - marginRatio;
     const deltaX = elementRect.left + ((elementRect.width - stylerRect.width) / 2);
@@ -170,12 +170,12 @@ export default class Styler {
       ? elementRect.top + elementRect.height + marginRatio : deltaY;
 
     if (yPosition < threshold) {
-      this.styler.style.opacity = 0;
+      this.el.style.opacity = 0;
       return;
     }
-    this.styler.style.opacity = 1;
-    this.styler.style.top = `${yPosition}px`;
-    this.styler.style.left = `${xPosition}px`;
+    this.el.style.opacity = 1;
+    this.el.style.top = `${yPosition}px`;
+    this.el.style.left = `${xPosition}px`;
   }
 
   show (item) {
@@ -192,8 +192,8 @@ export default class Styler {
     }
     if (this.visiable) return
     this.visiable = true;
-    this.styler.classList.add('is-visible');
-    this.styler.classList.remove('is-hidden');
+    this.el.classList.add('is-visible');
+    this.el.classList.remove('is-hidden');
     if (this.settings.mode === 'bubble') {
       window.addEventListener('scroll', this.bubbleScrollCallback);
     }
@@ -201,7 +201,7 @@ export default class Styler {
       document.addEventListener('click', (event) => {
         if (
           isElementClosest(event.target, this.currentItem.el) ||
-          isElementClosest(event.target, this.styler)
+          isElementClosest(event.target, this.el)
         ) return;
         this.hide();
       });
@@ -212,8 +212,8 @@ export default class Styler {
     if (this.currentItem) {
       this.currentItem.el.classList.remove('is-active');
     }
-    this.styler.classList.remove('is-visible');
-    this.styler.classList.add('is-hidden');
+    this.el.classList.remove('is-visible');
+    this.el.classList.add('is-hidden');
     this.visiable = false;
     if (this.settings.mode === 'bubble') {
       window.removeEventListener('scroll', this.bubbleScrollCallback);

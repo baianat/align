@@ -1,4 +1,5 @@
-import { isElementClosest } from "./partial/util";
+import { isElementClosest, updatePosition } from "./partial/util";
+import Selection from './selection';
 
 export default class Prompt {
   constructor (message = '', data = '', {
@@ -27,8 +28,13 @@ export default class Prompt {
     this.message.classList.add('prompt-message');
     this.submit.classList.add('prompt-submit');
 
-    this.el.style.left = `${position.left}px`;
-    this.el.style.top = `${position.top}px`;
+    if (position) {
+      this.el.style.left = `${position.left}px`;
+      this.el.style.top = `${position.top}px`;
+    }
+    if (!position) {
+      updatePosition(Selection.range, this.el, this.settings.wrapper, 'left-middle')
+    }
     this.message.innerText = message;
     this.submit.innerText = 'Submit';
     

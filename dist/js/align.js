@@ -1381,8 +1381,13 @@ var Prompt = function () {
       this.message.classList.add('prompt-message');
       this.submit.classList.add('prompt-submit');
 
-      this.el.style.left = position.left + 'px';
-      this.el.style.top = position.top + 'px';
+      if (position) {
+        this.el.style.left = position.left + 'px';
+        this.el.style.top = position.top + 'px';
+      }
+      if (!position) {
+        updatePosition(Selection.range, this.el, this.settings.wrapper, 'left-middle');
+      }
       this.message.innerText = message;
       this.submit.innerText = 'Submit';
 
@@ -2000,7 +2005,7 @@ var Styler = function () {
   function Styler(align) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
         _ref$mode = _ref.mode,
-        mode = _ref$mode === undefined ? 'default' : _ref$mode,
+        mode = _ref$mode === undefined ? 'toolbar' : _ref$mode,
         _ref$commands = _ref.commands,
         commands = _ref$commands === undefined ? ['bold', 'italic', 'underline'] : _ref$commands,
         _ref$hideWhenClickOut = _ref.hideWhenClickOut,
@@ -2035,21 +2040,21 @@ var Styler = function () {
 
       setElementsPrefix('styler-');
       this.cmdsSchema = cloneObject(cmdsSchema);
-      this.styler = document.createElement('ul');
-      this.styler.classList.add('styler', 'is-' + this.settings.mode, 'is-' + this.settings.theme);
+      this.el = document.createElement('ul');
+      this.el.classList.add('styler', 'is-' + this.settings.mode, 'is-' + this.settings.theme);
       this.cmds = {};
       this.visiable = false;
 
       this.settings.commands.forEach(function (command) {
         _this.generateCmdElement(command);
       });
-      this.$align.el.appendChild(this.styler);
+      this.$align.el.appendChild(this.el);
       if (this.settings.mode === 'bubble') this._initBubble();
     }
   }, {
     key: '_initBubble',
     value: function _initBubble() {
-      this.styler.classList.add('is-hidden');
+      this.el.classList.add('is-hidden');
       this.bubbleScrollCallback = debounce(this.updateBubblePosition.bind(this));
     }
   }, {
@@ -2135,7 +2140,7 @@ var Styler = function () {
         cmdSchema.init = null;
       }
 
-      this.styler.appendChild(li);
+      this.el.appendChild(li);
     }
   }, {
     key: 'cmdCallback',
@@ -2177,7 +2182,7 @@ var Styler = function () {
       var element = this.currentItem ? this.currentItem.el : Selection.textRange;
       var elementRect = element.getBoundingClientRect();
       var editorRect = this.$align.el.getBoundingClientRect();
-      var stylerRect = this.styler.getBoundingClientRect();
+      var stylerRect = this.el.getBoundingClientRect();
 
       var deltaY = elementRect.top - stylerRect.height - marginRatio;
       var deltaX = elementRect.left + (elementRect.width - stylerRect.width) / 2;
@@ -2187,12 +2192,12 @@ var Styler = function () {
       var yPosition = deltaY < threshold ? elementRect.top + elementRect.height + marginRatio : deltaY;
 
       if (yPosition < threshold) {
-        this.styler.style.opacity = 0;
+        this.el.style.opacity = 0;
         return;
       }
-      this.styler.style.opacity = 1;
-      this.styler.style.top = yPosition + 'px';
-      this.styler.style.left = xPosition + 'px';
+      this.el.style.opacity = 1;
+      this.el.style.top = yPosition + 'px';
+      this.el.style.left = xPosition + 'px';
     }
   }, {
     key: 'show',
@@ -2212,14 +2217,14 @@ var Styler = function () {
       }
       if (this.visiable) return;
       this.visiable = true;
-      this.styler.classList.add('is-visible');
-      this.styler.classList.remove('is-hidden');
+      this.el.classList.add('is-visible');
+      this.el.classList.remove('is-hidden');
       if (this.settings.mode === 'bubble') {
         window.addEventListener('scroll', this.bubbleScrollCallback);
       }
       if (this.settings.hideWhenClickOut) {
         document.addEventListener('click', function (event) {
-          if (isElementClosest(event.target, _this3.currentItem.el) || isElementClosest(event.target, _this3.styler)) return;
+          if (isElementClosest(event.target, _this3.currentItem.el) || isElementClosest(event.target, _this3.el)) return;
           _this3.hide();
         });
       }
@@ -2230,8 +2235,8 @@ var Styler = function () {
       if (this.currentItem) {
         this.currentItem.el.classList.remove('is-active');
       }
-      this.styler.classList.remove('is-visible');
-      this.styler.classList.add('is-hidden');
+      this.el.classList.remove('is-visible');
+      this.el.classList.add('is-hidden');
       this.visiable = false;
       if (this.settings.mode === 'bubble') {
         window.removeEventListener('scroll', this.bubbleScrollCallback);
@@ -2650,6 +2655,8 @@ var Section = function () {
 var Creator = function () {
   function Creator(align) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$mode = _ref.mode,
+        mode = _ref$mode === undefined ? 'toolbar' : _ref$mode,
         _ref$theme = _ref.theme,
         theme = _ref$theme === undefined ? 'light' : _ref$theme,
         _ref$items = _ref.items,
@@ -2659,6 +2666,7 @@ var Creator = function () {
 
     this.$align = align;
     this.settings = {
+      mode: mode,
       theme: theme,
       items: items
     };
@@ -2671,12 +2679,11 @@ var Creator = function () {
       var _this = this;
 
       setElementsPrefix('creator-');
-      this.creator = document.createElement('div');
-      this.creator.classList.add('creator', 'is-hidden', this.settings.theme);
+      this.el = document.createElement('div');
+      this.el.classList.add('creator', 'is-' + this.settings.theme, 'is-' + this.settings.mode);
       this.menu = document.createElement('ul');
       this.menu.classList.add('creator-menu');
-      this.toggleButton = button('plus');
-      this.toggleButton.addEventListener('click', this.toggleState.bind(this));
+
       this.figureOptions = new Styler(this.$align, {
         mode: 'bubble',
         hideWhenClickOut: true,
@@ -2722,15 +2729,33 @@ var Creator = function () {
         _this.menu.appendChild(li);
       });
 
-      this.creator.appendChild(this.toggleButton);
-      this.creator.appendChild(this.menu);
-      this.$align.el.appendChild(this.creator);
+      this.el.appendChild(this.menu);
+      if (this.settings.mode === 'inline') {
+        this.toggleButton = button('plus');
+        this.toggleButton.addEventListener('click', this.toggleState.bind(this));
+        this.el.appendChild(this.toggleButton);
+        this.$align.el.appendChild(this.el);
+      }
+      if (this.settings.mode === 'toolbar' && this.$align.toolbar) {
+        this.$align.toolbar.el.appendChild(this.el);
+      }
+      if (this.settings.mode === 'toolbar' && !this.$align.toolbar) {
+        this.$align.toolbar = new Styler(this.$align, {
+          mode: 'toolbar',
+          commands: []
+        });
+        this.$align.toolbar.el.appendChild(this.el);
+      }
     }
   }, {
     key: 'update',
     value: function update() {
+      if (this.settings.mode !== 'inline') {
+        this.position = null;
+        return;
+      }
       if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1 && Selection.current.anchorNode.parentNode.classList.contains('align-content')) {
-        this.position = updatePosition(Selection.current.anchorNode, this.creator, this.$align.el, 'middle-left');
+        this.position = updatePosition(Selection.current.anchorNode, this.el, this.$align.el, 'middle-left');
         this.show();
         return;
       }
@@ -2739,21 +2764,21 @@ var Creator = function () {
   }, {
     key: 'toggleState',
     value: function toggleState() {
-      this.creator.classList.toggle('is-active');
+      this.el.classList.toggle('is-active');
     }
   }, {
     key: 'show',
     value: function show() {
-      if (this.creator.classList.contains('is-visible')) return;
-      this.creator.classList.add('is-visible');
-      this.creator.classList.remove('is-hidden');
+      if (this.el.classList.contains('is-visible')) return;
+      this.el.classList.add('is-visible');
+      this.el.classList.remove('is-hidden');
     }
   }, {
     key: 'hide',
     value: function hide() {
-      this.creator.classList.remove('is-visible');
-      this.creator.classList.remove('is-active');
-      this.creator.classList.add('is-hidden');
+      this.el.classList.remove('is-visible');
+      this.el.classList.remove('is-active');
+      this.el.classList.add('is-hidden');
     }
   }, {
     key: 'createFigure',
@@ -2794,7 +2819,7 @@ var Creator = function () {
       });
       reader.readAsDataURL(file);
       input$$1.value = null;
-      selectedElement.parentNode.insertBefore(figure, selectedElement);
+      selectedElement.parentNode.insertBefore(figure, selectedElement.nextSibling);
     }
   }, {
     key: 'createVideo',
@@ -2820,7 +2845,7 @@ var Creator = function () {
         iframe.allowfullscreen = true;
         iframe.contentEditable = false;
         iframe.src = videoHoster === 'youtube' ? '//www.youtube.com/embed/' + videoId : videoHoster === 'vimeo' ? '//player.vimeo.com/video/' + videoId : '';
-        selectedElement.parentNode.insertBefore(iframe, selectedElement);
+        selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
       });
     }
   }, {
@@ -2836,7 +2861,7 @@ var Creator = function () {
         selectedElement.parentNode.insertBefore(new Table({
           rows: this.inputs[0].value,
           columns: this.inputs[1].value
-        }).el, selectedElement);
+        }).el, selectedElement.nextSibling);
       });
     }
   }, {
@@ -2857,7 +2882,7 @@ var Creator = function () {
         iframe.contentEditable = false;
         iframe.allowTransparency = true;
         iframe.src = '//www.facebook.com/plugins/post.php?href=' + postUrl;
-        selectedElement.parentNode.insertBefore(iframe, selectedElement);
+        selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
       });
     }
   }, {
@@ -2872,7 +2897,7 @@ var Creator = function () {
         if (!data) return;
         var div = document.createElement('div');
 
-        selectedElement.parentNode.insertBefore(div, selectedElement);
+        selectedElement.parentNode.insertBefore(div, selectedElement.nextSibling);
         div.insertAdjacentHTML('afterbegin', data);
       });
     }

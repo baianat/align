@@ -579,11 +579,23 @@
       align-items: center;
   width: auto;
   list-style: none;
-  position: absolute;
-  z-index: 30;
+}
+.creator.is-inline {
   border-radius: 40px;
+  position: absolute;
+  z-index: 50;
   -ms-transform: translate(-1em, -1.1em);
       transform: translate(-1em, -1.1em);
+}
+.creator.is-inline .creator-menu {
+  display: none;
+}
+.creator.is-toolbar {
+  width: 100%;
+}
+.creator.is-toolbar .creator-menu {
+  display: -ms-flexbox;
+  display: flex;
 }
 .creator >button {
   background: rgba(170,170,170,0.5);
@@ -593,7 +605,6 @@
   margin: 0 20px;
   list-style: none;
   padding: 0;
-  display: none;
 }
 .creator-button {
   position: relative;

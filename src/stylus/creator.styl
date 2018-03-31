@@ -4,10 +4,20 @@
   align-items: center
   width: auto
   list-style: none
-  position: absolute
-  z-index: 30
-  border-radius: 40px
-  transform: translate(-1em, -1.1em)
+
+  &.is-inline
+    border-radius: 40px
+    position: absolute
+    z-index: 50
+    transform: translate(-1em, -1.1em)
+    .creator-menu
+      display: none
+
+  &.is-toolbar
+    width: 100%
+    .creator-menu
+      display: flex
+  
   >button
     background: alpha($gray, 0.5)
     fill: $white
@@ -17,7 +27,6 @@
     margin: 0 20px
     list-style: none
     padding: 0
-    display: none
  
   &-button
     position: relative
