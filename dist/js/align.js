@@ -1386,10 +1386,10 @@ var Prompt = function () {
         this.el.style.top = position.top + 'px';
       }
       if (!position) {
-        if (myEditor.sel.range.startContainer.nodeType === 3) {
+        if (Selection.range.startContainer.nodeType === 3) {
           this.selectionRefrance = Selection.range;
         }
-        if (myEditor.sel.range.startContainer.nodeType === 1) {
+        if (Selection.range.startContainer.nodeType === 1) {
           this.selectionRefrance = Selection.current.anchorNode;
         }
         updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-middle');
@@ -2996,7 +2996,6 @@ var Align = function () {
       shortcuts: shortcuts,
       postTitle: postTitle
     };
-    this.sel = Selection;
     this._init();
   }
 

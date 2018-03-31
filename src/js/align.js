@@ -26,7 +26,6 @@ export default class Align {
       shortcuts,
       postTitle
     };
-    this.sel = Selection
     this._init();
   }
 

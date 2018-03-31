@@ -33,10 +33,10 @@ export default class Prompt {
       this.el.style.top = `${position.top}px`;
     }
     if (!position) {
-      if (myEditor.sel.range.startContainer.nodeType === 3) {
+      if (Selection.range.startContainer.nodeType === 3) {
         this.selectionRefrance = Selection.range;
       }
-      if (myEditor.sel.range.startContainer.nodeType === 1) {
+      if (Selection.range.startContainer.nodeType === 1) {
         this.selectionRefrance = Selection.current.anchorNode;
       }
       updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-middle');
