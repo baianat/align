@@ -132,7 +132,9 @@ export default class Styler {
       this.execute(cmdSchema.command, value, cmdSchema.useCSS);
     }
     if (typeof cmdSchema.func === 'string') {
-      const callback = this.$align[cmdSchema.func] || this.currentItem[cmdSchema.func].bind(this.currentItem);
+      let callback = this.$align[cmdSchema.func] ? 
+        this.$align[cmdSchema.func].bind(this.$align) :
+        this.currentItem[cmdSchema.func].bind(this.currentItem);
       callback(this, value || cmdSchema);
     }
     if (typeof cmdSchema.func === 'function') {

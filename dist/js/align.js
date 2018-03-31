@@ -2155,7 +2155,7 @@ var Styler = function () {
         this.execute(cmdSchema.command, value, cmdSchema.useCSS);
       }
       if (typeof cmdSchema.func === 'string') {
-        var callback = this.$align[cmdSchema.func] || this.currentItem[cmdSchema.func].bind(this.currentItem);
+        var callback = this.$align[cmdSchema.func] ? this.$align[cmdSchema.func].bind(this.$align) : this.currentItem[cmdSchema.func].bind(this.currentItem);
         callback(this, value || cmdSchema);
       }
       if (typeof cmdSchema.func === 'function') {
@@ -3194,6 +3194,7 @@ var Align = function () {
     key: 'toggleFullScreen',
     value: function toggleFullScreen() {
       var state = document.fullscreenElement || document.webkitIsFullScreen;
+      console.log(this);
       if (!state) {
         launchFullscreen(this.el);
         this.el.classList.add('is-fullscreen');

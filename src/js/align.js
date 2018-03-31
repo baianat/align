@@ -222,8 +222,9 @@ export default class Align {
    * Toggle on/off HTML
    */
 
-  toggleFullScreen() {
+  toggleFullScreen () {
     const state = document.fullscreenElement || document.webkitIsFullScreen;
+    console.log(this)
     if (!state) {
       launchFullscreen(this.el);
       this.el.classList.add('is-fullscreen');
@@ -233,7 +234,7 @@ export default class Align {
     exitFullscreen();
   }
 
-  update() {
+  update () {
     Selection.updateSelectedRange();
     setTimeout(() => {
       if (this.settings.toolbar) {
@@ -248,11 +249,11 @@ export default class Align {
     }, 16);
   }
 
-  applyFont(schema, cmd) {
+  applyFont (schema, cmd) {
     this.el.style.fontFamily = cmd.fontName[0];
   }
 
-  execute(cmd, value, useCSS = false) {
+  execute (cmd, value, useCSS = false) {
     this.editor.focus();
     document.execCommand('styleWithCSS', false, useCSS);
     document.execCommand(cmd, false, value);
