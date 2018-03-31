@@ -13,24 +13,25 @@
       -ms-user-select: auto;
           user-select: auto;
   width: 100%;
-  border: 1px solid #aaa;
+  max-width: 900px;
+  border: 1px solid #000;
   border-spacing: 0;
   border-collapse: separate;
   border-radius: 2px;
   color: #000;
   text-align: left;
 }
-.align-table tr:not(:first-child) {
-  border-top: 1px solid #aaa;
+.align-table tr:not(:first-child) td {
+  border-top: 1px solid #000;
 }
+.align-table th,
 .align-table td {
-  padding: $padding;
-  border-top: 1px solid #aaa;
+  padding: 5px 10px;
   background-color: #fff;
 }
 .align-table th:not(:last-child),
 .align-table td:not(:last-child) {
-  border-right: 1px solid #aaa;
+  border-right: 1px solid #000;
 }
 .align iframe {
   border: 0;

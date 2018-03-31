@@ -133,10 +133,10 @@ export default class Styler {
     }
     if (typeof cmdSchema.func === 'string') {
       const callback = this.$align[cmdSchema.func] || this.currentItem[cmdSchema.func].bind(this.currentItem);
-      callback(this, value);
+      callback(this, value || cmdSchema);
     }
     if (typeof cmdSchema.func === 'function') {
-      cmdSchema.func(this, value);
+      cmdSchema.func(this, value || cmdSchema);
     }
     if (this.settings.mode === 'bubble') {
       this.updateBubblePosition();

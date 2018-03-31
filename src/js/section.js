@@ -1,5 +1,6 @@
 import { stringToDOM, swapArrayItems } from './partial/util'
 import Styler from './styler';
+import Table from './table';
 
 let ID = 0;
 let ALL_SECTIONS = [];
@@ -76,6 +77,8 @@ export default class Section {
         this.el.innerHTML = '';
         this.el.appendChild(this.contentDiv);
         this.contentDiv.innerHTML = content;
+        const tables = Array.from(this.contentDiv.querySelectorAll('table'));
+        tables.forEach(table => new Table(table))
         this.generateAddSectionButton();
         this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
         break;

@@ -6,6 +6,7 @@ import Section from './section';
 import Creator from './creator';
 import Styler from './styler';
 import EventBus from './events';
+import Table from './table';
 
 export default class Align {
   constructor (selector, {
@@ -61,6 +62,8 @@ export default class Align {
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
+    Section.config(this, this.settings.section);
+    Table.config(this, this.settings.table);
 
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';
@@ -96,7 +99,6 @@ export default class Align {
 
   _initSections () {
     this.activeSection = '';
-    Section.config(this, this.settings.section);
 
     if (this.settings.postTitle !== false) {
       this.postTitle = new Section(this.settings.postTitle, '', 'title');

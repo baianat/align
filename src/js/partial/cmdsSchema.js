@@ -88,7 +88,7 @@ const cmdsSchema = {
         'Enter link:',
         Selection.current.toString(),
         { 
-          wrapper: styler.$align,
+          wrapper: styler.$align.el,
           position: Selection.textRange.getBoundingClientRect() 
         }
       ).onSubmit(function () {
@@ -346,6 +346,35 @@ const cmdsSchema = {
         </svg>
       `,
     }
+  },
+
+  _tableRowTop: {
+    element: 'button',
+    func: 'insertRow',
+    args: ['before']
+  },
+  _tableRowBottom: {
+    element: 'button',
+    func: 'insertRow',
+    args: ['after']
+  },
+  _tableColumnBefore: {
+    element: 'button',
+    func: 'insertColumn',
+    args: ['before']
+  },
+  _tableColumnAfter: {
+    element: 'button',
+    func: 'insertColumn',
+    args: ['after']
+  },
+  _tableDeleteRow: {
+    element: 'button',
+    func: 'deleteRow',
+  },
+  _tableDeleteColumn: {
+    element: 'button',
+    func: 'deleteColumn'
   },
 }
 

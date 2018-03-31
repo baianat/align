@@ -13,24 +13,24 @@
   &-table
     user-select: auto
     width: 100%
-    border: 1px solid $gray
+    max-width: 900px
+    border: 1px solid $black
     border-spacing: 0
     border-collapse: separate
     border-radius: 2px
     color: $black
     text-align: left
 
-    tr:not(:first-child)
-      border-top: 1px solid $gray
-
-    td
-      padding: $padding
-      border-top: 1px solid $gray
-      background-color: $white
+    tr
+      &:not(:first-child)
+        td
+          border-top: 1px solid $black
 
     th, td
+      padding: 5px 10px
+      background-color: $white
       &:not(:last-child)
-        border-right: 1px solid $gray
+        border-right: 1px solid $black
 
   iframe
     border: 0

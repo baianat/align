@@ -1511,7 +1511,7 @@ var cmdsSchema = {
     tooltip: 'Hyperlink',
     func: function func(styler) {
       new Prompt('Enter link:', Selection.current.toString(), {
-        wrapper: styler.$align,
+        wrapper: styler.$align.el,
         position: Selection.textRange.getBoundingClientRect()
       }).onSubmit(function () {
         var link = this.input.value;
@@ -1752,6 +1752,35 @@ var cmdsSchema = {
       disableLum: true,
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: #fff" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n        </svg>\n      '
     }
+  },
+
+  _tableRowTop: {
+    element: 'button',
+    func: 'insertRow',
+    args: ['before']
+  },
+  _tableRowBottom: {
+    element: 'button',
+    func: 'insertRow',
+    args: ['after']
+  },
+  _tableColumnBefore: {
+    element: 'button',
+    func: 'insertColumn',
+    args: ['before']
+  },
+  _tableColumnAfter: {
+    element: 'button',
+    func: 'insertColumn',
+    args: ['after']
+  },
+  _tableDeleteRow: {
+    element: 'button',
+    func: 'deleteRow'
+  },
+  _tableDeleteColumn: {
+    element: 'button',
+    func: 'deleteColumn'
   }
 };
 
@@ -1836,7 +1865,7 @@ var iconsPath = {
 
   figureFull: 'M23 18V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zM8.5 12.5l2.5 3.01L14.5 11l4.5 6H5l3.5-4.5z',
 
-  table: 'M4,3H20A2,2 0 0,1 22,5V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V5A2,2 0 0,1 4,3M4,7V10H8V7H4M10,7V10H14V7H10M20,10V7H16V10H20M4,12V15H8V12H4M4,20H8V17H4V20M10,12V15H14V12H10M10,20H14V17H10V20M20,20V17H16V20H20M20,12H16V15H20V12Z',
+  table: 'M5,4H19A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4M5,8V12H11V8H5M13,8V12H19V8H13M5,14V18H11V14H5M13,14V18H19V14H13Z',
 
   sectionNormal: 'M12.5,19.5V3.47H14.53V19.5H12.5M9.5,19.5V3.47H11.53V19.5H9.5M4.5,7.5L8.53,11.5L4.5,15.47V12.47H1.5V10.5H4.5V7.5M19.5,15.47L15.5,11.5L19.5,7.5V10.5H22.5V12.47H19.5V15.47Z',
 
@@ -1855,6 +1884,18 @@ var iconsPath = {
   twitter: '"M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3M17.71,9.33C18.19,8.93 18.75,8.45 19,7.92C18.59,8.13 18.1,8.26 17.56,8.33C18.06,7.97 18.47,7.5 18.68,6.86C18.16,7.14 17.63,7.38 16.97,7.5C15.42,5.63 11.71,7.15 12.37,9.95C9.76,9.79 8.17,8.61 6.85,7.16C6.1,8.38 6.75,10.23 7.64,10.74C7.18,10.71 6.83,10.57 6.5,10.41C6.54,11.95 7.39,12.69 8.58,13.09C8.22,13.16 7.82,13.18 7.44,13.12C7.81,14.19 8.58,14.86 9.9,15C9,15.76 7.34,16.29 6,16.08C7.15,16.81 8.46,17.39 10.28,17.31C14.69,17.11 17.64,13.95 17.71,9.33Z',
 
   embed: 'M12.89,3L14.85,3.4L11.11,21L9.15,20.6L12.89,3M19.59,12L16,8.41V5.58L22.42,12L16,18.41V15.58L19.59,12M1.58,12L8,5.58V8.41L4.41,12L8,15.58V18.41L1.58,12',
+
+  _tableRowTop: 'M22,14A2,2 0 0,0 20,12H4A2,2 0 0,0 2,14V21H4V19H8V21H10V19H14V21H16V19H20V21H22V14M4,14H8V17H4V14M10,14H14V17H10V14M20,14V17H16V14H20M11,10H13V7H16V5H13V2H11V5H8V7H11V10Z',
+
+  _tableRowBottom: 'M22,10A2,2 0 0,1 20,12H4A2,2 0 0,1 2,10V3H4V5H8V3H10V5H14V3H16V5H20V3H22V10M4,10H8V7H4V10M10,10H14V7H10V10M20,10V7H16V10H20M11,14H13V17H16V19H13V22H11V19H8V17H11V14Z',
+
+  _tableColumnBefore: 'M13,2A2,2 0 0,0 11,4V20A2,2 0 0,0 13,22H22V2H13M20,10V14H13V10H20M20,16V20H13V16H20M20,4V8H13V4H20M9,11H6V8H4V11H1V13H4V16H6V13H9V11Z',
+
+  _tableColumnAfter: 'M11,2A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H2V2H11M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M15,11H18V8H20V11H23V13H20V16H18V13H15V11Z',
+
+  _tableDeleteColumn: 'M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z',
+
+  _tableDeleteRow: 'M9.41,13L12,15.59L14.59,13L16,14.41L13.41,17L16,19.59L14.59,21L12,18.41L9.41,21L8,19.59L10.59,17L8,14.41L9.41,13M22,9A2,2 0 0,1 20,11H4A2,2 0 0,1 2,9V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V9M4,9H8V6H4V9M10,9H14V6H10V9M16,9H20V6H16V9Z',
 
   _remove: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
 
@@ -2104,10 +2145,10 @@ var Styler = function () {
       }
       if (typeof cmdSchema.func === 'string') {
         var callback = this.$align[cmdSchema.func] || this.currentItem[cmdSchema.func].bind(this.currentItem);
-        callback(this, value);
+        callback(this, value || cmdSchema);
       }
       if (typeof cmdSchema.func === 'function') {
-        cmdSchema.func(this, value);
+        cmdSchema.func(this, value || cmdSchema);
       }
       if (this.settings.mode === 'bubble') {
         this.updateBubblePosition();
@@ -2275,6 +2316,102 @@ var Styler = function () {
   return Styler;
 }();
 
+var Table = function () {
+  function Table(table) {
+    classCallCheck(this, Table);
+
+    if (!table) return;
+    this._init(table);
+    this._initEvents();
+    this.activeCell = this.el.rows[0].cells[0];
+  }
+
+  createClass(Table, [{
+    key: '_init',
+    value: function _init(table) {
+      if (table.nodeName === 'TABLE') {
+        this.el = table;
+        this.el.classList.add('align-table');
+        return;
+      }
+      var rows = Number(table.rows);
+      var columns = Number(table.columns);
+      if (isNaN(rows) || isNaN(columns)) {
+        return;
+      }
+      this.el = document.createElement('table');
+      this.el.classList.add('align-table');
+      this.el.insertAdjacentHTML('afterbegin', ('\n        <tr>\n          ' + '<td><br></td>'.repeat(columns) + '\n        </tr>\n      ').repeat(rows));
+    }
+  }, {
+    key: '_initEvents',
+    value: function _initEvents() {
+      var _this = this;
+
+      this.el.addEventListener('click', function (event) {
+        _this.activeCell = event.target;
+        Table.$optionsBar.show(_this);
+      });
+    }
+  }, {
+    key: 'remove',
+    value: function remove() {
+      this.el.remove();
+    }
+  }, {
+    key: 'insertRow',
+    value: function insertRow($styler, $schema) {
+      var position = $schema.args[0];
+      var columnsLength = this.el.rows[0].cells.length;
+      var newIndex = +this.activeCell.parentNode.rowIndex + (position === 'after' ? 1 : 0);
+      var row = this.el.insertRow(newIndex);
+      for (var i = 0; i < columnsLength; i++) {
+        var cell = row.insertCell(i);
+        cell.insertAdjacentHTML('afterbegin', '<br>');
+      }
+    }
+  }, {
+    key: 'deleteRow',
+    value: function deleteRow() {
+      this.el.deleteRow(this.activeCell.parentNode.rowIndex);
+    }
+  }, {
+    key: 'insertColumn',
+    value: function insertColumn($styler, $schema) {
+      var position = $schema.args[0];
+      var rowsLength = this.el.rows.length;
+      var columnIndex = this.activeCell.cellIndex + (position === 'after' ? 1 : 0);
+      for (var i = 0; i < rowsLength; i++) {
+        var cell = this.el.rows[i].insertCell(columnIndex);
+        cell.insertAdjacentHTML('afterbegin', '<br>');
+      }
+    }
+  }, {
+    key: 'deleteColumn',
+    value: function deleteColumn() {
+      var rowsLength = this.el.rows.length;
+      var columnIndex = this.activeCell.cellIndex;
+      for (var i = 0; i < rowsLength; i++) {
+        this.el.rows[i].deleteCell(columnIndex);
+      }
+    }
+  }], [{
+    key: 'config',
+    value: function config(align, settings) {
+      var config = Object.assign({
+        mode: 'bubble',
+        hideWhenClickOut: true,
+        commands: ['_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter', 'separator', '_tableDeleteRow', '_tableDeleteColumn', 'separator', '_remove'],
+        tooltip: true,
+        theme: 'dark'
+      }, settings);
+      this.$align = align;
+      this.$optionsBar = new Styler(align, config);
+    }
+  }]);
+  return Table;
+}();
+
 var ID = 0;
 var ALL_SECTIONS = [];
 
@@ -2321,6 +2458,10 @@ var Section = function () {
           this.el.innerHTML = '';
           this.el.appendChild(this.contentDiv);
           this.contentDiv.innerHTML = content;
+          var tables = Array.from(this.contentDiv.querySelectorAll('table'));
+          tables.forEach(function (table) {
+            return new Table(table);
+          });
           this.generateAddSectionButton();
           this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
           break;
@@ -2660,11 +2801,10 @@ var Creator = function () {
     value: function createVideo() {
       var selectedElement = Selection.current.anchorNode;
       new Prompt('Enter video link:', '', {
-        wrapper: this.$align,
+        wrapper: this.$align.el,
         position: this.position
       }).onSubmit(function () {
         var link = this.inputs[0].value;
-        console.log(link);
         if (!link) return;
         var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
 
@@ -2688,18 +2828,15 @@ var Creator = function () {
     value: function createTable() {
       var selectedElement = Selection.current.anchorNode;
       new Prompt('Enter post link:', '', {
-        wrapper: this.$align,
+        wrapper: this.$align.el,
         position: this.position,
         inputsCount: 2,
         inputsPlaceholders: ['rows', 'columns']
       }).onSubmit(function () {
-        var rows = Number(this.inputs[0].value);
-        var columns = Number(this.inputs[1].value);
-        if (isNaN(rows) || isNaN(columns)) return;
-        var table = document.createElement('table');
-        table.classList.add('align-table');
-        table.insertAdjacentHTML('afterbegin', ('\n        <tr>\n          ' + '<td><br></td>'.repeat(columns) + '\n        </tr>\n      ').repeat(rows));
-        selectedElement.parentNode.insertBefore(table, selectedElement);
+        selectedElement.parentNode.insertBefore(new Table({
+          rows: this.inputs[0].value,
+          columns: this.inputs[1].value
+        }).el, selectedElement);
       });
     }
   }, {
@@ -2707,7 +2844,7 @@ var Creator = function () {
     value: function embedPost() {
       var selectedElement = Selection.current.anchorNode;
       new Prompt('Enter post link:', '', {
-        wrapper: this.$align,
+        wrapper: this.$align.el,
         position: this.position
       }).onSubmit(function () {
         var postUrl = this.inputs[0].value;
@@ -2728,7 +2865,7 @@ var Creator = function () {
     value: function embed() {
       var selectedElement = Selection.current.anchorNode;
       new Prompt('Add embeded:', '', {
-        wrapper: this.$align,
+        wrapper: this.$align.el,
         position: this.position
       }).onSubmit(function () {
         var data = this.inputs[0].value;
@@ -2846,6 +2983,8 @@ var Align = function () {
       this.$bus = new EventBus();
       this.startContent = Array.from(this.el.children);
       this.el.innerText = '';
+      Section.config(this, this.settings.section);
+      Table.config(this, this.settings.table);
 
       if (this.settings.toolbar) {
         this.settings.toolbar.mode = 'toolbar';
@@ -2887,7 +3026,6 @@ var Align = function () {
       var _this = this;
 
       this.activeSection = '';
-      Section.config(this, this.settings.section);
 
       if (this.settings.postTitle !== false) {
         this.postTitle = new Section(this.settings.postTitle, '', 'title');

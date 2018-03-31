@@ -3,6 +3,7 @@ import { setElementsPrefix, button, fileButton } from './partial/elements';
 import Styler from './styler';
 import Selection from './selection';
 import Prompt from './prompt';
+import Table from './table';
 
 export default  class Creator {
   constructor(align, {
@@ -36,7 +37,7 @@ export default  class Creator {
       theme: 'dark'
     });
 
-    
+
     this.settings.items.forEach((item) => {
       const li = document.createElement('li');
       let el = null;
@@ -148,12 +149,11 @@ export default  class Creator {
   createVideo () {
     const selectedElement = Selection.current.anchorNode;
     new Prompt('Enter video link:', '', {
-      wrapper: this.$align,
+      wrapper: this.$align.el,
       position: this.position
     })
       .onSubmit(function () {
         const link = this.inputs[0].value
-        console.log(link)
         if (!link) return;
         const videoHoster = link.includes('yout')
           ? 'youtube' : link.includes('vimeo')
@@ -182,29 +182,25 @@ export default  class Creator {
   createTable () {
     const selectedElement = Selection.current.anchorNode;
     new Prompt('Enter post link:', '', { 
-      wrapper: this.$align,
+      wrapper: this.$align.el,
       position: this.position,
       inputsCount: 2,
       inputsPlaceholders: ['rows', 'columns']
     }).onSubmit(function () {
-      const rows = Number(this.inputs[0].value);
-      const columns = Number(this.inputs[1].value);
-      if (isNaN(rows) || isNaN(columns)) return;
-      const table = document.createElement('table');
-      table.classList.add('align-table')
-      table.insertAdjacentHTML('afterbegin', `
-        <tr>
-          ${'<td><br></td>'.repeat(columns)}
-        </tr>
-      `.repeat(rows))
-      selectedElement.parentNode.insertBefore(table, selectedElement);
+      selectedElement.parentNode.insertBefore(
+        new Table({
+          rows: this.inputs[0].value,
+          columns: this.inputs[1].value
+        }).el,
+        selectedElement
+      );
     });
   }
 
   embedPost () {
     const selectedElement = Selection.current.anchorNode;
     new Prompt('Enter post link:', '', {
-      wrapper: this.$align,
+      wrapper: this.$align.el,
       position: this.position
     })
       .onSubmit(function () {
@@ -225,7 +221,7 @@ export default  class Creator {
   embed () {
     const selectedElement = Selection.current.anchorNode;
     new Prompt('Add embeded:', '', {
-      wrapper: this.$align,
+      wrapper: this.$align.el,
       position: this.position
     })
       .onSubmit(function () {
