@@ -111,6 +111,9 @@
         theme: 'light'
       }
     });
+    myEditor.$bus.on('imageAdded', ({file, update}) => {
+      console.log(file);
+    })
   </script>
 </body>
 </html>

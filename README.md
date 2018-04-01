@@ -247,6 +247,22 @@ To get `Align`'s post title you can use `title` property
 saveToDatabase(myEditor.content);
 ```
 
+#### Handle resources uploading
+
+Align has events bus(`$bus`), you can listen for `imageAdded` and `videoAdded` to handle any resources uploading
+
+```js
+myEditor.$bus.on('imageAdded', ({file, update}) => {
+  // save the uploaded image
+  // and get its new link
+  const newLink = saveImageToStorage(file);
+
+  // update the image src with
+  // the new generated link
+  update(newLink);
+})
+```
+
 ### highlight
 
 We using [highlight.js](https://highlightjs.org/) plug-in to highlight pre tags.
