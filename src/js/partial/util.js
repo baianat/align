@@ -188,10 +188,10 @@ export function uploadeImage (input) {
 
 export function getVideoId (url, hoster) {
   let regExp = hoster === 'youtube'
-    ? /(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+    ? /(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
     : hoster === 'vimeo'
-    ? /vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/
-    : null
+      ? /vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/
+      : null
 
   if (!regExp) return;
   let match = url.match(regExp);

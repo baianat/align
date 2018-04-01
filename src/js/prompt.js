@@ -1,4 +1,4 @@
-import { isElementClosest, updatePosition } from "./partial/util";
+import { isElementClosest, updatePosition } from './partial/util';
 import Selection from './selection';
 
 export default class Prompt {
@@ -23,7 +23,7 @@ export default class Prompt {
     this.message = document.createElement('label');
     this.submit = document.createElement('button');
     this.inputs = []
-    
+
     this.el.classList.add('prompt');
     this.message.classList.add('prompt-message');
     this.submit.classList.add('prompt-submit');
@@ -43,7 +43,7 @@ export default class Prompt {
     }
     this.message.innerText = message;
     this.submit.innerText = 'Submit';
-    
+
     this.el.appendChild(this.message);
     for (let i = 0; i < this.settings.inputsCount; i++) {
       this.inputs[i] = document.createElement('input');

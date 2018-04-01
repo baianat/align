@@ -1,11 +1,11 @@
-import { updatePosition, camelCase, getVideoId } from './partial/util';
+import { updatePosition, getVideoId } from './partial/util';
 import { setElementsPrefix, button, fileButton } from './partial/elements';
 import Styler from './styler';
 import Selection from './selection';
 import Prompt from './prompt';
 import Table from './table';
 
-export default  class Creator {
+export default class Creator {
   constructor(align, {
     mode = 'toolbar',
     theme = 'light',
@@ -38,43 +38,42 @@ export default  class Creator {
       theme: 'dark'
     });
 
-
     this.settings.items.forEach((item) => {
       const li = document.createElement('li');
       let el = null;
 
-        switch (item) {
-          case 'figure': 
-            const btn = fileButton('figure');
-            btn.input.addEventListener('change', this.createFigure.bind(this));
-            el = btn.el;
-            break;
-          
-          case 'video': 
-            el = button('video');
-            el.addEventListener('click', this.createVideo.bind(this));
-            break;
+      switch (item) {
+        case 'figure':
+          const btn = fileButton('figure');
+          btn.input.addEventListener('change', this.createFigure.bind(this));
+          el = btn.el;
+          break;
 
-          case 'table':
-            el = button('table');
-            el.addEventListener('click', this.createTable.bind(this));
-            break;
+        case 'video':
+          el = button('video');
+          el.addEventListener('click', this.createVideo.bind(this));
+          break;
 
-          case 'facebook':
-            el = button('facebook');
-            el.addEventListener('click', this.embedPost.bind(this));
-            break;
+        case 'table':
+          el = button('table');
+          el.addEventListener('click', this.createTable.bind(this));
+          break;
 
-          case 'embed':
-            el = button('embed');
-            el.addEventListener('click', this.embed.bind(this));
-            break;
-          default:
-            return;
-        }
-        li.appendChild(el);
-        this.menu.appendChild(li);
-      })
+        case 'facebook':
+          el = button('facebook');
+          el.addEventListener('click', this.embedPost.bind(this));
+          break;
+
+        case 'embed':
+          el = button('embed');
+          el.addEventListener('click', this.embed.bind(this));
+          break;
+        default:
+          return;
+      }
+      li.appendChild(el);
+      this.menu.appendChild(li);
+    })
 
     this.el.appendChild(this.menu);
     if (this.settings.mode === 'inline') {
@@ -96,7 +95,7 @@ export default  class Creator {
   }
 
   update () {
-    if (this.settings.mode !== 'inline') { 
+    if (this.settings.mode !== 'inline') {
       this.position = null;
       return;
     }
@@ -145,7 +144,7 @@ export default  class Creator {
     figure.classList.add('align-figure', 'is-center');
     figure.appendChild(img);
     figure.appendChild(caption);
-    figure.addEventListener('click', () => this.figureOptions.show({ 
+    figure.addEventListener('click', () => this.figureOptions.show({
       el: figure,
       remove() {
         figure.remove();
@@ -176,12 +175,12 @@ export default  class Creator {
         if (!link) return;
         const videoHoster = link.includes('yout')
           ? 'youtube' : link.includes('vimeo')
-          ? 'vimeo' : '';
-        
-          if (!videoHoster) {
-            return;
-          }
-          
+            ? 'vimeo' : '';
+
+        if (!videoHoster) {
+          return;
+        }
+
         const videoId = getVideoId(link, videoHoster);
         const iframe = document.createElement('iframe');
 
@@ -200,7 +199,7 @@ export default  class Creator {
 
   createTable () {
     const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter post link:', '', { 
+    new Prompt('Enter post link:', '', {
       wrapper: this.$align.el,
       position: this.position,
       inputsCount: 2,
@@ -226,7 +225,7 @@ export default  class Creator {
         const postUrl = this.inputs[0].value
         if (!postUrl) return;
         const iframe = document.createElement('iframe');
-    
+
         iframe.width = 500;
         iframe.height = 200;
         iframe.scrolling = 'no';
@@ -255,6 +254,4 @@ export default  class Creator {
 
   embedTweet () {
   }
-
 }
-

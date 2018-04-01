@@ -66,7 +66,7 @@ export default class Section {
   generateEl (content) {
     this.el = (content && content.nodeName === 'DIV') ? content : document.createElement('div');
     this.el.classList.add('align-section');
-    
+
     switch (this.type) {
       case 'text':
         this.contentDiv = this.el.querySelector('.align-content') || document.createElement('div');
@@ -82,7 +82,7 @@ export default class Section {
         this.generateAddSectionButton();
         this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
         break;
-    
+
       case 'title':
         this.titleDiv = this.el.querySelector('.align-title') || document.createElement('div');
         this.titleDiv.classList.add('align-title');
@@ -162,9 +162,8 @@ export default class Section {
     if (!file) return;
     let video = this.el.querySelector('.align-bgVideo');
     let source = null;
-    let blob = null;
 
-    const url = URL.createObjectURL(event.target.files[0]);
+    const url = window.URL.createObjectURL(event.target.files[0]);
     if (!video) {
       const video = stringToDOM(`<video autoplay muted loop class="align-bgVideo"></video>`);
       source = document.createElement('source');
@@ -201,7 +200,7 @@ export default class Section {
     Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index + 1].el.nextSibling);
     swapArrayItems(ALL_SECTIONS, index, index + 1);
   }
-  
+
   active () {
     Section.$optionsBar.show(this);
     this.el.focus();
@@ -212,4 +211,3 @@ export default class Section {
     ALL_SECTIONS.splice(this.getIndex(), 1)
   }
 }
-

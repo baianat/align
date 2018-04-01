@@ -45,7 +45,6 @@ export default class Selection {
     sel.addRange(range);
   }
 
-
   static updateSelectedRange() {
     const sel = Selection.current = window.getSelection();
     if (sel.rangeCount && sel.anchorNode.nodeType === 3) {

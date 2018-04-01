@@ -60,7 +60,7 @@ export default class Table {
   insertRow ($styler, $schema) {
     const position = $schema.args[0];
     const columnsLength = this.el.rows[0].cells.length;
-    const newIndex = + this.activeCell.parentNode.rowIndex + (position === 'after' ? 1 : 0);
+    const newIndex = this.activeCell.parentNode.rowIndex + (position === 'after' ? 1 : 0);
     const row = this.el.insertRow(newIndex);
     for (let i = 0; i < columnsLength; i++) {
       const cell = row.insertCell(i);

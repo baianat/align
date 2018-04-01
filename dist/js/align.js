@@ -356,7 +356,7 @@ function exitFullscreen() {
 
 
 function getVideoId(url, hoster) {
-  var regExp = hoster === 'youtube' ? /(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/ : hoster === 'vimeo' ? /vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/ : null;
+  var regExp = hoster === 'youtube' ? /(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/ : hoster === 'vimeo' ? /vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/ : null;
 
   if (!regExp) return;
   var match = url.match(regExp);
@@ -1681,7 +1681,7 @@ var cmdsSchema = {
     element: 'input',
     type: 'text',
     command: 'backColor',
-    tooltip: 'Hightlight color',
+    tooltip: 'Highlight color',
     useCSS: true,
     init: colorpicker,
     initConfig: {
@@ -2155,8 +2155,8 @@ var Styler = function () {
         this.execute(cmdSchema.command, value, cmdSchema.useCSS);
       }
       if (typeof cmdSchema.func === 'string') {
-        var callback = this.$align[cmdSchema.func] ? this.$align[cmdSchema.func].bind(this.$align) : this.currentItem[cmdSchema.func].bind(this.currentItem);
-        callback(this, value || cmdSchema);
+        var callbackFunc = this.$align[cmdSchema.func] ? this.$align[cmdSchema.func].bind(this.$align) : this.currentItem[cmdSchema.func].bind(this.currentItem);
+        callbackFunc(this, value || cmdSchema);
       }
       if (typeof cmdSchema.func === 'function') {
         cmdSchema.func(this, value || cmdSchema);
@@ -2374,7 +2374,7 @@ var Table = function () {
     value: function insertRow($styler, $schema) {
       var position = $schema.args[0];
       var columnsLength = this.el.rows[0].cells.length;
-      var newIndex = +this.activeCell.parentNode.rowIndex + (position === 'after' ? 1 : 0);
+      var newIndex = this.activeCell.parentNode.rowIndex + (position === 'after' ? 1 : 0);
       var row = this.el.insertRow(newIndex);
       for (var i = 0; i < columnsLength; i++) {
         var cell = row.insertCell(i);
@@ -2571,7 +2571,8 @@ var Section = function () {
       if (!file) return;
       var video = this.el.querySelector('.align-bgVideo');
       var source = null;
-      var url = URL.createObjectURL(event.target.files[0]);
+
+      var url = window.URL.createObjectURL(event.target.files[0]);
       if (!video) {
         var _video = stringToDOM('<video autoplay muted loop class="align-bgVideo"></video>');
         source = document.createElement('source');
@@ -2939,12 +2940,12 @@ var EventBus = function () {
     }
   }, {
     key: "once",
-    value: function once(eventName, callback) {
+    value: function once(eventName, callbackFunc) {
       var _this2 = this;
 
       var idx = this.events.eventName ? this.events[eventName].length : 0;
       var cb = function cb() {
-        callback.apply(undefined, arguments);
+        callbackFunc.apply(undefined, arguments);
         _this2.events[eventName].splice(idx, 1);
       };
 
@@ -3172,6 +3173,7 @@ var Align = function () {
     /**
      * Hight light code text
      */
+    /* eslint-disable */
 
   }, {
     key: 'highlight',
@@ -3184,6 +3186,7 @@ var Align = function () {
         hljs.highlightBlock(block);
       });
     }
+    /* eslint-enable */
 
     /**
      * Toggle on/off HTML
@@ -3243,7 +3246,8 @@ var Align = function () {
         if (section.type !== 'text') {
           return acc;
         }
-        return acc += section.content;
+        acc += section.content;
+        return acc;
       }, '');
     }
   }, {
