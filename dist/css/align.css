@@ -337,7 +337,10 @@
   outline: none;
 }
 .align-section.is-active {
-  outline: 2px solid #aaa;
+  outline: 1px solid #aaa;
+}
+.align-section.is-active .align-column:not(:last-child) {
+  border-right: 1px solid #aaa;
 }
 .align p:empty::after {
   font-style: italic;

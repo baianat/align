@@ -3,6 +3,16 @@
   line-height: 2em;
   font-size: 18px;
 }
+.align-grid {
+  display: -ms-flexbox;
+  display: flex;
+  margin: 0 -20px;
+}
+.align-column {
+  padding: 20px;
+  -ms-flex: 1;
+      flex: 1;
+}
 .align-image {
   width: 100%;
   max-width: 400px;
@@ -112,6 +122,7 @@
 .align-section.is-full {
   width: 100%;
   max-width: 100%;
+  padding: 20px calc(15% + 20px);
 }
 .align-section.is-image {
   background-position: center center;

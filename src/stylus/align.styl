@@ -1,5 +1,6 @@
 .align
   position: relative
+
   &-editor
     padding: 50px 0
     background-color: $white
@@ -60,7 +61,9 @@
     *:focus
       outline: none
     &.is-active
-      outline: 2px solid $gray
+      outline: 1px solid $gray
+      .align-column:not(:last-child)
+        border-right: 1px solid $gray
 
   p:empty
     &::after

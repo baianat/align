@@ -1888,6 +1888,8 @@ var iconsPath = {
 
   video: 'M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z',
 
+  column: 'M16,5V18H21V5M4,18H9V5H4M10,18H15V5H10V18Z',
+
   delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
 
   facebook: 'M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3M18,5H15.5A3.5,3.5 0 0,0 12,8.5V11H10V14H12V21H15V14H18V11H15V9A1,1 0 0,1 16,8H18V5Z',
@@ -2666,7 +2668,7 @@ var Creator = function () {
         _ref$theme = _ref.theme,
         theme = _ref$theme === undefined ? 'light' : _ref$theme,
         _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'table', 'embed'] : _ref$items;
+        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'table', 'embed', 'column'] : _ref$items;
 
     classCallCheck(this, Creator);
 
@@ -2727,6 +2729,11 @@ var Creator = function () {
           case 'embed':
             el = button('embed');
             el.addEventListener('click', _this.embed.bind(_this));
+            break;
+
+          case 'column':
+            el = button('column');
+            el.addEventListener('click', _this.createGrid.bind(_this));
             break;
           default:
             return;
@@ -2852,6 +2859,20 @@ var Creator = function () {
         iframe.contentEditable = false;
         iframe.src = videoHoster === 'youtube' ? '//www.youtube.com/embed/' + videoId : videoHoster === 'vimeo' ? '//player.vimeo.com/video/' + videoId : '';
         selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
+      });
+    }
+  }, {
+    key: 'createGrid',
+    value: function createGrid() {
+      var selectedElement = Selection.current.anchorNode;
+      new Prompt('Enter columns count:', '', {
+        wrapper: this.$align.el,
+        position: this.position,
+        inputsCount: 1
+      }).onSubmit(function () {
+        var grid = stringToDOM('<div class="align-grid">\n        ' + '<div class="align-column"><br></div>'.repeat(this.inputs[0].value) + '\n      </div>');
+        console.log(grid);
+        selectedElement.parentNode.insertBefore(grid, selectedElement.nextSibling);
       });
     }
   }, {

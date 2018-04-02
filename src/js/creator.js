@@ -1,4 +1,4 @@
-import { updatePosition, camelCase, getVideoId } from './partial/util';
+import { updatePosition, camelCase, getVideoId, stringToDOM } from './partial/util';
 import { setElementsPrefix, button, fileButton } from './partial/elements';
 import Styler from './styler';
 import Selection from './selection';
@@ -9,7 +9,7 @@ export default  class Creator {
   constructor(align, {
     mode = 'toolbar',
     theme = 'light',
-    items = ['figure', 'video', 'facebook', 'table', 'embed']
+    items = ['figure', 'video', 'facebook', 'table', 'embed', 'column']
   } = {}) {
     this.$align = align;
     this.settings = {
@@ -68,6 +68,11 @@ export default  class Creator {
           case 'embed':
             el = button('embed');
             el.addEventListener('click', this.embed.bind(this));
+            break;
+
+          case 'column':
+            el = button('column');
+            el.addEventListener('click', this.createGrid.bind(this));
             break;
           default:
             return;
@@ -196,6 +201,21 @@ export default  class Creator {
             : ''
         selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
       });
+  }
+
+  createGrid() {
+    const selectedElement = Selection.current.anchorNode;
+    new Prompt('Enter columns count:', '', {
+      wrapper: this.$align.el,
+      position: this.position,
+      inputsCount: 1
+    }).onSubmit(function () {
+      const grid = stringToDOM(`<div class="align-grid">
+        ${'<div class="align-column"><br></div>'.repeat(this.inputs[0].value)}
+      </div>`);
+      console.log(grid)
+      selectedElement.parentNode.insertBefore(grid, selectedElement.nextSibling);
+    });
   }
 
   createTable () {
