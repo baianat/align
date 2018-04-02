@@ -87,7 +87,7 @@ new Align('.editor', {
       'separator', 
       'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 
       'separator', 
-      'h2', 'h3', 'h4', 'p', 'blockquote', 'pre', 'createLink', 'insertLine',
+      'h2', 'h3', 'h4', 'p', 'blockquote', 'pre', 'createLink',
       'separator',
       'orderedList', 'unorderedList', 'indent', 'outdent',
       'superscript', 'subscript',
@@ -141,7 +141,6 @@ new Align('.editor', {
 | pre           | | adds an HTML pre tag around the line containing the current selection so you can highlight its script. |
 | orderedList   | | creates a numbered ordered list for the selection or at the insertion point. |
 | unorderedList | | creates a bulleted unordered list for the selection or at the insertion point. |
-| insertLine    | | inserts a horizontal rule at the insertion point (deletes selection). |
 | createLink    | | creates an anchor link from the selection text. |
 | html          | | toggles HTML on/off for all text. |
 | sperator      | | used for decoration to separate commands. |

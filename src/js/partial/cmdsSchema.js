@@ -154,13 +154,6 @@ const cmdsSchema = {
     tooltip: 'Unordered list'
   },
 
-  insertLine: {
-    element: 'button',
-    command: 'insertHorizontalRule',
-    useCSS: true,
-    tooltip: `Insert line`
-  },
-
   indent: {
     element: 'button',
     command: 'indent',

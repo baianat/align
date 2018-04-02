@@ -1,4 +1,4 @@
-.styler
+.align .styler
   background-color: $white
   box-shadow: 0 20px 25px -20px alpha($black, 20%)
   &,
@@ -50,6 +50,12 @@
       color: $white !important
     .picker-guide svg
       color: $white
+    [data-tooltip]
+      &:before
+        border-color: transparent transparent $white transparent
+      &:after
+        background-color: $white
+        color: $black
 
   &.is-toolbar
     position: sticky
@@ -150,14 +156,14 @@
 
   &:before
     position: absolute
-    bottom: -13px
+    top: calc(100% - 4px)
     left: 50%
     z-index: 99999
     display: block
     visibility: hidden
     width: 0
     height: 0
-    border-width: 0 7px 7px 7px
+    border-width: 0 4px 4px 4px
     border-style: solid
     border-color: transparent transparent $black transparent
     content: ''
@@ -168,12 +174,12 @@
 
   &:after
     position: absolute
-    bottom: -44px
+    top: 100%
     left: 50%
     z-index: 99999
     display: block
     visibility: hidden
-    padding: 7px
+    padding: 4px 8px
     border-radius: 4px
     background-color: $black
     color: $white
@@ -183,4 +189,4 @@
     transition: 0.4s
     transform: translate(-50%, 0)
     user-select: none
-    font-size: 14px
+    font-size: 12px

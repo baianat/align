@@ -1587,13 +1587,6 @@ var cmdsSchema = {
     tooltip: 'Unordered list'
   },
 
-  insertLine: {
-    element: 'button',
-    command: 'insertHorizontalRule',
-    useCSS: true,
-    tooltip: 'Insert line'
-  },
-
   indent: {
     element: 'button',
     command: 'indent',
@@ -2007,6 +2000,41 @@ function menuButton(name, func, tooltip) {
   currentButton.addEventListener('click', func);
   menuItem.appendChild(currentButton);
   return menuItem;
+}
+
+function dropdown(name, itemsContent, callbackFunc) {
+  var dropdown = document.createElement('div');
+  var menu = document.createElement('div');
+  var tempPrefix = NAMING_PREFIX;
+  NAMING_PREFIX = 'dropdown-';
+  var dropdownButton = button(name);
+  NAMING_PREFIX = tempPrefix;
+  var items = [];
+  var icon = '\n    <svg viewBox="0 0 24 24" class="dropdown-caret">\n      <polygon points="6,10 12,17 18,10 "/>\n    </svg>';
+
+  dropdown.classList.add('dropdown');
+  dropdown.id = name;
+  menu.classList.add('dropdown-menu');
+  itemsContent.forEach(function (content) {
+    var itemElement = document.createElement('a');
+    itemElement.classList.add('dropdown-item');
+    itemElement.addEventListener('click', function () {
+      return callbackFunc(content);
+    });
+    items.push(itemElement);
+    itemElement.innerHTML = content;
+    menu.appendChild(itemElement);
+  });
+  dropdownButton.insertAdjacentHTML('beforeend', icon);
+  dropdownButton.addEventListener('click', function () {
+    return dropdown.classList.toggle('is-active');
+  });
+  dropdown.appendChild(dropdownButton);
+  dropdown.appendChild(menu);
+  return {
+    dropdown: dropdown,
+    items: items
+  };
 }
 
 var Styler = function () {
@@ -2674,7 +2702,7 @@ var Creator = function () {
         _ref$theme = _ref.theme,
         theme = _ref$theme === undefined ? 'light' : _ref$theme,
         _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'table', 'embed', 'column'] : _ref$items;
+        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'table', 'embed', 'column', 'line'] : _ref$items;
 
     classCallCheck(this, Creator);
 
@@ -2740,6 +2768,14 @@ var Creator = function () {
           case 'column':
             el = button('column');
             el.addEventListener('click', _this.createGrid.bind(_this));
+            break;
+
+          case 'line':
+            var ddown = dropdown('insertLine', ['<hr class="align-line">', '<hr class="align-line is-dashed">', '<hr class="align-line is-dotted">', '<hr class="align-line is-double">', '<hr class="align-line is-dots">', '<hr class="align-line is-bold">', '<hr class="align-line is-bold is-dashed">', '<hr class="align-line is-bold is-dotted">', '<hr class="align-line is-bold is-double">'], function (line) {
+              var selectedElement = Selection.textRange.endContainer.parentNode;
+              selectedElement.insertAdjacentHTML('afterend', line);
+            });
+            el = ddown.dropdown;
             break;
           default:
             return;
@@ -2877,7 +2913,6 @@ var Creator = function () {
         inputsCount: 1
       }).onSubmit(function () {
         var grid = stringToDOM('<div class="align-grid">\n        ' + '<div class="align-column"><br></div>'.repeat(this.inputs[0].value) + '\n      </div>');
-        console.log(grid);
         selectedElement.parentNode.insertBefore(grid, selectedElement.nextSibling);
       });
     }

@@ -1,5 +1,5 @@
 import { updatePosition, camelCase, getVideoId, stringToDOM } from './partial/util';
-import { setElementsPrefix, button, fileButton } from './partial/elements';
+import { setElementsPrefix, button, fileButton, dropdown } from './partial/elements';
 import Styler from './styler';
 import Selection from './selection';
 import Prompt from './prompt';
@@ -9,7 +9,7 @@ export default  class Creator {
   constructor(align, {
     mode = 'toolbar',
     theme = 'light',
-    items = ['figure', 'video', 'facebook', 'table', 'embed', 'column']
+    items = ['figure', 'video', 'facebook', 'table', 'embed', 'column', 'line']
   } = {}) {
     this.$align = align;
     this.settings = {
@@ -73,6 +73,24 @@ export default  class Creator {
           case 'column':
             el = button('column');
             el.addEventListener('click', this.createGrid.bind(this));
+            break;
+
+          case 'line':
+            const ddown = dropdown('insertLine', [
+              '<hr class="align-line">',
+              '<hr class="align-line is-dashed">',
+              '<hr class="align-line is-dotted">',
+              '<hr class="align-line is-double">',
+              '<hr class="align-line is-dots">',
+              '<hr class="align-line is-bold">',
+              '<hr class="align-line is-bold is-dashed">',
+              '<hr class="align-line is-bold is-dotted">',
+              '<hr class="align-line is-bold is-double">'
+            ], (line) => {
+              const selectedElement = Selection.textRange.endContainer.parentNode;
+              selectedElement.insertAdjacentHTML('afterend', line);
+            });
+            el = ddown.dropdown
             break;
           default:
             return;
@@ -213,7 +231,6 @@ export default  class Creator {
       const grid = stringToDOM(`<div class="align-grid">
         ${'<div class="align-column"><br></div>'.repeat(this.inputs[0].value)}
       </div>`);
-      console.log(grid)
       selectedElement.parentNode.insertBefore(grid, selectedElement.nextSibling);
     });
   }
