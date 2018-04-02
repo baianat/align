@@ -1,5 +1,18 @@
-import { normalizeNumber, debounce, cloneObject, camelCase, isElementClosest } from './partial/util';
-import { setElementsPrefix, button, select, input, menuButton, fileButton } from './partial/elements';
+import {
+  debounce,
+  cloneObject,
+  camelCase,
+  isElementClosest,
+  updatePosition
+} from './partial/util';
+import { 
+  setElementsPrefix,
+  button,
+  select,
+  input,
+  menuButton,
+  fileButton
+} from './partial/elements';
 import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
 
@@ -9,7 +22,8 @@ export default class Styler {
     commands = ['bold', 'italic', 'underline'],
     hideWhenClickOut = false,
     tooltip = false,
-    theme = 'light'
+    theme = 'light',
+    position = 'center-top'
   } = {}) {
     this.$align = align;
     this.settings = {
@@ -17,7 +31,8 @@ export default class Styler {
       commands,
       hideWhenClickOut,
       tooltip,
-      theme
+      theme,
+      position
     }
     this._init();
   }
@@ -42,7 +57,20 @@ export default class Styler {
 
   _initBubble () {
     this.el.classList.add('is-hidden');
-    this.bubbleScrollCallback = debounce(this.updateBubblePosition.bind(this));
+    this.currentPosition = null;
+    let ticking = false;
+    this.bubbleScrollCallback = () => {
+      this.scrollY = window.scrollY;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (!this.currentPosition) {
+            this.updateBubblePosition('center-top');
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
   }
 
   generateCmdElement(command) {
@@ -153,30 +181,15 @@ export default class Styler {
     this.$align.execute(...arguments);
   }
 
-  updateBubblePosition() {
+  updateBubblePosition (newPosition) {
     if (!Selection.textRange && !this.currentItem) return;
-    const marginRatio = 10;
-    const threshold = 70;
     const element = this.currentItem ? this.currentItem.el : Selection.textRange;
-    const elementRect = element.getBoundingClientRect();
-    const editorRect = this.$align.el.getBoundingClientRect();
-    const stylerRect = this.el.getBoundingClientRect();
-
-    const deltaY = elementRect.top - stylerRect.height - marginRatio;
-    const deltaX = elementRect.left + ((elementRect.width - stylerRect.width) / 2);
-    const startBoundary = editorRect.left;
-    const endBoundary = editorRect.left + editorRect.width - stylerRect.width;
-    const xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
-    const yPosition = deltaY < threshold
-      ? elementRect.top + elementRect.height + marginRatio : deltaY;
-
-    if (yPosition < threshold) {
-      this.el.style.opacity = 0;
-      return;
-    }
-    this.el.style.opacity = 1;
-    this.el.style.top = `${yPosition}px`;
-    this.el.style.left = `${xPosition}px`;
+    this.currentPosition = updatePosition(
+      element,
+      this.el,
+      this.$align.el,
+      newPosition || this.settings.position
+    );
   }
 
   show (item) {
@@ -185,19 +198,17 @@ export default class Styler {
     }
     if (item) {
       this.currentItem = item;
-      this.currentContent = item.contentDiv;
       this.currentItem.el.classList.add('is-active');
     }
     if (this.settings.mode === 'bubble') {
       this.updateBubblePosition();
     }
-    if (this.visiable) return
+    if (this.visiable) {
+      return;
+    }
     this.visiable = true;
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
-    if (this.settings.mode === 'bubble') {
-      window.addEventListener('scroll', this.bubbleScrollCallback);
-    }
     if (this.settings.hideWhenClickOut) {
       document.addEventListener('click', (event) => {
         if (
@@ -215,13 +226,10 @@ export default class Styler {
     }
     this.el.classList.remove('is-visible');
     this.el.classList.add('is-hidden');
-    this.visiable = false;
-    if (this.settings.mode === 'bubble') {
-      window.removeEventListener('scroll', this.bubbleScrollCallback);
-    }
     if (this.settings.hideWhenClickOut) {
       document.removeEventListener('click', this.clickCallback);
     }
+    this.visiable = false;
   }
 
   update () {

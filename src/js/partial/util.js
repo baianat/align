@@ -117,38 +117,40 @@ export function camelCase (string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function updatePosition (reference, element, align, mode = 'middle-left') {
+export function updatePosition(reference, element, align, mode = 'middle-left') {
   if (typeof reference.getBoundingClientRect !== 'function') return;
   const modes = mode.split('-');
-  const elmRect = element.getBoundingClientRect();
   const refRect = reference.getBoundingClientRect();
+  const elmRect = element.getBoundingClientRect();
   const alignRect = align.getBoundingClientRect();
-  const positon = {left: 0, top: 0}
-
+  const positon = {x: 0, y: 0}
+  const startBoundary = alignRect.left;
+  const endBoundary = alignRect.left + alignRect.width - elmRect.width;
   modes.forEach(mode => {
     switch (mode) {
       case 'center':
-        positon.left = refRect.left - alignRect.left + (refRect.width / 2);
+        positon.x = refRect.left - alignRect.left + (refRect.width / 2) - (elmRect.width / 2);
         break;
       case 'left':
-        positon.left = refRect.left - alignRect.left
+        positon.x = refRect.left - alignRect.left
         break;
       case 'right':
-        positon.left = refRect.left - alignRect.left - refRect.width
+        positon.x = refRect.left - alignRect.left - refRect.width
         break;
       case 'middle':
-        positon.top = refRect.top - alignRect.top + (refRect.height / 2)
+        positon.y = refRect.top - alignRect.top + (refRect.height / 2) - (elmRect.height / 2);
         break;
       case 'top':
-        positon.top = refRect.top - alignRect.top - elmRect.height;
+        positon.y = refRect.top - alignRect.top - elmRect.height;
         break;
       case 'bottom':
-        positon.top = alignRect.top - refRect.bottom + elmRect.height;
+        positon.y = refRect.bottom - alignRect.top;
         break;
     }
   })
-  element.style.left = `${positon.left}px`;
-  element.style.top = `${positon.top}px`;
+  positon.x = normalizeNumber(positon.x, startBoundary, endBoundary)
+  element.style.transform = `translate(${positon.x}px, ${positon.y}px)`;
+
   return positon;
 }
 

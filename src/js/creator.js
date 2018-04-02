@@ -34,8 +34,7 @@ export default class Creator {
         { '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] },
         '_remove'
       ],
-      tooltip: true,
-      theme: 'dark'
+      tooltip: true
     });
 
     this.settings.items.forEach((item) => {

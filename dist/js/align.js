@@ -226,22 +226,7 @@ function select(element) {
 
 
 /* eslint-disable */
-function debounce(callback) {
-  var immediate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-  var timeout = void 0;
-  return function () {
-    var _arguments = arguments;
-
-    var later = function later() {
-      timeout = null;
-      if (!immediate) callback.apply(undefined, _arguments);
-    };
-    var callNow = immediate && !timeout;
-    timeout = requestAnimationFrame(later);
-    if (callNow) callback.apply(undefined, arguments);
-  };
-}
 
 /* eslint-enable */
 
@@ -299,35 +284,37 @@ function updatePosition(reference, element, align) {
 
   if (typeof reference.getBoundingClientRect !== 'function') return;
   var modes = mode.split('-');
-  var elmRect = element.getBoundingClientRect();
   var refRect = reference.getBoundingClientRect();
+  var elmRect = element.getBoundingClientRect();
   var alignRect = align.getBoundingClientRect();
-  var positon = { left: 0, top: 0 };
-
+  var positon = { x: 0, y: 0 };
+  var startBoundary = alignRect.left;
+  var endBoundary = alignRect.left + alignRect.width - elmRect.width;
   modes.forEach(function (mode) {
     switch (mode) {
       case 'center':
-        positon.left = refRect.left - alignRect.left + refRect.width / 2;
+        positon.x = refRect.left - alignRect.left + refRect.width / 2 - elmRect.width / 2;
         break;
       case 'left':
-        positon.left = refRect.left - alignRect.left;
+        positon.x = refRect.left - alignRect.left;
         break;
       case 'right':
-        positon.left = refRect.left - alignRect.left - refRect.width;
+        positon.x = refRect.left - alignRect.left - refRect.width;
         break;
       case 'middle':
-        positon.top = refRect.top - alignRect.top + refRect.height / 2;
+        positon.y = refRect.top - alignRect.top + refRect.height / 2 - elmRect.height / 2;
         break;
       case 'top':
-        positon.top = refRect.top - alignRect.top - elmRect.height;
+        positon.y = refRect.top - alignRect.top - elmRect.height;
         break;
       case 'bottom':
-        positon.top = alignRect.top - refRect.bottom + elmRect.height;
+        positon.y = refRect.bottom - alignRect.top;
         break;
     }
   });
-  element.style.left = positon.left + 'px';
-  element.style.top = positon.top + 'px';
+  positon.x = normalizeNumber(positon.x, startBoundary, endBoundary);
+  element.style.transform = 'translate(' + positon.x + 'px, ' + positon.y + 'px)';
+
   return positon;
 }
 
@@ -1392,7 +1379,7 @@ var Prompt = function () {
         if (Selection.range.startContainer.nodeType === 1) {
           this.selectionRefrance = Selection.current.anchorNode;
         }
-        updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-middle');
+        updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-top');
       }
       this.message.innerText = message;
       this.submit.innerText = 'Submit';
@@ -1754,7 +1741,7 @@ var cmdsSchema = {
       defaultColor: '#000000',
       mode: 'hex',
       disableLum: true,
-      guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: #fff" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n        </svg>\n      '
+      guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n        </svg>\n      '
     }
   },
 
@@ -2049,7 +2036,9 @@ var Styler = function () {
         _ref$tooltip = _ref.tooltip,
         tooltip = _ref$tooltip === undefined ? false : _ref$tooltip,
         _ref$theme = _ref.theme,
-        theme = _ref$theme === undefined ? 'light' : _ref$theme;
+        theme = _ref$theme === undefined ? 'light' : _ref$theme,
+        _ref$position = _ref.position,
+        position = _ref$position === undefined ? 'center-top' : _ref$position;
 
     classCallCheck(this, Styler);
 
@@ -2059,7 +2048,8 @@ var Styler = function () {
       commands: commands,
       hideWhenClickOut: hideWhenClickOut,
       tooltip: tooltip,
-      theme: theme
+      theme: theme,
+      position: position
     };
     this._init();
   }
@@ -2090,13 +2080,28 @@ var Styler = function () {
   }, {
     key: '_initBubble',
     value: function _initBubble() {
+      var _this2 = this;
+
       this.el.classList.add('is-hidden');
-      this.bubbleScrollCallback = debounce(this.updateBubblePosition.bind(this));
+      this.currentPosition = null;
+      var ticking = false;
+      this.bubbleScrollCallback = function () {
+        _this2.scrollY = window.scrollY;
+        if (!ticking) {
+          window.requestAnimationFrame(function () {
+            if (!_this2.currentPosition) {
+              _this2.updateBubblePosition('center-top');
+            }
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
     }
   }, {
     key: 'generateCmdElement',
     value: function generateCmdElement(command) {
-      var _this2 = this;
+      var _this3 = this;
 
       var li = document.createElement('li');
       var cmd = typeof command === 'string' ? command : Object.keys(command)[0];
@@ -2112,7 +2117,7 @@ var Styler = function () {
         case 'button':
           currentCmd.el = button(cmd, this.getTooltip(cmdSchema));
           currentCmd.el.addEventListener('click', function () {
-            return _this2.cmdCallback(cmdSchema, cmdSchema.value);
+            return _this3.cmdCallback(cmdSchema, cmdSchema.value);
           });
           li.appendChild(currentCmd.el);
           break;
@@ -2121,7 +2126,7 @@ var Styler = function () {
           currentCmd.el = document.createElement('ul');
           command[cmd].forEach(function (className) {
             var li = menuButton('' + cmdSchema.command + camelCase(className), function () {
-              _this2.toggleClass('is-' + className, command[cmd]);
+              _this3.toggleClass('is-' + className, command[cmd]);
             }, camelCase(cmdSchema.command) + ' ' + className);
             currentCmd.el.appendChild(li);
           });
@@ -2132,7 +2137,7 @@ var Styler = function () {
           var fileBtn = fileButton(cmd, this.getTooltip(cmdSchema));
           currentCmd.el = fileBtn.input;
           currentCmd.el.addEventListener('change', function (event) {
-            _this2.cmdCallback(cmdSchema, event);
+            _this3.cmdCallback(cmdSchema, event);
           });
           li.appendChild(fileBtn.el);
           break;
@@ -2141,7 +2146,7 @@ var Styler = function () {
           var selectWrapper = select$1(cmd, command[cmd]);
           var temp = currentCmd.el = selectWrapper.querySelector('select');
           temp.addEventListener('change', function () {
-            return _this2.cmdCallback(cmdSchema, temp[temp.selectedIndex].value);
+            return _this3.cmdCallback(cmdSchema, temp[temp.selectedIndex].value);
           });
           li.appendChild(selectWrapper);
           break;
@@ -2149,7 +2154,7 @@ var Styler = function () {
         case 'input':
           currentCmd.el = input(cmd, cmdSchema.type, this.getTooltip(cmdSchema));
           currentCmd.el.addEventListener('change', function () {
-            _this2.cmdCallback(cmdSchema, currentCmd.el.value);
+            _this3.cmdCallback(cmdSchema, currentCmd.el.value);
           });
           li.appendChild(currentCmd.el);
           break;
@@ -2211,57 +2216,36 @@ var Styler = function () {
     }
   }, {
     key: 'updateBubblePosition',
-    value: function updateBubblePosition() {
+    value: function updateBubblePosition(newPosition) {
       if (!Selection.textRange && !this.currentItem) return;
-      var marginRatio = 10;
-      var threshold = 70;
       var element = this.currentItem ? this.currentItem.el : Selection.textRange;
-      var elementRect = element.getBoundingClientRect();
-      var editorRect = this.$align.el.getBoundingClientRect();
-      var stylerRect = this.el.getBoundingClientRect();
-
-      var deltaY = elementRect.top - stylerRect.height - marginRatio;
-      var deltaX = elementRect.left + (elementRect.width - stylerRect.width) / 2;
-      var startBoundary = editorRect.left;
-      var endBoundary = editorRect.left + editorRect.width - stylerRect.width;
-      var xPosition = normalizeNumber(deltaX, startBoundary, endBoundary);
-      var yPosition = deltaY < threshold ? elementRect.top + elementRect.height + marginRatio : deltaY;
-
-      if (yPosition < threshold) {
-        this.el.style.opacity = 0;
-        return;
-      }
-      this.el.style.opacity = 1;
-      this.el.style.top = yPosition + 'px';
-      this.el.style.left = xPosition + 'px';
+      this.currentPosition = updatePosition(element, this.el, this.$align.el, newPosition || this.settings.position);
     }
   }, {
     key: 'show',
     value: function show(item) {
-      var _this3 = this;
+      var _this4 = this;
 
       if (this.currentItem) {
         this.currentItem.el.classList.remove('is-active');
       }
       if (item) {
         this.currentItem = item;
-        this.currentContent = item.contentDiv;
         this.currentItem.el.classList.add('is-active');
       }
       if (this.settings.mode === 'bubble') {
         this.updateBubblePosition();
       }
-      if (this.visiable) return;
+      if (this.visiable) {
+        return;
+      }
       this.visiable = true;
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
-      if (this.settings.mode === 'bubble') {
-        window.addEventListener('scroll', this.bubbleScrollCallback);
-      }
       if (this.settings.hideWhenClickOut) {
         document.addEventListener('click', function (event) {
-          if (isElementClosest(event.target, _this3.currentItem.el) || isElementClosest(event.target, _this3.el)) return;
-          _this3.hide();
+          if (isElementClosest(event.target, _this4.currentItem.el) || isElementClosest(event.target, _this4.el)) return;
+          _this4.hide();
         });
       }
     }
@@ -2273,13 +2257,10 @@ var Styler = function () {
       }
       this.el.classList.remove('is-visible');
       this.el.classList.add('is-hidden');
-      this.visiable = false;
-      if (this.settings.mode === 'bubble') {
-        window.removeEventListener('scroll', this.bubbleScrollCallback);
-      }
       if (this.settings.hideWhenClickOut) {
         document.removeEventListener('click', this.clickCallback);
       }
+      this.visiable = false;
     }
   }, {
     key: 'update',
@@ -2308,10 +2289,10 @@ var Styler = function () {
   }, {
     key: 'updateCommandsStates',
     value: function updateCommandsStates() {
-      var _this4 = this;
+      var _this5 = this;
 
       Object.keys(this.cmds).forEach(function (cmd) {
-        var currentCmd = _this4.cmds[cmd];
+        var currentCmd = _this5.cmds[cmd];
         var command = currentCmd.schema.command;
         var value = currentCmd.schema.value;
         var init = currentCmd.schema.init;
@@ -2443,8 +2424,7 @@ var Table = function () {
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter', 'separator', '_tableDeleteRow', '_tableDeleteColumn', 'separator', '_remove'],
-        tooltip: true,
-        theme: 'dark'
+        tooltip: true
       }, settings);
       this.$align = align;
       this.$optionsBar = new Styler(align, config);
@@ -2682,7 +2662,7 @@ var Section = function () {
         hideWhenClickOut: true,
         commands: ['_sectionUp', '_sectionDown', '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML', { '_sectionClasses': ['normal', 'full'] }, '_remove'],
         tooltip: true,
-        theme: 'dark'
+        position: 'left-top'
       }, settings);
       this.$align = align;
       this.$optionsBar = new Styler(align, config);
@@ -2732,8 +2712,7 @@ var Creator = function () {
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
-        tooltip: true,
-        theme: 'dark'
+        tooltip: true
       });
 
       this.settings.items.forEach(function (item) {

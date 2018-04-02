@@ -38,7 +38,7 @@ export default class Section {
         '_remove'
       ],
       tooltip: true,
-      theme: 'dark'
+      position: 'left-top'
     }, settings);
     this.$align = align;
     this.$optionsBar = new Styler(align, config);

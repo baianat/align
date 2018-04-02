@@ -19,8 +19,7 @@ export default class Table {
         'separator',
         '_remove'
       ],
-      tooltip: true,
-      theme: 'dark'
+      tooltip: true
     }, settings);
     this.$align = align;
     this.$optionsBar = new Styler(align, config);

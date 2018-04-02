@@ -39,7 +39,7 @@ export default class Prompt {
       if (Selection.range.startContainer.nodeType === 1) {
         this.selectionRefrance = Selection.current.anchorNode;
       }
-      updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-middle');
+      updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-top');
     }
     this.message.innerText = message;
     this.submit.innerText = 'Submit';
