@@ -12,6 +12,7 @@ export default class Section {
     }
     this.id = ID++;
     this.type = type;
+    this.isHTMLView = false;
     this.generateEl(content);
     if (type === 'text') {
       this.el.addEventListener('click', () => {
@@ -53,6 +54,10 @@ export default class Section {
       output = this.el.cloneNode(true);
       const addButton = output.querySelector('.align-newSection');
       const contentDiv = output.querySelector('.align-content');
+      if (this.isHTMLView) {
+        contentDiv.innerHTML = contentDiv.innerText;
+      }
+      output.classList.remove('is-active');
       output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
       contentDiv.remove();
       addButton.remove();
@@ -66,14 +71,15 @@ export default class Section {
   generateEl (content) {
     this.el = (content && content.nodeName === 'DIV') ? content : document.createElement('div');
     this.el.classList.add('align-section');
-    
     switch (this.type) {
       case 'text':
         this.contentDiv = this.el.querySelector('.align-content') || document.createElement('div');
         this.contentDiv.classList.add('align-content');
         this.contentDiv.contentEditable = true;
         content = content ? this.contentDiv.innerHTML || this.el.innerHTML || content.outerHTML : '<p></p>';
-
+        if (this.contentDiv.querySelector('pre[data-align-html]')) {
+          content = this.contentDiv.innerText;
+        }
         this.el.innerHTML = '';
         this.el.appendChild(this.contentDiv);
         this.contentDiv.innerHTML = content;
@@ -111,21 +117,21 @@ export default class Section {
   }
 
   toggleHTML () {
-    if (this.contentDiv.firstElementChild.tagName !== 'PRE') {
+    if (!this.isHTMLView) {
+      this.isHTMLView = true;
       const content = document.createTextNode(this.contentDiv.innerHTML);
       const pre = document.createElement('pre');
 
       this.contentDiv.innerHTML = '';
-      pre.id = 'content';
-      pre.style.whiteSpace = 'pre-wrap';
+      pre.dataset.alignHtml = true;
       pre.appendChild(content);
       this.contentDiv.appendChild(pre);
       Section.$align.highlight();
       return;
     }
-    this.contentDiv.innerHTML = this.contentDiv.innerText;
-    this.contentDiv.contentEditable = true;
+    this.generateEl(this.el);
     this.contentDiv.focus();
+    this.isHTMLView = false;
   }
 
   backgroundColor (cmdSchema, color) {

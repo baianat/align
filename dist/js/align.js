@@ -2440,6 +2440,7 @@ var Section = function () {
     }
     this.id = ID++;
     this.type = type;
+    this.isHTMLView = false;
     this.generateEl(content);
     if (type === 'text') {
       this.el.addEventListener('click', function () {
@@ -2460,14 +2461,15 @@ var Section = function () {
     value: function generateEl(content) {
       this.el = content && content.nodeName === 'DIV' ? content : document.createElement('div');
       this.el.classList.add('align-section');
-
       switch (this.type) {
         case 'text':
           this.contentDiv = this.el.querySelector('.align-content') || document.createElement('div');
           this.contentDiv.classList.add('align-content');
           this.contentDiv.contentEditable = true;
           content = content ? this.contentDiv.innerHTML || this.el.innerHTML || content.outerHTML : '<p></p>';
-
+          if (this.contentDiv.querySelector('pre[data-align-html]')) {
+            content = this.contentDiv.innerText;
+          }
           this.el.innerHTML = '';
           this.el.appendChild(this.contentDiv);
           this.contentDiv.innerHTML = content;
@@ -2518,21 +2520,21 @@ var Section = function () {
   }, {
     key: 'toggleHTML',
     value: function toggleHTML() {
-      if (this.contentDiv.firstElementChild.tagName !== 'PRE') {
+      if (!this.isHTMLView) {
+        this.isHTMLView = true;
         var content = document.createTextNode(this.contentDiv.innerHTML);
         var pre = document.createElement('pre');
 
         this.contentDiv.innerHTML = '';
-        pre.id = 'content';
-        pre.style.whiteSpace = 'pre-wrap';
+        pre.dataset.alignHtml = true;
         pre.appendChild(content);
         this.contentDiv.appendChild(pre);
         Section.$align.highlight();
         return;
       }
-      this.contentDiv.innerHTML = this.contentDiv.innerText;
-      this.contentDiv.contentEditable = true;
+      this.generateEl(this.el);
       this.contentDiv.focus();
+      this.isHTMLView = false;
     }
   }, {
     key: 'backgroundColor',
@@ -2629,6 +2631,10 @@ var Section = function () {
         output = this.el.cloneNode(true);
         var addButton = output.querySelector('.align-newSection');
         var contentDiv = output.querySelector('.align-content');
+        if (this.isHTMLView) {
+          contentDiv.innerHTML = contentDiv.innerText;
+        }
+        output.classList.remove('is-active');
         output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
         contentDiv.remove();
         addButton.remove();
