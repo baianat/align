@@ -115,7 +115,6 @@ export default class Styler {
     }
 
     if (typeof cmdSchema.init === 'function') {
-      const _self = this;
       cmdSchema.init = new cmdSchema.init(currentCmd.el, cmdSchema.initConfig); // eslint-disable-line
     }
 
@@ -132,10 +131,10 @@ export default class Styler {
       this.execute(cmdSchema.command, value, cmdSchema.useCSS);
     }
     if (typeof cmdSchema.func === 'string') {
-      let callback = this.$align[cmdSchema.func] ? 
-        this.$align[cmdSchema.func].bind(this.$align) :
-        this.currentItem[cmdSchema.func].bind(this.currentItem);
-      callback(this, value || cmdSchema);
+      let callbackFunc = this.$align[cmdSchema.func]
+        ? this.$align[cmdSchema.func].bind(this.$align)
+        : this.currentItem[cmdSchema.func].bind(this.currentItem);
+      callbackFunc(this, value || cmdSchema);
     }
     if (typeof cmdSchema.func === 'function') {
       cmdSchema.func(this, value || cmdSchema);
@@ -285,4 +284,3 @@ export default class Styler {
     }
   }
 }
-

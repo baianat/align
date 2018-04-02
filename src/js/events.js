@@ -16,10 +16,10 @@ export default class EventBus {
     };
   }
 
-  once (eventName, callback) {
+  once (eventName, callbackFunc) {
     const idx = this.events.eventName ? this.events[eventName].length : 0;
     const cb = (...args) => {
-      callback(...args);
+      callbackFunc(...args);
       this.events[eventName].splice(idx, 1);
     };
 
@@ -36,4 +36,3 @@ export default class EventBus {
     }, 0);
   }
 };
-

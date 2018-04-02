@@ -65,13 +65,17 @@ You can also pass the element directly to the constructor
 </script>
 ```
 
-### Align
+### Align Customizations
 
-Align comes with two styling bars(stylers), the main toolbar (`toolbar`) and the pop-up toolbar (`bubble`) that pops when you select a text.
+Align comes with three styling bars(stylers), the main toolbar (`toolbar`) and the pop-up toolbar (`bubble`) that pops when you select a text.
 
 You can choose to work with either of the toolbars, or both of them, by passing the `toolbar` object and/or the `bubble` object to the `Align` settings object.
 
 You can choose what commands you'd like both of the stylers to include, by passing the desired commands through the `commands` array.
+
+Align also shipped with creator bar(`creator`), which dedicated to add items like images, tables, posts, etc...
+
+Creator
 
 ```js
 new Align('.editor', {
@@ -82,11 +86,11 @@ new Align('.editor', {
     commands: [
       {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
       {'fontName': ['Poppins', 'Raleway', 'Roboto']},
-      'separator', 
-      'bold', 'italic', 'underline', 'strikeThrough', 
-      'separator', 
+      'separator',
+      'bold', 'italic', 'underline', 'strikeThrough',
+      'separator',
       'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 
-      'separator', 
+      'separator',
       'h2', 'h3', 'h4', 'p', 'blockquote', 'pre', 'createLink',
       'separator',
       'orderedList', 'unorderedList', 'indent', 'outdent',
@@ -106,6 +110,7 @@ new Align('.editor', {
     ]
   },
   creator: {
+    mode: 'toolbar', // inline or toolbar defaults (toolbar)
     theme: 'light',
     items: ['figure', 'video', 'facebook', 'embed']
   }
@@ -149,14 +154,15 @@ new Align('.editor', {
 
 | ITEM      | DESCRIPTION |
 |-----------| ----------- |
-| figure    | uploades an image figure and inseart it in the selected place |
-| video     | embed a video for youtube/vimeo url in the selected place |
-| facebook  | embed a facebook post from url in the selected place |
-| embed     | embed any embed iframe script in the selected place |
+| figure    | uploads an image figure and inseart it after the selected place |
+| video     | embed a video for youtube/vimeo url after the selected place |
+| facebook  | embed a facebook post from url after the selected place |
+| embed     | embed any embed iframe script after the selected place |
+| table     | inserts a table after the selected place |
 
 ### Adding new custom commands
 
-To extend `Align`'s [cmdsSchemas](https://github.com/baianat/align/blob/master/src/js/cmdsSchemas.js) object to add a new command or overwrite a current command behavior, use `Align.extend('commandName', { //setting })`
+To extend `Align`'s [cmdsSchemas](https://github.com/baianat/align/blob/master/src/js/partial/cmdsSchema.js) object to add a new command or overwrite a current command behavior, use `Align.extend('commandName', { //setting })`
 > Note: you can overwrite the current commands behavior, if you used your `commandName` same as one of `Align`'s commands.
 
 ```javaScript
@@ -190,11 +196,10 @@ Align.extend('addImage', {
     }
   },
   create() {
-    this.$data = this.data;
-    this.data = this.$data();
-    const button = this.data.button;
-    const input = this.data.input;
-    const icon = this.data.icon;
+    this.$data = this.data();
+    const button = this.$data.button;
+    const input = this.$data.input;
+    const icon = this.$data.icon;
 
     button.classList.add('styler-button');
     button.appendChild(input);
@@ -206,7 +211,7 @@ Align.extend('addImage', {
     return button;
   },
   action() {
-    const file = this.data.input.files[0];
+    const file = this.$data.input.files[0];
     const selectedPosition = window.getSelection().getRangeAt(0);
     if (!file || !window.getSelection().rangeCount) return;
     const imageURL = URL.createObjectURL(file);
@@ -215,7 +220,7 @@ Align.extend('addImage', {
     img.src = imageURL;
     img.classList.add('align-image');
     selectedPosition.insertNode(img);
-    this.data.input.value = null;
+    this.$data.input.value = null;
 
     // add your logic to save `imageURL` in the database
   }
@@ -239,6 +244,22 @@ To get `Align`'s post title you can use `title` property
 
 ```js
 saveToDatabase(myEditor.content);
+```
+
+#### Handle resources uploading
+
+Align has events bus(`$bus`), you can listen for `imageAdded` and `videoAdded` to handle any resources uploading
+
+```js
+myEditor.$bus.on('imageAdded', ({file, update}) => {
+  // save the uploaded image
+  // and get its new link
+  const newLink = saveImageToStorage(file);
+
+  // update the image src with
+  // the new generated link
+  update(newLink);
+})
 ```
 
 ### highlight

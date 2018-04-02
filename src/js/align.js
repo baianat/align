@@ -13,7 +13,7 @@ export default class Align {
     toolbar = null,
     bubble = null,
     creator = null,
-    section = null, 
+    section = null,
     shortcuts = false,
     postTitle = false
   } = {}) {
@@ -37,7 +37,8 @@ export default class Align {
       if (section.type !== 'text') {
         return acc;
       }
-      return acc += section.content;
+      acc += section.content;
+      return acc;
     }, '')
   }
 
@@ -207,6 +208,7 @@ export default class Align {
   /**
    * Hight light code text
    */
+  /* eslint-disable */
   highlight() {
     if (typeof hljs === 'undefined') {
       return;
@@ -216,6 +218,7 @@ export default class Align {
       hljs.highlightBlock(block);
     })
   }
+  /* eslint-enable */
 
   /**
    * Toggle on/off HTML
@@ -259,5 +262,4 @@ export default class Align {
     document.execCommand('styleWithCSS', false, false);
     this.update();
   }
-
 }
