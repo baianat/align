@@ -95,7 +95,7 @@ export default class Align {
     this.cmdKeyPressed = false;
     this.el.appendChild(this.editor);
     this.editor.focus();
-    Selection.updateSelectedRange();
+    Selection.update();
   }
 
   _initSections () {
@@ -237,7 +237,7 @@ export default class Align {
   }
 
   update () {
-    Selection.updateSelectedRange();
+    Selection.update();
     setTimeout(() => {
       if (this.settings.toolbar) {
         this.toolbar.update();

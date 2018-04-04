@@ -85,8 +85,7 @@ export default class Creator {
             '<hr class="align-line is-bold is-dotted">',
             '<hr class="align-line is-bold is-double">'
           ], (line) => {
-            const selectedElement = Selection.textRange.endContainer.parentNode;
-            selectedElement.insertAdjacentHTML('afterend', line);
+            this.insertElement(stringToDOM(line));
           });
           el = ddown.dropdown
           break;
@@ -148,6 +147,13 @@ export default class Creator {
     this.el.classList.remove('is-active');
     this.el.classList.add('is-hidden');
   }
+  
+  insertElement(element, range = Selection.range) {
+    // check if the range is inside a section
+    if (range.startContainer.parentNode.closest('.align-content')) {
+      range.insertNode(element);
+    }
+  }
 
   createFigure (event) {
     const input = event.target;
@@ -157,7 +163,7 @@ export default class Creator {
     const figure = document.createElement('figure');
     const caption = document.createElement('figcaption');
     const img = document.createElement('img');
-    const selectedElement = Selection.current.anchorNode;
+
     figure.contentEditable = false
     caption.contentEditable = true
     caption.dataset.defaultValue = 'Figure caption';
@@ -174,7 +180,6 @@ export default class Creator {
     reader.addEventListener('load', () => {
       img.src = reader.result;
       img.dataset.alignFilename = file.name;
-      this.$align.update();
       const update = (src) => {
         img.src = src;
       };
@@ -182,109 +187,110 @@ export default class Creator {
     });
     reader.readAsDataURL(file);
     input.value = null;
-    selectedElement.parentNode.insertBefore(figure, selectedElement.nextSibling);
+    this.insertElement(figure);
   }
 
   createVideo () {
-    const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter video link:', '', {
+    const selectedRange = Selection.range;
+
+    const prompt = new Prompt('Enter video link:', '', {
       wrapper: this.$align.el,
       position: this.position
     })
-      .onSubmit(function () {
-        const link = this.inputs[0].value
-        if (!link) return;
-        const videoHoster = link.includes('yout')
-          ? 'youtube' : link.includes('vimeo')
-            ? 'vimeo' : '';
+    prompt.onSubmit(() => {
+      const link = prompt.inputs[0].value
+      if (!link) return;
+      const videoHoster = link.includes('yout')
+        ? 'youtube' : link.includes('vimeo')
+          ? 'vimeo' : '';
 
-        if (!videoHoster) {
-          return;
-        }
+      if (!videoHoster) {
+        return;
+      }
+      const videoId = getVideoId(link, videoHoster);
+      const iframe = document.createElement('iframe');
 
-        const videoId = getVideoId(link, videoHoster);
-        const iframe = document.createElement('iframe');
+      iframe.width = 560;
+      iframe.height = 315;
+      iframe.allowfullscreen = true;
+      iframe.contentEditable = false
+      iframe.src = videoHoster === 'youtube'
+        ? `//www.youtube.com/embed/${videoId}`
+        : videoHoster === 'vimeo'
+          ? `//player.vimeo.com/video/${videoId}`
+          : ''
 
-        iframe.width = 560;
-        iframe.height = 315;
-        iframe.allowfullscreen = true;
-        iframe.contentEditable = false
-        iframe.src = videoHoster === 'youtube'
-          ? `//www.youtube.com/embed/${videoId}`
-          : videoHoster === 'vimeo'
-            ? `//player.vimeo.com/video/${videoId}`
-            : ''
-        selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
-      });
+      this.insertElement(iframe, selectedRange);
+    });
   }
 
   createGrid() {
-    const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter columns count:', '', {
+    const selectedRange = Selection.range;
+    const prompt = new Prompt('Enter columns count:', '', {
       wrapper: this.$align.el,
       position: this.position,
       inputsCount: 1
-    }).onSubmit(function () {
+    })
+    prompt.onSubmit(() => {
       const grid = stringToDOM(`<div class="align-grid">
-        ${'<div class="align-column"><br></div>'.repeat(this.inputs[0].value)}
+        ${'<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value)}
       </div>`);
-      selectedElement.parentNode.insertBefore(grid, selectedElement.nextSibling);
+      this.insertElement(grid, selectedRange);
     });
   }
 
   createTable () {
-    const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter post link:', '', {
+    const selectedRange = Selection.range;
+    const prompt = new Prompt('Enter post link:', '', {
       wrapper: this.$align.el,
       position: this.position,
       inputsCount: 2,
       inputsPlaceholders: ['rows', 'columns']
-    }).onSubmit(function () {
-      selectedElement.parentNode.insertBefore(
-        new Table({
-          rows: this.inputs[0].value,
-          columns: this.inputs[1].value
-        }).el,
-        selectedElement.nextSibling
-      );
+    })
+    prompt.onSubmit(() => {
+      const table = new Table({
+        rows: prompt.inputs[0].value,
+        columns: prompt.inputs[1].value
+      }).el;
+      this.insertElement(table, selectedRange);
     });
   }
 
   embedPost () {
-    const selectedElement = Selection.current.anchorNode;
-    new Prompt('Enter post link:', '', {
+    const selectedRange = Selection.range;
+    const prompt = new Prompt('Enter post link:', '', {
       wrapper: this.$align.el,
       position: this.position
     })
-      .onSubmit(function () {
-        const postUrl = this.inputs[0].value
-        if (!postUrl) return;
-        const iframe = document.createElement('iframe');
+    prompt.onSubmit(() => {
+      const postUrl = prompt.inputs[0].value
+      if (!postUrl) return;
+      const iframe = document.createElement('iframe');
 
-        iframe.width = 500;
-        iframe.height = 200;
-        iframe.scrolling = 'no';
-        iframe.contentEditable = false;
-        iframe.allowTransparency = true;
-        iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
-        selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
-      });
+      iframe.width = 500;
+      iframe.height = 200;
+      iframe.scrolling = 'no';
+      iframe.contentEditable = false;
+      iframe.allowTransparency = true;
+      iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
+      this.insertElement(iframe, selectedRange);
+    });
   }
 
   embed () {
-    const selectedElement = Selection.current.anchorNode;
-    new Prompt('Add embeded:', '', {
+    const selectedRange = Selection.range;
+    const prompt = new Prompt('Add embeded:', '', {
       wrapper: this.$align.el,
       position: this.position
     })
-      .onSubmit(function () {
-        const data = this.inputs[0].value
-        if (!data) return;
-        const div = document.createElement('div');
+    prompt.onSubmit(() => {
+      const data = prompt.inputs[0].value
+      if (!data) return;
+      const div = document.createElement('div');
+      div.insertAdjacentHTML('afterbegin', data);
 
-        selectedElement.parentNode.insertBefore(div, selectedElement.nextSibling);
-        div.insertAdjacentHTML('afterbegin', data);
-      });
+      this.insertElement(div, selectedRange);
+    });
   }
 
   embedTweet () {

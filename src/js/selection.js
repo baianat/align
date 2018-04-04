@@ -1,33 +1,8 @@
-let CURRENT_SELECTION = null;
-let TEXT_RANGE = null;
-let RANGE = null;
-
 export default class Selection {
-  static set textRange(range) {
-    if (!range) return;
-    TEXT_RANGE = range;
-  }
+  static current = null;
+  static textRange = null;
+  static range = null;
 
-  static get textRange() {
-    return TEXT_RANGE;
-  }
-
-  static set range(range) {
-    if (!range) return;
-    RANGE = range;
-  }
-
-  static get range() {
-    return RANGE;
-  }
-
-  static set current(selection) {
-    CURRENT_SELECTION = selection;
-  }
-
-  static get current() {
-    return CURRENT_SELECTION;
-  }
 
   static selectTextRange(range = Selection.textRange) {
     if (!range) return;
@@ -45,7 +20,7 @@ export default class Selection {
     sel.addRange(range);
   }
 
-  static updateSelectedRange() {
+  static update() {
     const sel = Selection.current = window.getSelection();
     if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
       Selection.textRange = sel.getRangeAt(0);

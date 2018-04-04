@@ -94,7 +94,7 @@ const cmdsSchema = {
       ).onSubmit(function () {
         const link = this.input.value;
         if (!link) return;
-        Selection.selectTextRange();
+        Selection.selectRange();
         styler.$align.execute('createLink', link);
       }, [styler]);
     }
@@ -219,8 +219,9 @@ const cmdsSchema = {
     useCSS: true,
     init: Colorpicker,
     initConfig: {
-      defaultColor: '#000000',
+      defaultColor: '#fff',
       mode: 'hex',
+      picker: { mode: 'square' },
       disableLum: true,
       guideIcon: `
         <svg viewBox="0 0 24 24">
@@ -230,13 +231,13 @@ const cmdsSchema = {
       `,
       events: {
         beforeSubmit() {
-          Selection.selectTextRange();
+          Selection.selectRange();
         },
         afterOpen() {
-          Selection.updateSelectedRange();
+          Selection.update();
         },
         afterSelect() {
-          Selection.updateSelectedRange();
+          Selection.update();
         }
       }
     }
@@ -252,6 +253,7 @@ const cmdsSchema = {
     initConfig: {
       defaultColor: '#fdfdfd',
       mode: 'hex',
+      picker: { mode: 'square' },
       disableLum: true,
       guideIcon: `
         <svg viewBox="0 0 24 24">
@@ -261,13 +263,13 @@ const cmdsSchema = {
       `,
       events: {
         beforeSubmit() {
-          Selection.selectTextRange();
+          Selection.selectRange();
         },
         afterOpen() {
-          Selection.updateSelectedRange();
+          Selection.update();
         },
         afterSelect() {
-          Selection.updateSelectedRange();
+          Selection.update();
         }
       }
     }
@@ -329,6 +331,7 @@ const cmdsSchema = {
     init: Colorpicker,
     initConfig: {
       defaultColor: '#000000',
+      picker: { mode: 'square'},
       mode: 'hex',
       disableLum: true,
       guideIcon: `
