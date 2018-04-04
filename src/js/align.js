@@ -132,7 +132,6 @@ export default class Align {
         return;
       }
 
-      this.update();
       if (event[this.cmdKey] && this.settings.shortcuts) {
         switch (event.key.toUpperCase()) {
           case 'B':
@@ -202,6 +201,7 @@ export default class Align {
         default:
           break;
       }
+      setTimeout(this.update.bind(this), 1);
     }, true);
   }
 
@@ -216,7 +216,7 @@ export default class Align {
     const code = Array.from(this.editor.querySelectorAll('pre'));
     code.forEach((block) => {
       hljs.highlightBlock(block);
-    })
+    });
   }
   /* eslint-enable */
 
