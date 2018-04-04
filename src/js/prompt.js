@@ -37,9 +37,11 @@ export default class Prompt {
         this.selectionRefrance = Selection.range;
       }
       if (Selection.range.startContainer.nodeType === 1) {
-        this.selectionRefrance = Selection.current.anchorNode;
+        this.selectionRefrance = Selection.range.startContainer;
       }
-      updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-top');
+      setTimeout(() => {
+        updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-top');
+      }, 1);
     }
     this.message.innerText = message;
     this.submit.innerText = 'Submit';
@@ -65,12 +67,12 @@ export default class Prompt {
         ) return;
         this.remove();
       });
-    }, 16);
+    }, 1);
   }
 
   onSubmit (func, args) {
-    this.submit.addEventListener('click', () => func.call(this, args));
-    this.submit.addEventListener('click', () => setTimeout(this.remove.bind(this), 16));
+    this.submit.addEventListener('click', () => func(args));
+    this.submit.addEventListener('click', () => setTimeout(this.remove.bind(this), 1));
     return this;
   }
 
