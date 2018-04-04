@@ -4,7 +4,7 @@ export default class Selection {
   static range = null;
 
 
-  static selectTextRange(range = Selection.textRange) {
+  static selectRange(range = Selection.textRange) {
     if (!range) return;
     const sel = Selection.current = window.getSelection();
     sel.removeAllRanges();
@@ -22,6 +22,13 @@ export default class Selection {
 
   static update() {
     const sel = Selection.current = window.getSelection();
+    // check if the range is inside a section
+    if (
+      sel.anchorNode &&
+      !sel.anchorNode.parentNode.closest('.align-content')
+    ) {
+      return;
+    }
     if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
       Selection.textRange = sel.getRangeAt(0);
     }

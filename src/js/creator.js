@@ -148,11 +148,8 @@ export default class Creator {
     this.el.classList.add('is-hidden');
   }
   
-  insertElement(element, range = Selection.range) {
-    // check if the range is inside a section
-    if (range.startContainer.parentNode.closest('.align-content')) {
-      range.insertNode(element);
-    }
+  insertElement(element) {
+    Selection.range.insertNode(element);
   }
 
   createFigure (event) {
@@ -191,8 +188,6 @@ export default class Creator {
   }
 
   createVideo () {
-    const selectedRange = Selection.range;
-
     const prompt = new Prompt('Enter video link:', '', {
       wrapper: this.$align.el,
       position: this.position
@@ -220,12 +215,11 @@ export default class Creator {
           ? `//player.vimeo.com/video/${videoId}`
           : ''
 
-      this.insertElement(iframe, selectedRange);
+      this.insertElement(iframe);
     });
   }
 
   createGrid() {
-    const selectedRange = Selection.range;
     const prompt = new Prompt('Enter columns count:', '', {
       wrapper: this.$align.el,
       position: this.position,
@@ -235,12 +229,11 @@ export default class Creator {
       const grid = stringToDOM(`<div class="align-grid">
         ${'<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value)}
       </div>`);
-      this.insertElement(grid, selectedRange);
+      this.insertElement(grid);
     });
   }
 
   createTable () {
-    const selectedRange = Selection.range;
     const prompt = new Prompt('Enter post link:', '', {
       wrapper: this.$align.el,
       position: this.position,
@@ -252,12 +245,11 @@ export default class Creator {
         rows: prompt.inputs[0].value,
         columns: prompt.inputs[1].value
       }).el;
-      this.insertElement(table, selectedRange);
+      this.insertElement(table);
     });
   }
 
   embedPost () {
-    const selectedRange = Selection.range;
     const prompt = new Prompt('Enter post link:', '', {
       wrapper: this.$align.el,
       position: this.position
@@ -273,12 +265,11 @@ export default class Creator {
       iframe.contentEditable = false;
       iframe.allowTransparency = true;
       iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
-      this.insertElement(iframe, selectedRange);
+      this.insertElement(iframe);
     });
   }
 
   embed () {
-    const selectedRange = Selection.range;
     const prompt = new Prompt('Add embeded:', '', {
       wrapper: this.$align.el,
       position: this.position
@@ -289,7 +280,7 @@ export default class Creator {
       const div = document.createElement('div');
       div.insertAdjacentHTML('afterbegin', data);
 
-      this.insertElement(div, selectedRange);
+      this.insertElement(div);
     });
   }
 
