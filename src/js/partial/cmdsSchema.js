@@ -80,26 +80,6 @@ const cmdsSchema = {
     tooltip: `Justify full (${symbols.cmdKey} J)`
   },
 
-  createLink: {
-    element: 'button',
-    tooltip: 'Hyperlink',
-    func(styler) {
-      new Prompt(
-        'Enter link:',
-        Selection.current.toString(),
-        {
-          wrapper: styler.$align.el,
-          position: Selection.textRange.getBoundingClientRect()
-        }
-      ).onSubmit(function () {
-        const link = this.input.value;
-        if (!link) return;
-        Selection.selectRange();
-        styler.$align.execute('createLink', link);
-      }, [styler]);
-    }
-  },
-
   h1: {
     element: 'button',
     command: 'formatblock',
@@ -334,6 +314,13 @@ const cmdsSchema = {
     func: 'createLine',
     tooltip: 'Add line'
   },
+
+  createLink: {
+    element: 'button',
+    tooltip: 'Hyperlink',
+    func: 'createLink',
+  },
+
   // internal functions don't use it
 
   _figureClasses: {

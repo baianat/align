@@ -16,6 +16,7 @@ import {
 } from './partial/elements';
 import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
+import Section from './section';
 
 export default class Styler {
   constructor(align, {
@@ -44,8 +45,11 @@ export default class Styler {
   _init () {
     setElementsPrefix('styler-');
     this.cmdsSchema = cloneObject(cmdsSchema);
-    this.el = document.createElement('ul');
+    this.el = document.createElement('div');
+    this.menu = document.createElement('ul')
     this.el.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
+    this.el.appendChild(this.menu);
+    this.menu.classList.add('styler-menu');
     this.cmds = {};
     this.visiable = false;
 
@@ -53,7 +57,23 @@ export default class Styler {
       this.generateCmdElement(command);
     })
     this.$align.el.appendChild(this.el);
-    if (this.settings.mode === 'bubble') this._initBubble();
+    if (this.settings.mode === 'bubble') {
+      this._initBubble();
+    }
+    if (this.settings.mode === 'creator') {
+      this._initCreator();
+    }
+    if (this.settings.hideWhenClickOut) {
+      this.clickCallback = (event) => {
+        if (
+          isElementClosest(event.target, this.el) ||
+          isElementClosest(event.target, this.currentItem.el)
+        ) {
+          return;
+        }
+        this.hide();
+      }
+    }
   }
 
   _initBubble () {
@@ -65,13 +85,22 @@ export default class Styler {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           if (!this.currentPosition) {
-            this.updateBubblePosition('center-top');
+            this.updateBubble();
           }
           ticking = false;
         });
         ticking = true;
       }
     }
+  }
+
+  _initCreator () {
+    this.toggleButton = button('plus');
+    this.toggleButton.addEventListener('click', () => {
+      this.el.classList.toggle('is-active');
+    });
+    this.el.insertBefore(this.toggleButton, this.menu);
+    this.hide();
   }
 
   generateCmdElement(command) {
@@ -160,7 +189,7 @@ export default class Styler {
       cmdSchema.init = null;
     }
 
-    this.el.appendChild(li);
+    this.menu.appendChild(li);
   }
 
   cmdCallback(cmdSchema, value) {
@@ -176,9 +205,7 @@ export default class Styler {
     if (typeof cmdSchema.func === 'function') {
       cmdSchema.func(this, value || cmdSchema);
     }
-    if (this.settings.mode === 'bubble') {
-      this.updateBubblePosition();
-    }
+    this.update();
   }
 
   /**
@@ -190,28 +217,44 @@ export default class Styler {
     this.$align.execute(...arguments);
   }
 
-  updateBubblePosition (newPosition) {
-    if (!Selection.textRange && !this.currentItem) return;
-    const element = this.currentItem ? this.currentItem.el : Selection.textRange;
-    this.currentPosition = updatePosition(
-      element,
-      this.el,
-      this.$align.el,
-      newPosition || this.settings.position
-    );
+  updateBubble(newPosition) {
+    if ((
+      Selection.range &&
+      !Selection.range.collapsed &&
+      Selection.range === Selection.current.getRangeAt(0)
+    ) || this.currentItem) {
+      const element = this.currentItem ? this.currentItem.el : Selection.range;
+      this.currentPosition = updatePosition(
+        element,
+        this.el,
+        this.$align.el,
+        newPosition || this.settings.position
+      );
+      this.show();
+      return;
+    }
+    this.hide();
   }
 
-  show (item) {
-    if (this.currentItem) {
-      this.currentItem.el.classList.remove('is-active');
+  updateCreator(newPosition) {
+    if (
+      Selection.range &&
+      Selection.range.collapsed &&
+      Selection.range.startContainer.nodeType === 1 &&
+      Selection.range.startContainer.childNodes.length <= 1
+    ) {
+      this.position = updatePosition(
+        Selection.range.startContainer,
+        this.el,
+        this.$align.el,
+        newPosition || this.settings.position);
+      this.show();
+      return;
     }
-    if (item) {
-      this.currentItem = item;
-      this.currentItem.el.classList.add('is-active');
-    }
-    if (this.settings.mode === 'bubble') {
-      this.updateBubblePosition();
-    }
+    this.hide();
+  }
+
+  show () {
     if (this.visiable) {
       return;
     }
@@ -219,36 +262,40 @@ export default class Styler {
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
     if (this.settings.hideWhenClickOut) {
-      document.addEventListener('click', (event) => {
-        if (
-          isElementClosest(event.target, this.currentItem.el) ||
-          isElementClosest(event.target, this.el)
-        ) return;
-        this.hide();
-      });
+      document.addEventListener('click', this.clickCallback)
     }
   }
 
   hide () {
     if (this.currentItem) {
       this.currentItem.el.classList.remove('is-active');
+      this.currentItem = null;
     }
     this.el.classList.remove('is-visible');
+    this.el.classList.remove('is-active');
     this.el.classList.add('is-hidden');
-    if (this.settings.hideWhenClickOut) {
-      document.removeEventListener('click', this.clickCallback);
-    }
     this.visiable = false;
+    if (this.settings.hideWhenClickOut) {
+      document.removeEventListener('click', this.clickCallback)
+    }
   }
 
-  update () {
-    this.updateCommandsStates();
-    if (this.settings.mode !== 'bubble' || !Selection.textRange) return;
-    if (Selection.textRange.collapsed || Selection.range.collapsed) {
-      this.hide();
-      return;
+  update(item) {
+    if (this.currentItem) {
+      this.currentItem.el.classList.remove('is-active');
     }
-    this.show();
+    if (item) {
+      this.currentItem = item;
+      this.currentItem.el.classList.add('is-active');
+    }
+    this.updateCommandsStates();
+    if (this.settings.mode === 'bubble') {
+      this.updateBubble();
+    }
+    if (this.settings.mode === 'creator') {
+      this.updateCreator();
+    }
+
   };
 
   getTooltip(schema) {
@@ -300,8 +347,6 @@ export default class Styler {
     const prefixedClasses = allClasses.map(cls => `is-${cls}`);
     this.currentItem.el.classList.remove(...prefixedClasses);
     this.currentItem.el.classList.toggle(currentClass);
-    if (this.settings.mode === 'bubble') {
-      this.updateBubblePosition();
-    }
+    this.update();
   }
 }

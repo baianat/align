@@ -11,7 +11,6 @@ import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './selection';
 import Section from './section';
-import Creator from './creator';
 import Prompt from './prompt';
 import Styler from './styler';
 import EventBus from './events';
@@ -82,6 +81,7 @@ export default class Align {
       tooltip: true
     });
     Section.config(this, this.settings.section);
+    Table.config(this, this.settings.table);
 
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';
@@ -93,8 +93,9 @@ export default class Align {
       this.bubble = new Styler(this, this.settings.bubble);
     }
     if (this.settings.creator) {
-      this.creator = new Creator(this, this.settings.creator);
-      Table.config(this, this.settings.table);
+      this.settings.creator.mode = 'creator';
+      this.settings.creator.position = 'middle-left';
+      this.creator = new Styler(this, this.settings.creator);
     }
     this._initEditor();
     this._initSections();
@@ -253,7 +254,7 @@ export default class Align {
     exitFullscreen();
   }
 
-  update () {
+  update (evet) {
     Selection.update();
     setTimeout(() => {
       if (this.settings.toolbar) {
@@ -296,7 +297,7 @@ export default class Align {
     figure.classList.add('align-figure', 'is-center');
     figure.appendChild(img);
     figure.appendChild(caption);
-    figure.addEventListener('click', () => this.figureOptions.show({
+    figure.addEventListener('click', () => this.figureOptions.update({
       el: figure,
       remove() {
         figure.remove();
@@ -357,6 +358,7 @@ export default class Align {
       const grid = stringToDOM(`<div class="align-grid">
         ${'<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value)}
       </div>`);
+      console.log(Selection.range)
       Selection.range.insertNode(grid);
     });
   }
@@ -412,6 +414,23 @@ export default class Align {
       div.insertAdjacentHTML('afterbegin', data);
 
       Selection.range.insertNode(div);
+    });
+  }
+
+  createLink() {
+    const prompt = new Prompt(
+      'Enter link:',
+      Selection.current.toString(),
+      {
+        wrapper: this.el,
+        position: this.position
+      }
+    )
+    prompt.onSubmit(() => {
+      const link = prompt.inputs[0].value;
+      if (!link) return;
+      Selection.selectRange();
+      this.execute('createLink', link);
     });
   }
 }

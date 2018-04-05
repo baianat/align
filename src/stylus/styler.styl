@@ -1,16 +1,20 @@
-.align .styler
+.styler
   background-color: $white
   box-shadow: 0 20px 25px -20px alpha($black, 20%)
-  &,
-  & ul
-    margin: 0
-    padding: 0
-    width: auto
-    list-style: none
-    display: flex
-    flex-wrap: wrap
-    justify-content: center
-    align-items: center
+  display: flex
+
+  &-menu
+    &,
+    ul
+      margin: 0
+      padding: 0
+      width: auto
+      list-style: none
+      display: flex
+      flex-wrap: wrap
+      justify-content: center
+      align-items: center
+      user-select: none
 
   &-button
     background-color: $white
@@ -35,61 +39,10 @@
     padding: 5px
     svg
       color: $black
-
-  &.is-dark
-    background-color: $black
-    color: $white
-    .styler-button
-      background-color: $black
-      fill: $white
-      &.is-active
-        fill: $magenta
-    .styler-select
-      color: $white
-    .styler-icon
-      color: $white !important
-    .picker-guide svg
-      color: $white
-    [data-tooltip]
-      &:before
-        border-color: transparent transparent $white transparent
-      &:after
-        background-color: $white
-        color: $black
-
-  &.is-toolbar
-    position: sticky
-    width: 100%
-    top: 0
-    right: 0
-    left: 0
-    z-index: 50
-    padding: 10px
-    
-  &.is-bubble
-    padding: 10px
-    top: 0
-    left: 0
-    position: absolute
-    z-index: 40
-    border-radius: 40px
-    margin-top: -10px
-    box-shadow: 0 0 25px alpha($black, 5%)
-    transition: opacity 0.2s
-
-  &.is-visible
-    opacity: 1
-    visibility: visible
-
-  &.is-hidden
-    visibility: hidden
-    opacity: 0
   
   &-separator
     content: '|'
     padding: 0 10px
-
-
 
   &-list
     -webkit-appearance: none
@@ -144,44 +97,63 @@
     display: flex
 
 
-[data-tooltip]
-  position: relative
-
-  &:focus
-    outline: none
-  &:hover
-    &:before,
-    &:after
-      display: block
-
-  &:before
-    position: absolute
-    top: calc(100% - 4px)
-    left: 50%
-    z-index: 99999
-    display: block
-    width: 0
-    height: 0
-    border-width: 0 4px 4px 4px
-    border-style: solid
-    border-color: transparent transparent $black transparent
-    content: ''
-    display: none
-    transform: translate(-50%, 0)
-    user-select: none
-
-  &:after
-    position: absolute
-    top: 100%
-    left: 50%
-    z-index: 99999
-    display: none
-    padding: 4px 8px
-    border-radius: 4px
+  &.is-dark
     background-color: $black
     color: $white
-    content: attr(data-tooltip)
-    white-space: nowrap
-    transform: translate(-50%, 0)
-    user-select: none
-    font-size: 12px
+    .styler-button
+      background-color: $black
+      fill: $white
+      &.is-active
+        fill: $magenta
+    .styler-select
+      color: $white
+    .styler-icon
+      color: $white !important
+    .picker-guide svg
+      color: $white
+    [data-tooltip]
+      &:before
+        border-color: transparent transparent $white transparent
+      &:after
+        background-color: $white
+        color: $black
+
+  &.is-toolbar
+    position: sticky
+    width: 100%
+    top: 0
+    right: 0
+    left: 0
+    z-index: 50
+    padding: 10px
+    
+  &.is-bubble
+    padding: 10px
+    top: 0
+    left: 0
+    position: absolute
+    z-index: 40
+    border-radius: 40px
+    margin-top: -10px
+    box-shadow: 0 0 25px alpha($black, 5%)
+    transition: 0.2s
+
+  &.is-creator
+    top: 0
+    left: 0
+    position: absolute
+    z-index: 30
+    .styler-menu
+      display: none
+
+  &.is-active
+    .styler-menu
+      display: flex
+
+  &.is-visible
+    opacity: 1
+    visibility: visible
+
+  &.is-hidden
+    visibility: hidden
+    opacity: 0

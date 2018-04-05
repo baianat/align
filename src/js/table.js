@@ -48,11 +48,12 @@ export default class Table {
   _initEvents () {
     this.el.addEventListener('click', event => {
       this.activeCell = event.target;
-      Table.$optionsBar.show(this);
+      Table.$optionsBar.update(this);
     })
   }
 
   remove () {
+    Table.$optionsBar.hide();
     this.el.remove();
   }
 

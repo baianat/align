@@ -17,7 +17,7 @@ export default class Section {
     if (type === 'text') {
       this.el.addEventListener('click', () => {
         Section.$align.activeSection = this.el;
-        Section.$optionsBar.show(this);
+        Section.$optionsBar.update(this);
       });
     }
     if (typeof position === 'object') {
@@ -205,12 +205,13 @@ export default class Section {
   }
 
   active () {
-    Section.$optionsBar.show(this);
+    Section.$optionsBar.update(this);
     this.el.focus();
   }
 
   remove () {
+    Section.$optionsBar.hide();
     this.el.remove();
-    Section.allSections.splice(this.getIndex(), 1)
+    Section.allSections.splice(this.getIndex(), 1);
   }
 }
