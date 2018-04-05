@@ -89,7 +89,7 @@ new Align('.editor', {
       'separator',
       'bold', 'italic', 'underline', 'strikeThrough',
       'separator',
-      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 
+      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
       'separator',
       'h2', 'h3', 'h4', 'p', 'blockquote', 'pre', 'createLink',
       'separator',
@@ -149,16 +149,12 @@ new Align('.editor', {
 | createLink    | | creates an anchor link from the selection text. |
 | html          | | toggles HTML on/off for all text. |
 | sperator      | | used for decoration to separate commands. |
-
-#### List of all available creator items
-
-| ITEM      | DESCRIPTION |
-|-----------| ----------- |
-| figure    | uploads an image figure and inseart it after the selected place |
-| video     | embed a video for youtube/vimeo url after the selected place |
-| facebook  | embed a facebook post from url after the selected place |
-| embed     | embed any embed iframe script after the selected place |
-| table     | inserts a table after the selected place |
+| createFigure  | | uploads an image figure and inseart it at insert at the start of the selected range |
+| createVideo   | | embed a video for youtube/vimeo url at insert at the start of the selected range |
+| createPost    | | embed a facebook post from url at insert at the start of the selected range |
+| createEmbed   | | embed any embed iframe script at insert at the start of the selected range |
+| createTable   | | inserts a table at insert at the start of the selected range |
+| createLine    | | inserts a selected horizontal line at insert at the start of the selected range |
 
 ### Adding new custom commands
 
