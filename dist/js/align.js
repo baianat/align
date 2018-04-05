@@ -14,118 +14,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
 
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
 
 
 
@@ -262,7 +151,7 @@ function cloneObject(object) {
   var output = {};
   Object.keys(object).forEach(function (key) {
     var tempValue = object[key];
-    output[key] = (typeof tempValue === 'undefined' ? 'undefined' : _typeof(tempValue)) === 'object' ? cloneObject(tempValue) : tempValue;
+    output[key] = (typeof tempValue === 'undefined' ? 'undefined' : _typeof(tempValue)) === 'object' && !Array.isArray(tempValue) ? cloneObject(tempValue) : tempValue;
   });
   return output;
 }
@@ -361,905 +250,1610 @@ function swapArrayItems(array, index1, index2) {
   return array;
 }
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+/**
+  * color-fns v0.0.1
+  * (c) 2018 Baianat
+  * @license MIT
+  */
+var _typeof$1 = typeof Symbol === "function" && _typeof(Symbol.iterator) === "symbol" ? function (obj) {
+  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
+};
 
+var classCallCheck$1 = function classCallCheck$$1(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
 
+var createClass$1 = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) {
+        descriptor.writable = true;
+      }
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
 
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) {
+      defineProperties(Constructor.prototype, protoProps);
+    }
+    if (staticProps) {
+      defineProperties(Constructor, staticProps);
+    }
+    return Constructor;
+  };
+}();
 
+var get$1 = function get$$1(object, property, receiver) {
+  if (object === null) {
+    object = Function.prototype;
+  }
+  var desc = Object.getOwnPropertyDescriptor(object, property);
 
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get$$1(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+var inherits$1 = function inherits$$1(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof(superClass)));
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) {
+    Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+};
+
+var possibleConstructorReturn$1 = function possibleConstructorReturn$$1(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
+};
+
+function getColorModel(color) {
+  if ((typeof color === 'undefined' ? 'undefined' : _typeof$1(color)) === 'object' && color.model) {
+    return color.model;
+  }
+
+  if (color.slice(0, 1) === '#' && (color.length === 4 || color.length === 7)) {
+    return 'hex';
+  }
+
+  if (color.slice(0, 1) === '#' && (color.length === 6 || color.length === 9)) {
+    return 'hex';
+  }
+
+  if (color.slice(0, 4).toUpperCase() === 'RGBA') {
+    return 'rgb';
+  }
+
+  if (color.slice(0, 3).toUpperCase() === 'RGB') {
+    return 'rgb';
+  }
+
+  if (color.slice(0, 4).toUpperCase() === 'HSLA') {
+    return 'hsl';
+  }
+
+  if (color.slice(0, 3).toUpperCase() === 'HSL') {
+    return 'hsl';
+  }
+
+  return false;
 }
 
-var colorpicker = createCommonjsModule(function (module, exports) {
-  (function (global, factory) {
-    module.exports = factory();
-  })(commonjsGlobal, function () {
-    'use strict';
+/**
+ * Checks if the given color string is valid (parsable).
+ *
+ * @param {String} color The color string to be checked.
+ */
+function isAColor(color) {
+  return !!getColorModel(color);
+}
 
-    var commonjsGlobal$$1 = typeof window !== 'undefined' ? window : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
+function hexNumToDec(hexNum) {
+  if (isNaN(parseInt(hexNum, 16))) {
+    return 0;
+  }
 
-    function createCommonjsModule$$1(fn, module) {
-      return module = { exports: {} }, fn(module, module.exports), module.exports;
-    }
+  return parseInt(hexNum, 16);
+}
 
-    var slider$1 = createCommonjsModule$$1(function (module, exports) {
-      (function (global, factory) {
-        module.exports = factory();
-      })(commonjsGlobal$$1, function () {
-        'use strict';
+function decNumToHex(decNum) {
+  decNum = Math.floor(decNum);
+  if (isNaN(decNum)) {
+    return '00';
+  }
 
-        /**
-         * Utilities
-         */
+  return ('0' + decNum.toString(16)).slice(-2);
+}
 
-        function select(element) {
-          if (typeof element === 'string') {
-            return document.querySelector(element);
-          }
-          return element;
-        }
+function isBetween(lb, ub) {
+  return function (value) {
+    return value >= lb && value <= ub;
+  };
+}
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
-        function getNumber(number1, number2) {
-          return number1 ? parseInt(number1, 10) : parseInt(number2, 10);
-        }
+var Color = function () {
+  function Color(components) {
+    var _this = this;
 
-        function wrap(el, wrapper) {
-          // insert wrapper before el in the DOM tree
-          el.parentNode.insertBefore(wrapper, el);
+    classCallCheck$1(this, Color);
 
-          // move el into wrapper
-          wrapper.appendChild(el);
-        }
-
-        /**
-         * Converts an array-like object to an array.
-         */
-
-        /**
-         * Slider class
-         */
-        var Slider = function Slider(selector, ref) {
-          if (ref === void 0) {
-            ref = {};
-          }
-          var gradient = ref.gradient;if (gradient === void 0) {
-            gradient = null;
-          }
-          var classes = ref.classes;if (classes === void 0) {
-            classes = null;
-          }
-          var colorCode = ref.colorCode;if (colorCode === void 0) {
-            colorCode = false;
-          }
-          var editable = ref.editable;if (editable === void 0) {
-            editable = false;
-          }
-          var reverse = ref.reverse;if (reverse === void 0) {
-            reverse = false;
-          }
-          var label = ref.label;if (label === void 0) {
-            label = true;
-          }
-          var min = ref.min;if (min === void 0) {
-            min = 0;
-          }
-          var max = ref.max;if (max === void 0) {
-            max = 10;
-          }
-          var step = ref.step;if (step === void 0) {
-            step = 1;
-          }
-          var value = ref.value;if (value === void 0) {
-            value = 0;
-          }
-
-          this.el = select(selector);
-          this.settings = {
-            gradient: gradient,
-            classes: classes,
-            colorCode: colorCode,
-            editable: editable,
-            reverse: reverse,
-            label: label,
-            min: min,
-            max: max,
-            step: step,
-            value: value
-          };
-          this.init();
-        };
-
-        /**
-         * create new rang slider element
-         * @param {String|HTMLElement} selector
-         * @param {Object}           settings
-         */
-        Slider.create = function create(selector, settings) {
-          Slider(selector, settings);
-        };
-
-        Slider.prototype.init = function init() {
-          this.initElements();
-
-          this.min = getNumber(this.el.min, this.settings.min);
-          this.max = getNumber(this.el.max, this.settings.max);
-          this.step = getNumber(this.el.step, this.settings.step);
-          this.callbacks = {};
-
-          if (this.settings.gradient) {
-            this.initGradient();
-          }
-
-          this.updateWidth();
-          this.update(getNumber(this.el.value, this.settings.value));
-          this.initEvents();
-        };
-
-        Slider.prototype.initElements = function initElements() {
-          this.wrapper = document.createElement('div');
-          this.track = document.createElement('div');
-          this.handle = document.createElement('div');
-          this.fill = document.createElement('div');
-
-          this.wrapper.classList.add('slider');
-          if (this.settings.editable) {
-            this.wrapper.classList.add('is-editable');
-          }
-          if (this.settings.reverse) {
-            this.wrapper.classList.add('is-reverse');
-          }
-          if (this.settings.classes) {
-            this.wrapper.classList.add(this.settings.classes);
-          }
-          this.track.classList.add('slider-track');
-          this.handle.classList.add('slider-handle');
-          this.fill.classList.add('slider-fill');
-          this.el.classList.add('slider-input');
-
-          wrap(this.el, this.wrapper);
-          this.track.appendChild(this.fill);
-          this.track.appendChild(this.handle);
-          this.wrapper.appendChild(this.track);
-          if (this.settings.label) {
-            this.label = document.createElement('div');
-            this.label.classList.add('slider-label');
-            this.handle.appendChild(this.label);
-          }
-        };
-
-        Slider.prototype.initGradient = function initGradient() {
-          if (this.settings.gradient.length > 1) {
-            this.track.style.backgroundImage = "linear-gradient(90deg, " + this.settings.gradient + ")";
-            this.gradient = this.settings.gradient;
-            this.colorCode = this.settings.colorCode;
-            return;
-          }
-          this.track.style.backgroundImage = 'none';
-          this.track.style.backgroundColor = this.settings.gradient[0];
-          this.handle.style.backgroundColor = this.settings.gradient[0];
-          this.gradient = null;
-        };
-
-        Slider.prototype.initEvents = function initEvents() {
-          var this$1 = this;
-
-          this.track.addEventListener('mousedown', this.select.bind(this), false);
-          this.track.addEventListener('touchstart', this.select.bind(this), false);
-          if (this.settings.editable && !this.settings.colorCode) {
-            this.el.addEventListener('change', function (evt) {
-              this$1.update(this$1.el.value);
-            }, false);
-          }
-        };
-
-        /**
-         * fire select events
-         */
-        Slider.prototype.select = function select$$1(event) {
-          event.preventDefault();
-          this.updateWidth();
-          this.click(event);
-          this.callbacks.tempDrag = this.dragging.bind(this);
-          this.callbacks.tempRelease = this.release.bind(this);
-          document.addEventListener('mousemove', this.callbacks.tempDrag, false);
-          document.addEventListener('touchmove', this.callbacks.tempDrag, false);
-          document.addEventListener('touchend', this.callbacks.tempRelease, false);
-          document.addEventListener('mouseup', this.callbacks.tempRelease, false);
-        };
-
-        /**
-         * dragging motion
-         */
-        Slider.prototype.dragging = function dragging(event) {
-          event.preventDefault();
-          // get drag change value
-          var eventX = event.type === 'mousemove' ? event.clientX : event.touches[0].clientX;
-          var mouseValue = eventX - this.currentX;
-
-          // check ifleft mouse is clicked
-          if (event.buttons !== 1 && event.type === 'mousemove') {
-            return;
-          }
-          this.track.classList.add('is-dragging');
-          var stepCount = parseInt(mouseValue / this.stepWidth + 0.5, 10);
-          var stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
-          if (stepValue !== this.currentValue) {
-            this.update(stepValue);
-          }
-        };
-
-        /**
-         * release handler
-         */
-        Slider.prototype.release = function release() {
-          this.track.classList.remove('is-dragging');
-          document.removeEventListener('mousemove', this.callbacks.tempDrag);
-          document.removeEventListener('touchmove', this.callbacks.tempDrag);
-          document.removeEventListener('mouseup', this.callbacks.tempRelease);
-          document.removeEventListener('touchend', this.callbacks.tempRelease);
-        };
-
-        Slider.prototype.click = function click(event) {
-          event.preventDefault();
-          var eventX = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
-          var mouseValue = eventX - this.currentX;
-
-          // check ifleft mouse is clicked
-          if (event.buttons !== 1 && event.type === 'mousemove') {
-            return;
-          }
-          var stepCount = parseInt(mouseValue / this.stepWidth + 0.5, 10);
-          var stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
-          if (stepValue !== this.currentValue) {
-            this.update(stepValue);
-          }
-        };
-
-        Slider.prototype.updateWidth = function updateWidth() {
-          this.currentX = this.track.getBoundingClientRect().left;
-          this.width = this.track.clientWidth;
-          this.stepWidth = this.width / (this.max - this.min);
-        };
-
-        /**
-         * get the filled area percentage
-         * @param{Object} slider
-         * @param{Number} value
-         * @return {Number}
-         */
-        Slider.prototype.getFillPercentage = function getFillPercentage(value) {
-          return (value - this.min) * 100 / (this.max - this.min);
-        };
-
-        Slider.prototype.normalizeValue = function normalizeValue(value) {
-          if (value >= this.max) {
-            return this.max;
-          }
-          if (value <= this.min) {
-            return this.min;
-          }
-          if (isNaN(Number(value))) {
-            return this.value;
-          }
-          return Number(value);
-        };
-
-        Slider.prototype.newGradient = function newGradient(newGradient$1) {
-          this.settings.gradient = newGradient$1;
-          this.initGradient();
-          this.update(undefined, true);
-        };
-
-        /**
-         * get the handle color
-         * @param{Number} fillPercentage
-         * @return {Number}              handle hex color code
-         */
-        Slider.prototype.getHandleColor = function getHandleColor(fillPercentage) {
-          var this$1 = this;
-
-          var colorCount = this.gradient.length - 1;
-          var region = fillPercentage / 100;
-          for (var i = 1; i <= colorCount; i++) {
-            // check the current zone
-            if (region >= (i - 1) / colorCount && region <= i / colorCount) {
-              // get the active color percentage
-              var colorPercentage = (region - (i - 1) / colorCount) / (1 / colorCount);
-              // return the mixed color based on the zone boundary colors
-              return Slider.mixColors(this$1.gradient[i - 1], this$1.gradient[i], colorPercentage);
-            }
-          }
-          return '#000000';
-        };
-
-        /**
-         * update the slider fill, value and color
-         * @param {Number} value
-         */
-        Slider.prototype.update = function update(value, mute) {
-          if (mute === void 0) {
-            mute = false;
-          }
-
-          if (Number(value) === this.value) {
-            return;
-          }
-          var normalized = this.normalizeValue(value);
-
-          var fillPercentage = this.getFillPercentage(normalized);
-
-          this.handle.style.left = fillPercentage + "%";
-          this.fill.style.left = fillPercentage + "%";
-
-          this.value = normalized;
-          this.el.value = this.value;
-          if (this.settings.label) {
-            this.label.innerHTML = this.value;
-          }
-          if (this.gradient) {
-            var color = this.getHandleColor(fillPercentage);
-            this.handle.style.backgroundColor = color;
-            if (this.settings.colorCode) {
-              this.el.value = color;
-              this.label.innerHTML = color;
-            }
-          }
-          if (mute) {
-            return;
-          }
-          this.el.dispatchEvent(new Event('change'));
-          this.el.dispatchEvent(new Event('input'));
-        };
-
-        /**
-         * private functions
-         */
-        Slider.hexAverage = function hexAverage(color1, color2, ratio) {
-          if (ratio === void 0) {
-            ratio = 0.5;
-          }
-
-          var average = parseInt(color1, 16) * (1 - ratio) + parseInt(color2, 16) * ratio;
-          return ("00" + Math.floor(average + 0.5).toString(16)).slice(-2);
-        };
-
-        Slider.mixColors = function mixColors(color1, color2, ratio) {
-          color1 = color1.replace('#', '');
-          color2 = color2.replace('#', '');
-          var red = Slider.hexAverage(color1.slice(0, -4), color2.slice(0, -4), ratio);
-          var green = Slider.hexAverage(color1.slice(2, -2), color2.slice(2, -2), ratio);
-          var blue = Slider.hexAverage(color1.slice(-2), color2.slice(-2), ratio);
-          return "#" + (red + green + blue).toUpperCase();
-        };
-
-        return Slider;
+    this.invalid = !this.validate(components);
+    if (!this.invalid) {
+      Object.keys(components).forEach(function (c) {
+        _this[c] = components[c];
       });
+    }
+    this.init();
+  }
+
+  createClass$1(Color, [{
+    key: 'init',
+    value: function init() {}
+  }, {
+    key: 'validate',
+    value: function validate(components) {
+      return !!components && (typeof components === 'undefined' ? 'undefined' : _typeof$1(components)) === 'object';
+    }
+  }]);
+  return Color;
+}();
+
+var RgbColor = function (_Color) {
+  inherits$1(RgbColor, _Color);
+
+  function RgbColor() {
+    classCallCheck$1(this, RgbColor);
+    return possibleConstructorReturn$1(this, (RgbColor.__proto__ || Object.getPrototypeOf(RgbColor)).apply(this, arguments));
+  }
+
+  createClass$1(RgbColor, [{
+    key: 'validate',
+    value: function validate(components) {
+      if (!get$1(RgbColor.prototype.__proto__ || Object.getPrototypeOf(RgbColor.prototype), 'validate', this).call(this, components)) {
+        return false;
+      }
+
+      var isInRange = isBetween(0, 255);
+
+      return isInRange(components.red) && isInRange(components.green) && isInRange(components.blue);
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      this.model = 'rgb';
+      this.alpha = this.alpha || 1;
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      if (this.invalid) {
+        return 'Invalid Color';
+      }
+      if (isBetween(0, 0.999)(this.alpha)) {
+        return 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')';
+      }
+      return 'rgb(' + this.red + ',' + this.green + ',' + this.blue + ')';
+    }
+  }]);
+  return RgbColor;
+}(Color);
+
+var HslColor = function (_Color2) {
+  inherits$1(HslColor, _Color2);
+
+  function HslColor() {
+    classCallCheck$1(this, HslColor);
+    return possibleConstructorReturn$1(this, (HslColor.__proto__ || Object.getPrototypeOf(HslColor)).apply(this, arguments));
+  }
+
+  createClass$1(HslColor, [{
+    key: 'validate',
+    value: function validate(components) {
+      if (!get$1(HslColor.prototype.__proto__ || Object.getPrototypeOf(HslColor.prototype), 'validate', this).call(this, components)) {
+        return false;
+      }
+
+      var isPercentage = isBetween(0, 100);
+
+      return isBetween(0, 360)(components.hue) && isPercentage(components.lum) && isPercentage(components.sat);
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      this.model = 'hsl';
+      this.alpha = this.alpha || 1;
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      if (this.invalid) {
+        return 'Invalid Color';
+      }
+      if (isBetween(0, 0.999)(this.alpha)) {
+        return 'hsla(' + this.hue + ',' + this.sat + '%,' + this.lum + '%,' + this.alpha + ')';
+      }
+      return 'hsl(' + this.hue + ',' + this.sat + '%,' + this.lum + '%)';
+    }
+  }]);
+  return HslColor;
+}(Color);
+
+var HexColor = function (_Color3) {
+  inherits$1(HexColor, _Color3);
+
+  function HexColor() {
+    classCallCheck$1(this, HexColor);
+    return possibleConstructorReturn$1(this, (HexColor.__proto__ || Object.getPrototypeOf(HexColor)).apply(this, arguments));
+  }
+
+  createClass$1(HexColor, [{
+    key: 'validate',
+    value: function validate(components) {
+      if (!get$1(HexColor.prototype.__proto__ || Object.getPrototypeOf(HexColor.prototype), 'validate', this).call(this, components)) {
+        return false;
+      }
+
+      return (/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test('#' + components.red + components.green + components.blue)
+      );
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      this.model = 'hex';
+      this.alpha = this.alpha || 'ff';
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      if (this.invalid) {
+        return 'Invalid Color';
+      }
+      if (isBetween(0, 0.999)(hexNumToDec(this.alpha) / 255)) {
+        return '#' + this.red + this.green + this.blue + this.alpha;
+      }
+      return '#' + this.red + this.green + this.blue;
+    }
+  }]);
+  return HexColor;
+}(Color);
+
+function rgbToHex(rgb) {
+  var _ref = [decNumToHex(rgb.red), decNumToHex(rgb.green), decNumToHex(rgb.blue), rgb.alpha ? decNumToHex(rgb.alpha * 255) : null],
+      rr = _ref[0],
+      gg = _ref[1],
+      bb = _ref[2],
+      aa = _ref[3];
+
+  return new HexColor({
+    red: rr,
+    green: gg,
+    blue: bb,
+    alpha: aa || 1
+  });
+}
+
+function rgb2Hsl(rgb) {
+  if (!rgb) {
+    return new HslColor();
+  }
+
+  // Convert the RGB values to the range 0-1
+  var _ref = [rgb.red / 255, rgb.green / 255, rgb.blue / 255, rgb.alpha],
+      red = _ref[0],
+      green = _ref[1],
+      blue = _ref[2],
+      alpha = _ref[3];
+  var hue = 0,
+      sat = 0,
+      lum = 0;
+
+  // Find the minimum and maximum values of R, G and B.
+
+  var min = Math.min(red, green, blue);
+  var max = Math.max(red, green, blue);
+
+  // Calculate the lightness value
+  lum = (min + max) / 2;
+
+  // Calculate the saturation.
+  if (min !== max) {
+    sat = lum > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min);
+  }
+
+  // calculate the hue
+  if (red >= max && min !== max) {
+    hue = 60 * ((green - blue) / (max - min));
+  }
+  if (green >= max && min !== max) {
+    hue = 60 * (2.0 + (blue - red) / (max - min));
+  }
+  if (blue >= max && min !== max) {
+    hue = 60 * (4.0 + (red - green) / (max - min));
+  }
+
+  // normalize values
+  hue = hue < 0 ? Math.floor(hue + 360) : Math.floor(hue);
+  sat = Math.floor(sat * 100);
+  lum = Math.floor(lum * 100);
+
+  return new HslColor({
+    hue: hue,
+    sat: sat,
+    lum: lum,
+    alpha: alpha
+  });
+}
+
+function hexToRgb(hex) {
+  var red = hex.red,
+      green = hex.green,
+      blue = hex.blue,
+      alpha = hex.alpha;
+
+  return new RgbColor({
+    red: hexNumToDec(red),
+    green: hexNumToDec(green),
+    blue: hexNumToDec(blue),
+    alpha: alpha ? Number((hexNumToDec(alpha) / 255).toFixed(2)) : 1
+  });
+}
+
+function normalizeDecNum(value) {
+  return Math.min(Math.max(parseInt(value), 0), 255);
+}
+
+function hslToRgb(hsl) {
+  if (!hsl) {
+    return new RgbColor();
+  }
+  var _ref = [hsl.hue / 360, hsl.sat / 100, hsl.lum / 100, hsl.alpha],
+      hue = _ref[0],
+      sat = _ref[1],
+      lgh = _ref[2],
+      alpha = _ref[3];
+  var red = 0,
+      green = 0,
+      blue = 0;
+
+  if (sat === 0) {
+    red = green = blue = normalizeDecNum(lgh * 255);
+  }
+
+  if (sat !== 0) {
+    var temp1 = lgh >= 50 ? lgh + sat - lgh * sat : lgh * (1 + sat);
+    var temp2 = 2 * lgh - temp1;
+
+    var testHue = function testHue(test) {
+      if (test < 0) {
+        test += 1;
+      }
+      if (test > 1) {
+        test -= 1;
+      }
+      if (test < 1 / 6) {
+        return temp2 + (temp1 - temp2) * 6 * test;
+      }
+      if (test < 1 / 2) {
+        return temp1;
+      }
+      if (test < 2 / 3) {
+        return temp2 + (temp1 - temp2) * (2 / 3 - test) * 6;
+      }
+      return temp2;
+    };
+
+    red = normalizeDecNum(255 * testHue(hue + 1 / 3));
+    green = normalizeDecNum(255 * testHue(hue));
+    blue = normalizeDecNum(255 * testHue(hue - 1 / 3));
+  }
+
+  return new RgbColor({
+    red: red,
+    green: green,
+    blue: blue,
+    alpha: alpha
+  });
+}
+
+function hexToHsl(hex) {
+  return rgb2Hsl(hexToRgb(hex));
+}
+
+function hslToHex(hsl) {
+  return rgbToHex(hslToRgb(hsl));
+}
+
+function parseRgb(rgb) {
+  // will consider rgb/rgba color prefix as a valid input color
+  // while the output will be a valid web colors
+  // valid input colors examples 'rgb(100, 0, 0, 0.5)', 'rgba(0, 0, 0)'
+  // the output for the inputted examples 'rgba(100, 0, 0, 0.5)', 'rgb(0, 0, 0)'
+  var match = rgb.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,*\s*(\d*(?:\.\d+)*)*\)/i);
+  if (!match || match.length < 4) {
+    return new RgbColor();
+  }
+
+  return new RgbColor({
+    red: Number(match[1]),
+    green: Number(match[2]),
+    blue: Number(match[3]),
+    alpha: Number(match[4])
+  });
+}
+
+/**
+ * Parses the given color string into a RGB color object.
+ *
+ * @param {String} color The color to be parsed and converted.
+ */
+function toRgb(color) {
+  var model = getColorModel(color);
+
+  if (model === 'hex') {
+    return hexToRgb(color);
+  }
+
+  if (model === 'hsl') {
+    return hslToRgb(color);
+  }
+
+  if (model === 'rgb' && typeof color === 'string') {
+    return parseRgb(color);
+  }
+
+  if (model === 'rgb' && (typeof color === "undefined" ? "undefined" : _typeof(color)) === 'object') {
+    return color;
+  }
+
+  return new Color();
+}
+
+function parseHsl(hsl) {
+  // will consider hsl/hsla color prefix as a valid input color
+  // while the output will be a valid web colors
+  // valid input colors examples 'hsl(255, 100%, 50%, 0.5)', 'hsla(100, 100%, 50%)'
+  // the output for the inputted examples 'hsla(255, 100%, 50%, 0.5)', 'hsl(100, 100%, 50%)'
+  var match = hsl.match(/^hsla?\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,*\s*(\d*(?:\.\d+)*)*\)/i);
+  if (!match || match.length < 4) {
+    return new HslColor();
+  }
+
+  return new HslColor({
+    hue: Number(match[1]),
+    sat: Number(match[2]),
+    lum: Number(match[3]),
+    alpha: Number(match[4])
+  });
+}
+
+/**
+ * Parses the given color string into a HSL color object.
+ *
+ * @param {String} color The color to be parsed and converted.
+ */
+function toHsl(color) {
+  var model = getColorModel(color);
+
+  if (model === 'hex') {
+    return hexToHsl(color);
+  }
+
+  if (model === 'rgb') {
+    return rgb2Hsl(color);
+  }
+
+  if (model === 'hsl') {
+    return parseHsl(color);
+  }
+
+  return new Color();
+}
+
+function expandHexShorthand(hex) {
+  var regex = /^#([a-f\d])([a-f\d])([a-f\d])([a-f\d])*$/i;
+  if ((hex.length === 5 || hex.length === 4) && regex.test(hex)) {
+    hex = hex.replace(regex, function (m, r, g, b, a) {
+      return '#' + r + r + g + g + b + b + (a ? '' + a + a : '');
+    });
+  }
+
+  return hex;
+}
+
+function parseHex(hex) {
+  var expanded = expandHexShorthand(hex);
+  var match = expanded.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})*/i);
+  if (!match || match.length < 4) {
+    return new HexColor();
+  }
+
+  return new HexColor({
+    hex: expanded,
+    red: match[1],
+    green: match[2],
+    blue: match[3],
+    alpha: match[4]
+  });
+}
+
+/**
+ * Parses the given color string into a Hex color object.
+ *
+ * @param {String} color The color to be parsed and converted.
+ */
+function toHex(color) {
+  var model = getColorModel(color);
+
+  if (model === 'rgb') {
+    return rgbToHex(color);
+  }
+
+  if (model === 'hsl') {
+    return hslToHex(color);
+  }
+
+  if (model === 'hex' && typeof color === 'string') {
+    return parseHex(color);
+  }
+
+  if (model === 'hex' && (typeof color === "undefined" ? "undefined" : _typeof(color)) === 'object') {
+    return color;
+  }
+
+  return new Color();
+}
+
+function parseColor(color) {
+  var model = getColorModel(color);
+  if (model === 'rgb') {
+    return parseRgb(color);
+  }
+
+  if (model === 'hex') {
+    return parseHex(color);
+  }
+
+  if (model === 'hsl') {
+    return parseHsl(color);
+  }
+
+  return new Color();
+}
+
+function getRandomColor() {
+  return 'rgb(' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ')';
+}
+
+function mixValue(color1, color2, ratio) {
+  if (ratio === void 0) ratio = 0.5;
+
+  return Number((color1 * (1 - ratio) + color2 * ratio).toFixed(2));
+}
+
+function mixColors(color1, color2, ratio) {
+  color1 = toRgb(color1);
+  color2 = toRgb(color2);
+  var red = Math.floor(mixValue(color1.red, color2.red, ratio));
+  var green = Math.floor(mixValue(color1.green, color2.green, ratio));
+  var blue = Math.floor(mixValue(color1.blue, color2.blue, ratio));
+  var alpha = mixValue(color1.alpha, color2.alpha, ratio);
+  return new RgbColor({
+    red: red,
+    green: green,
+    blue: blue,
+    alpha: alpha
+  });
+}
+
+function getCartesianCoords(r, theta) {
+  return {
+    x: r * Math.cos(theta * Math.PI * 2),
+    y: r * Math.sin(theta * Math.PI * 2)
+  };
+}
+
+/**
+ * Utilities
+ */
+function select$1(element) {
+  if (typeof element === 'string') {
+    return document.querySelector(element);
+  }
+  return element;
+}
+
+function call(func, args) {
+  if (args === void 0) args = null;
+
+  if (typeof func === 'function') {
+    func(args);
+  }
+}
+
+function getArray$1(length, value) {
+  var array = [];
+  for (var i = 0; i < length; i++) {
+    var temp = typeof value === 'function' ? value() : value;
+    array.push(temp);
+  }
+  return array;
+}
+
+function wrap$1(el, wrapper) {
+  // insert wrapper before el in the DOM tree
+  el.parentNode.insertBefore(wrapper, el);
+
+  // move el into wrapper
+  wrapper.appendChild(el);
+}
+
+/**
+ * Converts an array-like object to an array.
+ */
+
+function isElementClosest$1(element, wrapper) {
+  while (element !== document && element !== null) {
+    if (element === wrapper) {
+      return true;
+    }
+    element = element.parentNode;
+  }
+  return false;
+}
+
+function stringToDOM$1(string) {
+  return document.createRange().createContextualFragment(string).firstElementChild;
+}
+
+function getClosestValue(array, value) {
+  return array.reduce(function (prev, curr) {
+    return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
+  });
+}
+
+function mouseDownHandler(event) {
+  event.preventDefault();
+  return function (func) {
+    func(event);
+    var tempFunc = function tempFunc(event) {
+      window.requestAnimationFrame(function () {
+        return func(event);
+      });
+    };
+    var mouseupHandler = function mouseupHandler() {
+      document.removeEventListener('mousemove', tempFunc);
+      document.removeEventListener('mouseup', mouseupHandler);
+    };
+    document.addEventListener('mousemove', tempFunc);
+    document.addEventListener('mouseup', mouseupHandler);
+  };
+}
+
+/**
+ * Slider class
+ */
+var Slider = function Slider(selector, ref) {
+  if (ref === void 0) ref = {};
+  var created = ref.created;if (created === void 0) created = {};
+  var updated = ref.updated;if (updated === void 0) updated = {};
+  var gradient = ref.gradient;if (gradient === void 0) gradient = null;
+  var classes = ref.classes;if (classes === void 0) classes = null;
+  var colorCode = ref.colorCode;if (colorCode === void 0) colorCode = false;
+  var editable = ref.editable;if (editable === void 0) editable = false;
+  var reverse = ref.reverse;if (reverse === void 0) reverse = false;
+  var label = ref.label;if (label === void 0) label = true;
+  var min = ref.min;if (min === void 0) min = 0;
+  var max = ref.max;if (max === void 0) max = 10;
+  var step = ref.step;if (step === void 0) step = 1;
+  var value = ref.value;if (value === void 0) value = 0;
+  var handles = ref.handles;if (handles === void 0) handles = [0];
+  var trackSlide = ref.trackSlide;if (trackSlide === void 0) trackSlide = true;
+
+  this.el = select$1(selector);
+  this.settings = {
+    created: created,
+    updated: updated,
+    gradient: gradient,
+    classes: classes,
+    colorCode: colorCode,
+    editable: editable,
+    reverse: reverse,
+    label: label,
+    min: min,
+    max: max,
+    step: step,
+    value: value,
+    handles: handles,
+    trackSlide: trackSlide
+  };
+  this._init();
+};
+
+/**
+ * create new rang slider element
+ * @param {String|HTMLElement} selector
+ * @param {Object}           settings
+ */
+Slider.create = function create(selector, settings) {
+  Slider(selector, settings);
+};
+
+Slider.prototype._init = function _init() {
+  var this$1 = this;
+
+  this.values = [];
+  this.percentages = [];
+  this.multiple = this.settings.handles.length > 1;
+  this.min = Number(this.el.min) || Number(this.settings.min);
+  this.max = Number(this.el.max) || Number(this.settings.max);
+  this.step = Number(this.el.step) || Number(this.settings.step);
+  if (this.settings.handles.length === 1) {
+    this.settings.handles[0] = Number(this.el.value) || Number(this.settings.value);
+  }
+  this.settings.handles.sort();
+  if (this.settings.colorCode) {
+    this.el.type = 'text';
+  }
+
+  this._initElements();
+  if (this.settings.gradient) {
+    this._initGradient();
+  }
+  this._initEvents();
+  this.settings.handles.forEach(function (handle, index) {
+    this$1.activeHandle = index;
+    this$1.update(handle);
+  });
+  this.update();
+};
+
+Slider.prototype._initElements = function _initElements() {
+  var this$1 = this;
+
+  this.handles = [];
+  this.labels = [];
+  this.wrapper = document.createElement('div');
+  this.track = document.createElement('div');
+
+  this.wrapper.classList.add('slider');
+  this.wrapper.classList.toggle('is-editable', this.settings.editable);
+  this.wrapper.classList.toggle('is-reverse', this.settings.reverse);
+  if (this.settings.classes) {
+    (ref = this.wrapper.classList).add.apply(ref, this.settings.classes);
+  }
+  this.track.classList.add('slider-track');
+  this.el.classList.add('slider-input');
+
+  if (this.settings.handles.length === 1) {
+    this.fill = document.createElement('div');
+    this.fill.classList.add('slider-fill');
+    this.track.appendChild(this.fill);
+  }
+
+  this.settings.handles.forEach(function (position, index) {
+    this$1.handles[index] = stringToDOM$1("<div class=\"slider-handle\"></div>");
+    if (this$1.settings.label) {
+      this$1.labels[index] = stringToDOM$1("<div class=\"slider-label\"></div>");
+      this$1.handles[index].appendChild(this$1.labels[index]);
+    }
+    this$1.handles[index].addEventListener('mousedown', this$1.select.bind(this$1), false);
+    this$1.handles[index].addEventListener('touchstart', this$1.select.bind(this$1), false);
+    this$1.track.appendChild(this$1.handles[index]);
+  });
+
+  wrap$1(this.el, this.wrapper);
+  this.wrapper.appendChild(this.track);
+  call(this.settings.created, this);
+  var ref;
+};
+
+Slider.prototype._initGradient = function _initGradient() {
+  var this$1 = this;
+
+  if (this.settings.gradient.length > 1) {
+    this.track.style.backgroundImage = "linear-gradient(90deg, " + this.settings.gradient + ")";
+    this.gradient = this.settings.gradient.map(function (color) {
+      return parseColor(color);
+    });
+    return;
+  }
+  this.track.style.backgroundImage = '';
+  this.track.style.backgroundColor = this.settings.gradient[0];
+  this.handles.forEach(function (handle) {
+    handle.style.color = this$1.settings.gradient[0];
+  });
+  this.gradient = null;
+};
+
+Slider.prototype._initEvents = function _initEvents() {
+  var this$1 = this;
+
+  window.addEventListener('resize', function () {
+    this$1.updateWidth();
+    this$1.update(undefined, true);
+  });
+  if (this.settings.trackSlide) {
+    this.track.addEventListener('mousedown', this.select.bind(this), false);
+    this.track.addEventListener('touchstart', this.select.bind(this), false);
+  }
+  if (this.settings.editable && !this.settings.colorCode) {
+    this.el.addEventListener('change', function (evt) {
+      this$1.update(this$1.el.value);
+    }, false);
+  }
+};
+
+/**
+ * fire select events
+ */
+Slider.prototype.select = function select$$1(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  // check ifleft mouse is clicked
+  if (event.buttons !== 1) {
+    return;
+  }
+  this.track.classList.add('is-dragging');
+  this.ticking = false;
+
+  var stepValue = this.getStepValue(event);
+
+  if (this.multiple) {
+    var closest = getClosestValue(this.values, stepValue);
+    this.activeHandle = this.values.indexOf(closest);
+  }
+  this.update(stepValue);
+
+  this.tempDrag = this.dragging.bind(this);
+  this.tempRelease = this.release.bind(this);
+  document.addEventListener('mousemove', this.tempDrag);
+  document.addEventListener('touchmove', this.tempDrag);
+  document.addEventListener('touchend', this.tempRelease);
+  document.addEventListener('mouseup', this.tempRelease);
+};
+
+/**
+ * dragging motion
+ */
+Slider.prototype.dragging = function dragging(event) {
+  var this$1 = this;
+
+  event.preventDefault();
+  var stepValue = this.getStepValue(event);
+  if (!this.ticking) {
+    window.requestAnimationFrame(function () {
+      this$1.update(stepValue);
+      this$1.ticking = false;
     });
 
-    function polyfill() {
-      if (!Element.prototype.matches) {
-        Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
-      }
+    this.ticking = true;
+  }
+};
 
-      if (!Element.prototype.closest) {
-        Element.prototype.closest = function (s) {
-          var el = this;
-          if (!document.documentElement.contains(el)) {
-            return null;
-          }
-          do {
-            if (el.matches(s)) {
-              return el;
-            }
-            el = el.parentElement;
-          } while (el !== null);
-          return null;
-        };
-      }
+/**
+ * release handler
+ */
+Slider.prototype.release = function release() {
+  this.track.classList.remove('is-dragging');
+  document.removeEventListener('mousemove', this.tempDrag);
+  document.removeEventListener('touchmove', this.tempDrag);
+  document.removeEventListener('mouseup', this.tempRelease);
+  document.removeEventListener('touchend', this.tempRelease);
+};
+
+Slider.prototype.getStepValue = function getStepValue(event) {
+  var eventX = event.type.includes('mouse') ? event.clientX : event.type.includes('touch') ? event.touches[0].clientX : event;
+
+  var mouseValue = eventX - this.currentX;
+  var stepCount = parseInt(mouseValue / this.stepWidth + 0.5, 10);
+  var stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
+  return stepValue;
+};
+
+Slider.prototype.updateWidth = function updateWidth() {
+  var trackRect = this.track.getBoundingClientRect();
+  this.currentX = trackRect.left;
+  this.width = trackRect.width;
+  this.stepWidth = this.width / (this.max - this.min);
+};
+
+/**
+ * get the filled area percentage
+ * @param{Object} slider
+ * @param{Number} value
+ * @return {Number}
+ */
+Slider.prototype.getPositionPercentage = function getPositionPercentage(value) {
+  return (value - this.min) / (this.max - this.min);
+};
+
+Slider.prototype.normalizeValue = function normalizeValue(value) {
+  if (isNaN(Number(value))) {
+    return this.value;
+  }
+  if (this.multiple) {
+    var prevValue = this.values[this.activeHandle - 1] || this.min;
+    var nextValue = this.values[this.activeHandle + 1] || this.max;
+    value = Math.min(Math.max(Number(value), prevValue), nextValue);
+  }
+  return Math.min(Math.max(Number(value), this.min), this.max);
+};
+
+Slider.prototype.newGradient = function newGradient(newGradient$1) {
+  this.settings.gradient = newGradient$1;
+  this._initGradient();
+  this.update(undefined, true);
+};
+
+Slider.prototype.addHandle = function addHandle(value) {
+  var closest = getClosestValue(this.values, value);
+  var closestIndex = this.values.indexOf(closest);
+  var closestValue = this.values[closestIndex];
+  var newIndex = closestValue <= value ? closestIndex + 1 : closestIndex;
+  this.values.splice(newIndex, 0, value);
+  this.percentages.splice(newIndex, 0, this.getPositionPercentage(value));
+  this.handles.splice(newIndex, 0, stringToDOM$1("<div class=\"slider-handle\"></div>"));
+  if (this.settings.label) {
+    this.labels.splice(newIndex, 0, stringToDOM$1("<div class=\"slider-label\"></div>"));
+    this.handles[newIndex].appendChild(this.labels[newIndex]);
+  }
+  this.handles[newIndex].addEventListener('mousedown', this.select.bind(this), false);
+  this.handles[newIndex].addEventListener('touchstart', this.select.bind(this), false);
+  this.track.appendChild(this.handles[newIndex]);
+  this.activeHandle = newIndex;
+  this.value = null;
+  this.update(value);
+  return this.handles[newIndex];
+};
+
+Slider.prototype.removeHandle = function removeHandle(index) {
+  this.handles[index].remove();
+  this.handles.splice(index, 1);
+  this.values.splice(index, 1);
+  this.percentages.splice(index, 1);
+  if (this.settings.label) {
+    this.labels.splice(index, 1);
+  }
+  this.activeHandle = index === 0 ? index + 1 : index - 1;
+};
+
+/**
+ * get the handle color
+ * @param{Number} positionPercentage
+ * @return {Number}              handle hex color code
+ */
+Slider.prototype.getHandleColor = function getHandleColor(positionPercentage) {
+  var this$1 = this;
+
+  var colorCount = this.gradient.length - 1;
+  var region = positionPercentage;
+  for (var i = 1; i <= colorCount; i++) {
+    // check the current zone
+    if (region >= (i - 1) / colorCount && region <= i / colorCount) {
+      // get the active color percentage
+      var colorPercentage = (region - (i - 1) / colorCount) / (1 / colorCount);
+      // return the mixed color based on the zone boundary colors
+      return mixColors(this$1.gradient[i - 1], this$1.gradient[i], colorPercentage);
     }
+  }
+  return 'rgb(0, 0, 0)';
+};
 
-    /**
-     * Utilities
-     */
-    function select(element) {
-      if (typeof element === 'string') {
-        return document.querySelector(element);
-      }
-      return element;
+/**
+ * update the slider fill, value and color
+ * @param {Number} value
+ */
+Slider.prototype.update = function update(value, mute) {
+  if (mute === void 0) mute = false;
+
+  if (Number(value) === this.value) {
+    return;
+  }
+
+  if (!this.width) {
+    this.updateWidth();
+  }
+  var normalized = this.normalizeValue(value);
+  var positionPercentage = this.getPositionPercentage(normalized);
+
+  if (this.fill) {
+    this.fill.style.transform = "translate(" + positionPercentage * this.width + "px, 0) scale(" + (1 - positionPercentage) + ", 1)";
+  }
+  this.handles[this.activeHandle].style.transform = "translate(" + positionPercentage * this.width + "px, 0)";
+  this.value = normalized;
+  this.values[this.activeHandle] = normalized;
+  this.percentages[this.activeHandle] = positionPercentage;
+  this.el.value = this.value;
+  if (this.settings.label) {
+    this.labels[this.activeHandle].innerHTML = this.value;
+  }
+  if (this.gradient) {
+    var color = toHex(this.getHandleColor(positionPercentage));
+    this.handles[this.activeHandle].style.color = color;
+    if (this.settings.colorCode) {
+      this.el.value = color;
+      this.labels[this.activeHandle].innerHTML = color;
     }
+  }
+  if (mute) {
+    return;
+  }
+  this.el.dispatchEvent(new Event('change')); // eslint-disable-line
+  this.el.dispatchEvent(new Event('input')); // eslint-disable-line
+  call(this.settings.updated);
+};
 
-    function call(func) {
-      if (typeof func === 'function') {
-        func();
-      }
+var Colorpicker = function Colorpicker(selector, ref) {
+  if (ref === void 0) ref = {};
+  var defaultColor = ref.defaultColor;if (defaultColor === void 0) defaultColor = getRandomColor();
+  var model = ref.model;if (model === void 0) model = 'rgb';
+  var events = ref.events;if (events === void 0) events = {};
+  var picker = ref.picker;if (picker === void 0) picker = {};
+  var recentColors = ref.recentColors;if (recentColors === void 0) recentColors = {};
+  var menu = ref.menu;if (menu === void 0) menu = {};
+  var rgbSliders = ref.rgbSliders;if (rgbSliders === void 0) rgbSliders = true;
+  var guideIcon = ref.guideIcon;if (guideIcon === void 0) guideIcon = "<svg viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"12\"/></svg>";
+
+  this.el = select$1(selector);
+
+  var pickerDefaults = {
+    mode: 'wheel',
+    radius: 200,
+    saturation: true,
+    edge: 190
+  };
+
+  var recentColorsDefaults = {
+    max: 6,
+    colors: getArray$1(6, getRandomColor)
+  };
+
+  var menuDefaults = {
+    draggable: true,
+    hideWhenSubmit: true
+  };
+
+  this.settings = {
+    defaultColor: defaultColor,
+    model: model,
+    events: events,
+    picker: picker ? Object.assign(pickerDefaults, picker) : false,
+    recentColors: recentColors ? Object.assign(recentColorsDefaults, recentColors) : false,
+    menu: Object.assign(menuDefaults, menu),
+    rgbSliders: rgbSliders,
+    guideIcon: guideIcon
+  };
+  this.init();
+};
+
+Colorpicker.prototype.init = function init() {
+  this.currentColor = this.settings.defaultColor;
+  this.lastMove = { x: 0, y: 0 };
+  this.isMenuActive = false;
+  this._initElements();
+  this._initEvents();
+  this.selectColor(this.settings.defaultColor, true);
+  this.updateCursor();
+};
+
+Colorpicker.prototype._initElements = function _initElements() {
+  this.sliders = {};
+  this.mouse = { x: 0, y: 0 };
+  // create colorpicker element
+  this.picker = document.createElement('div');
+  this.menu = stringToDOM$1('<div class="picker-menu" tabindex="-1"></div>');
+  this.guide = stringToDOM$1("<button class=\"picker-guide\">" + this.settings.guideIcon + "</button>");
+
+  this.submit = stringToDOM$1("\n    <button class=\"picker-submit\">\n      <svg class=\"icon\" viewBox=\"0 0 24 24\">\n        <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n      </svg>\n    </button>");
+  this.menuInput = stringToDOM$1('<div class="picker-input"></div>');
+
+  // append colorpicker elements
+  this.picker.appendChild(this.menu);
+  this.picker.appendChild(this.guide);
+  if (this.settings.picker && this.settings.picker.mode === 'wheel') {
+    this._initWheel();
+  }
+  if (this.settings.picker && this.settings.picker.mode === 'square') {
+    this._initSquare();
+  }
+  if (this.settings.rgbSliders) {
+    this._initRGBSliders();
+  }
+  this.menu.appendChild(this.menuInput);
+  if (this.settings.recentColors) {
+    this._initRecentColors();
+  }
+
+  this.el.parentNode.insertBefore(this.picker, this.el);
+  this.el.classList.add('picker-value');
+  this.picker.classList.add('picker');
+  this.menuInput.appendChild(this.el);
+  this.menuInput.appendChild(this.submit);
+  this.guide.style.color = this.settings.defaultColor;
+  this.guide.style.fill = this.settings.defaultColor;
+  setTimeout(this.closePicker.bind(this), 1);
+};
+
+Colorpicker.prototype._initSquare = function _initSquare() {
+  var this$1 = this;
+
+  this.square = stringToDOM$1("\n      <div class=\"picker-square\">\n        <canvas class=\"picker-canvas\"></canvas>\n        <canvas class=\"picker-squareStrip\"></canvas>\n        <div class=\"picker-cursor\"></div>\n      </div>");
+
+  this.currentHue = 'hsl(0, 100%, 50%)';
+  this.canvas = this.square.querySelector('.picker-canvas');
+  this.strip = this.square.querySelector('.picker-squareStrip');
+  this.cursor = this.square.querySelector('.picker-cursor');
+  this.menu.appendChild(this.square);
+
+  // setup canvas
+  var edge = this.settings.picker.edge;
+  this.canvas.width = edge;
+  this.canvas.height = edge;
+  this.strip.width = this.settings.picker.edge / 10;
+  this.strip.height = edge;
+  this.ctx = this.canvas.getContext('2d');
+  this.stripCtx = this.strip.getContext('2d');
+
+  this.stripCtx.rect(0, 0, this.strip.width, this.strip.height);
+  var hue = this.stripCtx.createLinearGradient(0, 0, 0, this.strip.height);
+  for (var angle = 0; angle < 360; angle += 1) {
+    hue.addColorStop(angle / 359, "hsl(" + angle + ", 100%, 50%)");
+  }
+  this.stripCtx.fillStyle = hue;
+  this.stripCtx.fill();
+  var squareThreshold = this.settings.picker.edge - 1;
+  var updateColor = function updateColor(event) {
+    if (event.target !== this$1.canvas) {
+      return;
     }
+    var ref = this$1.getMouseCords(event);
+    var x = ref.x;
+    var y = ref.y;
+    this$1.mouse = { x: Math.min(x, squareThreshold), y: Math.min(y, squareThreshold) };
+    var color = this$1.getColorCanvas(this$1.mouse, this$1.ctx);
+    this$1.selectColor(color);
+    this$1.updateCursor(this$1.mouse);
+  };
 
-    function getArray(length, value) {
-      var array = [];
-      for (var i = 0; i < length; i++) {
-        var temp = typeof value === 'function' ? value() : value;
-        array.push(temp);
-      }
-      return array;
+  var updateHue = function updateHue(event) {
+    if (event.target !== this$1.strip) {
+      return;
     }
+    var mouse = this$1.getMouseCords(event);
+    this$1.currentHue = this$1.getColorCanvas(mouse, this$1.stripCtx);
+    this$1.updateSquareColors();
+    var color = this$1.getColorCanvas(this$1.mouse, this$1.ctx);
+    this$1.selectColor(color);
+  };
 
-    /**
-     * Converts an array-like object to an array.
-     */
+  this.updateSquareColors();
 
-    function getRandomInt(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+  // add event listener
+  this.canvas.addEventListener('mousedown', function (event) {
+    return mouseDownHandler(event)(updateColor);
+  });
+  this.strip.addEventListener('mousedown', function (event) {
+    return mouseDownHandler(event)(updateHue);
+  });
+};
+
+Colorpicker.prototype._initWheel = function _initWheel() {
+  var this$1 = this;
+
+  this.wheel = stringToDOM$1("\n      <div class=\"picker-wheel\">\n        <canvas class=\"picker-canvas\"></canvas>\n        <div class=\"picker-cursor\"></div>\n      </div>");
+  this.saturation = stringToDOM$1('<input class="picker-saturation" type="number" min="0" max="100" value="0">');
+
+  this.canvas = this.wheel.querySelector('.picker-canvas');
+  this.cursor = this.wheel.querySelector('.picker-cursor');
+  this.menu.appendChild(this.wheel);
+
+  if (this.settings.picker.saturation) {
+    this.menu.appendChild(this.saturation);
+    this.sliders.saturation = new Slider(this.saturation, {
+      gradient: ['#FFFFFF', '#000000'],
+      label: false
+    });
+    this.saturation.addEventListener('change', function () {
+      window.requestAnimationFrame(function () {
+        this$1.updateWheelColors();
+      });
+    });
+  }
+
+  // setup canvas
+  this.canvas.width = this.settings.picker.radius;
+  this.canvas.height = this.settings.picker.radius;
+  this.ctx = this.canvas.getContext('2d');
+
+  // draw wheel circle path
+  this.circle = {
+    path: new Path2D(), // eslint-disable-line
+    xCords: this.canvas.width / 2,
+    yCords: this.canvas.height / 2,
+    radius: this.canvas.width / 2
+  };
+  this.circle.path.moveTo(this.circle.xCords, this.circle.yCords);
+  this.circle.path.arc(this.circle.xCords, this.circle.yCords, this.circle.radius, 0, 360);
+  this.circle.path.closePath();
+
+  var updateColor = function updateColor(event) {
+    // check if mouse outside the wheel
+    var mouse = this$1.getMouseCords(event);
+    if (this$1.ctx.isPointInPath(this$1.circle.path, mouse.x, mouse.y)) {
+      var color = this$1.getColorCanvas(mouse, this$1.ctx);
+      this$1.selectColor(color);
+      this$1.updateCursor(mouse);
     }
+  };
+  // add event listener
+  this.wheel.addEventListener('mousedown', function (event) {
+    return mouseDownHandler(event)(updateColor);
+  });
 
-    function isElementClosest(element, wrapper) {
-      while (element !== document && element !== null) {
-        if (element === wrapper) {
-          return true;
-        }
-        element = element.parentNode;
-      }
-      return false;
-    }
+  this.updateWheelColors();
+  this.updateCursor();
+};
 
-    function normalizeColorValue(value) {
-      if (value > 255) {
-        return 255;
-      }
-      if (value < 0) {
-        return 0;
-      }
-      return value;
-    }
+Colorpicker.prototype._initRGBSliders = function _initRGBSliders() {
+  var this$1 = this;
 
-    function getHexValue(value) {
-      if (isNaN(Number(value))) {
-        return '00';
-      }
-      return ('0' + Number(value).toString(16)).slice(-2);
-    }
+  this.rgbSliders = {
+    red: stringToDOM$1('<input id="red" type="number" min="0" max="255" value="0">'),
+    green: stringToDOM$1('<input id="green" type="number" min="0" max="255" value="0">'),
+    blue: stringToDOM$1('<input id="blue" type="number" min="0" max="255" value="0">')
+  };
 
-    function getDecimalValue(value) {
-      if (isNaN(parseInt(value, 16))) {
-        return '0';
-      }
-      return parseInt(value, 16);
-    }
+  this.menu.appendChild(this.rgbSliders.red);
+  this.menu.appendChild(this.rgbSliders.green);
+  this.menu.appendChild(this.rgbSliders.blue);
 
-    function getRandomColor() {
-      return "rgb(" + getRandomInt(0, 255) + ", " + getRandomInt(0, 255) + ", " + getRandomInt(0, 255) + ")";
-    }
+  Object.keys(this.rgbSliders).forEach(function (key) {
+    this$1.sliders[key] = new Slider(this$1.rgbSliders[key], {
+      gradient: ['#000000', '#FFFFFF'],
+      label: false,
+      editable: true,
+      reverse: true
+    });
+  });
 
-    function rgb2hex(rgb) {
-      rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-      return rgb && rgb.length === 4 ? '#' + ('0' + parseInt(normalizeColorValue(rgb[1]), 10).toString(16)).slice(-2) + ('0' + parseInt(normalizeColorValue(rgb[2]), 10).toString(16)).slice(-2) + ('0' + parseInt(normalizeColorValue(rgb[3]), 10).toString(16)).slice(-2) : '';
-    }
+  // add event listener
+  Object.keys(this.rgbSliders).forEach(function (key) {
+    this$1.rgbSliders[key].addEventListener('change', function () {
+      window.requestAnimationFrame(function () {
+        var color = this$1.getColorFromSliders();
+        this$1.selectColor(color);
+        this$1.updateCursor();
+      });
+    });
+  });
+};
 
-    function rgb2hsl(rgb) {
-      rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-      if (!rgb || rgb.length !== 4) {
+Colorpicker.prototype._initRecentColors = function _initRecentColors() {
+  var this$1 = this;
+
+  this.recentColors = this.settings.recentColors.colors;
+  this.recent = stringToDOM$1('<div class="picker-recent"></div>');
+
+  this.menu.appendChild(this.recent);
+
+  this.recentColors.forEach(function (color) {
+    var recentColor = document.createElement('a');
+    recentColor.classList.add('picker-color');
+    recentColor.style.backgroundColor = color;
+    this$1.recent.appendChild(recentColor);
+    recentColor.addEventListener('mousedown', function (event) {
+      return event.preventDefault();
+    });
+    recentColor.addEventListener('click', function (event) {
+      this$1.selectColor(color);
+      this$1.updateCursor();
+    });
+  });
+};
+
+Colorpicker.prototype._initEvents = function _initEvents() {
+  var this$1 = this;
+
+  // eslint-disable-next-line
+  this.events = [new Event('input'), new Event('change')];
+
+  this.guide.addEventListener('click', function () {
+    call(this$1.settings.events.beforeOpen);
+    this$1.togglePicker();
+  });
+
+  if (this.settings.menu.draggable) {
+    this.menu.addEventListener('mousedown', function (event) {
+      if (event.target !== this$1.menu || event.button !== 0) {
         return;
       }
+      var startPosition = {};
+      var endPosition = {};
+      var delta = {};
 
-      // Convert the RGB values to the range 0-1
-      var red = rgb[1] / 255;
-      var green = rgb[2] / 255;
-      var blue = rgb[3] / 255;
-      var Hue = 0;
-      var Sat = 0;
-      var Lum = 0;
+      event.preventDefault();
+      startPosition.x = event.clientX;
+      startPosition.y = event.clientY;
 
-      //Find the minimum and maximum values of R, G and B.
-      var min = Math.min(red, green, blue);
-      var max = Math.max(red, green, blue);
-
-      //Calculate the Luminace value
-      Lum = (min + max) / 2;
-
-      //Calculate the Saturation.
-      if (min !== max) {
-        Sat = Lum > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min);
-      }
-
-      //calculate the Hue
-      if (red >= max && min !== max) {
-        Hue = 60 * ((green - blue) / (max - min));
-      }
-      if (green >= max && min !== max) {
-        Hue = 60 * (2.0 + (blue - red) / (max - min));
-      }
-      if (blue >= max && min !== max) {
-        Hue = 60 * (4.0 + (red - green) / (max - min));
-      }
-
-      // normalize values 
-      Hue = Hue < 0 ? parseInt(Hue + 360) : parseInt(Hue);
-      Sat = parseInt(Sat * 100);
-      Lum = parseInt(Lum * 100);
-
-      return "hsl(" + Hue + ", " + Sat + "%, " + Lum + "%)";
-    }
-
-    function getCartesianCoords(r, θ) {
-      return { x: r * Math.cos(θ * Math.PI * 2), y: r * Math.sin(θ * Math.PI * 2) };
-    }
-
-    var Colorpicker = function Colorpicker(selector, ref) {
-      if (ref === void 0) ref = {};
-      var defaultColor = ref.defaultColor;if (defaultColor === void 0) defaultColor = getRandomColor();
-      var radius = ref.radius;if (radius === void 0) radius = 200;
-      var mode = ref.mode;if (mode === void 0) mode = 'rgb';
-      var events = ref.events;if (events === void 0) events = {};
-      var recentColors = ref.recentColors;if (recentColors === void 0) recentColors = getArray(6, getRandomColor);
-      var disableLum = ref.disableLum;if (disableLum === void 0) disableLum = false;
-      var guideIcon = ref.guideIcon;if (guideIcon === void 0) guideIcon = "<svg viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"12\"/></svg>";
-      this.el = select(selector);
-      this.options = {
-        defaultColor: defaultColor,
-        radius: radius,
-        mode: mode,
-        events: events,
-        recentColors: recentColors,
-        disableLum: disableLum,
-        guideIcon: guideIcon
-      };
-      this.init();
-    };
-
-    Colorpicker.prototype.init = function init() {
-      this.recentColors = this.options.recentColors;
-      this.lastMove = { x: 0, y: 0 };
-      this.isMenuActive = false;
-      polyfill();
-      this._initElements();
-      this._initWheel();
-      this._initEvents();
-      this.selectColor(this.options.defaultColor, true);
-    };
-
-    Colorpicker.prototype._initElements = function _initElements() {
-      var this$1 = this;
-
-      // create elements and config them
-      this.picker = document.createElement('div');
-      this.picker.insertAdjacentHTML('afterbegin', "\n      <button class=\"picker-guide\">\n        " + this.options.guideIcon + "\n      </button>\n      <div class=\"picker-menu is-hidden\" tabindex=\"-1\">\n        <div class=\"picker-wheel\">\n          <canvas class=\"picker-canvas\"></canvas>\n          <div class=\"picker-cursor\"></div>\n        </div>\n        " + (this.options.disableLum ? '' : '<input class="picker-saturation" type="number" min="0" max="100" value="100">') + "\n        <input id=\"red\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <input id=\"green\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <input id=\"blue\" type=\"number\" min=\"0\" max=\"255\" value=\"0\">\n        <div class=\"picker-input\">\n          <button class=\"picker-submit\">\n            <svg class=\"icon\" viewBox=\"0 0 24 24\">\n              <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n            </svg>\n          </button>\n        </div>\n        <div class=\"picker-recent\"></div>\n      </div>\n    ");
-
-      this.menu = this.picker.querySelector('.picker-menu');
-      this.recent = this.picker.querySelector('.picker-recent');
-      this.guide = this.picker.querySelector('.picker-guide');
-      this.canvas = this.picker.querySelector('.picker-canvas');
-      this.wheel = this.picker.querySelector('.picker-wheel');
-      this.submit = this.picker.querySelector('.picker-submit');
-      this.cursor = this.picker.querySelector('.picker-cursor');
-      this.saturation = this.picker.querySelector('.picker-saturation');
-      this.rgbSliders = {
-        red: this.picker.querySelector('#red'),
-        green: this.picker.querySelector('#green'),
-        blue: this.picker.querySelector('#blue')
-      };
-
-      this.el.parentNode.insertBefore(this.picker, this.el);
-      this.el.classList.add('picker-value');
-      this.picker.classList.add('picker');
-      this.submit.parentNode.insertBefore(this.el, this.submit);
-      this.guide.style.color = this.options.defaultColor;
-      this.guide.style.fill = this.options.defaultColor;
-
-      this.sliders = {};
-      if (!this.options.disableLum) {
-        this.sliders.saturation = new slider$1(this.saturation, {
-          gradient: ['#FFFFFF', '#000000'],
-          label: false
-        });
-      }
-      Object.keys(this.rgbSliders).forEach(function (key) {
-        this$1.sliders[key] = new slider$1(this$1.rgbSliders[key], {
-          gradient: ['#000000', '#FFFFFF'],
-          label: false,
-          editable: true,
-          reverse: true
-        });
-      });
-
-      this.recentColors.forEach(function (color) {
-        var recentColor = document.createElement('a');
-        recentColor.classList.add('picker-color');
-        recentColor.style.backgroundColor = color;
-        this$1.recent.appendChild(recentColor);
-        recentColor.addEventListener('mousedown', function (event) {
-          return event.preventDefault();
-        });
-        recentColor.addEventListener('click', function (event) {
-          return this$1.selectColor(color);
-        });
-      });
-    };
-
-    Colorpicker.prototype._initWheel = function _initWheel() {
-      // setup canvas
-      this.canvas.width = this.options.radius;
-      this.canvas.height = this.options.radius;
-      this.context = this.canvas.getContext('2d');
-
-      // draw wheel circle path
-      this.circle = {
-        path: new Path2D(),
-        xCords: this.canvas.width / 2,
-        yCords: this.canvas.height / 2,
-        radius: this.canvas.width / 2
-      };
-      this.circle.path.moveTo(this.circle.xCords, this.circle.yCords);
-      this.circle.path.arc(this.circle.xCords, this.circle.yCords, this.circle.radius, 0, 360);
-      this.circle.path.closePath();
-      this.updateWheelColors();
-    };
-
-    Colorpicker.prototype._initEvents = function _initEvents() {
-      var this$1 = this;
-
-      this.events = [new Event('input'), new Event('change')];
-
-      this.guide.addEventListener('click', function () {
-        call(this$1.options.events.beforerOpen);
-        this$1.togglePicker();
-      });
-
-      this.menu.addEventListener('mousedown', function (event) {
-        if (event.target !== this$1.menu || event.button !== 0) {
-          return;
-        }
-        var startPosition = {};
-        var endPosition = {};
-        var delta = {};
-
-        event.preventDefault();
-        startPosition.x = event.clientX;
-        startPosition.y = event.clientY;
-
-        var mousemoveHandler = function mousemoveHandler(evnt) {
+      var mousemoveHandler = function mousemoveHandler(evnt) {
+        window.requestAnimationFrame(function () {
           endPosition.x = evnt.clientX;
           endPosition.y = evnt.clientY;
           delta.x = this$1.lastMove.x + endPosition.x - startPosition.x;
           delta.y = this$1.lastMove.y + endPosition.y - startPosition.y;
           this$1.menu.style.transform = "translate(" + delta.x + "px, " + delta.y + "px)";
-        };
-        var mouseupHandler = function mouseupHandler() {
-          this$1.lastMove = delta;
-          document.removeEventListener('mousemove', mousemoveHandler);
-          document.removeEventListener('mouseup', mouseupHandler);
-        };
-        document.addEventListener('mousemove', mousemoveHandler);
-        document.addEventListener('mouseup', mouseupHandler);
-      });
-
-      this.wheel.addEventListener('mousedown', function (event) {
-        event.preventDefault();
-        var updateColor = function updateColor(evnt) {
-          // check if mouse outside the wheel
-          var mouse = this$1.getMouseCords(evnt);
-          if (this$1.context.isPointInPath(this$1.circle.path, mouse.x, mouse.y)) {
-            var color = this$1.getColorFromWheel(mouse);
-            this$1.selectColor(color, false, mouse);
-
-            return color;
-          }
-          return this$1.el.value;
-        };
-        var mouseupHandler = function mouseupHandler(evnt) {
-          var color = updateColor(evnt);
-          if (color !== this$1.el.value) {
-            this$1.updateRecentColors(color);
-            this$1.selectColor(color, false, this$1.mouse);
-          }
-          document.removeEventListener('mousemove', updateColor);
-          document.removeEventListener('mouseup', mouseupHandler);
-        };
-        document.addEventListener('mousemove', updateColor);
-        document.addEventListener('mouseup', mouseupHandler);
-      });
-
-      if (!this.options.disableLum) {
-        this.saturation.addEventListener('change', function () {
-          this$1.updateWheelColors();
         });
-      }
-
-      Object.keys(this.rgbSliders).forEach(function (key) {
-        this$1.rgbSliders[key].addEventListener('change', function (event) {
-          var color = this$1.getColorFromSliders();
-          this$1.selectColor(color);
-        });
-      });
-
-      this.el.addEventListener('focus', function (event) {
-        var edit = function edit() {
-          this$1.selectColor(this$1.el.value, true);
-        };
-        var release = function release() {
-          this$1.el.removeEventListener('change', edit);
-          this$1.el.removeEventListener('blur', release);
-        };
-        this$1.el.addEventListener('change', edit);
-        this$1.el.addEventListener('blur', release);
-      });
-
-      this.submit.addEventListener('click', function (event) {
-        call(this$1.options.events.beforeSubmit);
-        this$1.selectColor(this$1.el.value);
-        this$1.closePicker();
-        call(this$1.options.events.afterSubmit);
-      });
-    };
-
-    Colorpicker.prototype.updateWheelColors = function updateWheelColors() {
-      var this$1 = this;
-
-      var x = this.circle.xCords;
-      var y = this.circle.yCords;
-      var radius = this.circle.radius;
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-      for (var angle = 0; angle < 360; angle += 1) {
-        var gradient = this$1.context.createRadialGradient(x, y, 0, x, y, radius);
-        var startAngle = (angle - 2) * Math.PI / 180;
-        var endAngle = (angle + 2) * Math.PI / 180;
-
-        this$1.context.beginPath();
-        this$1.context.moveTo(x, y);
-        this$1.context.arc(x, y, radius, startAngle, endAngle);
-        this$1.context.closePath();
-        gradient.addColorStop(0, "hsl(" + angle + ", " + (this$1.options.disableLum ? 100 : this$1.saturation.value) + "%, 100%)");
-        gradient.addColorStop(0.5, "hsl(" + angle + ", " + (this$1.options.disableLum ? 100 : this$1.saturation.value) + "%, 50%)");
-        gradient.addColorStop(1, "hsl(" + angle + ", " + (this$1.options.disableLum ? 100 : this$1.saturation.value) + "%, 0%)");
-        this$1.context.fillStyle = gradient;
-        this$1.context.fill();
-      }
-    };
-
-    Colorpicker.prototype.updateRecentColors = function updateRecentColors(newColor) {
-      var this$1 = this;
-
-      // update recent color array
-      if (this.recentColors.length >= 6) {
-        this.recentColors.shift();
-      }
-      if (newColor) {
-        this.recentColors.push(newColor);
-      }
-
-      // update recent colors buttons
-      if (this.recent.childNodes.length >= 6) {
-        this.recent.removeChild(this.recent.firstChild);
-      }
-      var recentColor = document.createElement('a');
-      recentColor.classList.add('picker-color');
-      recentColor.style.backgroundColor = newColor;
-      this.recent.appendChild(recentColor);
-      recentColor.addEventListener('click', function (event) {
-        event.preventDefault();
-        this$1.selectColor(newColor);
-      });
-    };
-
-    Colorpicker.prototype.updateSlidersInputs = function updateSlidersInputs(slider) {
-      var red = getHexValue(this.rgbSliders.red.value);
-      var green = getHexValue(this.rgbSliders.green.value);
-      var blue = getHexValue(this.rgbSliders.blue.value);
-      this.sliders.red.newGradient(["#00" + green + blue, "#ff" + green + blue]);
-      this.sliders.green.newGradient(["#" + red + "00" + blue, "#" + red + "ff" + blue]);
-      this.sliders.blue.newGradient(["#" + red + green + "00", "#" + red + green + "ff"]);
-    };
-
-    Colorpicker.prototype.updateCursor = function updateCursor(mouse) {
-      var rgbColor = this.getColorFromSliders();
-      var hexColor = rgb2hex(rgbColor);
-      var hslColor = rgb2hsl(rgbColor);
-      var hsl = hslColor.match(/^hsl?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)\%[\s+]?,[\s+]?(\d+)\%[\s+]?/i);
-      var r = (100 - hsl[3]) * (this.options.radius / 200);
-      var coords = getCartesianCoords(r, hsl[1] / 360);
-      var ratio = this.options.radius / 2;
-      if (!this.options.disableLum) {
-        this.sliders.saturation.update(hsl[2]);
-        this.sliders.saturation.newGradient(['#FFFFFF', hexColor]);
-      }
-      this.cursor.style.backgroundColor = hslColor;
-      if (mouse) {
-        this.cursor.style.transform = "translate(" + mouse.x + "px, " + mouse.y + "px)";
-        return;
-      }
-      this.cursor.style.transform = "translate(" + (coords.x + ratio) + "px, " + (coords.y + ratio) + "px)";
-    };
-
-    Colorpicker.prototype.selectColor = function selectColor(color, mute, mouse) {
-      var this$1 = this;
-      if (mute === void 0) mute = false;
-
-      if (color.slice(0, 1) !== '#' && color.slice(0, 3).toUpperCase() !== 'RGB' && color.slice(0, 3).toUpperCase() !== 'HSL') {
-        return;
-      }
-      call(this.options.events.beforeSelect);
-      var hexColor = color.slice(0, 1) === '#' ? color : rgb2hex(color);
-      var hslColor = rgb2hsl(color);
-      this.el.value = this.options.mode === 'hex' ? hexColor : this.options.mode === 'hsl' ? hslColor : color;
-      this.guide.style.color = color;
-      this.guide.style.fill = color;
-      this.sliders.red.update(getDecimalValue(hexColor.slice(1, 3)), true);
-      this.sliders.green.update(getDecimalValue(hexColor.slice(3, 5)), true);
-      this.sliders.blue.update(getDecimalValue(hexColor.slice(5, 7)), true);
-      this.updateSlidersInputs();
-      this.updateCursor(mouse);
-      call(this.options.events.afterSelect);
-      if (mute) {
-        return;
-      }
-      this.events.forEach(function (event) {
-        return this$1.el.dispatchEvent(event);
-      });
-    };
-
-    Colorpicker.prototype.getColorFromSliders = function getColorFromSliders() {
-      var red = this.rgbSliders.red.value;
-      var green = this.rgbSliders.green.value;
-      var blue = this.rgbSliders.blue.value;
-      return "rgb(" + red + ", " + green + ", " + blue + ")";
-    };
-
-    Colorpicker.prototype.getColorFromWheel = function getColorFromWheel(mouse) {
-      var imageData = this.context.getImageData(mouse.x, mouse.y, 1, 1).data;
-      return "rgb(" + imageData[0] + ", " + imageData[1] + ", " + imageData[2] + ")";
-    };
-
-    Colorpicker.prototype.getMouseCords = function getMouseCords(evnt) {
-      var rect = this.canvas.getBoundingClientRect();
-      var mouse = {
-        x: evnt.clientX - rect.left,
-        y: evnt.clientY - rect.top
       };
-      this.mouse = mouse;
-      return mouse;
-    };
-
-    Colorpicker.prototype.togglePicker = function togglePicker() {
-
-      if (this.isMenuActive) {
-        this.closePicker();
-        return;
-      }
-      this.openPiker();
-    };
-
-    Colorpicker.prototype.closePicker = function closePicker() {
-      this.menu.classList.add('is-hidden');
-      this.isMenuActive = false;
-      document.removeEventListener('click', this.documentCallback);
-    };
-
-    Colorpicker.prototype.openPiker = function openPiker() {
-      var this$1 = this;
-
-      this.menu.classList.remove('is-hidden');
-      this.isMenuActive = true;
-      var documentCallback = function documentCallback(evnt) {
-        if (!isElementClosest(evnt.target, this$1.menu) && !isElementClosest(evnt.target, this$1.guide)) {
-          this$1.closePicker();
-          return;
-        }
-        call(this$1.options.events.clicked);
+      var mouseupHandler = function mouseupHandler() {
+        this$1.lastMove = delta;
+        document.removeEventListener('mousemove', mousemoveHandler);
+        document.removeEventListener('mouseup', mouseupHandler);
       };
-      this.documentCallback = documentCallback.bind(this);
-      document.addEventListener('click', this.documentCallback);
-      call(this.options.events.afterOpen);
-    };
+      document.addEventListener('mousemove', mousemoveHandler);
+      document.addEventListener('mouseup', mouseupHandler);
+    });
+  }
 
-    return Colorpicker;
+  this.el.addEventListener('focus', function (event) {
+    var edit = function edit() {
+      this$1.selectColor(this$1.el.value, true);
+      this$1.updateCursor();
+    };
+    var release = function release() {
+      this$1.el.removeEventListener('change', edit);
+      this$1.el.removeEventListener('blur', release);
+    };
+    this$1.el.addEventListener('change', edit);
+    this$1.el.addEventListener('blur', release);
   });
-});
 
-var CURRENT_SELECTION = null;
-var TEXT_RANGE = null;
-var RANGE = null;
+  this.submit.addEventListener('click', function (event) {
+    call(this$1.settings.events.beforeSubmit);
+    this$1.selectColor(this$1.el.value);
+    this$1.updateCursor();
+    if (this$1.settings.menu.hideWhenSubmit) {
+      this$1.closePicker();
+    }
+    this$1.updateRecentColors(this$1.currentColor);
+    call(this$1.settings.events.afterSubmit);
+  });
+};
+
+Colorpicker.prototype.updateWheelColors = function updateWheelColors() {
+  var this$1 = this;
+
+  var x = this.circle.xCords;
+  var y = this.circle.yCords;
+  var radius = this.circle.radius;
+  var saturation = this.settings.picker.saturation ? this.saturation.value : 100;
+  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+  for (var angle = 0; angle < 360; angle += 1) {
+    var gradient = this$1.ctx.createRadialGradient(x, y, 0, x, y, radius);
+    var startAngle = (angle - 2) * Math.PI / 180;
+    var endAngle = (angle + 2) * Math.PI / 180;
+
+    this$1.ctx.beginPath();
+    this$1.ctx.moveTo(x, y);
+    this$1.ctx.arc(x, y, radius, startAngle, endAngle);
+    this$1.ctx.closePath();
+
+    gradient.addColorStop(0, "hsl(" + angle + ", " + saturation + "%, 100%)");
+    gradient.addColorStop(0.5, "hsl(" + angle + ", " + saturation + "%, 50%)");
+    gradient.addColorStop(1, "hsl(" + angle + ", " + saturation + "%, 0%)");
+    this$1.ctx.fillStyle = gradient;
+    this$1.ctx.fill();
+  }
+};
+
+Colorpicker.prototype.updateSquareColors = function updateSquareColors() {
+  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+  this.ctx.fillStyle = this.currentHue;
+  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+  var grdBlack = this.ctx.createLinearGradient(0, 0, this.canvas.width, 0);
+  grdBlack.addColorStop(0, "hsl(0, 0%, 50%)");
+  grdBlack.addColorStop(1, "hsla(0, 0%, 50%, 0)");
+  this.ctx.fillStyle = grdBlack;
+  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+  var grdWhite = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+  grdWhite.addColorStop(0, "hsl(0, 0%, 100%)");
+  grdWhite.addColorStop(0.5, "hsla(0, 0%, 100%, 0)");
+  grdWhite.addColorStop(0.5, "hsla(0, 0%, 0%, 0)");
+  grdWhite.addColorStop(1, "hsl(0, 0%, 0%) ");
+  this.ctx.fillStyle = grdWhite;
+  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+};
+
+Colorpicker.prototype.updateRecentColors = function updateRecentColors(newColor) {
+  var this$1 = this;
+
+  // update recent color array
+  if (!newColor) {
+    return;
+  }
+  if (this.recentColors.length >= this.settings.recentColors.max) {
+    this.recentColors.shift();
+    this.recent.removeChild(this.recent.firstChild);
+  }
+
+  this.recentColors.push(newColor);
+  var recentColor = document.createElement('a');
+  recentColor.classList.add('picker-color');
+  recentColor.style.backgroundColor = newColor;
+  this.recent.appendChild(recentColor);
+  recentColor.addEventListener('click', function (event) {
+    event.preventDefault();
+    this$1.selectColor(newColor);
+    this$1.updateCursor();
+  });
+};
+
+Colorpicker.prototype.updateSlidersInputs = function updateSlidersInputs(slider) {
+  var cl = this.currentColor;
+  this.sliders.red.newGradient(["rgb(0," + cl.green + "," + cl.blue + ")", "rgb(255," + cl.green + "," + cl.blue + ")"]);
+  this.sliders.green.newGradient(["rgb(" + cl.red + ",0," + cl.blue + ")", "rgb(" + cl.red + ",255," + cl.blue + ")"]);
+  this.sliders.blue.newGradient(["rgb(" + cl.red + "," + cl.green + ",0)", "rgb(" + cl.red + "," + cl.green + ",255)"]);
+};
+
+Colorpicker.prototype.updateCursor = function updateCursor(mouse) {
+  if (mouse) {
+    this.cursor.style.transform = "translate3d(" + mouse.x + "px, " + mouse.y + "px, 0)";
+    return;
+  }
+
+  var hslColor = toHsl(this.currentColor, true);
+  if (this.settings.picker.mode === 'wheel') {
+    var r = (100 - hslColor[3]) * (this.settings.picker.radius / 200);
+    var ratio = this.settings.picker.radius / 2;
+    this.mouse = getCartesianCoords(r, hslColor[1] / 360);
+    this.cursor.style.transform = "translate3d(" + (this.mouse.x + ratio) + "px, " + (this.mouse.y + ratio) + "px, 0)";
+  }
+  if (this.settings.picker.mode === 'square') {
+    var x = hslColor[2] / 100 * this.settings.picker.edge;
+    var y = (100 - hslColor[3]) / 100 * this.settings.picker.edge;
+    this.mouse = { x: x, y: y };
+    this.cursor.style.transform = "translate3d(" + x + "px, " + y + "px, 0)";
+  }
+};
+
+Colorpicker.prototype.selectColor = function selectColor(color, mute) {
+  var this$1 = this;
+  if (mute === void 0) mute = false;
+
+  if (!isAColor(color)) {
+    return;
+  }
+  if (!mute) {
+    call(this.settings.events.beforeSelect);
+  }
+
+  color = parseColor(color);
+  var rgbColor = toRgb(color);
+  var hexColor = toHex(color);
+  var hslColor = toHsl(color);
+  this.el.value = this.settings.model === 'hex' ? hexColor : this.settings.model === 'hsl' ? hslColor : this.settings.model === 'rgb' ? rgbColor : '';
+
+  this.currentColor = rgbColor;
+  this.guide.style.color = color;
+  this.guide.style.fill = color;
+  if (this.settings.rgbSliders) {
+    this.sliders.red.update(rgbColor.red, true);
+    this.sliders.green.update(rgbColor.green, true);
+    this.sliders.blue.update(rgbColor.blue, true);
+    this.updateSlidersInputs();
+  }
+  if (this.settings.picker.mode === 'wheel' && this.settings.picker.saturation) {
+    this.sliders.saturation.update(hslColor.sat);
+    this.sliders.saturation.newGradient(['#FFFFFF', hexColor[0]]);
+  }
+
+  if (this.settings.picker.mode === 'square') {
+    this.currentHue = "hsl(" + hslColor.hue + ", 100%, 50%)";
+    this.updateSquareColors();
+  }
+
+  if (mute) {
+    return;
+  }
+  call(this.settings.events.afterSelect);
+  this.events.forEach(function (event) {
+    return this$1.el.dispatchEvent(event);
+  });
+};
+
+Colorpicker.prototype.getColorFromSliders = function getColorFromSliders() {
+  var red = this.rgbSliders.red.value;
+  var green = this.rgbSliders.green.value;
+  var blue = this.rgbSliders.blue.value;
+  return "rgb(" + red + ", " + green + ", " + blue + ")";
+};
+
+Colorpicker.prototype.getColorCanvas = function getColorCanvas(mouse, ctx) {
+  var imageData = ctx.getImageData(mouse.x, mouse.y, 1, 1).data;
+  return "rgb(" + imageData[0] + ", " + imageData[1] + ", " + imageData[2] + ")";
+};
+
+Colorpicker.prototype.getMouseCords = function getMouseCords(event) {
+  var mouse = {
+    x: event.offsetX,
+    y: event.offsetY
+  };
+  return mouse;
+};
+
+Colorpicker.prototype.togglePicker = function togglePicker() {
+  if (this.isMenuActive) {
+    this.closePicker();
+    return;
+  }
+  this.openPiker();
+};
+
+Colorpicker.prototype.closePicker = function closePicker() {
+  this.menu.classList.add('is-hidden');
+  this.isMenuActive = false;
+  document.removeEventListener('click', this.documentCallback);
+};
+
+Colorpicker.prototype.openPiker = function openPiker() {
+  var this$1 = this;
+
+  this.menu.classList.remove('is-hidden');
+  this.isMenuActive = true;
+  var documentCallback = function documentCallback(evnt) {
+    if (!isElementClosest$1(evnt.target, this$1.menu) && !isElementClosest$1(evnt.target, this$1.guide)) {
+      this$1.closePicker();
+      return;
+    }
+    call(this$1.settings.events.clicked);
+  };
+  this.documentCallback = documentCallback.bind(this);
+  document.addEventListener('click', this.documentCallback);
+  call(this.settings.events.afterOpen);
+};
 
 var Selection = function () {
   function Selection() {
@@ -1267,8 +1861,8 @@ var Selection = function () {
   }
 
   createClass(Selection, null, [{
-    key: "selectTextRange",
-    value: function selectTextRange() {
+    key: 'selectRange',
+    value: function selectRange() {
       var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.textRange;
 
       if (!range) return;
@@ -1277,7 +1871,7 @@ var Selection = function () {
       sel.addRange(range);
     }
   }, {
-    key: "selectElement",
+    key: 'selectElement',
     value: function selectElement(el) {
       if (!el) return;
       var range = document.createRange();
@@ -1287,9 +1881,13 @@ var Selection = function () {
       sel.addRange(range);
     }
   }, {
-    key: "updateSelectedRange",
-    value: function updateSelectedRange() {
+    key: 'update',
+    value: function update() {
       var sel = Selection.current = window.getSelection();
+      // check if the range is inside a section
+      if (sel.anchorNode && !sel.anchorNode.parentNode.closest('.align-content')) {
+        return;
+      }
       if (sel.rangeCount && sel.anchorNode.nodeType === 3) {
         Selection.textRange = sel.getRangeAt(0);
       }
@@ -1297,35 +1895,13 @@ var Selection = function () {
         Selection.range = sel.getRangeAt(0);
       }
     }
-  }, {
-    key: "textRange",
-    set: function set$$1(range) {
-      if (!range) return;
-      TEXT_RANGE = range;
-    },
-    get: function get$$1() {
-      return TEXT_RANGE;
-    }
-  }, {
-    key: "range",
-    set: function set$$1(range) {
-      if (!range) return;
-      RANGE = range;
-    },
-    get: function get$$1() {
-      return RANGE;
-    }
-  }, {
-    key: "current",
-    set: function set$$1(selection) {
-      CURRENT_SELECTION = selection;
-    },
-    get: function get$$1() {
-      return CURRENT_SELECTION;
-    }
   }]);
   return Selection;
 }();
+
+Selection.current = null;
+Selection.textRange = null;
+Selection.range = null;
 
 var Prompt = function () {
   function Prompt() {
@@ -1336,7 +1912,7 @@ var Prompt = function () {
         _ref$wrapper = _ref.wrapper,
         wrapper = _ref$wrapper === undefined ? document.body : _ref$wrapper,
         _ref$position = _ref.position,
-        position = _ref$position === undefined ? { left: 0, top: 0 } : _ref$position,
+        position = _ref$position === undefined ? null : _ref$position,
         _ref$inputsCount = _ref.inputsCount,
         inputsCount = _ref$inputsCount === undefined ? 1 : _ref$inputsCount,
         _ref$inputsPlaceholde = _ref.inputsPlaceholders,
@@ -1377,9 +1953,11 @@ var Prompt = function () {
           this.selectionRefrance = Selection.range;
         }
         if (Selection.range.startContainer.nodeType === 1) {
-          this.selectionRefrance = Selection.current.anchorNode;
+          this.selectionRefrance = Selection.range.startContainer;
         }
-        updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-top');
+        setTimeout(function () {
+          updatePosition(_this.selectionRefrance, _this.el, _this.settings.wrapper, 'left-top');
+        }, 1);
       }
       this.message.innerText = message;
       this.submit.innerText = 'Submit';
@@ -1403,7 +1981,7 @@ var Prompt = function () {
           if (isElementClosest(event.target, _this.el)) return;
           _this.remove();
         });
-      }, 16);
+      }, 1);
     }
   }, {
     key: 'onSubmit',
@@ -1411,10 +1989,10 @@ var Prompt = function () {
       var _this2 = this;
 
       this.submit.addEventListener('click', function () {
-        return func.call(_this2, args);
+        return func(args);
       });
       this.submit.addEventListener('click', function () {
-        return setTimeout(_this2.remove.bind(_this2), 16);
+        return setTimeout(_this2.remove.bind(_this2), 1);
       });
       return this;
     }
@@ -1502,22 +2080,6 @@ var cmdsSchema = {
     element: 'button',
     command: 'justifyFull',
     tooltip: 'Justify full (' + symbols.cmdKey + ' J)'
-  },
-
-  createLink: {
-    element: 'button',
-    tooltip: 'Hyperlink',
-    func: function func(styler) {
-      new Prompt('Enter link:', Selection.current.toString(), {
-        wrapper: styler.$align.el,
-        position: Selection.textRange.getBoundingClientRect()
-      }).onSubmit(function () {
-        var link = this.input.value;
-        if (!link) return;
-        Selection.selectTextRange();
-        styler.$align.execute('createLink', link);
-      }, [styler]);
-    }
   },
 
   h1: {
@@ -1637,21 +2199,22 @@ var cmdsSchema = {
     command: 'foreColor',
     tooltip: 'Font color',
     useCSS: true,
-    init: colorpicker,
+    init: Colorpicker,
     initConfig: {
-      defaultColor: '#000000',
+      defaultColor: '#fff',
       mode: 'hex',
+      picker: { mode: 'square' },
       disableLum: true,
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
-          Selection.selectTextRange();
+          Selection.selectRange();
         },
         afterOpen: function afterOpen() {
-          Selection.updateSelectedRange();
+          Selection.update();
         },
         afterSelect: function afterSelect() {
-          Selection.updateSelectedRange();
+          Selection.update();
         }
       }
     }
@@ -1663,24 +2226,81 @@ var cmdsSchema = {
     command: 'backColor',
     tooltip: 'Highlight color',
     useCSS: true,
-    init: colorpicker,
+    init: Colorpicker,
     initConfig: {
       defaultColor: '#fdfdfd',
       mode: 'hex',
+      picker: { mode: 'square' },
       disableLum: true,
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path style="fill: currentColor" d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/>\n          <path d="M0 20h24v4H0z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
-          Selection.selectTextRange();
+          Selection.selectRange();
         },
         afterOpen: function afterOpen() {
-          Selection.updateSelectedRange();
+          Selection.update();
         },
         afterSelect: function afterSelect() {
-          Selection.updateSelectedRange();
+          Selection.update();
         }
       }
     }
+  },
+
+  createTable: {
+    element: 'button',
+    func: 'createTable',
+    icon: 'table',
+    tooltip: 'Add Table'
+  },
+
+  createFigure: {
+    element: 'file',
+    icon: 'figure',
+    func: 'createFigure',
+    tooltip: 'Add Figure'
+  },
+
+  createPost: {
+    element: 'button',
+    icon: 'facebook',
+    func: 'createPost',
+    tooltip: 'Add post'
+  },
+
+  createEmbed: {
+    element: 'button',
+    icon: 'embed',
+    func: 'createEmbed',
+    tooltip: 'Add embed'
+  },
+
+  createColumn: {
+    element: 'button',
+    icon: 'column',
+    func: 'createColumn',
+    tooltip: 'Add columns'
+  },
+
+  createVideo: {
+    element: 'button',
+    icon: 'video',
+    func: 'createVideo',
+    tooltip: 'Add video'
+  },
+
+  createLine: {
+    element: 'dropdown',
+    items: ['<hr class="align-line">', '<hr class="align-line is-dashed">', '<hr class="align-line is-dotted">', '<hr class="align-line is-double">', '<hr class="align-line is-dots">', '<hr class="align-line is-bold">', '<hr class="align-line is-bold is-dashed">', '<hr class="align-line is-bold is-dotted">', '<hr class="align-line is-bold is-double">'],
+    icon: 'insertLine',
+    func: 'createLine',
+    tooltip: 'Add line'
+  },
+
+  createLink: {
+    element: 'button',
+    tooltip: 'Hyperlink',
+    func: 'createLink'
   },
 
   // internal functions don't use it
@@ -1698,37 +2318,43 @@ var cmdsSchema = {
   _sectionToggleHTML: {
     element: 'button',
     func: 'toggleHTML',
-    tooltip: 'Edit as HTMl'
+    tooltip: 'Edit as HTMl',
+    icon: 'toggleHTML'
   },
 
   _remove: {
     element: 'button',
     func: 'remove',
-    tooltip: 'Remove section'
+    tooltip: 'Remove section',
+    icon: 'remove'
   },
 
   _sectionUp: {
     element: 'button',
     func: 'moveUp',
-    tooltip: 'Move section up'
+    tooltip: 'Move section up',
+    icon: 'caretUp'
   },
 
   _sectionDown: {
     element: 'button',
     func: 'moveDown',
-    tooltip: 'Move section down'
+    tooltip: 'Move section down',
+    icon: 'caretDown'
   },
 
   _sectionImage: {
     element: 'file',
     func: 'backgroundImage',
-    tooltip: 'Add background image'
+    tooltip: 'Add background image',
+    icon: 'image'
   },
 
   _sectionVideo: {
     element: 'file',
     func: 'backgroundVideo',
-    tooltip: 'Add background video'
+    tooltip: 'Add background video',
+    icon: 'video'
   },
 
   _sectionColor: {
@@ -1736,9 +2362,10 @@ var cmdsSchema = {
     type: 'text',
     func: 'backgroundColor',
     tooltip: 'Change background color',
-    init: colorpicker,
+    init: Colorpicker,
     initConfig: {
       defaultColor: '#000000',
+      picker: { mode: 'square' },
       mode: 'hex',
       disableLum: true,
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n        </svg>\n      '
@@ -1748,30 +2375,36 @@ var cmdsSchema = {
   _tableRowTop: {
     element: 'button',
     func: 'insertRow',
-    args: ['before']
+    args: ['before'],
+    icon: 'tableRowTop'
   },
   _tableRowBottom: {
     element: 'button',
     func: 'insertRow',
-    args: ['after']
+    args: ['after'],
+    icon: 'tableRowBottom'
   },
   _tableColumnBefore: {
     element: 'button',
     func: 'insertColumn',
-    args: ['before']
+    args: ['before'],
+    icon: 'tableColumnBefore'
   },
   _tableColumnAfter: {
     element: 'button',
     func: 'insertColumn',
-    args: ['after']
+    args: ['after'],
+    icon: 'tableColumnAfter'
   },
   _tableDeleteRow: {
     element: 'button',
-    func: 'deleteRow'
+    func: 'deleteRow',
+    icon: 'tableDeleteRow'
   },
   _tableDeleteColumn: {
     element: 'button',
-    func: 'deleteColumn'
+    func: 'deleteColumn',
+    icon: 'tableDeleteColumn'
   }
 };
 
@@ -1782,7 +2415,7 @@ function icons(name) {
 var iconsPath = {
   blockquote: 'M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z',
 
-  bold: 'M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z',
+  bold: 'M13.5,15.5H10V12.5H13.5A1.5,1.5 0 0,1 15,14A1.5,1.5 0 0,1 13.5,15.5M10,6.5H13A1.5,1.5 0 0,1 14.5,8A1.5,1.5 0 0,1 13,9.5H10M15.6,10.79C16.57,10.11 17.25,9 17.25,8C17.25,5.74 15.5,4 13.25,4H7V18H14.04C16.14,18 17.75,16.3 17.75,14.21C17.75,12.69 16.89,11.39 15.6,10.79Z',
 
   fontSize: 'M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z',
 
@@ -1795,8 +2428,6 @@ var iconsPath = {
   h4: 'M3,4H5V10H9V4H11V18H9V12H5V18H3V4M18,18V13H13V11L18,4H20V11H21V13H20V18H18M18,11V7.42L15.45,11H18Z',
 
   html: 'M19 12h-2v3h-3v2h5v-5zM7 9h3V7H5v5h2V9zm14-6H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02z',
-
-  image: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 
   italic: 'M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z',
 
@@ -1814,15 +2445,13 @@ var iconsPath = {
 
   removeFormat: 'M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zM14 5h-3l-1-1H6L5 5H2v2h12z',
 
-  strikeThrough: 'M7.24 8.75c-.26-.48-.39-1.03-.39-1.67 0-.61.13-1.16.4-1.67.26-.5.63-.93 1.11-1.29.48-.35 1.05-.63 1.7-.83.66-.19 1.39-.29 2.18-.29.81 0 1.54.11 2.21.34.66.22 1.23.54 1.69.94.47.4.83.88 1.08 1.43.25.55.38 1.15.38 1.81h-3.01c0-.31-.05-.59-.15-.85-.09-.27-.24-.49-.44-.68-.2-.19-.45-.33-.75-.44-.3-.1-.66-.16-1.06-.16-.39 0-.74.04-1.03.13-.29.09-.53.21-.72.36-.19.16-.34.34-.44.55-.1.21-.15.43-.15.66 0 .48.25.88.74 1.21.38.25.77.48 1.41.7H7.39c-.05-.08-.11-.17-.15-.25zM21 12v-2H3v2h9.62c.18.07.4.14.55.2.37.17.66.34.87.51.21.17.35.36.43.57.07.2.11.43.11.69 0 .23-.05.45-.14.66-.09.2-.23.38-.42.53-.19.15-.42.26-.71.35-.29.08-.63.13-1.01.13-.43 0-.83-.04-1.18-.13s-.66-.23-.91-.42c-.25-.19-.45-.44-.59-.75-.14-.31-.25-.76-.25-1.21H6.4c0 .55.08 1.13.24 1.58.16.45.37.85.65 1.21.28.35.6.66.98.92.37.26.78.48 1.22.65.44.17.9.3 1.38.39.48.08.96.13 1.44.13.8 0 1.53-.09 2.18-.28s1.21-.45 1.67-.79c.46-.34.82-.77 1.07-1.27s.38-1.07.38-1.71c0-.6-.1-1.14-.31-1.61-.05-.11-.11-.23-.17-.33H21z',
+  strikeThrough: 'M23,12V14H18.61C19.61,16.14 19.56,22 12.38,22C4.05,22.05 4.37,15.5 4.37,15.5L8.34,15.55C8.37,18.92 11.5,18.92 12.12,18.88C12.76,18.83 15.15,18.84 15.34,16.5C15.42,15.41 14.32,14.58 13.12,14H1V12H23M19.41,7.89L15.43,7.86C15.43,7.86 15.6,5.09 12.15,5.08C8.7,5.06 9,7.28 9,7.56C9.04,7.84 9.34,9.22 12,9.88H5.71C5.71,9.88 2.22,3.15 10.74,2C19.45,0.8 19.43,7.91 19.41,7.89Z',
 
   text: 'M5 17v2h14v-2H5zm4.5-4.2h5l.9 2.2h2.1L12.75 4h-1.5L6.5 15h2.1l.9-2.2zM12 5.98L13.87 11h-3.74L12 5.98z',
 
-  underline: 'M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z',
+  underline: 'M5,21H19V19H5V21M12,17A6,6 0 0,0 18,11V3H15.5V11A3.5,3.5 0 0,1 12,14.5A3.5,3.5 0 0,1 8.5,11V3H6V11A6,6 0 0,0 12,17Z',
 
-  insertColumn: 'M13 12h7v1.5h-7zm0-2.5h7V11h-7zm0 5h7V16h-7zM21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15h-9V6h9v13z',
-
-  unorderedList: 'M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z',
+  unorderedList: 'M7,5H21V7H7V5M7,13V11H21V13H7M4,4.5A1.5,1.5 0 0,1 5.5,6A1.5,1.5 0 0,1 4,7.5A1.5,1.5 0 0,1 2.5,6A1.5,1.5 0 0,1 4,4.5M4,10.5A1.5,1.5 0 0,1 5.5,12A1.5,1.5 0 0,1 4,13.5A1.5,1.5 0 0,1 2.5,12A1.5,1.5 0 0,1 4,10.5M7,19V17H21V19H7M4,16.5A1.5,1.5 0 0,1 5.5,18A1.5,1.5 0 0,1 4,19.5A1.5,1.5 0 0,1 2.5,18A1.5,1.5 0 0,1 4,16.5Z',
 
   orderedList: 'M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z',
 
@@ -1836,7 +2465,7 @@ var iconsPath = {
 
   createLink: 'M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z',
 
-  selectContent: 'M19.51 3.08L3.08 19.51c.09.34.27.65.51.9.25.24.56.42.9.51L20.93 4.49c-.19-.69-.73-1.23-1.42-1.41zM11.88 3L3 11.88v2.83L14.71 3h-2.83zM5 3c-1.1 0-2 .9-2 2v2l4-4H5zm14 18c.55 0 1.05-.22 1.41-.59.37-.36.59-.86.59-1.41v-2l-4 4h2zm-9.71 0h2.83L21 12.12V9.29L9.29 21z',
+  selectContent: 'M9,9H15V15H9M7,17H17V7H7M15,5H17V3H15M15,21H17V19H15M19,17H21V15H19M19,9H21V7H19M19,21A2,2 0 0,0 21,19H19M19,13H21V11H19M11,21H13V19H11M9,3H7V5H9M3,17H5V15H3M5,21V19H3A2,2 0 0,0 5,21M19,3V5H21A2,2 0 0,0 19,3M13,3H11V5H13M3,9H5V7H3M7,21H9V19H7M3,13H5V11H3M3,5H5V3A2,2 0 0,0 3,5Z',
 
   insertLine: 'M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13.25c1.1 0 2 .9 2 2s-.9 2-2 2H15v-2l-3 3 3 3v-2h2c2.21 0 4-1.79 4-4s-1.79-4-4-4z',
 
@@ -1845,6 +2474,10 @@ var iconsPath = {
   redo: 'M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z',
 
   plus: 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
+
+  video: 'M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z',
+
+  image: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 
   figure: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 
@@ -1866,8 +2499,6 @@ var iconsPath = {
 
   fullscreen: 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z',
 
-  video: 'M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z',
-
   column: 'M16,5V18H21V5M4,18H9V5H4M10,18H15V5H10V18Z',
 
   delete: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
@@ -1878,29 +2509,25 @@ var iconsPath = {
 
   embed: 'M12.89,3L14.85,3.4L11.11,21L9.15,20.6L12.89,3M19.59,12L16,8.41V5.58L22.42,12L16,18.41V15.58L19.59,12M1.58,12L8,5.58V8.41L4.41,12L8,15.58V18.41L1.58,12',
 
-  _tableRowTop: 'M22,14A2,2 0 0,0 20,12H4A2,2 0 0,0 2,14V21H4V19H8V21H10V19H14V21H16V19H20V21H22V14M4,14H8V17H4V14M10,14H14V17H10V14M20,14V17H16V14H20M11,10H13V7H16V5H13V2H11V5H8V7H11V10Z',
+  tableRowTop: 'M22,14A2,2 0 0,0 20,12H4A2,2 0 0,0 2,14V21H4V19H8V21H10V19H14V21H16V19H20V21H22V14M4,14H8V17H4V14M10,14H14V17H10V14M20,14V17H16V14H20M11,10H13V7H16V5H13V2H11V5H8V7H11V10Z',
 
-  _tableRowBottom: 'M22,10A2,2 0 0,1 20,12H4A2,2 0 0,1 2,10V3H4V5H8V3H10V5H14V3H16V5H20V3H22V10M4,10H8V7H4V10M10,10H14V7H10V10M20,10V7H16V10H20M11,14H13V17H16V19H13V22H11V19H8V17H11V14Z',
+  tableRowBottom: 'M22,10A2,2 0 0,1 20,12H4A2,2 0 0,1 2,10V3H4V5H8V3H10V5H14V3H16V5H20V3H22V10M4,10H8V7H4V10M10,10H14V7H10V10M20,10V7H16V10H20M11,14H13V17H16V19H13V22H11V19H8V17H11V14Z',
 
-  _tableColumnBefore: 'M13,2A2,2 0 0,0 11,4V20A2,2 0 0,0 13,22H22V2H13M20,10V14H13V10H20M20,16V20H13V16H20M20,4V8H13V4H20M9,11H6V8H4V11H1V13H4V16H6V13H9V11Z',
+  tableColumnBefore: 'M13,2A2,2 0 0,0 11,4V20A2,2 0 0,0 13,22H22V2H13M20,10V14H13V10H20M20,16V20H13V16H20M20,4V8H13V4H20M9,11H6V8H4V11H1V13H4V16H6V13H9V11Z',
 
-  _tableColumnAfter: 'M11,2A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H2V2H11M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M15,11H18V8H20V11H23V13H20V16H18V13H15V11Z',
+  tableColumnAfter: 'M11,2A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H2V2H11M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M15,11H18V8H20V11H23V13H20V16H18V13H15V11Z',
 
-  _tableDeleteColumn: 'M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z',
+  tableDeleteColumn: 'M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z',
 
-  _tableDeleteRow: 'M9.41,13L12,15.59L14.59,13L16,14.41L13.41,17L16,19.59L14.59,21L12,18.41L9.41,21L8,19.59L10.59,17L8,14.41L9.41,13M22,9A2,2 0 0,1 20,11H4A2,2 0 0,1 2,9V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V9M4,9H8V6H4V9M10,9H14V6H10V9M16,9H20V6H16V9Z',
+  tableDeleteRow: 'M9.41,13L12,15.59L14.59,13L16,14.41L13.41,17L16,19.59L14.59,21L12,18.41L9.41,21L8,19.59L10.59,17L8,14.41L9.41,13M22,9A2,2 0 0,1 20,11H4A2,2 0 0,1 2,9V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V9M4,9H8V6H4V9M10,9H14V6H10V9M16,9H20V6H16V9Z',
 
-  _remove: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
+  remove: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z',
 
-  _sectionUp: 'M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z',
+  caretUp: 'M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z',
 
-  _sectionDown: 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z',
+  caretDown: 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z',
 
-  _sectionImage: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
-
-  _sectionVideo: 'M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z',
-
-  _sectionToggleHTML: 'M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z'
+  toggleHTML: 'M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z'
 };
 
 var NAMING_PREFIX = '';
@@ -1928,7 +2555,7 @@ function button(name, tooltip) {
  * @param {String} name
  * @param {Object} options
  */
-function select$1(name, options) {
+function select$2(name, options) {
   var selectWrapper = document.createElement('div');
   var select = document.createElement('select');
   var icon = '\n    <svg viewBox="0 0 24 24">\n      <polygon points="8,15 12,19 16,15 "/>\n      <polygon points="8,9 12,5 16,9 "/>\n    </svg>';
@@ -2066,8 +2693,11 @@ var Styler = function () {
 
       setElementsPrefix('styler-');
       this.cmdsSchema = cloneObject(cmdsSchema);
-      this.el = document.createElement('ul');
+      this.el = document.createElement('div');
+      this.menu = document.createElement('ul');
       this.el.classList.add('styler', 'is-' + this.settings.mode, 'is-' + this.settings.theme);
+      this.el.appendChild(this.menu);
+      this.menu.classList.add('styler-menu');
       this.cmds = {};
       this.visiable = false;
 
@@ -2075,7 +2705,20 @@ var Styler = function () {
         _this.generateCmdElement(command);
       });
       this.$align.el.appendChild(this.el);
-      if (this.settings.mode === 'bubble') this._initBubble();
+      if (this.settings.mode === 'bubble') {
+        this._initBubble();
+      }
+      if (this.settings.mode === 'creator') {
+        this._initCreator();
+      }
+      if (this.settings.hideWhenClickOut) {
+        this.clickCallback = function (event) {
+          if (isElementClosest(event.target, _this.el) || isElementClosest(event.target, _this.currentItem.el)) {
+            return;
+          }
+          _this.hide();
+        };
+      }
     }
   }, {
     key: '_initBubble',
@@ -2090,7 +2733,7 @@ var Styler = function () {
         if (!ticking) {
           window.requestAnimationFrame(function () {
             if (!_this2.currentPosition) {
-              _this2.updateBubblePosition('center-top');
+              _this2.updateBubble();
             }
             ticking = false;
           });
@@ -2099,9 +2742,21 @@ var Styler = function () {
       };
     }
   }, {
+    key: '_initCreator',
+    value: function _initCreator() {
+      var _this3 = this;
+
+      this.toggleButton = button('plus');
+      this.toggleButton.addEventListener('click', function () {
+        _this3.el.classList.toggle('is-active');
+      });
+      this.el.insertBefore(this.toggleButton, this.menu);
+      this.hide();
+    }
+  }, {
     key: 'generateCmdElement',
     value: function generateCmdElement(command) {
-      var _this3 = this;
+      var _this4 = this;
 
       var li = document.createElement('li');
       var cmd = typeof command === 'string' ? command : Object.keys(command)[0];
@@ -2112,51 +2767,48 @@ var Styler = function () {
       }
 
       var currentCmd = this.cmds[cmd] = { schema: cmdSchema };
-
+      var icon = cmdSchema.icon || cmd;
       switch (cmdSchema.element) {
         case 'button':
-          currentCmd.el = button(cmd, this.getTooltip(cmdSchema));
+          currentCmd.el = button(icon, this.getTooltip(cmdSchema));
           currentCmd.el.addEventListener('click', function () {
-            return _this3.cmdCallback(cmdSchema, cmdSchema.value);
-          });
-          li.appendChild(currentCmd.el);
-          break;
-
-        case 'classes':
-          currentCmd.el = document.createElement('ul');
-          command[cmd].forEach(function (className) {
-            var li = menuButton('' + cmdSchema.command + camelCase(className), function () {
-              _this3.toggleClass('is-' + className, command[cmd]);
-            }, camelCase(cmdSchema.command) + ' ' + className);
-            currentCmd.el.appendChild(li);
+            return _this4.cmdCallback(cmdSchema, cmdSchema.value);
           });
           li.appendChild(currentCmd.el);
           break;
 
         case 'file':
-          var fileBtn = fileButton(cmd, this.getTooltip(cmdSchema));
+          var fileBtn = fileButton(icon, this.getTooltip(cmdSchema));
           currentCmd.el = fileBtn.input;
           currentCmd.el.addEventListener('change', function (event) {
-            _this3.cmdCallback(cmdSchema, event);
+            _this4.cmdCallback(cmdSchema, event);
           });
           li.appendChild(fileBtn.el);
           break;
 
+        case 'input':
+          currentCmd.el = input(icon, cmdSchema.type, this.getTooltip(cmdSchema));
+          currentCmd.el.addEventListener('change', function () {
+            _this4.cmdCallback(cmdSchema, currentCmd.el.value);
+          });
+          li.appendChild(currentCmd.el);
+          break;
+
         case 'select':
-          var selectWrapper = select$1(cmd, command[cmd]);
+          var selectWrapper = select$2(icon, command[cmd]);
           var temp = currentCmd.el = selectWrapper.querySelector('select');
           temp.addEventListener('change', function () {
-            return _this3.cmdCallback(cmdSchema, temp[temp.selectedIndex].value);
+            return _this4.cmdCallback(cmdSchema, temp[temp.selectedIndex].value);
           });
           li.appendChild(selectWrapper);
           break;
 
-        case 'input':
-          currentCmd.el = input(cmd, cmdSchema.type, this.getTooltip(cmdSchema));
-          currentCmd.el.addEventListener('change', function () {
-            _this3.cmdCallback(cmdSchema, currentCmd.el.value);
+        case 'dropdown':
+          var ddown = dropdown(icon, cmdSchema.items, function (value) {
+            return _this4.cmdCallback(cmdSchema, value);
           });
-          li.appendChild(currentCmd.el);
+          li.appendChild(ddown.dropdown);
+
           break;
 
         case 'styling':
@@ -2166,6 +2818,17 @@ var Styler = function () {
         case 'custom':
           var markup = cmdSchema.create(this);
           li.appendChild(markup);
+          break;
+
+        case 'classes':
+          currentCmd.el = document.createElement('ul');
+          command[cmd].forEach(function (className) {
+            var li = menuButton('' + cmdSchema.command + camelCase(className), function () {
+              _this4.toggleClass('is-' + className, command[cmd]);
+            }, camelCase(cmdSchema.command) + ' ' + className);
+            currentCmd.el.appendChild(li);
+          });
+          li.appendChild(currentCmd.el);
           break;
 
         default:
@@ -2181,7 +2844,7 @@ var Styler = function () {
         cmdSchema.init = null;
       }
 
-      this.el.appendChild(li);
+      this.menu.appendChild(li);
     }
   }, {
     key: 'cmdCallback',
@@ -2196,9 +2859,7 @@ var Styler = function () {
       if (typeof cmdSchema.func === 'function') {
         cmdSchema.func(this, value || cmdSchema);
       }
-      if (this.settings.mode === 'bubble') {
-        this.updateBubblePosition();
-      }
+      this.update();
     }
 
     /**
@@ -2215,27 +2876,29 @@ var Styler = function () {
       (_$align = this.$align).execute.apply(_$align, arguments);
     }
   }, {
-    key: 'updateBubblePosition',
-    value: function updateBubblePosition(newPosition) {
-      if (!Selection.textRange && !this.currentItem) return;
-      var element = this.currentItem ? this.currentItem.el : Selection.textRange;
-      this.currentPosition = updatePosition(element, this.el, this.$align.el, newPosition || this.settings.position);
+    key: 'updateBubble',
+    value: function updateBubble(newPosition) {
+      if (Selection.range && !Selection.range.collapsed && Selection.range === Selection.current.getRangeAt(0) || this.currentItem) {
+        var element = this.currentItem ? this.currentItem.el : Selection.range;
+        this.currentPosition = updatePosition(element, this.el, this.$align.el, newPosition || this.settings.position);
+        this.show();
+        return;
+      }
+      this.hide();
+    }
+  }, {
+    key: 'updateCreator',
+    value: function updateCreator(newPosition) {
+      if (Selection.range && Selection.range.collapsed && Selection.range.startContainer.nodeType === 1 && Selection.range.startContainer.childNodes.length <= 1) {
+        this.position = updatePosition(Selection.range.startContainer, this.el, this.$align.el, newPosition || this.settings.position);
+        this.show();
+        return;
+      }
+      this.hide();
     }
   }, {
     key: 'show',
-    value: function show(item) {
-      var _this4 = this;
-
-      if (this.currentItem) {
-        this.currentItem.el.classList.remove('is-active');
-      }
-      if (item) {
-        this.currentItem = item;
-        this.currentItem.el.classList.add('is-active');
-      }
-      if (this.settings.mode === 'bubble') {
-        this.updateBubblePosition();
-      }
+    value: function show() {
       if (this.visiable) {
         return;
       }
@@ -2243,10 +2906,7 @@ var Styler = function () {
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
       if (this.settings.hideWhenClickOut) {
-        document.addEventListener('click', function (event) {
-          if (isElementClosest(event.target, _this4.currentItem.el) || isElementClosest(event.target, _this4.el)) return;
-          _this4.hide();
-        });
+        document.addEventListener('click', this.clickCallback);
       }
     }
   }, {
@@ -2254,24 +2914,33 @@ var Styler = function () {
     value: function hide() {
       if (this.currentItem) {
         this.currentItem.el.classList.remove('is-active');
+        this.currentItem = null;
       }
       this.el.classList.remove('is-visible');
+      this.el.classList.remove('is-active');
       this.el.classList.add('is-hidden');
+      this.visiable = false;
       if (this.settings.hideWhenClickOut) {
         document.removeEventListener('click', this.clickCallback);
       }
-      this.visiable = false;
     }
   }, {
     key: 'update',
-    value: function update() {
-      this.updateCommandsStates();
-      if (this.settings.mode !== 'bubble' || !Selection.textRange) return;
-      if (Selection.textRange.collapsed || Selection.range.collapsed) {
-        this.hide();
-        return;
+    value: function update(item) {
+      if (this.currentItem) {
+        this.currentItem.el.classList.remove('is-active');
       }
-      this.show();
+      if (item) {
+        this.currentItem = item;
+        this.currentItem.el.classList.add('is-active');
+      }
+      this.updateCommandsStates();
+      if (this.settings.mode === 'bubble') {
+        this.updateBubble();
+      }
+      if (this.settings.mode === 'creator') {
+        this.updateCreator();
+      }
     }
   }, {
     key: 'getTooltip',
@@ -2308,7 +2977,9 @@ var Styler = function () {
           return;
         }
         if (init) {
-          if (Selection.range === Selection.textRange) {
+          var selectedElement = Selection.current.anchorNode.type === 1 ? Selection.current.anchorNode : Selection.current.anchorNode.parentNode;
+          if (selectedElement.closest('.align-content')) {
+            document.queryCommandValue(command);
             init.selectColor(document.queryCommandValue(command), true);
           }
           return;
@@ -2330,9 +3001,7 @@ var Styler = function () {
       });
       (_currentItem$el$class = this.currentItem.el.classList).remove.apply(_currentItem$el$class, toConsumableArray(prefixedClasses));
       this.currentItem.el.classList.toggle(currentClass);
-      if (this.settings.mode === 'bubble') {
-        this.updateBubblePosition();
-      }
+      this.update();
     }
   }]);
   return Styler;
@@ -2372,12 +3041,13 @@ var Table = function () {
 
       this.el.addEventListener('click', function (event) {
         _this.activeCell = event.target;
-        Table.$optionsBar.show(_this);
+        Table.$optionsBar.update(_this);
       });
     }
   }, {
     key: 'remove',
     value: function remove() {
+      Table.$optionsBar.hide();
       this.el.remove();
     }
   }, {
@@ -2420,21 +3090,17 @@ var Table = function () {
   }], [{
     key: 'config',
     value: function config(align, settings) {
-      var config = Object.assign({
+      this.$align = align;
+      this.$optionsBar = new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter', 'separator', '_tableDeleteRow', '_tableDeleteColumn', 'separator', '_remove'],
         tooltip: true
-      }, settings);
-      this.$align = align;
-      this.$optionsBar = new Styler(align, config);
+      }, settings));
     }
   }]);
   return Table;
 }();
-
-var ID = 0;
-var ALL_SECTIONS = [];
 
 var Section = function () {
   function Section(content, position) {
@@ -2446,14 +3112,14 @@ var Section = function () {
     if (content && content.nodeName === 'BR') {
       return;
     }
-    this.id = ID++;
+    this.id = Section.id++;
     this.type = type;
     this.isHTMLView = false;
     this.generateEl(content);
     if (type === 'text') {
       this.el.addEventListener('click', function () {
         Section.$align.activeSection = _this.el;
-        Section.$optionsBar.show(_this);
+        Section.$optionsBar.update(_this);
       });
     }
     if ((typeof position === 'undefined' ? 'undefined' : _typeof(position)) === 'object') {
@@ -2461,7 +3127,7 @@ var Section = function () {
       return;
     }
     Section.$align.editor.appendChild(this.el);
-    ALL_SECTIONS.push(this);
+    Section.allSections.push(this);
   }
 
   createClass(Section, [{
@@ -2522,7 +3188,7 @@ var Section = function () {
     value: function getIndex() {
       var _this3 = this;
 
-      return ALL_SECTIONS.findIndex(function (el) {
+      return Section.allSections.findIndex(function (el) {
         return el === _this3;
       });
     }
@@ -2608,30 +3274,31 @@ var Section = function () {
     key: 'moveUp',
     value: function moveUp() {
       var index = this.getIndex();
-      if (!this.el.previousSibling || ALL_SECTIONS[index - 1].type === 'title') return;
+      if (!this.el.previousSibling || Section.allSections[index - 1].type === 'title') return;
 
-      Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index - 1].el);
-      swapArrayItems(ALL_SECTIONS, index, index - 1);
+      Section.$align.editor.insertBefore(this.el, Section.allSections[index - 1].el);
+      swapArrayItems(Section.allSections, index, index - 1);
     }
   }, {
     key: 'moveDown',
     value: function moveDown() {
       var index = this.getIndex();
       if (!this.el.nextSibling) return;
-      Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index + 1].el.nextSibling);
-      swapArrayItems(ALL_SECTIONS, index, index + 1);
+      Section.$align.editor.insertBefore(this.el, Section.allSections[index + 1].el.nextSibling);
+      swapArrayItems(Section.allSections, index, index + 1);
     }
   }, {
     key: 'active',
     value: function active() {
-      Section.$optionsBar.show(this);
+      Section.$optionsBar.update(this);
       this.el.focus();
     }
   }, {
     key: 'remove',
     value: function remove() {
+      Section.$optionsBar.hide();
       this.el.remove();
-      ALL_SECTIONS.splice(this.getIndex(), 1);
+      Section.allSections.splice(this.getIndex(), 1);
     }
   }, {
     key: 'content',
@@ -2657,304 +3324,21 @@ var Section = function () {
   }], [{
     key: 'config',
     value: function config(align, settings) {
-      var config = Object.assign({
+      this.$align = align;
+      this.$optionsBar = new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_sectionUp', '_sectionDown', '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML', { '_sectionClasses': ['normal', 'full'] }, '_remove'],
         tooltip: true,
         position: 'left-top'
-      }, settings);
-      this.$align = align;
-      this.$optionsBar = new Styler(align, config);
-    }
-  }, {
-    key: 'allSections',
-    get: function get$$1() {
-      return ALL_SECTIONS;
+      }, settings));
     }
   }]);
   return Section;
 }();
 
-var Creator = function () {
-  function Creator(align) {
-    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref$mode = _ref.mode,
-        mode = _ref$mode === undefined ? 'toolbar' : _ref$mode,
-        _ref$theme = _ref.theme,
-        theme = _ref$theme === undefined ? 'light' : _ref$theme,
-        _ref$items = _ref.items,
-        items = _ref$items === undefined ? ['figure', 'video', 'facebook', 'table', 'embed', 'column', 'line'] : _ref$items;
-
-    classCallCheck(this, Creator);
-
-    this.$align = align;
-    this.settings = {
-      mode: mode,
-      theme: theme,
-      items: items
-    };
-    this._init();
-  }
-
-  createClass(Creator, [{
-    key: '_init',
-    value: function _init() {
-      var _this = this;
-
-      setElementsPrefix('creator-');
-      this.el = document.createElement('div');
-      this.el.classList.add('creator', 'is-' + this.settings.theme, 'is-' + this.settings.mode);
-      this.menu = document.createElement('ul');
-      this.menu.classList.add('creator-menu');
-
-      this.figureOptions = new Styler(this.$align, {
-        mode: 'bubble',
-        hideWhenClickOut: true,
-        commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
-        tooltip: true
-      });
-
-      this.settings.items.forEach(function (item) {
-        var li = document.createElement('li');
-        var el = null;
-
-        switch (item) {
-          case 'figure':
-            var btn = fileButton('figure');
-            btn.input.addEventListener('change', _this.createFigure.bind(_this));
-            el = btn.el;
-            break;
-
-          case 'video':
-            el = button('video');
-            el.addEventListener('click', _this.createVideo.bind(_this));
-            break;
-
-          case 'table':
-            el = button('table');
-            el.addEventListener('click', _this.createTable.bind(_this));
-            break;
-
-          case 'facebook':
-            el = button('facebook');
-            el.addEventListener('click', _this.embedPost.bind(_this));
-            break;
-
-          case 'embed':
-            el = button('embed');
-            el.addEventListener('click', _this.embed.bind(_this));
-            break;
-
-          case 'column':
-            el = button('column');
-            el.addEventListener('click', _this.createGrid.bind(_this));
-            break;
-
-          case 'line':
-            var ddown = dropdown('insertLine', ['<hr class="align-line">', '<hr class="align-line is-dashed">', '<hr class="align-line is-dotted">', '<hr class="align-line is-double">', '<hr class="align-line is-dots">', '<hr class="align-line is-bold">', '<hr class="align-line is-bold is-dashed">', '<hr class="align-line is-bold is-dotted">', '<hr class="align-line is-bold is-double">'], function (line) {
-              var selectedElement = Selection.textRange.endContainer.parentNode;
-              selectedElement.insertAdjacentHTML('afterend', line);
-            });
-            el = ddown.dropdown;
-            break;
-          default:
-            return;
-        }
-        li.appendChild(el);
-        _this.menu.appendChild(li);
-      });
-      this.el.appendChild(this.menu);
-      if (this.settings.mode === 'inline') {
-        this.toggleButton = button('plus');
-        this.toggleButton.addEventListener('click', this.toggleState.bind(this));
-        this.el.appendChild(this.toggleButton);
-        this.$align.el.appendChild(this.el);
-      }
-      if (this.settings.mode === 'toolbar' && this.$align.toolbar) {
-        this.$align.toolbar.el.appendChild(this.el);
-      }
-      if (this.settings.mode === 'toolbar' && !this.$align.toolbar) {
-        this.$align.toolbar = new Styler(this.$align, {
-          mode: 'toolbar',
-          commands: []
-        });
-        this.$align.toolbar.el.appendChild(this.el);
-      }
-    }
-  }, {
-    key: 'update',
-    value: function update() {
-      if (this.settings.mode !== 'inline') {
-        this.position = null;
-        return;
-      }
-      if (Selection.current.isCollapsed && Selection.current.anchorNode.nodeType === 1 && Selection.current.anchorNode.childNodes.length <= 1 && Selection.current.anchorNode.parentNode.classList.contains('align-content')) {
-        this.position = updatePosition(Selection.current.anchorNode, this.el, this.$align.el, 'middle-left');
-        this.show();
-        return;
-      }
-      this.hide();
-    }
-  }, {
-    key: 'toggleState',
-    value: function toggleState() {
-      this.el.classList.toggle('is-active');
-    }
-  }, {
-    key: 'show',
-    value: function show() {
-      if (this.el.classList.contains('is-visible')) return;
-      this.el.classList.add('is-visible');
-      this.el.classList.remove('is-hidden');
-    }
-  }, {
-    key: 'hide',
-    value: function hide() {
-      this.el.classList.remove('is-visible');
-      this.el.classList.remove('is-active');
-      this.el.classList.add('is-hidden');
-    }
-  }, {
-    key: 'createFigure',
-    value: function createFigure(event) {
-      var _this2 = this;
-
-      var input$$1 = event.target;
-      var file = input$$1.files[0];
-      if (!file || !Selection.range) return;
-      var reader = new FileReader(); // eslint-disable-line
-      var figure = document.createElement('figure');
-      var caption = document.createElement('figcaption');
-      var img = document.createElement('img');
-      var selectedElement = Selection.current.anchorNode;
-      figure.contentEditable = false;
-      caption.contentEditable = true;
-      caption.dataset.defaultValue = 'Figure caption';
-      img.classList.add('align-image');
-      figure.classList.add('align-figure', 'is-center');
-      figure.appendChild(img);
-      figure.appendChild(caption);
-      figure.addEventListener('click', function () {
-        return _this2.figureOptions.show({
-          el: figure,
-          remove: function remove() {
-            figure.remove();
-          }
-        });
-      }, false);
-      reader.addEventListener('load', function () {
-        img.src = reader.result;
-        img.dataset.alignFilename = file.name;
-        _this2.$align.update();
-        var update = function update(src) {
-          img.src = src;
-        };
-        _this2.$align.$bus.emit('imageAdded', { file: file, update: update });
-      });
-      reader.readAsDataURL(file);
-      input$$1.value = null;
-      selectedElement.parentNode.insertBefore(figure, selectedElement.nextSibling);
-    }
-  }, {
-    key: 'createVideo',
-    value: function createVideo() {
-      var selectedElement = Selection.current.anchorNode;
-      new Prompt('Enter video link:', '', {
-        wrapper: this.$align.el,
-        position: this.position
-      }).onSubmit(function () {
-        var link = this.inputs[0].value;
-        if (!link) return;
-        var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
-
-        if (!videoHoster) {
-          return;
-        }
-
-        var videoId = getVideoId(link, videoHoster);
-        var iframe = document.createElement('iframe');
-
-        iframe.width = 560;
-        iframe.height = 315;
-        iframe.allowfullscreen = true;
-        iframe.contentEditable = false;
-        iframe.src = videoHoster === 'youtube' ? '//www.youtube.com/embed/' + videoId : videoHoster === 'vimeo' ? '//player.vimeo.com/video/' + videoId : '';
-        selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
-      });
-    }
-  }, {
-    key: 'createGrid',
-    value: function createGrid() {
-      var selectedElement = Selection.current.anchorNode;
-      new Prompt('Enter columns count:', '', {
-        wrapper: this.$align.el,
-        position: this.position,
-        inputsCount: 1
-      }).onSubmit(function () {
-        var grid = stringToDOM('<div class="align-grid">\n        ' + '<div class="align-column"><br></div>'.repeat(this.inputs[0].value) + '\n      </div>');
-        selectedElement.parentNode.insertBefore(grid, selectedElement.nextSibling);
-      });
-    }
-  }, {
-    key: 'createTable',
-    value: function createTable() {
-      var selectedElement = Selection.current.anchorNode;
-      new Prompt('Enter post link:', '', {
-        wrapper: this.$align.el,
-        position: this.position,
-        inputsCount: 2,
-        inputsPlaceholders: ['rows', 'columns']
-      }).onSubmit(function () {
-        selectedElement.parentNode.insertBefore(new Table({
-          rows: this.inputs[0].value,
-          columns: this.inputs[1].value
-        }).el, selectedElement.nextSibling);
-      });
-    }
-  }, {
-    key: 'embedPost',
-    value: function embedPost() {
-      var selectedElement = Selection.current.anchorNode;
-      new Prompt('Enter post link:', '', {
-        wrapper: this.$align.el,
-        position: this.position
-      }).onSubmit(function () {
-        var postUrl = this.inputs[0].value;
-        if (!postUrl) return;
-        var iframe = document.createElement('iframe');
-
-        iframe.width = 500;
-        iframe.height = 200;
-        iframe.scrolling = 'no';
-        iframe.contentEditable = false;
-        iframe.allowTransparency = true;
-        iframe.src = '//www.facebook.com/plugins/post.php?href=' + postUrl;
-        selectedElement.parentNode.insertBefore(iframe, selectedElement.nextSibling);
-      });
-    }
-  }, {
-    key: 'embed',
-    value: function embed() {
-      var selectedElement = Selection.current.anchorNode;
-      new Prompt('Add embeded:', '', {
-        wrapper: this.$align.el,
-        position: this.position
-      }).onSubmit(function () {
-        var data = this.inputs[0].value;
-        if (!data) return;
-        var div = document.createElement('div');
-
-        selectedElement.parentNode.insertBefore(div, selectedElement.nextSibling);
-        div.insertAdjacentHTML('afterbegin', data);
-      });
-    }
-  }, {
-    key: 'embedTweet',
-    value: function embedTweet() {}
-  }]);
-  return Creator;
-}();
+Section.id = 0;
+Section.allSections = [];
 
 var EventBus = function () {
   function EventBus() {
@@ -3056,6 +3440,12 @@ var Align = function () {
       this.$bus = new EventBus();
       this.startContent = Array.from(this.el.children);
       this.el.innerText = '';
+      this.figureOptions = new Styler(this, {
+        mode: 'bubble',
+        hideWhenClickOut: true,
+        commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
+        tooltip: true
+      });
       Section.config(this, this.settings.section);
       Table.config(this, this.settings.table);
 
@@ -3069,7 +3459,9 @@ var Align = function () {
         this.bubble = new Styler(this, this.settings.bubble);
       }
       if (this.settings.creator) {
-        this.creator = new Creator(this, this.settings.creator);
+        this.settings.creator.mode = 'creator';
+        this.settings.creator.position = 'middle-left';
+        this.creator = new Styler(this, this.settings.creator);
       }
       this._initEditor();
       this._initSections();
@@ -3091,7 +3483,7 @@ var Align = function () {
       this.cmdKeyPressed = false;
       this.el.appendChild(this.editor);
       this.editor.focus();
-      Selection.updateSelectedRange();
+      Selection.update();
     }
   }, {
     key: '_initSections',
@@ -3138,7 +3530,6 @@ var Align = function () {
           return;
         }
 
-        _this2.update();
         if (event[_this2.cmdKey] && _this2.settings.shortcuts) {
           switch (event.key.toUpperCase()) {
             case 'B':
@@ -3208,6 +3599,7 @@ var Align = function () {
           default:
             break;
         }
+        setTimeout(_this2.update.bind(_this2), 1);
       }, true);
     }
 
@@ -3248,10 +3640,10 @@ var Align = function () {
     }
   }, {
     key: 'update',
-    value: function update() {
+    value: function update(evet) {
       var _this3 = this;
 
-      Selection.updateSelectedRange();
+      Selection.update();
       setTimeout(function () {
         if (_this3.settings.toolbar) {
           _this3.toolbar.update();
@@ -3279,6 +3671,161 @@ var Align = function () {
       document.execCommand(cmd, false, value);
       document.execCommand('styleWithCSS', false, false);
       this.update();
+    }
+  }, {
+    key: 'createFigure',
+    value: function createFigure(styler, event) {
+      var _this4 = this;
+
+      var input = event.target;
+      var file = input.files[0];
+      if (!file || !Selection.range) return;
+      var reader = new FileReader(); // eslint-disable-line
+      var figure = document.createElement('figure');
+      var caption = document.createElement('figcaption');
+      var img = document.createElement('img');
+
+      figure.contentEditable = false;
+      caption.contentEditable = true;
+      caption.dataset.defaultValue = 'Figure caption';
+      img.classList.add('align-image');
+      figure.classList.add('align-figure', 'is-center');
+      figure.appendChild(img);
+      figure.appendChild(caption);
+      figure.addEventListener('click', function () {
+        return _this4.figureOptions.update({
+          el: figure,
+          remove: function remove() {
+            figure.remove();
+          }
+        });
+      }, false);
+      reader.addEventListener('load', function () {
+        img.src = reader.result;
+        img.dataset.alignFilename = file.name;
+        var update = function update(src) {
+          img.src = src;
+        };
+        _this4.$bus.emit('imageAdded', { file: file, update: update });
+      });
+      reader.readAsDataURL(file);
+      input.value = null;
+      Selection.range.insertNode(figure);
+    }
+  }, {
+    key: 'createVideo',
+    value: function createVideo() {
+      var prompt = new Prompt('Enter video link:', '', {
+        wrapper: this.el,
+        position: this.position
+      });
+      prompt.onSubmit(function () {
+        var link = prompt.inputs[0].value;
+        if (!link) return;
+        var videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
+
+        if (!videoHoster) {
+          return;
+        }
+        var videoId = getVideoId(link, videoHoster);
+        var iframe = document.createElement('iframe');
+
+        iframe.width = 560;
+        iframe.height = 315;
+        iframe.allowfullscreen = true;
+        iframe.contentEditable = false;
+        iframe.src = videoHoster === 'youtube' ? '//www.youtube.com/embed/' + videoId : videoHoster === 'vimeo' ? '//player.vimeo.com/video/' + videoId : '';
+
+        Selection.range.insertNode(iframe);
+      });
+    }
+  }, {
+    key: 'createColumn',
+    value: function createColumn() {
+      var prompt = new Prompt('Enter columns count:', '', {
+        wrapper: this.el,
+        position: this.position,
+        inputsCount: 1
+      });
+      prompt.onSubmit(function () {
+        var grid = stringToDOM('<div class="align-grid">\n        ' + '<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value) + '\n      </div>');
+        console.log(Selection.range);
+        Selection.range.insertNode(grid);
+      });
+    }
+  }, {
+    key: 'createTable',
+    value: function createTable() {
+      var prompt = new Prompt('Enter post link:', '', {
+        wrapper: this.el,
+        inputsCount: 2,
+        inputsPlaceholders: ['rows', 'columns']
+      });
+      prompt.onSubmit(function () {
+        var table = new Table({
+          rows: prompt.inputs[0].value,
+          columns: prompt.inputs[1].value
+        }).el;
+        Selection.range.insertNode(table);
+      });
+    }
+  }, {
+    key: 'createLine',
+    value: function createLine(styler, line) {
+      Selection.range.insertNode(stringToDOM(line));
+    }
+  }, {
+    key: 'createPost',
+    value: function createPost() {
+      var prompt = new Prompt('Enter post link:', '', {
+        wrapper: this.el,
+        position: this.position
+      });
+      prompt.onSubmit(function () {
+        var postUrl = prompt.inputs[0].value;
+        if (!postUrl) return;
+        var iframe = document.createElement('iframe');
+
+        iframe.width = 500;
+        iframe.height = 200;
+        iframe.scrolling = 'no';
+        iframe.contentEditable = false;
+        iframe.allowTransparency = true;
+        iframe.src = '//www.facebook.com/plugins/post.php?href=' + postUrl;
+        Selection.range.insertNode(iframe);
+      });
+    }
+  }, {
+    key: 'createEmbed',
+    value: function createEmbed() {
+      var prompt = new Prompt('Add embeded:', '', {
+        wrapper: this.el,
+        position: this.position
+      });
+      prompt.onSubmit(function () {
+        var data = prompt.inputs[0].value;
+        if (!data) return;
+        var div = document.createElement('div');
+        div.insertAdjacentHTML('afterbegin', data);
+
+        Selection.range.insertNode(div);
+      });
+    }
+  }, {
+    key: 'createLink',
+    value: function createLink() {
+      var _this5 = this;
+
+      var prompt = new Prompt('Enter link:', Selection.current.toString(), {
+        wrapper: this.el,
+        position: this.position
+      });
+      prompt.onSubmit(function () {
+        var link = prompt.inputs[0].value;
+        if (!link) return;
+        Selection.selectRange();
+        _this5.execute('createLink', link);
+      });
     }
   }, {
     key: 'content',
