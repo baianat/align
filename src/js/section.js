@@ -2,15 +2,15 @@ import { stringToDOM, swapArrayItems } from './partial/util'
 import Styler from './styler';
 import Table from './table';
 
-let ID = 0;
-let ALL_SECTIONS = [];
-
 export default class Section {
+  static id = 0;
+  static allSections = [];
+
   constructor (content, position, type = 'text') {
     if (content && content.nodeName === 'BR') {
       return;
     }
-    this.id = ID++;
+    this.id = Section.id++;
     this.type = type;
     this.isHTMLView = false;
     this.generateEl(content);
@@ -25,11 +25,12 @@ export default class Section {
       return;
     }
     Section.$align.editor.appendChild(this.el);
-    ALL_SECTIONS.push(this);
+    Section.allSections.push(this);
   }
 
   static config (align, settings) {
-    const config = Object.assign({
+    this.$align = align;
+    this.$optionsBar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: ['_sectionUp', '_sectionDown',
@@ -38,14 +39,9 @@ export default class Section {
         '_remove'
       ],
       tooltip: true,
-      position: 'left-top'
-    }, settings);
-    this.$align = align;
-    this.$optionsBar = new Styler(align, config);
-  }
-
-  static get allSections () {
-    return ALL_SECTIONS;
+      position: 'left-top',
+      ...settings
+    });
   }
 
   get content () {
@@ -114,7 +110,7 @@ export default class Section {
   }
 
   getIndex () {
-    return ALL_SECTIONS.findIndex(el => el === this);
+    return Section.allSections.findIndex(el => el === this);
   }
 
   toggleHTML () {
@@ -194,18 +190,18 @@ export default class Section {
     const index = this.getIndex();
     if (
       !this.el.previousSibling ||
-      ALL_SECTIONS[index - 1].type === 'title'
+      Section.allSections[index - 1].type === 'title'
     ) return;
 
-    Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index - 1].el);
-    swapArrayItems(ALL_SECTIONS, index, index - 1);
+    Section.$align.editor.insertBefore(this.el, Section.allSections[index - 1].el);
+    swapArrayItems(Section.allSections, index, index - 1);
   }
 
   moveDown () {
     const index = this.getIndex();
     if (!this.el.nextSibling) return;
-    Section.$align.editor.insertBefore(this.el, ALL_SECTIONS[index + 1].el.nextSibling);
-    swapArrayItems(ALL_SECTIONS, index, index + 1);
+    Section.$align.editor.insertBefore(this.el, Section.allSections[index + 1].el.nextSibling);
+    swapArrayItems(Section.allSections, index, index + 1);
   }
 
   active () {
@@ -215,6 +211,6 @@ export default class Section {
 
   remove () {
     this.el.remove();
-    ALL_SECTIONS.splice(this.getIndex(), 1)
+    Section.allSections.splice(this.getIndex(), 1)
   }
 }

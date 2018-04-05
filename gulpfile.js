@@ -76,12 +76,13 @@ gulp.task('scripts', () => {
     .pipe(plumber())
     .pipe(rollup({
       input: 'src/js/align.js',
-      format: 'umd',
-      name: 'Align',
+      output: {
+        format: 'umd',
+        name: 'Align'
+      },
       allowRealFiles: true,
       plugins: [
         nodeResolve(),
-        commonjs(),
         babel()
       ]
     }))

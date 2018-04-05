@@ -9,7 +9,8 @@ export default class Table {
   }
 
   static config(align, settings) {
-    const config = Object.assign({
+    this.$align = align;
+    this.$optionsBar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: [
@@ -19,10 +20,9 @@ export default class Table {
         'separator',
         '_remove'
       ],
-      tooltip: true
-    }, settings);
-    this.$align = align;
-    this.$optionsBar = new Styler(align, config);
+      tooltip: true,
+      ...settings
+    });
   }
 
   _init (table) {
