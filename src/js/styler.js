@@ -11,7 +11,8 @@ import {
   select,
   input,
   menuButton,
-  fileButton
+  fileButton,
+  dropdown
 } from './partial/elements';
 import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
@@ -83,12 +84,55 @@ export default class Styler {
     }
 
     const currentCmd = this.cmds[cmd] = { schema: cmdSchema };
-
+    const icon = cmdSchema.icon || cmd;
     switch (cmdSchema.element) {
       case 'button':
-        currentCmd.el = button(cmd, this.getTooltip(cmdSchema));
+        currentCmd.el = button(icon, this.getTooltip(cmdSchema));
         currentCmd.el.addEventListener('click', () => this.cmdCallback(cmdSchema, cmdSchema.value));
         li.appendChild(currentCmd.el);
+        break;
+
+      case 'file':
+        const fileBtn = fileButton(icon, this.getTooltip(cmdSchema));
+        currentCmd.el = fileBtn.input;
+        currentCmd.el.addEventListener('change', (event) => {
+          this.cmdCallback(cmdSchema, event);
+        })
+        li.appendChild(fileBtn.el);
+        break;
+
+
+      case 'input':
+        currentCmd.el = input(icon, cmdSchema.type, this.getTooltip(cmdSchema));
+        currentCmd.el.addEventListener('change', () => {
+          this.cmdCallback(cmdSchema, currentCmd.el.value)
+        });
+        li.appendChild(currentCmd.el);
+        break;
+
+      case 'select':
+        const selectWrapper = select(icon, command[cmd]);
+        const temp = currentCmd.el = selectWrapper.querySelector('select');
+        temp.addEventListener('change',
+          () => this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value)
+        );
+        li.appendChild(selectWrapper);
+        break;
+
+      case 'dropdown':
+        const ddown = dropdown(icon, cmdSchema.items, (value) => this.cmdCallback(cmdSchema, value)
+        );
+        li.appendChild(ddown.dropdown);
+  
+        break;
+
+      case 'styling':
+        li.classList.add(cmdSchema.class);
+        break;
+
+      case 'custom':
+        const markup = cmdSchema.create(this);
+        li.appendChild(markup);
         break;
 
       case 'classes':
@@ -101,41 +145,6 @@ export default class Styler {
           currentCmd.el.appendChild(li);
         });
         li.appendChild(currentCmd.el);
-        break;
-
-      case 'file':
-        const fileBtn = fileButton(cmd, this.getTooltip(cmdSchema));
-        currentCmd.el = fileBtn.input;
-        currentCmd.el.addEventListener('change', (event) => {
-          this.cmdCallback(cmdSchema, event);
-        })
-        li.appendChild(fileBtn.el);
-        break;
-
-      case 'select':
-        const selectWrapper = select(cmd, command[cmd]);
-        const temp = currentCmd.el = selectWrapper.querySelector('select');
-        temp.addEventListener('change',
-          () => this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value)
-        );
-        li.appendChild(selectWrapper);
-        break;
-
-      case 'input':
-        currentCmd.el = input(cmd, cmdSchema.type, this.getTooltip(cmdSchema));
-        currentCmd.el.addEventListener('change', () => {
-          this.cmdCallback(cmdSchema, currentCmd.el.value)
-        });
-        li.appendChild(currentCmd.el);
-        break;
-
-      case 'styling':
-        li.classList.add(cmdSchema.class);
-        break;
-
-      case 'custom':
-        const markup = cmdSchema.create(this);
-        li.appendChild(markup);
         break;
 
       default:

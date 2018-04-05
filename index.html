@@ -95,7 +95,9 @@
           'separator',
           'color', 'backColor',
           'separator',
-          'selectContent', 'removeFormat', 'undo', 'redo', 'fullscreen'
+          'selectContent', 'removeFormat', 'undo', 'redo', 'fullscreen',
+          'separator',
+          'createTable', 'createFigure', 'createPost', 'createColumn', 'createVideo', 'createEmbed', 'createLine'
         ]
       },
       bubble: {
@@ -106,12 +108,8 @@
           'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
         ]
       },
-      creator: {
-        mode: 'toolbar',
-        theme: 'light'
-      }
     });
-    myEditor.$bus.on('imageAdded', ({file, update}) => {
+    myEditor.$bus.on('imageAdded', ({ file, update }) => {
       console.log(file);
     })
   </script>

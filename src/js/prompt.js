@@ -4,7 +4,7 @@ import Selection from './selection';
 export default class Prompt {
   constructor (message = '', data = '', {
     wrapper = document.body,
-    position = {left: 0, top: 0},
+    position = null,
     inputsCount = 1,
     inputsPlaceholders = []
   } = {}) {

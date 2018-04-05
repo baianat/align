@@ -100,7 +100,7 @@ export function cloneObject (object) {
   let output = {};
   Object.keys(object).forEach((key) => {
     let tempValue = object[key];
-    output[key] = (typeof tempValue === 'object') ? cloneObject(tempValue) : tempValue;
+    output[key] = (typeof tempValue === 'object' && !Array.isArray(tempValue)) ? cloneObject(tempValue) : tempValue;
   });
   return output;
 }

@@ -275,6 +275,65 @@ const cmdsSchema = {
     }
   },
 
+  createTable: {
+    element: 'button',
+    func: 'createTable',
+    icon: 'table',
+    tooltip: 'Add Table'
+  },
+
+  createFigure: {
+    element: 'file',
+    icon: 'figure',
+    func: 'createFigure',
+    tooltip: 'Add Figure'
+  },
+
+  createPost: {
+    element: 'button',
+    icon: 'facebook',
+    func: 'createPost',
+    tooltip: 'Add post'
+  },
+
+  createEmbed: {
+    element: 'button',
+    icon: 'embed',
+    func: 'createEmbed',
+    tooltip: 'Add embed'
+  },
+
+  createColumn: {
+    element: 'button',
+    icon: 'column',
+    func: 'createColumn',
+    tooltip: 'Add columns'
+  },
+
+  createVideo: {
+    element: 'button',
+    icon: 'video',
+    func: 'createVideo',
+    tooltip: 'Add video'
+  },
+
+  createLine: {
+    element: 'dropdown',
+    items: [
+      '<hr class="align-line">',
+      '<hr class="align-line is-dashed">',
+      '<hr class="align-line is-dotted">',
+      '<hr class="align-line is-double">',
+      '<hr class="align-line is-dots">',
+      '<hr class="align-line is-bold">',
+      '<hr class="align-line is-bold is-dashed">',
+      '<hr class="align-line is-bold is-dotted">',
+      '<hr class="align-line is-bold is-double">'
+    ],
+    icon: 'insertLine',
+    func: 'createLine',
+    tooltip: 'Add line'
+  },
   // internal functions don't use it
 
   _figureClasses: {

@@ -1,9 +1,18 @@
-import { select, userOS, launchFullscreen, exitFullscreen } from './partial/util';
+import {
+  select,
+  userOS,
+  launchFullscreen,
+  exitFullscreen,
+  camelCase,
+  getVideoId,
+  stringToDOM
+} from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './selection';
 import Section from './section';
 import Creator from './creator';
+import Prompt from './prompt';
 import Styler from './styler';
 import EventBus from './events';
 import Table from './table';
@@ -63,8 +72,16 @@ export default class Align {
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
+    this.figureOptions = new Styler(this, {
+      mode: 'bubble',
+      hideWhenClickOut: true,
+      commands: [
+        { '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] },
+        '_remove'
+      ],
+      tooltip: true
+    });
     Section.config(this, this.settings.section);
-    Table.config(this, this.settings.table);
 
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';
@@ -77,6 +94,7 @@ export default class Align {
     }
     if (this.settings.creator) {
       this.creator = new Creator(this, this.settings.creator);
+      Table.config(this, this.settings.table);
     }
     this._initEditor();
     this._initSections();
@@ -223,7 +241,6 @@ export default class Align {
   /**
    * Toggle on/off HTML
    */
-
   toggleFullScreen () {
     const state = document.fullscreenElement || document.webkitIsFullScreen;
     console.log(this)
@@ -261,5 +278,140 @@ export default class Align {
     document.execCommand(cmd, false, value);
     document.execCommand('styleWithCSS', false, false);
     this.update();
+  }
+
+  createFigure(styler, event) {
+    const input = event.target;
+    const file = input.files[0];
+    if (!file || !Selection.range) return;
+    const reader = new FileReader(); // eslint-disable-line
+    const figure = document.createElement('figure');
+    const caption = document.createElement('figcaption');
+    const img = document.createElement('img');
+
+    figure.contentEditable = false
+    caption.contentEditable = true
+    caption.dataset.defaultValue = 'Figure caption';
+    img.classList.add('align-image');
+    figure.classList.add('align-figure', 'is-center');
+    figure.appendChild(img);
+    figure.appendChild(caption);
+    figure.addEventListener('click', () => this.figureOptions.show({
+      el: figure,
+      remove() {
+        figure.remove();
+      }
+    }), false);
+    reader.addEventListener('load', () => {
+      img.src = reader.result;
+      img.dataset.alignFilename = file.name;
+      const update = (src) => {
+        img.src = src;
+      };
+      this.$bus.emit('imageAdded', { file, update });
+    });
+    reader.readAsDataURL(file);
+    input.value = null;
+    Selection.range.insertNode(figure);
+  }
+
+  createVideo() {
+    const prompt = new Prompt('Enter video link:', '', {
+      wrapper: this.el,
+      position: this.position
+    })
+    prompt.onSubmit(() => {
+      const link = prompt.inputs[0].value
+      if (!link) return;
+      const videoHoster = link.includes('yout')
+        ? 'youtube' : link.includes('vimeo')
+          ? 'vimeo' : '';
+
+      if (!videoHoster) {
+        return;
+      }
+      const videoId = getVideoId(link, videoHoster);
+      const iframe = document.createElement('iframe');
+
+      iframe.width = 560;
+      iframe.height = 315;
+      iframe.allowfullscreen = true;
+      iframe.contentEditable = false
+      iframe.src = videoHoster === 'youtube'
+        ? `//www.youtube.com/embed/${videoId}`
+        : videoHoster === 'vimeo'
+          ? `//player.vimeo.com/video/${videoId}`
+          : ''
+
+      Selection.range.insertNode(iframe);
+    });
+  }
+
+  createColumn() {
+    const prompt = new Prompt('Enter columns count:', '', {
+      wrapper: this.el,
+      position: this.position,
+      inputsCount: 1
+    })
+    prompt.onSubmit(() => {
+      const grid = stringToDOM(`<div class="align-grid">
+        ${'<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value)}
+      </div>`);
+      Selection.range.insertNode(grid);
+    });
+  }
+
+  createTable() {
+    const prompt = new Prompt('Enter post link:', '', {
+      wrapper: this.el,
+      inputsCount: 2,
+      inputsPlaceholders: ['rows', 'columns']
+    })
+    prompt.onSubmit(() => {
+      const table = new Table({
+        rows: prompt.inputs[0].value,
+        columns: prompt.inputs[1].value
+      }).el;
+      Selection.range.insertNode(table);
+    });
+  }
+
+  createLine(styler, line) {
+    Selection.range.insertNode(stringToDOM(line));
+  }
+
+  createPost() {
+    const prompt = new Prompt('Enter post link:', '', {
+      wrapper: this.el,
+      position: this.position
+    })
+    prompt.onSubmit(() => {
+      const postUrl = prompt.inputs[0].value
+      if (!postUrl) return;
+      const iframe = document.createElement('iframe');
+
+      iframe.width = 500;
+      iframe.height = 200;
+      iframe.scrolling = 'no';
+      iframe.contentEditable = false;
+      iframe.allowTransparency = true;
+      iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
+      Selection.range.insertNode(iframe);
+    });
+  }
+
+  createEmbed() {
+    const prompt = new Prompt('Add embeded:', '', {
+      wrapper: this.el,
+      position: this.position
+    })
+    prompt.onSubmit(() => {
+      const data = prompt.inputs[0].value
+      if (!data) return;
+      const div = document.createElement('div');
+      div.insertAdjacentHTML('afterbegin', data);
+
+      Selection.range.insertNode(div);
+    });
   }
 }
