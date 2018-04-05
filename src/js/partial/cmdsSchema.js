@@ -349,37 +349,43 @@ const cmdsSchema = {
   _sectionToggleHTML: {
     element: 'button',
     func: 'toggleHTML',
-    tooltip: 'Edit as HTMl'
+    tooltip: 'Edit as HTMl',
+    icon: 'toggleHTML'
   },
 
   _remove: {
     element: 'button',
     func: 'remove',
-    tooltip: 'Remove section'
+    tooltip: 'Remove section',
+    icon: 'remove'
   },
 
   _sectionUp: {
     element: 'button',
     func: 'moveUp',
-    tooltip: 'Move section up'
+    tooltip: 'Move section up',
+    icon: 'caretUp'
   },
 
   _sectionDown: {
     element: 'button',
     func: 'moveDown',
-    tooltip: 'Move section down'
+    tooltip: 'Move section down',
+    icon: 'caretDown'
   },
 
   _sectionImage: {
     element: 'file',
     func: 'backgroundImage',
-    tooltip: 'Add background image'
+    tooltip: 'Add background image',
+    icon: 'image'
   },
 
   _sectionVideo: {
     element: 'file',
     func: 'backgroundVideo',
-    tooltip: 'Add background video'
+    tooltip: 'Add background video',
+    icon: 'video'
   },
 
   _sectionColor: {
@@ -405,30 +411,36 @@ const cmdsSchema = {
   _tableRowTop: {
     element: 'button',
     func: 'insertRow',
-    args: ['before']
+    args: ['before'],
+    icon: 'tableRowTop'
   },
   _tableRowBottom: {
     element: 'button',
     func: 'insertRow',
-    args: ['after']
+    args: ['after'],
+    icon: 'tableRowBottom'
   },
   _tableColumnBefore: {
     element: 'button',
     func: 'insertColumn',
-    args: ['before']
+    args: ['before'],
+    icon: 'tableColumnBefore'
   },
   _tableColumnAfter: {
     element: 'button',
     func: 'insertColumn',
-    args: ['after']
+    args: ['after'],
+    icon: 'tableColumnAfter'
   },
   _tableDeleteRow: {
     element: 'button',
-    func: 'deleteRow'
+    func: 'deleteRow',
+    icon: 'tableDeleteRow'
   },
   _tableDeleteColumn: {
     element: 'button',
-    func: 'deleteColumn'
+    func: 'deleteColumn',
+    icon: 'tableDeleteColumn'
   }
 }
 
