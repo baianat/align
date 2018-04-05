@@ -270,7 +270,11 @@ export default class Styler {
         return;
       }
       if (init) {
-        if (Selection.range === Selection.textRange) {
+        const selectedElement = Selection.current.anchorNode.type === 1
+          ? Selection.current.anchorNode
+          : Selection.current.anchorNode.parentNode
+        if (selectedElement.closest('.align-content')) {
+          document.queryCommandValue(command)
           init.selectColor(document.queryCommandValue(command), true);
         }
         return;
