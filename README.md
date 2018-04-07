@@ -29,11 +29,16 @@ yarn add @baianat/align
 ``` html
 <head>
   <link rel="stylesheet" href="dist/css/align.css">
-  <!-- the editor's theme -->
+  <!-- use editor's theme -->
+  <!-- or create your own -->
   <link rel="stylesheet" href="dist/css/default-theme.css">
+  <!-- @baianat/colorpicker stylesheet -->
+  <link rel="stylesheet" href="path-to-colorpicker/css/colorpicker.css">
 </head>
 <body>
     ...
+    <!-- @baianat/colorpicker script file -->
+    <script type="text/javascript" src="path-to-colorpicker/js/colorpicker.j"></script>
     <script type="text/javascript" src="dist/js/align.js"></script>
 </body>
 ```

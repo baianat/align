@@ -76,9 +76,13 @@ gulp.task('scripts', () => {
     .pipe(plumber())
     .pipe(rollup({
       input: 'src/js/align.js',
+      external: ['@baianat/colorpicker'],
       output: {
         format: 'umd',
-        name: 'Align'
+        name: 'Align',
+        globals: {
+          '@baianat/colorpicker': 'Colorpicker'
+        },
       },
       allowRealFiles: true,
       plugins: [
