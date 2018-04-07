@@ -1,6 +1,6 @@
 {
   "name": "@baianat/align",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "ES6 text editor",
   "main": "dist/js/align.js",
   "dependencies": {
