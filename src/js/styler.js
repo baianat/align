@@ -264,7 +264,7 @@ export default class Styler {
     this.el.classList.remove('is-hidden');
     setTimeout(() => {
       this.el.style.transition = '';
-    });
+    }, 200);
     if (this.settings.hideWhenClickOut) {
       document.addEventListener('click', this.clickCallback)
     }

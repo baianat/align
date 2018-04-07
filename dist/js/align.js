@@ -1307,7 +1307,7 @@ var Styler = function () {
       this.el.classList.remove('is-hidden');
       setTimeout(function () {
         _this5.el.style.transition = '';
-      });
+      }, 200);
       if (this.settings.hideWhenClickOut) {
         document.addEventListener('click', this.clickCallback);
       }
@@ -1505,6 +1505,113 @@ var Table = function () {
   return Table;
 }();
 
+var Figure = function () {
+  function Figure(figure) {
+    classCallCheck(this, Figure);
+
+    if (!figure) {
+      return {
+        el: null
+      };
+    }
+    this._init(figure);
+  }
+
+  createClass(Figure, [{
+    key: '_init',
+    value: function _init(figure) {
+      var _this = this;
+
+      // check if it's the figure element
+      if (figure.nodeType === 1) {
+        this.el = figure;
+        this.caption = figure.querySelector('figcaption');
+        this.img = figure.querySelector('img');
+      }
+
+      // check if it's the figure image url
+      if (figure.nodeType !== 1) {
+        this.el = document.createElement('figure');
+        this.caption = document.createElement('figcaption');
+        this.img = document.createElement('img');
+        this.readFileContent(figure);
+      }
+
+      this.el.contentEditable = false;
+      this.caption.contentEditable = true;
+      this.caption.dataset.defaultValue = 'Figure caption';
+      this.img.classList.add('align-image');
+      this.el.classList.add('align-figure', 'is-center');
+      this.el.appendChild(this.img);
+      this.el.appendChild(this.caption);
+      this.el.addEventListener('click', function () {
+        Figure.$optionsBar.update(_this);
+      });
+    }
+  }, {
+    key: 'readFileContent',
+    value: function readFileContent(file) {
+      var _this2 = this;
+
+      if (!this.isImage(file.name)) {
+        return {
+          el: null
+        };
+      }
+      var reader = new FileReader(); // eslint-disable-line
+      reader.addEventListener('load', function () {
+        _this2.img.src = reader.result;
+
+        _this2.img.dataset.alignFilename = file.name;
+        Figure.$align.$bus.emit('imageAdded', {
+          file: file,
+          update: _this2.update.bind(_this2)
+        });
+      });
+      reader.readAsDataURL(file);
+    }
+  }, {
+    key: 'isImage',
+    value: function isImage(filename) {
+      var parts = filename.split('.');
+      var ext = parts.slice(-1)[0];
+
+      switch (ext.toLowerCase()) {
+        case 'jpg':
+        case 'jpge':
+        case 'gif':
+        case 'bmp':
+        case 'png':
+          return true;
+      }
+      return false;
+    }
+  }, {
+    key: 'update',
+    value: function update(newSrc) {
+      this.img.src = newSrc;
+    }
+  }, {
+    key: 'remove',
+    value: function remove() {
+      Figure.$optionsBar.hide();
+      this.el.remove();
+    }
+  }], [{
+    key: 'config',
+    value: function config(align, settings) {
+      this.$align = align;
+      this.$optionsBar = new Styler(align, Object.assign({
+        mode: 'bubble',
+        hideWhenClickOut: true,
+        commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
+        tooltip: true
+      }, settings));
+    }
+  }]);
+  return Figure;
+}();
+
 var Section = function () {
   function Section(content, position) {
     var _this = this;
@@ -1551,12 +1658,7 @@ var Section = function () {
           this.el.innerHTML = '';
           this.el.appendChild(this.contentDiv);
           this.contentDiv.innerHTML = content;
-          var tables = Array.from(this.contentDiv.querySelectorAll('table'));
-          tables.forEach(function (table) {
-            return new Table(table);
-          });
-          this.generateAddSectionButton();
-          this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
+          this.generateSectionElements();
           break;
 
         case 'title':
@@ -1574,6 +1676,20 @@ var Section = function () {
       }
     }
   }, {
+    key: 'generateSectionElements',
+    value: function generateSectionElements() {
+      var tables = Array.from(this.contentDiv.querySelectorAll('table'));
+      var figures = Array.from(this.contentDiv.querySelectorAll('figure'));
+
+      tables.forEach(function (table) {
+        return new Table(table);
+      });
+      figures.forEach(function (figure) {
+        return new Figure(figure);
+      });
+      this.generateAddSectionButton();
+    }
+  }, {
     key: 'generateAddSectionButton',
     value: function generateAddSectionButton() {
       var _this2 = this;
@@ -1584,7 +1700,7 @@ var Section = function () {
         return new Section('', _this2.el);
       });
       this.addSectionButton.contentEditable = false;
-      return this.addSectionButton;
+      this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
     }
   }, {
     key: 'getIndex',
@@ -1843,13 +1959,9 @@ var Align = function () {
       this.$bus = new EventBus();
       this.startContent = Array.from(this.el.children);
       this.el.innerText = '';
-      this.figureOptions = new Styler(this, {
-        mode: 'bubble',
-        hideWhenClickOut: true,
-        commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
-        tooltip: true
-      });
+
       Section.config(this, this.settings.section);
+      Figure.config(this, this.settings.figure);
       Table.config(this, this.settings.table);
 
       if (this.settings.toolbar) {
@@ -2043,7 +2155,7 @@ var Align = function () {
     }
   }, {
     key: 'update',
-    value: function update(evet) {
+    value: function update() {
       var _this3 = this;
 
       Selection.update();
@@ -2078,42 +2190,14 @@ var Align = function () {
   }, {
     key: 'createFigure',
     value: function createFigure(styler, event) {
-      var _this4 = this;
-
       var input = event.target;
       var file = input.files[0];
       if (!file || !Selection.range) return;
-      var reader = new FileReader(); // eslint-disable-line
-      var figure = document.createElement('figure');
-      var caption = document.createElement('figcaption');
-      var img = document.createElement('img');
-
-      figure.contentEditable = false;
-      caption.contentEditable = true;
-      caption.dataset.defaultValue = 'Figure caption';
-      img.classList.add('align-image');
-      figure.classList.add('align-figure', 'is-center');
-      figure.appendChild(img);
-      figure.appendChild(caption);
-      figure.addEventListener('click', function () {
-        return _this4.figureOptions.update({
-          el: figure,
-          remove: function remove() {
-            figure.remove();
-          }
-        });
-      }, false);
-      reader.addEventListener('load', function () {
-        img.src = reader.result;
-        img.dataset.alignFilename = file.name;
-        var update = function update(src) {
-          img.src = src;
-        };
-        _this4.$bus.emit('imageAdded', { file: file, update: update });
-      });
-      reader.readAsDataURL(file);
+      var figure = new Figure(file);
       input.value = null;
-      Selection.range.insertNode(figure);
+      if (figure.el) {
+        Selection.range.insertNode(figure.el);
+      }
     }
   }, {
     key: 'createVideo',
@@ -2152,7 +2236,6 @@ var Align = function () {
       });
       prompt.onSubmit(function () {
         var grid = stringToDOM('<div class="align-grid">\n        ' + '<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value) + '\n      </div>');
-        console.log(Selection.range);
         Selection.range.insertNode(grid);
       });
     }
@@ -2217,7 +2300,7 @@ var Align = function () {
   }, {
     key: 'createLink',
     value: function createLink() {
-      var _this5 = this;
+      var _this4 = this;
 
       var prompt = new Prompt('Enter link:', Selection.current.toString(), {
         wrapper: this.el,
@@ -2227,7 +2310,7 @@ var Align = function () {
         var link = prompt.inputs[0].value;
         if (!link) return;
         Selection.selectRange();
-        _this5.execute('createLink', link);
+        _this4.execute('createLink', link);
       });
     }
   }, {

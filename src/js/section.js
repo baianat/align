@@ -1,6 +1,7 @@
 import { stringToDOM, swapArrayItems } from './partial/util'
 import Styler from './styler';
 import Table from './table';
+import Figure from './figure';
 
 export default class Section {
   static id = 0;
@@ -80,10 +81,7 @@ export default class Section {
         this.el.innerHTML = '';
         this.el.appendChild(this.contentDiv);
         this.contentDiv.innerHTML = content;
-        const tables = Array.from(this.contentDiv.querySelectorAll('table'));
-        tables.forEach(table => new Table(table))
-        this.generateAddSectionButton();
-        this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
+        this.generateSectionElements();
         break;
 
       case 'title':
@@ -101,12 +99,21 @@ export default class Section {
     }
   }
 
+  generateSectionElements () {
+    const tables = Array.from(this.contentDiv.querySelectorAll('table'));
+    const figures = Array.from(this.contentDiv.querySelectorAll('figure'));
+
+    tables.forEach(table => new Table(table));
+    figures.forEach(figure => new Figure(figure));
+    this.generateAddSectionButton();
+  }
+
   generateAddSectionButton () {
     this.addSectionButton = document.createElement('button');
     this.addSectionButton.classList.add('align-newSection');
     this.addSectionButton.addEventListener('click', () => new Section('', this.el));
     this.addSectionButton.contentEditable = false;
-    return this.addSectionButton
+    this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
   }
 
   getIndex () {

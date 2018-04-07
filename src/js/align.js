@@ -15,6 +15,7 @@ import Prompt from './prompt';
 import Styler from './styler';
 import EventBus from './events';
 import Table from './table';
+import Figure from './figure';
 
 export default class Align {
   constructor (selector, {
@@ -71,16 +72,9 @@ export default class Align {
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
-    this.figureOptions = new Styler(this, {
-      mode: 'bubble',
-      hideWhenClickOut: true,
-      commands: [
-        { '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] },
-        '_remove'
-      ],
-      tooltip: true
-    });
+
     Section.config(this, this.settings.section);
+    Figure.config(this, this.settings.figure);
     Table.config(this, this.settings.table);
 
     if (this.settings.toolbar) {
@@ -254,7 +248,7 @@ export default class Align {
     exitFullscreen();
   }
 
-  update (evet) {
+  update () {
     Selection.update();
     setTimeout(() => {
       if (this.settings.toolbar) {
@@ -285,35 +279,11 @@ export default class Align {
     const input = event.target;
     const file = input.files[0];
     if (!file || !Selection.range) return;
-    const reader = new FileReader(); // eslint-disable-line
-    const figure = document.createElement('figure');
-    const caption = document.createElement('figcaption');
-    const img = document.createElement('img');
-
-    figure.contentEditable = false
-    caption.contentEditable = true
-    caption.dataset.defaultValue = 'Figure caption';
-    img.classList.add('align-image');
-    figure.classList.add('align-figure', 'is-center');
-    figure.appendChild(img);
-    figure.appendChild(caption);
-    figure.addEventListener('click', () => this.figureOptions.update({
-      el: figure,
-      remove() {
-        figure.remove();
-      }
-    }), false);
-    reader.addEventListener('load', () => {
-      img.src = reader.result;
-      img.dataset.alignFilename = file.name;
-      const update = (src) => {
-        img.src = src;
-      };
-      this.$bus.emit('imageAdded', { file, update });
-    });
-    reader.readAsDataURL(file);
+    const figure = new Figure(file);
     input.value = null;
-    Selection.range.insertNode(figure);
+    if (figure.el) {
+      Selection.range.insertNode(figure.el);
+    }
   }
 
   createVideo() {
@@ -358,7 +328,6 @@ export default class Align {
       const grid = stringToDOM(`<div class="align-grid">
         ${'<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value)}
       </div>`);
-      console.log(Selection.range)
       Selection.range.insertNode(grid);
     });
   }
