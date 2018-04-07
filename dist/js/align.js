@@ -1655,9 +1655,12 @@ var Section = function () {
           if (this.contentDiv.querySelector('pre[data-align-html]')) {
             content = this.contentDiv.innerText;
           }
+
           this.el.innerHTML = '';
           this.el.appendChild(this.contentDiv);
           this.contentDiv.innerHTML = content;
+          this.bgImage = this.bgImage || this.contentDiv.querySelector('.align-bgImage');
+          this.bgVideo = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
           this.generateSectionElements();
           break;
 
@@ -1688,6 +1691,7 @@ var Section = function () {
         return new Figure(figure);
       });
       this.generateAddSectionButton();
+      this.generateBackground();
     }
   }, {
     key: 'generateAddSectionButton',
@@ -1701,6 +1705,16 @@ var Section = function () {
       });
       this.addSectionButton.contentEditable = false;
       this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
+    }
+  }, {
+    key: 'generateBackground',
+    value: function generateBackground() {
+      if (this.bgImage) {
+        this.el.insertAdjacentElement('afterBegin', this.bgImage);
+      }
+      if (this.bgVideo) {
+        this.el.insertAdjacentElement('afterBegin', this.bgVideo);
+      }
     }
   }, {
     key: 'getIndex',
@@ -1743,22 +1757,18 @@ var Section = function () {
       var input = event.target;
       var file = input.files[0];
       if (!file) return;
-      var reader = new FileReader(); // eslint-disable-line
-      var bg = this.el.querySelector('.align-bgImage') || document.createElement('div');
-      if (!this.el.querySelector('.align-bgImage')) {
-        bg.classList.add('align-bgImage');
-        this.el.insertAdjacentElement('afterBegin', bg);
+      if (!this.bgImage) {
+        this.bgImage = document.createElement('div');
+        this.bgImage.classList.add('align-bgImage');
+        this.el.insertAdjacentElement('afterBegin', this.bgImage);
       }
-      reader.addEventListener('load', function () {
-        _this4.el.classList.add('is-bgImage');
-        bg.style.backgroundImage = 'url(' + reader.result + ')';
-        var update = function update(src) {
-          bg.style.backgroundImage = 'url(' + src + ')';
-        };
-        Section.$align.update();
-        Section.$align.$bus.emit('imageAdded', { file: file, update: update });
-      });
-      reader.readAsDataURL(file);
+      var update = function update(src) {
+        _this4.bgImage.style.backgroundImage = 'url(' + src + ')';
+      };
+      this.bgImage.style.backgroundImage = 'url(' + URL.createObjectURL(file) + ')';
+      this.el.classList.add('is-bgImage');
+      Section.$align.update();
+      Section.$align.$bus.emit('imageAdded', { file: file, update: update });
       input.value = null;
     }
   }, {
@@ -1767,18 +1777,17 @@ var Section = function () {
       var input = event.target;
       var file = input.files[0];
       if (!file) return;
-      var video = this.el.querySelector('.align-bgVideo');
+      var url = window.URL.createObjectURL(event.target.files[0]);
       var source = null;
 
-      var url = window.URL.createObjectURL(event.target.files[0]);
-      if (!video) {
-        var _video = stringToDOM('<video autoplay muted loop class="align-bgVideo"></video>');
+      if (!this.bgVideo) {
+        this.bgVideo = stringToDOM('<video autoplay muted loop class="align-bgVideo"></video>');
         source = document.createElement('source');
-        _video.appendChild(source);
-        this.el.insertAdjacentElement('afterBegin', _video);
+        this.bgVideo.appendChild(source);
+        this.el.insertAdjacentElement('afterBegin', this.bgVideo);
       }
-      if (video) {
-        source = video.querySelector('source');
+      if (this.bgVideo) {
+        source = this.bgVideo.querySelector('source');
       }
       this.el.classList.add('is-bgVideo');
       source.src = url;

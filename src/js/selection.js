@@ -3,7 +3,6 @@ export default class Selection {
   static textRange = null;
   static range = null;
 
-
   static selectRange(range = Selection.textRange) {
     if (!range) return;
     const sel = Selection.current = window.getSelection();

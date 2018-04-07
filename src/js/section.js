@@ -78,9 +78,12 @@ export default class Section {
         if (this.contentDiv.querySelector('pre[data-align-html]')) {
           content = this.contentDiv.innerText;
         }
+
         this.el.innerHTML = '';
         this.el.appendChild(this.contentDiv);
-        this.contentDiv.innerHTML = content;
+        this.contentDiv.innerHTML = content
+        this.bgImage = this.bgImage || this.contentDiv.querySelector('.align-bgImage');
+        this.bgVideo = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
         this.generateSectionElements();
         break;
 
@@ -106,6 +109,7 @@ export default class Section {
     tables.forEach(table => new Table(table));
     figures.forEach(figure => new Figure(figure));
     this.generateAddSectionButton();
+    this.generateBackground();
   }
 
   generateAddSectionButton () {
@@ -114,6 +118,15 @@ export default class Section {
     this.addSectionButton.addEventListener('click', () => new Section('', this.el));
     this.addSectionButton.contentEditable = false;
     this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
+  }
+
+  generateBackground () {
+    if (this.bgImage) {
+      this.el.insertAdjacentElement('afterBegin', this.bgImage);
+    }
+    if (this.bgVideo) {
+      this.el.insertAdjacentElement('afterBegin', this.bgVideo);
+    }
   }
 
   getIndex () {
@@ -146,23 +159,18 @@ export default class Section {
     const input = event.target;
     const file = input.files[0];
     if (!file) return;
-    const reader = new FileReader(); // eslint-disable-line
-    const bg = this.el.querySelector('.align-bgImage') ||
-              document.createElement('div');
-    if (!this.el.querySelector('.align-bgImage')) {
-      bg.classList.add('align-bgImage');
-      this.el.insertAdjacentElement('afterBegin', bg);
+    if (!this.bgImage) {
+      this.bgImage = document.createElement('div');
+      this.bgImage.classList.add('align-bgImage');
+      this.el.insertAdjacentElement('afterBegin', this.bgImage);
     }
-    reader.addEventListener('load', () => {
-      this.el.classList.add('is-bgImage');
-      bg.style.backgroundImage = `url(${reader.result})`;
-      const update = (src) => {
-        bg.style.backgroundImage = `url(${src})`;
-      };
-      Section.$align.update();
-      Section.$align.$bus.emit('imageAdded', { file, update });
-    });
-    reader.readAsDataURL(file);
+    const update = (src) => {
+      this.bgImage.style.backgroundImage = `url(${src})`;
+    };
+    this.bgImage.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
+    this.el.classList.add('is-bgImage');
+    Section.$align.update();
+    Section.$align.$bus.emit('imageAdded', { file, update });
     input.value = null;
   }
 
@@ -170,18 +178,17 @@ export default class Section {
     const input = event.target;
     const file = input.files[0];
     if (!file) return;
-    let video = this.el.querySelector('.align-bgVideo');
+    const url = window.URL.createObjectURL(event.target.files[0]);
     let source = null;
 
-    const url = window.URL.createObjectURL(event.target.files[0]);
-    if (!video) {
-      const video = stringToDOM(`<video autoplay muted loop class="align-bgVideo"></video>`);
+    if (!this.bgVideo) {
+      this.bgVideo = stringToDOM(`<video autoplay muted loop class="align-bgVideo"></video>`);
       source = document.createElement('source');
-      video.appendChild(source);
-      this.el.insertAdjacentElement('afterBegin', video);
+      this.bgVideo.appendChild(source);
+      this.el.insertAdjacentElement('afterBegin', this.bgVideo);
     }
-    if (video) {
-      source = video.querySelector('source');
+    if (this.bgVideo) {
+      source = this.bgVideo.querySelector('source');
     }
     this.el.classList.add('is-bgVideo');
     source.src = url;
