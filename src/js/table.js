@@ -52,11 +52,6 @@ export default class Table {
     })
   }
 
-  remove () {
-    Table.$optionsBar.hide();
-    this.el.remove();
-  }
-
   insertRow ($styler, $schema) {
     const position = $schema.args[0];
     const columnsLength = this.el.rows[0].cells.length;
@@ -88,5 +83,10 @@ export default class Table {
     for (let i = 0; i < rowsLength; i++) {
       this.el.rows[i].deleteCell(columnIndex);
     }
+  }
+
+  remove() {
+    Table.$optionsBar.hide();
+    this.el.remove();
   }
 }

@@ -21,12 +21,10 @@ export default class Prompt {
     const position = this.settings.position;
     this.el = document.createElement('div');
     this.message = document.createElement('label');
-    this.submit = document.createElement('button');
     this.inputs = []
 
     this.el.classList.add('prompt');
     this.message.classList.add('prompt-message');
-    this.submit.classList.add('prompt-submit');
 
     if (position) {
       this.el.style.left = `${position.left}px`;
@@ -34,17 +32,16 @@ export default class Prompt {
     }
     if (!position) {
       if (Selection.range.startContainer.nodeType === 3) {
-        this.selectionRefrance = Selection.range;
+        this.selectionReference = Selection.range;
       }
       if (Selection.range.startContainer.nodeType === 1) {
-        this.selectionRefrance = Selection.range.startContainer;
+        this.selectionReference = Selection.range.startContainer;
       }
       setTimeout(() => {
-        updatePosition(this.selectionRefrance, this.el, this.settings.wrapper, 'left-top');
+        updatePosition(this.selectionReference, this.el, this.settings.wrapper, 'left-top');
       }, 1);
     }
     this.message.innerText = message;
-    this.submit.innerText = 'Submit';
 
     this.el.appendChild(this.message);
     for (let i = 0; i < this.settings.inputsCount; i++) {
@@ -57,7 +54,6 @@ export default class Prompt {
     }
 
     this.inputs[0].value = data;
-    this.el.appendChild(this.submit);
 
     this.settings.wrapper.appendChild(this.el);
     setTimeout(() => {
@@ -70,13 +66,37 @@ export default class Prompt {
     }, 1);
   }
 
+  _generateButton(name) {
+    this[name] = document.createElement('button');
+    this[name].classList.add(`prompt-button`);
+    this[name].innerText = name;
+    this[name].addEventListener('click', this.remove.bind(this));
+    this.el.appendChild(this[name]);
+  }
+
   onSubmit (func, args) {
+    this._generateButton('submit');
     this.submit.addEventListener('click', () => func(args));
-    this.submit.addEventListener('click', () => setTimeout(this.remove.bind(this), 1));
     return this;
   }
 
+  onDelete(func, args) {
+    this._generateButton('delete');
+    this.delete.addEventListener('click', () => func(args));
+    return this;
+  }
+  
+
+  onCancel(func, args) {
+    this._generateButton('cancel');
+    this.cancel.addEventListener('click', () => func(args));
+    return this;
+  }
+
+
   remove () {
-    this.el.remove();
+    setTimeout(() => {
+      this.el.remove();
+    }, 1)
   }
 }

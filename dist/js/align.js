@@ -334,12 +334,10 @@ var Prompt = function () {
       var position = this.settings.position;
       this.el = document.createElement('div');
       this.message = document.createElement('label');
-      this.submit = document.createElement('button');
       this.inputs = [];
 
       this.el.classList.add('prompt');
       this.message.classList.add('prompt-message');
-      this.submit.classList.add('prompt-submit');
 
       if (position) {
         this.el.style.left = position.left + 'px';
@@ -347,17 +345,16 @@ var Prompt = function () {
       }
       if (!position) {
         if (Selection.range.startContainer.nodeType === 3) {
-          this.selectionRefrance = Selection.range;
+          this.selectionReference = Selection.range;
         }
         if (Selection.range.startContainer.nodeType === 1) {
-          this.selectionRefrance = Selection.range.startContainer;
+          this.selectionReference = Selection.range.startContainer;
         }
         setTimeout(function () {
-          updatePosition(_this.selectionRefrance, _this.el, _this.settings.wrapper, 'left-top');
+          updatePosition(_this.selectionReference, _this.el, _this.settings.wrapper, 'left-top');
         }, 1);
       }
       this.message.innerText = message;
-      this.submit.innerText = 'Submit';
 
       this.el.appendChild(this.message);
       for (var i = 0; i < this.settings.inputsCount; i++) {
@@ -370,7 +367,6 @@ var Prompt = function () {
       }
 
       this.inputs[0].value = data;
-      this.el.appendChild(this.submit);
 
       this.settings.wrapper.appendChild(this.el);
       setTimeout(function () {
@@ -381,22 +377,49 @@ var Prompt = function () {
       }, 1);
     }
   }, {
+    key: '_generateButton',
+    value: function _generateButton(name) {
+      this[name] = document.createElement('button');
+      this[name].classList.add('prompt-button');
+      this[name].innerText = name;
+      this[name].addEventListener('click', this.remove.bind(this));
+      this.el.appendChild(this[name]);
+    }
+  }, {
     key: 'onSubmit',
     value: function onSubmit(func, args) {
-      var _this2 = this;
-
+      this._generateButton('submit');
       this.submit.addEventListener('click', function () {
         return func(args);
       });
-      this.submit.addEventListener('click', function () {
-        return setTimeout(_this2.remove.bind(_this2), 1);
+      return this;
+    }
+  }, {
+    key: 'onDelete',
+    value: function onDelete(func, args) {
+      this._generateButton('delete');
+      this.delete.addEventListener('click', function () {
+        return func(args);
+      });
+      return this;
+    }
+  }, {
+    key: 'onCancel',
+    value: function onCancel(func, args) {
+      this._generateButton('cancel');
+      this.cancel.addEventListener('click', function () {
+        return func(args);
       });
       return this;
     }
   }, {
     key: 'remove',
     value: function remove() {
-      this.el.remove();
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.el.remove();
+      }, 1);
     }
   }]);
   return Prompt;
@@ -1417,101 +1440,6 @@ var Styler = function () {
   return Styler;
 }();
 
-var Table = function () {
-  function Table(table) {
-    classCallCheck(this, Table);
-
-    if (!table) return;
-    this._init(table);
-    this._initEvents();
-    this.activeCell = this.el.rows[0].cells[0];
-  }
-
-  createClass(Table, [{
-    key: '_init',
-    value: function _init(table) {
-      if (table.nodeName === 'TABLE') {
-        this.el = table;
-        this.el.classList.add('align-table');
-        return;
-      }
-      var rows = Number(table.rows);
-      var columns = Number(table.columns);
-      if (isNaN(rows) || isNaN(columns)) {
-        return;
-      }
-      this.el = document.createElement('table');
-      this.el.classList.add('align-table');
-      this.el.insertAdjacentHTML('afterbegin', ('\n        <tr>\n          ' + '<td><br></td>'.repeat(columns) + '\n        </tr>\n      ').repeat(rows));
-    }
-  }, {
-    key: '_initEvents',
-    value: function _initEvents() {
-      var _this = this;
-
-      this.el.addEventListener('click', function (event) {
-        _this.activeCell = event.target;
-        Table.$optionsBar.update(_this);
-      });
-    }
-  }, {
-    key: 'remove',
-    value: function remove() {
-      Table.$optionsBar.hide();
-      this.el.remove();
-    }
-  }, {
-    key: 'insertRow',
-    value: function insertRow($styler, $schema) {
-      var position = $schema.args[0];
-      var columnsLength = this.el.rows[0].cells.length;
-      var newIndex = this.activeCell.parentNode.rowIndex + (position === 'after' ? 1 : 0);
-      var row = this.el.insertRow(newIndex);
-      for (var i = 0; i < columnsLength; i++) {
-        var cell = row.insertCell(i);
-        cell.insertAdjacentHTML('afterbegin', '<br>');
-      }
-    }
-  }, {
-    key: 'deleteRow',
-    value: function deleteRow() {
-      this.el.deleteRow(this.activeCell.parentNode.rowIndex);
-    }
-  }, {
-    key: 'insertColumn',
-    value: function insertColumn($styler, $schema) {
-      var position = $schema.args[0];
-      var rowsLength = this.el.rows.length;
-      var columnIndex = this.activeCell.cellIndex + (position === 'after' ? 1 : 0);
-      for (var i = 0; i < rowsLength; i++) {
-        var cell = this.el.rows[i].insertCell(columnIndex);
-        cell.insertAdjacentHTML('afterbegin', '<br>');
-      }
-    }
-  }, {
-    key: 'deleteColumn',
-    value: function deleteColumn() {
-      var rowsLength = this.el.rows.length;
-      var columnIndex = this.activeCell.cellIndex;
-      for (var i = 0; i < rowsLength; i++) {
-        this.el.rows[i].deleteCell(columnIndex);
-      }
-    }
-  }], [{
-    key: 'config',
-    value: function config(align, settings) {
-      this.$align = align;
-      this.$optionsBar = new Styler(align, Object.assign({
-        mode: 'bubble',
-        hideWhenClickOut: true,
-        commands: ['_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter', 'separator', '_tableDeleteRow', '_tableDeleteColumn', 'separator', '_remove'],
-        tooltip: true
-      }, settings));
-    }
-  }]);
-  return Table;
-}();
-
 var Figure = function () {
   function Figure(figure) {
     classCallCheck(this, Figure);
@@ -1619,6 +1547,158 @@ var Figure = function () {
   return Figure;
 }();
 
+var Table = function () {
+  function Table(table) {
+    classCallCheck(this, Table);
+
+    if (!table) return;
+    this._init(table);
+    this._initEvents();
+    this.activeCell = this.el.rows[0].cells[0];
+  }
+
+  createClass(Table, [{
+    key: '_init',
+    value: function _init(table) {
+      if (table.nodeName === 'TABLE') {
+        this.el = table;
+        this.el.classList.add('align-table');
+        return;
+      }
+      var rows = Number(table.rows);
+      var columns = Number(table.columns);
+      if (isNaN(rows) || isNaN(columns)) {
+        return;
+      }
+      this.el = document.createElement('table');
+      this.el.classList.add('align-table');
+      this.el.insertAdjacentHTML('afterbegin', ('\n        <tr>\n          ' + '<td><br></td>'.repeat(columns) + '\n        </tr>\n      ').repeat(rows));
+    }
+  }, {
+    key: '_initEvents',
+    value: function _initEvents() {
+      var _this = this;
+
+      this.el.addEventListener('click', function (event) {
+        _this.activeCell = event.target;
+        Table.$optionsBar.update(_this);
+      });
+    }
+  }, {
+    key: 'insertRow',
+    value: function insertRow($styler, $schema) {
+      var position = $schema.args[0];
+      var columnsLength = this.el.rows[0].cells.length;
+      var newIndex = this.activeCell.parentNode.rowIndex + (position === 'after' ? 1 : 0);
+      var row = this.el.insertRow(newIndex);
+      for (var i = 0; i < columnsLength; i++) {
+        var cell = row.insertCell(i);
+        cell.insertAdjacentHTML('afterbegin', '<br>');
+      }
+    }
+  }, {
+    key: 'deleteRow',
+    value: function deleteRow() {
+      this.el.deleteRow(this.activeCell.parentNode.rowIndex);
+    }
+  }, {
+    key: 'insertColumn',
+    value: function insertColumn($styler, $schema) {
+      var position = $schema.args[0];
+      var rowsLength = this.el.rows.length;
+      var columnIndex = this.activeCell.cellIndex + (position === 'after' ? 1 : 0);
+      for (var i = 0; i < rowsLength; i++) {
+        var cell = this.el.rows[i].insertCell(columnIndex);
+        cell.insertAdjacentHTML('afterbegin', '<br>');
+      }
+    }
+  }, {
+    key: 'deleteColumn',
+    value: function deleteColumn() {
+      var rowsLength = this.el.rows.length;
+      var columnIndex = this.activeCell.cellIndex;
+      for (var i = 0; i < rowsLength; i++) {
+        this.el.rows[i].deleteCell(columnIndex);
+      }
+    }
+  }, {
+    key: 'remove',
+    value: function remove() {
+      Table.$optionsBar.hide();
+      this.el.remove();
+    }
+  }], [{
+    key: 'config',
+    value: function config(align, settings) {
+      this.$align = align;
+      this.$optionsBar = new Styler(align, Object.assign({
+        mode: 'bubble',
+        hideWhenClickOut: true,
+        commands: ['_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter', 'separator', '_tableDeleteRow', '_tableDeleteColumn', 'separator', '_remove'],
+        tooltip: true
+      }, settings));
+    }
+  }]);
+  return Table;
+}();
+
+var Link = function () {
+  function Link(link) {
+    classCallCheck(this, Link);
+
+    this._init(link);
+  }
+
+  createClass(Link, [{
+    key: '_init',
+    value: function _init(link) {
+      this.el = link || document.createElement('a');
+      if (!link) {
+        this.el.appendChild(Selection.range.extractContents());
+        Selection.range.insertNode(this.el);
+      }
+      this.el.addEventListener('click', this.edit.bind(this));
+    }
+  }, {
+    key: 'edit',
+    value: function edit() {
+      var _this = this;
+
+      var prompt = new Prompt('Enter link:', this.el.href, {
+        wrapper: Link.$align.el
+      });
+      prompt.onSubmit(function () {
+        var link = prompt.inputs[0].value;
+        if (!link) return;
+        _this.update(link);
+      });
+      if (this.el.href) {
+        prompt.onDelete(function () {
+          _this.remove();
+        });
+      }
+    }
+  }, {
+    key: 'update',
+    value: function update(link) {
+      this.el.href = link;
+    }
+  }, {
+    key: 'remove',
+    value: function remove() {
+      var content = this.el.innerHTML;
+      this.el.insertAdjacentHTML('beforebegin', content);
+      this.el.remove();
+    }
+  }], [{
+    key: 'config',
+    value: function config(align) {
+      this.$align = align;
+    }
+  }]);
+  return Link;
+}();
+
 var Section = function () {
   function Section(content, position) {
     var _this = this;
@@ -1688,14 +1768,18 @@ var Section = function () {
   }, {
     key: 'generateSectionElements',
     value: function generateSectionElements() {
-      var tables = Array.from(this.contentDiv.querySelectorAll('table'));
       var figures = Array.from(this.contentDiv.querySelectorAll('figure'));
+      var tables = Array.from(this.contentDiv.querySelectorAll('table'));
+      var links = Array.from(this.contentDiv.querySelectorAll('a'));
 
+      figures.forEach(function (figure) {
+        return new Figure(figure);
+      });
       tables.forEach(function (table) {
         return new Table(table);
       });
-      figures.forEach(function (figure) {
-        return new Figure(figure);
+      links.forEach(function (link) {
+        return new Link(link);
       });
       this.generateAddSectionButton();
       this.generateBackground();
@@ -1979,6 +2063,7 @@ var Align = function () {
       Section.config(this, this.settings.section);
       Figure.config(this, this.settings.figure);
       Table.config(this, this.settings.table);
+      Link.config(this, this.settings.link);
 
       if (this.settings.toolbar) {
         this.settings.toolbar.mode = 'toolbar';
@@ -2316,18 +2401,8 @@ var Align = function () {
   }, {
     key: 'createLink',
     value: function createLink() {
-      var _this4 = this;
-
-      var prompt = new Prompt('Enter link:', Selection.current.toString(), {
-        wrapper: this.el,
-        position: this.position
-      });
-      prompt.onSubmit(function () {
-        var link = prompt.inputs[0].value;
-        if (!link) return;
-        Selection.selectRange();
-        _this4.execute('createLink', link);
-      });
+      var link = new Link();
+      link.edit();
     }
   }, {
     key: 'content',

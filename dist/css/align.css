@@ -647,11 +647,16 @@
   margin: 0 10px;
   line-height: 1.5em;
 }
-.align .prompt-submit {
+.align .prompt-button {
   border: 0;
   background: transparent;
   color: #1700ff;
   cursor: pointer;
+  padding: 1px 5px;
+}
+.align .prompt-button:not(:last-child):after {
+  content: "|";
+  padding-left: 10px;
 }
 [data-tooltip] {
   position: relative;

@@ -16,9 +16,13 @@
     margin: 0 10px
     line-height: 1.5em
 
-  &-submit
+  &-button
     border: 0
     background: transparent
     color: $blue
     cursor: pointer
+    padding: 1px 5px
+    &:not(:last-child):after
+      content: "|"
+      padding-left: 10px
 

@@ -1,7 +1,8 @@
 import { stringToDOM, swapArrayItems } from './partial/util'
 import Styler from './styler';
-import Table from './table';
 import Figure from './figure';
+import Table from './table';
+import Link from './link';
 
 export default class Section {
   static id = 0;
@@ -103,11 +104,13 @@ export default class Section {
   }
 
   generateSectionElements () {
-    const tables = Array.from(this.contentDiv.querySelectorAll('table'));
     const figures = Array.from(this.contentDiv.querySelectorAll('figure'));
+    const tables = Array.from(this.contentDiv.querySelectorAll('table'));
+    const links = Array.from(this.contentDiv.querySelectorAll('a'));
 
-    tables.forEach(table => new Table(table));
     figures.forEach(figure => new Figure(figure));
+    tables.forEach(table => new Table(table));
+    links.forEach(link => new Link(link));
     this.generateAddSectionButton();
     this.generateBackground();
   }

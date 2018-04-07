@@ -11,11 +11,12 @@ import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './selection';
 import Section from './section';
-import Prompt from './prompt';
-import Styler from './styler';
 import EventBus from './events';
-import Table from './table';
+import Styler from './styler';
+import Prompt from './prompt';
 import Figure from './figure';
+import Table from './table';
+import Link from './link';
 
 export default class Align {
   constructor (selector, {
@@ -76,6 +77,7 @@ export default class Align {
     Section.config(this, this.settings.section);
     Figure.config(this, this.settings.figure);
     Table.config(this, this.settings.table);
+    Link.config(this, this.settings.link);
 
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';
@@ -387,19 +389,7 @@ export default class Align {
   }
 
   createLink() {
-    const prompt = new Prompt(
-      'Enter link:',
-      Selection.current.toString(),
-      {
-        wrapper: this.el,
-        position: this.position
-      }
-    )
-    prompt.onSubmit(() => {
-      const link = prompt.inputs[0].value;
-      if (!link) return;
-      Selection.selectRange();
-      this.execute('createLink', link);
-    });
+    const link = new Link();
+    link.edit();
   }
 }
