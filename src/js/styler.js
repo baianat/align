@@ -259,8 +259,12 @@ export default class Styler {
       return;
     }
     this.visiable = true;
+    this.el.style.transition = 'opacity 0.2s';
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
+    setTimeout(() => {
+      this.el.style.transition = '';
+    });
     if (this.settings.hideWhenClickOut) {
       document.addEventListener('click', this.clickCallback)
     }

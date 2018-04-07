@@ -2899,12 +2899,18 @@ var Styler = function () {
   }, {
     key: 'show',
     value: function show() {
+      var _this5 = this;
+
       if (this.visiable) {
         return;
       }
       this.visiable = true;
+      this.el.style.transition = 'opacity 0.2s';
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
+      setTimeout(function () {
+        _this5.el.style.transition = '';
+      });
       if (this.settings.hideWhenClickOut) {
         document.addEventListener('click', this.clickCallback);
       }
@@ -2958,10 +2964,10 @@ var Styler = function () {
   }, {
     key: 'updateCommandsStates',
     value: function updateCommandsStates() {
-      var _this5 = this;
+      var _this6 = this;
 
       Object.keys(this.cmds).forEach(function (cmd) {
-        var currentCmd = _this5.cmds[cmd];
+        var currentCmd = _this6.cmds[cmd];
         var command = currentCmd.schema.command;
         var value = currentCmd.schema.value;
         var init = currentCmd.schema.init;
