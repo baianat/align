@@ -259,6 +259,7 @@ export default class Styler {
       return;
     }
     this.visiable = true;
+    this.updateTemp = null;
     this.el.style.transition = 'opacity 0.2s';
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
@@ -299,7 +300,6 @@ export default class Styler {
     if (this.settings.mode === 'creator') {
       this.updateCreator();
     }
-
   };
 
   getTooltip(schema) {
@@ -352,5 +352,10 @@ export default class Styler {
     this.currentItem.el.classList.remove(...prefixedClasses);
     this.currentItem.el.classList.toggle(currentClass);
     this.update();
+    const updateTemp = () => {
+      this.update();
+      this.currentItem.el.removeEventListener('transitionend', updateTemp)
+    }
+    this.currentItem.el.addEventListener('transitionend', updateTemp)
   }
 }

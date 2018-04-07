@@ -355,6 +355,9 @@
 .align-content p {
   word-wrap: break-word;
 }
+.align-figure {
+  transition: 0.2s;
+}
 .align-section {
   position: relative;
   z-index: 1;

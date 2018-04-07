@@ -1302,6 +1302,7 @@ var Styler = function () {
         return;
       }
       this.visiable = true;
+      this.updateTemp = null;
       this.el.style.transition = 'opacity 0.2s';
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
@@ -1396,7 +1397,8 @@ var Styler = function () {
   }, {
     key: 'toggleClass',
     value: function toggleClass(currentClass, allClasses) {
-      var _currentItem$el$class;
+      var _currentItem$el$class,
+          _this7 = this;
 
       if (!this.currentItem) return;
       var prefixedClasses = allClasses.map(function (cls) {
@@ -1405,6 +1407,11 @@ var Styler = function () {
       (_currentItem$el$class = this.currentItem.el.classList).remove.apply(_currentItem$el$class, toConsumableArray(prefixedClasses));
       this.currentItem.el.classList.toggle(currentClass);
       this.update();
+      var updateTemp = function updateTemp() {
+        _this7.update();
+        _this7.currentItem.el.removeEventListener('transitionend', updateTemp);
+      };
+      this.currentItem.el.addEventListener('transitionend', updateTemp);
     }
   }]);
   return Styler;
