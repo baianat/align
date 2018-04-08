@@ -123,35 +123,36 @@ export function updatePosition(reference, element, align, mode = 'middle-left') 
   const refRect = reference.getBoundingClientRect();
   const elmRect = element.getBoundingClientRect();
   const alignRect = align.getBoundingClientRect();
-  const positon = {x: 0, y: 0}
+  const alignScroll = align.scrollTop;
+  const position = {x: 0, y: 0}
   const startBoundary = alignRect.left;
   const endBoundary = alignRect.left + alignRect.width - elmRect.width;
   modes.forEach(mode => {
     switch (mode) {
       case 'center':
-        positon.x = refRect.left - alignRect.left + (refRect.width / 2) - (elmRect.width / 2);
+        position.x = refRect.left - alignRect.left + (refRect.width / 2) - (elmRect.width / 2);
         break;
       case 'left':
-        positon.x = refRect.left - alignRect.left
+        position.x = refRect.left - alignRect.left
         break;
       case 'right':
-        positon.x = refRect.left - alignRect.left - refRect.width
+        position.x = refRect.left - alignRect.left - refRect.width
         break;
       case 'middle':
-        positon.y = refRect.top - alignRect.top + (refRect.height / 2) - (elmRect.height / 2);
+        position.y = refRect.top - alignRect.top + alignScroll + (refRect.height / 2) - (elmRect.height / 2);
         break;
       case 'top':
-        positon.y = refRect.top - alignRect.top - elmRect.height;
+        position.y = refRect.top - alignRect.top + alignScroll - elmRect.height;
         break;
       case 'bottom':
-        positon.y = refRect.bottom - alignRect.top;
+        position.y = refRect.bottom - alignRect.top+ alignScroll ;
         break;
     }
   })
-  positon.x = normalizeNumber(positon.x, startBoundary, endBoundary)
-  element.style.transform = `translate(${positon.x}px, ${positon.y}px)`;
+  position.x = normalizeNumber(position.x, startBoundary, endBoundary)
+  element.style.transform = `translate(${position.x}px, ${position.y}px)`;
 
-  return positon;
+  return position;
 }
 
 export function launchFullscreen (element) {
