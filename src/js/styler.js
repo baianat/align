@@ -313,8 +313,8 @@ export default class Styler {
    * Update the state of the active style
    */
   updateCommandsStates () {
-    Object.keys(this.cmds).forEach((cmd) => {
-      const currentCmd = this.cmds[cmd];
+    Object.values(this.cmds).forEach((cmd) => {
+      const currentCmd = cmd;
       const command = currentCmd.schema.command;
       const value = currentCmd.schema.value;
       const init = currentCmd.schema.init;

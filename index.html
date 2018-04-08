@@ -139,21 +139,7 @@
           'separator',
           'createTable', 'createFigure', 'createPost', 'createColumn', 'createVideo', 'createEmbed', 'createLine'
         ]
-      },
-      bubble: {
-        theme: 'light',
-        commands: [
-          'bold', 'italic', 'underline', 'strikeThrough',
-          'separator',
-          'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
-        ]
-      },
-      creator: {
-        theme: 'light',
-        commands: [
-          'createTable', 'createFigure', 'createPost', 'createColumn', 'createVideo', 'createEmbed', 'createLine'
-        ]
-      },
+      }
     });
     myEditor.$bus.on('imageAdded', ({ file, update }) => {
       console.log(file);

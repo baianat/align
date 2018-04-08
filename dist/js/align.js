@@ -625,7 +625,6 @@ var cmdsSchema = {
       defaultColor: '#fff',
       mode: 'hex',
       picker: { mode: 'square' },
-      disableLum: true,
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
@@ -652,7 +651,6 @@ var cmdsSchema = {
       defaultColor: '#fdfdfd',
       mode: 'hex',
       picker: { mode: 'square' },
-      disableLum: true,
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path style="fill: currentColor" d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/>\n          <path d="M0 20h24v4H0z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
@@ -788,7 +786,6 @@ var cmdsSchema = {
       defaultColor: '#000000',
       picker: { mode: 'square' },
       mode: 'hex',
-      disableLum: true,
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n        </svg>\n      '
     }
   },
@@ -1386,10 +1383,8 @@ var Styler = function () {
   }, {
     key: 'updateCommandsStates',
     value: function updateCommandsStates() {
-      var _this6 = this;
-
-      Object.keys(this.cmds).forEach(function (cmd) {
-        var currentCmd = _this6.cmds[cmd];
+      Object.values(this.cmds).forEach(function (cmd) {
+        var currentCmd = cmd;
         var command = currentCmd.schema.command;
         var value = currentCmd.schema.value;
         var init = currentCmd.schema.init;
@@ -1422,7 +1417,7 @@ var Styler = function () {
     key: 'toggleClass',
     value: function toggleClass(currentClass, allClasses) {
       var _currentItem$el$class,
-          _this7 = this;
+          _this6 = this;
 
       if (!this.currentItem) return;
       var prefixedClasses = allClasses.map(function (cls) {
@@ -1432,8 +1427,8 @@ var Styler = function () {
       this.currentItem.el.classList.toggle(currentClass);
       this.update();
       var updateTemp = function updateTemp() {
-        _this7.update();
-        _this7.currentItem.el.removeEventListener('transitionend', updateTemp);
+        _this6.update();
+        _this6.currentItem.el.removeEventListener('transitionend', updateTemp);
       };
       this.currentItem.el.addEventListener('transitionend', updateTemp);
     }
