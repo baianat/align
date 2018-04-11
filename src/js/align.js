@@ -221,6 +221,11 @@ export default class Align {
     }, true);
   }
 
+  clearContent() {
+    this.sections = [];
+    this.editor.innerHTML = '';
+  }
+
   /**
    * Hight light code text
    */
