@@ -22,7 +22,7 @@ export default class Prompt {
     const position = this.settings.position;
     this.el = document.createElement('div');
     this.message = document.createElement('label');
-    this.inputs = []
+    this.inputs = [];
 
     this.el.classList.add('prompt');
     this.message.classList.add('prompt-message');
@@ -67,7 +67,7 @@ export default class Prompt {
     }, 1);
   }
 
-  _generateButton(name) {
+  _generateButton (name) {
     this[name] = document.createElement('button');
     this[name].classList.add(`prompt-button`);
     this[name].innerText = name;
@@ -81,23 +81,21 @@ export default class Prompt {
     return this;
   }
 
-  onDelete(func, args) {
+  onDelete (func, args) {
     this._generateButton('delete');
     this.delete.addEventListener('click', () => func(args));
     return this;
   }
-  
 
-  onCancel(func, args) {
+  onCancel (func, args) {
     this._generateButton('cancel');
     this.cancel.addEventListener('click', () => func(args));
     return this;
   }
 
-
   remove () {
     setTimeout(() => {
       this.el.remove();
-    }, 1)
+    }, 1);
   }
 }

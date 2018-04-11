@@ -1,6 +1,5 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from '../selection';
-import Prompt from '../prompt';
 import { generateKeysSymbols } from './util';
 
 const symbols = generateKeysSymbols();
@@ -69,7 +68,7 @@ const cmdsSchema = {
   selectContent: {
     element: 'button',
     tooltip: `Select all content (${symbols.cmdKey} ${symbols.shift} A)`,
-    func(styler) {
+    func (styler) {
       Selection.selectElement(styler.$align.editor);
     }
   },
@@ -209,13 +208,13 @@ const cmdsSchema = {
         </svg>
       `,
       events: {
-        beforeSubmit() {
+        beforeSubmit () {
           Selection.selectRange();
         },
-        afterOpen() {
+        afterOpen () {
           Selection.update();
         },
-        afterSelect() {
+        afterSelect () {
           Selection.update();
         }
       }
@@ -240,13 +239,13 @@ const cmdsSchema = {
         </svg>
       `,
       events: {
-        beforeSubmit() {
+        beforeSubmit () {
           Selection.selectRange();
         },
-        afterOpen() {
+        afterOpen () {
           Selection.update();
         },
-        afterSelect() {
+        afterSelect () {
           Selection.update();
         }
       }
@@ -316,7 +315,7 @@ const cmdsSchema = {
   createLink: {
     element: 'button',
     tooltip: 'Hyperlink',
-    func: 'createLink',
+    func: 'createLink'
   },
 
   // internal functions don't use it
@@ -381,7 +380,7 @@ const cmdsSchema = {
     init: Colorpicker,
     initConfig: {
       defaultColor: '#000000',
-      picker: { mode: 'square'},
+      picker: { mode: 'square' },
       mode: 'hex',
       guideIcon: `
         <svg viewBox="0 0 24 24">
@@ -426,6 +425,6 @@ const cmdsSchema = {
     func: 'deleteColumn',
     icon: 'tableDeleteColumn'
   }
-}
+};
 
 export default cmdsSchema;

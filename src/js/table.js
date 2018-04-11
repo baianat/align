@@ -9,7 +9,7 @@ export default class Table {
     this.activeCell = this.el.rows[0].cells[0];
   }
 
-  static config(align) {
+  static config (align) {
     align.$tableToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
@@ -28,7 +28,7 @@ export default class Table {
   _init (table) {
     if (table.nodeName === 'TABLE') {
       this.el = table;
-      this.el.classList.add('align-table')
+      this.el.classList.add('align-table');
       return;
     }
     const rows = Number(table.rows);
@@ -37,19 +37,19 @@ export default class Table {
       return;
     }
     this.el = document.createElement('table');
-    this.el.classList.add('align-table')
+    this.el.classList.add('align-table');
     this.el.insertAdjacentHTML('afterbegin', `
         <tr>
           ${'<td><br></td>'.repeat(columns)}
         </tr>
-      `.repeat(rows))
+      `.repeat(rows));
   }
 
   _initEvents () {
     this.el.addEventListener('click', event => {
       this.activeCell = event.target;
       this.$align.$tableToolbar.update(this);
-    })
+    });
   }
 
   insertRow ($styler, $schema) {
@@ -64,7 +64,7 @@ export default class Table {
   }
 
   deleteRow () {
-    this.el.deleteRow(this.activeCell.parentNode.rowIndex)
+    this.el.deleteRow(this.activeCell.parentNode.rowIndex);
   }
 
   insertColumn ($styler, $schema) {
@@ -85,7 +85,7 @@ export default class Table {
     }
   }
 
-  remove() {
+  remove () {
     this.$align.$tableToolbar.hide();
     this.el.remove();
   }

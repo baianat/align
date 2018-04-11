@@ -5,7 +5,7 @@ import Table from './table';
 import Link from './link';
 
 export default class Section {
-  static id = 0;
+  static id = 0; // eslint-disable-line
 
   constructor (align, content, {
     position,
@@ -32,7 +32,7 @@ export default class Section {
     this.$align.sections.push(this);
   }
 
-  static config(align) {
+  static config (align) {
     align.$sectionToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,

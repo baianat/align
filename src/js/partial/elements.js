@@ -1,6 +1,6 @@
 import icons from './icons';
 
-let NAMING_PREFIX = ''
+let NAMING_PREFIX = '';
 
 export function setElementsPrefix (prefix) {
   NAMING_PREFIX = prefix;
@@ -41,7 +41,7 @@ export function select (name, options) {
     optionElement.value = option;
     optionElement.innerText = option === false ? name : option;
     select.appendChild(optionElement);
-  })
+  });
   selectWrapper.appendChild(select);
   selectWrapper.insertAdjacentHTML('beforeend', icon);
   return selectWrapper;
@@ -90,7 +90,6 @@ export function menuButton (name, func, tooltip) {
   return menuItem;
 }
 
-
 export function dropdown (name, itemsContent, callbackFunc) {
   const dropdown = document.createElement('div');
   const menu = document.createElement('div');
@@ -114,9 +113,9 @@ export function dropdown (name, itemsContent, callbackFunc) {
     items.push(itemElement);
     itemElement.innerHTML = content;
     menu.appendChild(itemElement);
-  })
+  });
   dropdownButton.insertAdjacentHTML('beforeend', icon);
-  dropdownButton.addEventListener('click', () => dropdown.classList.toggle('is-active'))
+  dropdownButton.addEventListener('click', () => dropdown.classList.toggle('is-active'));
   dropdown.appendChild(dropdownButton);
   dropdown.appendChild(menu);
   return {

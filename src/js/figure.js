@@ -1,30 +1,27 @@
 import Styler from './styler';
 
 export default class Figure {
-  constructor(align, figure) {
+  constructor (align, figure) {
     if (!figure) {
       return {
         el: null
-      }
+      };
     }
     this.$align = align;
     this._init(figure);
   }
 
-  static config(align) {
+  static config (align) {
     align.$figureToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
-      commands: [
-        { '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] },
-        '_remove'
-      ],
+      commands: [{ _figureClasses: ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
       tooltip: true,
       ...align.settings.figure
     });
   }
 
-  _init(figure) {
+  _init (figure) {
     // check if it's the figure element
     if (figure.nodeType === 1) {
       this.el = figure;
@@ -40,25 +37,23 @@ export default class Figure {
       this.readFileContent(figure);
     }
 
-
-    this.el.contentEditable = false
-    this.caption.contentEditable = true
+    this.el.contentEditable = false;
+    this.caption.contentEditable = true;
     this.caption.dataset.defaultValue = 'Figure caption';
     this.img.classList.add('align-image');
     this.el.classList.add('align-figure', 'is-center');
     this.el.appendChild(this.img);
     this.el.appendChild(this.caption);
     this.el.addEventListener('click', () => {
-      this.$align.$figureToolbar.update(this)
+      this.$align.$figureToolbar.update(this);
     });
-
   }
 
-  readFileContent(file) {
+  readFileContent (file) {
     if (!this.isImage(file.name)) {
       return {
         el: null
-      }
+      };
     }
     const reader = new FileReader(); // eslint-disable-line
     reader.addEventListener('load', () => {
@@ -73,10 +68,10 @@ export default class Figure {
     reader.readAsDataURL(file);
   }
 
-  isImage(filename) {
+  isImage (filename) {
     const parts = filename.split('.');
     const ext = parts.slice(-1)[0];
-    
+
     switch (ext.toLowerCase()) {
       case 'jpg':
       case 'jpge':
@@ -88,11 +83,11 @@ export default class Figure {
     return false;
   }
 
-  update(newSrc) {
+  update (newSrc) {
     this.img.src = newSrc;
-  };
+  }
 
-  remove() {
+  remove () {
     this.$align.$figureToolbar.hide();
     this.el.remove();
   }

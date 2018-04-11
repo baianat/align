@@ -1,12 +1,4 @@
-import {
-  select,
-  userOS,
-  launchFullscreen,
-  exitFullscreen,
-  camelCase,
-  getVideoId,
-  stringToDOM
-} from './partial/util';
+import { select, userOS, launchFullscreen, exitFullscreen, getVideoId, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './selection';
@@ -19,14 +11,10 @@ import Table from './table';
 import Link from './link';
 
 export default class Align {
-  constructor (selector, {
-    toolbar = null,
-    bubble = null,
-    creator = null,
-    section = null,
-    shortcuts = false,
-    postTitle = false
-  } = {}) {
+  constructor (
+    selector,
+    { toolbar = null, bubble = null, creator = null, section = null, shortcuts = false, postTitle = false } = {}
+  ) {
     this.el = select(selector);
     this.settings = {
       toolbar,
@@ -49,7 +37,7 @@ export default class Align {
       }
       acc += section.content;
       return acc;
-    }, '')
+    }, '');
   }
 
   get title () {
@@ -120,7 +108,7 @@ export default class Align {
         type: 'title'
       });
     }
-    this.startContent.forEach(content => new Section(this, content));
+    this.startContent.forEach((content) => new Section(this, content));
     this.newSectionButton = document.createElement('button');
     this.newSectionButton.classList.add('align-addButton');
     this.el.appendChild(this.newSectionButton);
@@ -142,86 +130,104 @@ export default class Align {
 
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
 
-    window.addEventListener('keydown', (event) => {
-      // Do nothing if the event was already processed
-      if (event.defaultPrevented) {
-        return;
-      }
+    window.addEventListener(
+      'keydown',
+      (event) => {
+        // Do nothing if the event was already processed
+        if (event.defaultPrevented) {
+          return;
+        }
 
-      if (event[this.cmdKey] && this.settings.shortcuts) {
-        switch (event.key.toUpperCase()) {
-          case 'B':
-            event.preventDefault();
-            this.execute('bold'); break;
-          case 'I':
-            event.preventDefault();
-            this.execute('italic'); break;
-          case 'U':
-            event.preventDefault();
-            this.execute('underline'); break;
-          case 'E':
-            event.preventDefault();
-            this.execute('justifyCenter'); break;
-          case 'R':
-            event.preventDefault();
-            this.execute('justifyRight'); break;
-          case 'L':
-            event.preventDefault();
-            this.execute('justifyLeft'); break;
-          case 'J':
-            event.preventDefault();
-            this.execute('justifyFull'); break;
-          case 'A':
-            if (event.shiftKey) {
+        if (event[this.cmdKey] && this.settings.shortcuts) {
+          switch (event.key.toUpperCase()) {
+            case 'B':
               event.preventDefault();
-              Selection.selectElement(this.editor);
+              this.execute('bold');
+              break;
+            case 'I':
+              event.preventDefault();
+              this.execute('italic');
+              break;
+            case 'U':
+              event.preventDefault();
+              this.execute('underline');
+              break;
+            case 'E':
+              event.preventDefault();
+              this.execute('justifyCenter');
+              break;
+            case 'R':
+              event.preventDefault();
+              this.execute('justifyRight');
+              break;
+            case 'L':
+              event.preventDefault();
+              this.execute('justifyLeft');
+              break;
+            case 'J':
+              event.preventDefault();
+              this.execute('justifyFull');
+              break;
+            case 'A':
+              if (event.shiftKey) {
+                event.preventDefault();
+                Selection.selectElement(this.editor);
+              }
+              break;
+            case 'F':
+              event.preventDefault();
+              if (event.shiftKey) {
+                this.toggleFullScreen();
+              }
+              break;
+            case 'Z':
+              event.preventDefault();
+              if (event.shiftKey) {
+                this.execute('redo');
+                break;
+              }
+              this.execute('undo');
+              break;
+            case '\\':
+              event.preventDefault();
+              this.execute('removeFormat');
+              break;
+            case '=':
+              event.preventDefault();
+              if (event.shiftKey) {
+                this.execute('superscript');
+                break;
+              }
+              this.execute('subscript');
+              break;
+            default:
+              break;
+          }
+        }
+
+        switch (event.key) {
+          case 'Tab':
+            event.preventDefault();
+            if (event.shiftKey) {
+              this.execute('outdent', false, true);
+              break;
             }
+            this.execute('indent', false, true);
             break;
-          case 'F':
-            event.preventDefault();
-            if (event.shiftKey) {
-              this.toggleFullScreen();
-            }
+          case 'Escape':
+            this.el.classList.remove('is-fullscreen');
+            exitFullscreen();
             break;
-          case 'Z':
-            event.preventDefault();
-            if (event.shiftKey) {
-              this.execute('redo'); break;
-            }
-            this.execute('undo'); break;
-          case '\\':
-            event.preventDefault();
-            this.execute('removeFormat'); break;
-          case '=':
-            event.preventDefault();
-            if (event.shiftKey) {
-              this.execute('superscript'); break;
-            }
-            this.execute('subscript'); break;
           default:
             break;
         }
-      }
-
-      switch (event.key) {
-        case 'Tab':
-          event.preventDefault();
-          if (event.shiftKey) {
-            this.execute('outdent', false, true); break;
-          }
-          this.execute('indent', false, true); break;
-        case 'Escape':
-          this.el.classList.remove('is-fullscreen');
-          exitFullscreen();
-          break;
-        default:
-          break;
-      }
-      setTimeout(this.update.bind(this), 1);
-    }, true);
+        setTimeout(this.update.bind(this), 1);
+      },
+      true
+    );
   }
 
-  clearContent() {
+  clearContent () {
     this.sections = [];
     this.editor.innerHTML = '';
   }
@@ -230,7 +236,7 @@ export default class Align {
    * Hight light code text
    */
   /* eslint-disable */
-  highlight() {
+  highlight () {
     if (typeof hljs === 'undefined') {
       return;
     }
@@ -282,7 +288,7 @@ export default class Align {
     this.update();
   }
 
-  createFigure(styler, event) {
+  createFigure (styler, event) {
     const input = event.target;
     const file = input.files[0];
     if (!file || !Selection.range) return;
@@ -293,16 +299,14 @@ export default class Align {
     }
   }
 
-  createVideo() {
+  createVideo () {
     const prompt = new Prompt(this, {
       message: 'Enter video link:'
     });
     prompt.onSubmit(() => {
-      const link = prompt.inputs[0].value
+      const link = prompt.inputs[0].value;
       if (!link) return;
-      const videoHoster = link.includes('yout')
-        ? 'youtube' : link.includes('vimeo')
-          ? 'vimeo' : '';
+      const videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
 
       if (!videoHoster) {
         return;
@@ -313,22 +317,21 @@ export default class Align {
       iframe.width = 560;
       iframe.height = 315;
       iframe.allowfullscreen = true;
-      iframe.contentEditable = false
-      iframe.src = videoHoster === 'youtube'
-        ? `//www.youtube.com/embed/${videoId}`
-        : videoHoster === 'vimeo'
-          ? `//player.vimeo.com/video/${videoId}`
-          : ''
+      iframe.contentEditable = false;
+      iframe.src =
+        videoHoster === 'youtube'
+          ? `//www.youtube.com/embed/${videoId}`
+          : videoHoster === 'vimeo' ? `//player.vimeo.com/video/${videoId}` : '';
 
       Selection.range.insertNode(iframe);
     });
   }
 
-  createColumn() {
+  createColumn () {
     const prompt = new Prompt(this, {
       message: 'Enter columns count:',
       inputsCount: 1
-    })
+    });
     prompt.onSubmit(() => {
       const grid = stringToDOM(`<div class="align-grid">
         ${'<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value)}
@@ -337,12 +340,12 @@ export default class Align {
     });
   }
 
-  createTable() {
+  createTable () {
     const prompt = new Prompt(this, {
       message: 'Enter post link:',
       inputsCount: 2,
       inputsPlaceholders: ['rows', 'columns']
-    })
+    });
     prompt.onSubmit(() => {
       const table = new Table(this, {
         rows: prompt.inputs[0].value,
@@ -352,16 +355,16 @@ export default class Align {
     });
   }
 
-  createLine(styler, line) {
+  createLine (styler, line) {
     Selection.range.insertNode(stringToDOM(line));
   }
 
-  createPost() {
+  createPost () {
     const prompt = new Prompt(this, {
       message: 'Enter post link:'
     });
     prompt.onSubmit(() => {
-      const postUrl = prompt.inputs[0].value
+      const postUrl = prompt.inputs[0].value;
       if (!postUrl) return;
       const iframe = document.createElement('iframe');
 
@@ -370,17 +373,17 @@ export default class Align {
       iframe.scrolling = 'no';
       iframe.contentEditable = false;
       iframe.allowTransparency = true;
-      iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`
+      iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`;
       Selection.range.insertNode(iframe);
     });
   }
 
-  createEmbed() {
+  createEmbed () {
     const prompt = new Prompt(this, {
-      message: 'Add an embedded:',
-    })
+      message: 'Add an embedded:'
+    });
     prompt.onSubmit(() => {
-      const data = prompt.inputs[0].value
+      const data = prompt.inputs[0].value;
       if (!data) return;
       const div = document.createElement('div');
       div.insertAdjacentHTML('afterbegin', data);
@@ -389,7 +392,7 @@ export default class Align {
     });
   }
 
-  createLink() {
+  createLink () {
     const link = new Link(this);
     link.edit();
   }

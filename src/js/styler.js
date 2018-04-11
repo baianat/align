@@ -1,11 +1,10 @@
 import {
-  debounce,
   cloneObject,
   camelCase,
   isElementClosest,
   updatePosition
 } from './partial/util';
-import { 
+import {
   setElementsPrefix,
   button,
   select,
@@ -16,10 +15,9 @@ import {
 } from './partial/elements';
 import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
-import Section from './section';
 
 export default class Styler {
-  constructor(align, {
+  constructor (align, {
     mode = 'toolbar',
     commands = ['bold', 'italic', 'underline'],
     hideWhenClickOut = false,
@@ -35,7 +33,7 @@ export default class Styler {
       tooltip,
       theme,
       position
-    }
+    };
     this._init();
   }
 
@@ -46,7 +44,7 @@ export default class Styler {
     setElementsPrefix('styler-');
     this.cmdsSchema = cloneObject(cmdsSchema);
     this.el = document.createElement('div');
-    this.menu = document.createElement('ul')
+    this.menu = document.createElement('ul');
     this.el.classList.add('styler', `is-${this.settings.mode}`, `is-${this.settings.theme}`);
     this.el.appendChild(this.menu);
     this.menu.classList.add('styler-menu');
@@ -55,7 +53,7 @@ export default class Styler {
 
     this.settings.commands.forEach((command) => {
       this.generateCmdElement(command);
-    })
+    });
     this.$align.el.appendChild(this.el);
     if (this.settings.mode === 'bubble') {
       this._initBubble();
@@ -72,7 +70,7 @@ export default class Styler {
           return;
         }
         this.hide();
-      }
+      };
     }
   }
 
@@ -91,7 +89,7 @@ export default class Styler {
         });
         ticking = true;
       }
-    }
+    };
   }
 
   _initCreator () {
@@ -103,7 +101,7 @@ export default class Styler {
     this.hide();
   }
 
-  generateCmdElement(command) {
+  generateCmdElement (command) {
     const li = document.createElement('li');
     const cmd = typeof command === 'string' ? command : Object.keys(command)[0];
     const cmdSchema = this.cmdsSchema[cmd];
@@ -126,15 +124,14 @@ export default class Styler {
         currentCmd.el = fileBtn.input;
         currentCmd.el.addEventListener('change', (event) => {
           this.cmdCallback(cmdSchema, event);
-        })
+        });
         li.appendChild(fileBtn.el);
         break;
-
 
       case 'input':
         currentCmd.el = input(icon, cmdSchema.type, this.getTooltip(cmdSchema));
         currentCmd.el.addEventListener('change', () => {
-          this.cmdCallback(cmdSchema, currentCmd.el.value)
+          this.cmdCallback(cmdSchema, currentCmd.el.value);
         });
         li.appendChild(currentCmd.el);
         break;
@@ -152,7 +149,7 @@ export default class Styler {
         const ddown = dropdown(icon, cmdSchema.items, (value) => this.cmdCallback(cmdSchema, value)
         );
         li.appendChild(ddown.dropdown);
-  
+
         break;
 
       case 'styling':
@@ -168,9 +165,11 @@ export default class Styler {
         currentCmd.el = document.createElement('ul');
         command[cmd].forEach(className => {
           const li = menuButton(`${cmdSchema.command}${camelCase(className)}`,
-            () => { this.toggleClass(`is-${className}`, command[cmd]) },
+            () => {
+              this.toggleClass(`is-${className}`, command[cmd]);
+            },
             `${camelCase(cmdSchema.command)} ${className}`
-          )
+          );
           currentCmd.el.appendChild(li);
         });
         li.appendChild(currentCmd.el);
@@ -192,7 +191,7 @@ export default class Styler {
     this.menu.appendChild(li);
   }
 
-  cmdCallback(cmdSchema, value) {
+  cmdCallback (cmdSchema, value) {
     if (cmdSchema.command) {
       this.execute(cmdSchema.command, value, cmdSchema.useCSS);
     }
@@ -213,11 +212,11 @@ export default class Styler {
    * @param {String} cmd
    * @param {String|Number} value
    */
-  execute(cmd, value, useCSS = false) {
+  execute (cmd, value, useCSS = false) {
     this.$align.execute(...arguments);
   }
 
-  updateBubble(newPosition) {
+  updateBubble (newPosition) {
     if ((
       Selection.range &&
       !Selection.range.collapsed &&
@@ -236,7 +235,7 @@ export default class Styler {
     this.hide();
   }
 
-  updateCreator(newPosition) {
+  updateCreator (newPosition) {
     if (
       Selection.range &&
       Selection.range.collapsed &&
@@ -267,7 +266,7 @@ export default class Styler {
       this.el.style.transition = '';
     }, 200);
     if (this.settings.hideWhenClickOut) {
-      document.addEventListener('click', this.clickCallback)
+      document.addEventListener('click', this.clickCallback);
     }
   }
 
@@ -281,11 +280,11 @@ export default class Styler {
     this.el.classList.add('is-hidden');
     this.visible = false;
     if (this.settings.hideWhenClickOut) {
-      document.removeEventListener('click', this.clickCallback)
+      document.removeEventListener('click', this.clickCallback);
     }
   }
 
-  update(item) {
+  update (item) {
     if (this.currentItem) {
       this.currentItem.el.classList.remove('is-active');
     }
@@ -302,7 +301,7 @@ export default class Styler {
     }
   };
 
-  getTooltip(schema) {
+  getTooltip (schema) {
     if (!schema.tooltip || !this.settings.tooltip) {
       return false;
     }
@@ -332,9 +331,9 @@ export default class Styler {
       if (init) {
         const selectedElement = Selection.current.anchorNode.type === 1
           ? Selection.current.anchorNode
-          : Selection.current.anchorNode.parentNode
+          : Selection.current.anchorNode.parentNode;
         if (selectedElement.closest('.align-content')) {
-          document.queryCommandValue(command)
+          document.queryCommandValue(command);
           init.selectColor(document.queryCommandValue(command), true);
         }
         return;
@@ -343,7 +342,7 @@ export default class Styler {
         currentCmd.el.value = document.queryCommandValue(command);
       }
       currentCmd.el.classList.remove('is-active');
-    })
+    });
   }
 
   toggleClass (currentClass, allClasses) {
@@ -354,8 +353,8 @@ export default class Styler {
     this.update();
     const updateTemp = () => {
       this.update();
-      this.currentItem.el.removeEventListener('transitionend', updateTemp)
-    }
-    this.currentItem.el.addEventListener('transitionend', updateTemp)
+      this.currentItem.el.removeEventListener('transitionend', updateTemp);
+    };
+    this.currentItem.el.addEventListener('transitionend', updateTemp);
   }
 }

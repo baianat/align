@@ -27,11 +27,11 @@ export function callable (func) {
 export function getAverage (array, length) {
   let sum = 0;
   const elements = array.slice(Math.max(array.length - length, 1));
-  elements.forEach((value) => { sum = sum + value });
+  elements.forEach((value) => { sum = sum + value; });
   return Math.ceil(sum / length);
 }
 
-export function getArray(length, value) {
+export function getArray (length, value) {
   return new Array(length).fill(value);
 }
 
@@ -71,7 +71,7 @@ export function wrap (el, wrapper) {
   wrapper.appendChild(el);
 }
 
-export function normalizeNumber(number, min, max) {
+export function normalizeNumber (number, min, max) {
   return Math.round(Math.max(Math.min(Number(number), max), min));
 }
 
@@ -93,7 +93,7 @@ export function generateKeysSymbols () {
     ctrl: OS === 'Mac' ? '⌃' : 'Ctrl',
     alt: OS === 'Mac' ? '⌥' : 'Alt',
     tab: OS === 'Mac' ? '⇥' : 'Tab'
-  }
+  };
 }
 
 export function cloneObject (object) {
@@ -117,14 +117,14 @@ export function camelCase (string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function updatePosition(reference, element, align, mode = 'middle-left') {
+export function updatePosition (reference, element, align, mode = 'middle-left') {
   if (typeof reference.getBoundingClientRect !== 'function') return;
   const modes = mode.split('-');
   const refRect = reference.getBoundingClientRect();
   const elmRect = element.getBoundingClientRect();
   const alignRect = align.getBoundingClientRect();
   const alignScroll = align.scrollTop;
-  const position = {x: 0, y: 0}
+  const position = { x: 0, y: 0 };
   const startBoundary = 0;
   const endBoundary = alignRect.width - elmRect.width;
   modes.forEach(mode => {
@@ -133,10 +133,10 @@ export function updatePosition(reference, element, align, mode = 'middle-left') 
         position.x = refRect.left - alignRect.left + (refRect.width / 2) - (elmRect.width / 2);
         break;
       case 'left':
-        position.x = refRect.left - alignRect.left
+        position.x = refRect.left - alignRect.left;
         break;
       case 'right':
-        position.x = refRect.left - alignRect.left - refRect.width
+        position.x = refRect.left - alignRect.left - refRect.width;
         break;
       case 'middle':
         position.y = refRect.top - alignRect.top + alignScroll + (refRect.height / 2) - (elmRect.height / 2);
@@ -145,11 +145,11 @@ export function updatePosition(reference, element, align, mode = 'middle-left') 
         position.y = refRect.top - alignRect.top + alignScroll - elmRect.height;
         break;
       case 'bottom':
-        position.y = refRect.bottom - alignRect.top+ alignScroll ;
+        position.y = refRect.bottom - alignRect.top + alignScroll;
         break;
     }
-  })
-  position.x = normalizeNumber(position.x, startBoundary, endBoundary)
+  });
+  position.x = normalizeNumber(position.x, startBoundary, endBoundary);
   element.style.transform = `translate(${position.x}px, ${position.y}px)`;
 
   return position;
@@ -194,18 +194,18 @@ export function getVideoId (url, hoster) {
     ? /(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
     : hoster === 'vimeo'
       ? /vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/
-      : null
+      : null;
 
   if (!regExp) return;
   let match = url.match(regExp);
   return match[1];
 }
 
-export function stringToDOM(string) {
+export function stringToDOM (string) {
   return document.createRange().createContextualFragment(string).firstElementChild;
 }
 
-export function swapArrayItems(array, index1, index2) {
+export function swapArrayItems (array, index1, index2) {
   let temp = array[index1];
   array[index1] = array[index2];
   array[index2] = temp;

@@ -301,9 +301,14 @@ var Selection = function () {
     }
   }, {
     key: 'current',
+
+    /* eslint-enable */
+
     get: function get$$1() {
       return Selection._current || window.getSelection();
     }
+    /* eslint-disable */
+
   }]);
   return Selection;
 }();
@@ -311,130 +316,6 @@ var Selection = function () {
 Selection._current = null;
 Selection.textRange = null;
 Selection.range = null;
-
-var Prompt = function () {
-  function Prompt(align) {
-    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref$message = _ref.message,
-        message = _ref$message === undefined ? '' : _ref$message,
-        _ref$data = _ref.data,
-        data = _ref$data === undefined ? '' : _ref$data,
-        _ref$position = _ref.position,
-        position = _ref$position === undefined ? null : _ref$position,
-        _ref$inputsCount = _ref.inputsCount,
-        inputsCount = _ref$inputsCount === undefined ? 1 : _ref$inputsCount,
-        _ref$inputsPlaceholde = _ref.inputsPlaceholders,
-        inputsPlaceholders = _ref$inputsPlaceholde === undefined ? [] : _ref$inputsPlaceholde;
-
-    classCallCheck(this, Prompt);
-
-    this.settings = {
-      position: position,
-      inputsCount: inputsCount,
-      inputsPlaceholders: inputsPlaceholders
-    };
-    this.$align = align;
-    this._init(message, data);
-  }
-
-  createClass(Prompt, [{
-    key: '_init',
-    value: function _init(message, data) {
-      var _this = this;
-
-      var position = this.settings.position;
-      this.el = document.createElement('div');
-      this.message = document.createElement('label');
-      this.inputs = [];
-
-      this.el.classList.add('prompt');
-      this.message.classList.add('prompt-message');
-
-      if (position) {
-        this.el.style.left = position.left + 'px';
-        this.el.style.top = position.top + 'px';
-      }
-      if (!position) {
-        if (Selection.range.startContainer.nodeType === 3) {
-          this.selectionReference = Selection.range;
-        }
-        if (Selection.range.startContainer.nodeType === 1) {
-          this.selectionReference = Selection.range.startContainer;
-        }
-        setTimeout(function () {
-          updatePosition(_this.selectionReference, _this.el, _this.$align.el, 'left-top');
-        }, 1);
-      }
-      this.message.innerText = message;
-
-      this.el.appendChild(this.message);
-      for (var i = 0; i < this.settings.inputsCount; i++) {
-        this.inputs[i] = document.createElement('input');
-        this.inputs[i].classList.add('prompt-input');
-        if (this.settings.inputsPlaceholders[i]) {
-          this.inputs[i].placeholder = this.settings.inputsPlaceholders[i];
-        }
-        this.el.appendChild(this.inputs[i]);
-      }
-
-      this.inputs[0].value = data;
-
-      this.$align.el.appendChild(this.el);
-      setTimeout(function () {
-        document.addEventListener('click', function (event) {
-          if (isElementClosest(event.target, _this.el)) return;
-          _this.remove();
-        });
-      }, 1);
-    }
-  }, {
-    key: '_generateButton',
-    value: function _generateButton(name) {
-      this[name] = document.createElement('button');
-      this[name].classList.add('prompt-button');
-      this[name].innerText = name;
-      this[name].addEventListener('click', this.remove.bind(this));
-      this.el.appendChild(this[name]);
-    }
-  }, {
-    key: 'onSubmit',
-    value: function onSubmit(func, args) {
-      this._generateButton('submit');
-      this.submit.addEventListener('click', function () {
-        return func(args);
-      });
-      return this;
-    }
-  }, {
-    key: 'onDelete',
-    value: function onDelete(func, args) {
-      this._generateButton('delete');
-      this.delete.addEventListener('click', function () {
-        return func(args);
-      });
-      return this;
-    }
-  }, {
-    key: 'onCancel',
-    value: function onCancel(func, args) {
-      this._generateButton('cancel');
-      this.cancel.addEventListener('click', function () {
-        return func(args);
-      });
-      return this;
-    }
-  }, {
-    key: 'remove',
-    value: function remove() {
-      var _this2 = this;
-
-      setTimeout(function () {
-        _this2.el.remove();
-      }, 1);
-    }
-  }]);
-  return Prompt;
-}();
 
 var symbols = generateKeysSymbols();
 
@@ -1545,7 +1426,7 @@ var Figure = function () {
       align.$figureToolbar = new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
-        commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
+        commands: [{ _figureClasses: ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
         tooltip: true
       }, align.settings.figure));
     }
@@ -1648,6 +1529,130 @@ var Table = function () {
   return Table;
 }();
 
+var Prompt = function () {
+  function Prompt(align) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$message = _ref.message,
+        message = _ref$message === undefined ? '' : _ref$message,
+        _ref$data = _ref.data,
+        data = _ref$data === undefined ? '' : _ref$data,
+        _ref$position = _ref.position,
+        position = _ref$position === undefined ? null : _ref$position,
+        _ref$inputsCount = _ref.inputsCount,
+        inputsCount = _ref$inputsCount === undefined ? 1 : _ref$inputsCount,
+        _ref$inputsPlaceholde = _ref.inputsPlaceholders,
+        inputsPlaceholders = _ref$inputsPlaceholde === undefined ? [] : _ref$inputsPlaceholde;
+
+    classCallCheck(this, Prompt);
+
+    this.settings = {
+      position: position,
+      inputsCount: inputsCount,
+      inputsPlaceholders: inputsPlaceholders
+    };
+    this.$align = align;
+    this._init(message, data);
+  }
+
+  createClass(Prompt, [{
+    key: '_init',
+    value: function _init(message, data) {
+      var _this = this;
+
+      var position = this.settings.position;
+      this.el = document.createElement('div');
+      this.message = document.createElement('label');
+      this.inputs = [];
+
+      this.el.classList.add('prompt');
+      this.message.classList.add('prompt-message');
+
+      if (position) {
+        this.el.style.left = position.left + 'px';
+        this.el.style.top = position.top + 'px';
+      }
+      if (!position) {
+        if (Selection.range.startContainer.nodeType === 3) {
+          this.selectionReference = Selection.range;
+        }
+        if (Selection.range.startContainer.nodeType === 1) {
+          this.selectionReference = Selection.range.startContainer;
+        }
+        setTimeout(function () {
+          updatePosition(_this.selectionReference, _this.el, _this.$align.el, 'left-top');
+        }, 1);
+      }
+      this.message.innerText = message;
+
+      this.el.appendChild(this.message);
+      for (var i = 0; i < this.settings.inputsCount; i++) {
+        this.inputs[i] = document.createElement('input');
+        this.inputs[i].classList.add('prompt-input');
+        if (this.settings.inputsPlaceholders[i]) {
+          this.inputs[i].placeholder = this.settings.inputsPlaceholders[i];
+        }
+        this.el.appendChild(this.inputs[i]);
+      }
+
+      this.inputs[0].value = data;
+
+      this.$align.el.appendChild(this.el);
+      setTimeout(function () {
+        document.addEventListener('click', function (event) {
+          if (isElementClosest(event.target, _this.el)) return;
+          _this.remove();
+        });
+      }, 1);
+    }
+  }, {
+    key: '_generateButton',
+    value: function _generateButton(name) {
+      this[name] = document.createElement('button');
+      this[name].classList.add('prompt-button');
+      this[name].innerText = name;
+      this[name].addEventListener('click', this.remove.bind(this));
+      this.el.appendChild(this[name]);
+    }
+  }, {
+    key: 'onSubmit',
+    value: function onSubmit(func, args) {
+      this._generateButton('submit');
+      this.submit.addEventListener('click', function () {
+        return func(args);
+      });
+      return this;
+    }
+  }, {
+    key: 'onDelete',
+    value: function onDelete(func, args) {
+      this._generateButton('delete');
+      this.delete.addEventListener('click', function () {
+        return func(args);
+      });
+      return this;
+    }
+  }, {
+    key: 'onCancel',
+    value: function onCancel(func, args) {
+      this._generateButton('cancel');
+      this.cancel.addEventListener('click', function () {
+        return func(args);
+      });
+      return this;
+    }
+  }, {
+    key: 'remove',
+    value: function remove() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.el.remove();
+      }, 1);
+    }
+  }]);
+  return Prompt;
+}();
+
 var Link = function () {
   function Link(align, link) {
     classCallCheck(this, Link);
@@ -1703,6 +1708,8 @@ var Link = function () {
 }();
 
 var Section = function () {
+  // eslint-disable-line
+
   function Section(align, content) {
     var _this = this;
 
@@ -2161,25 +2168,32 @@ var Align = function () {
           switch (event.key.toUpperCase()) {
             case 'B':
               event.preventDefault();
-              _this2.execute('bold');break;
+              _this2.execute('bold');
+              break;
             case 'I':
               event.preventDefault();
-              _this2.execute('italic');break;
+              _this2.execute('italic');
+              break;
             case 'U':
               event.preventDefault();
-              _this2.execute('underline');break;
+              _this2.execute('underline');
+              break;
             case 'E':
               event.preventDefault();
-              _this2.execute('justifyCenter');break;
+              _this2.execute('justifyCenter');
+              break;
             case 'R':
               event.preventDefault();
-              _this2.execute('justifyRight');break;
+              _this2.execute('justifyRight');
+              break;
             case 'L':
               event.preventDefault();
-              _this2.execute('justifyLeft');break;
+              _this2.execute('justifyLeft');
+              break;
             case 'J':
               event.preventDefault();
-              _this2.execute('justifyFull');break;
+              _this2.execute('justifyFull');
+              break;
             case 'A':
               if (event.shiftKey) {
                 event.preventDefault();
@@ -2195,18 +2209,23 @@ var Align = function () {
             case 'Z':
               event.preventDefault();
               if (event.shiftKey) {
-                _this2.execute('redo');break;
+                _this2.execute('redo');
+                break;
               }
-              _this2.execute('undo');break;
+              _this2.execute('undo');
+              break;
             case '\\':
               event.preventDefault();
-              _this2.execute('removeFormat');break;
+              _this2.execute('removeFormat');
+              break;
             case '=':
               event.preventDefault();
               if (event.shiftKey) {
-                _this2.execute('superscript');break;
+                _this2.execute('superscript');
+                break;
               }
-              _this2.execute('subscript');break;
+              _this2.execute('subscript');
+              break;
             default:
               break;
           }
@@ -2216,9 +2235,11 @@ var Align = function () {
           case 'Tab':
             event.preventDefault();
             if (event.shiftKey) {
-              _this2.execute('outdent', false, true);break;
+              _this2.execute('outdent', false, true);
+              break;
             }
-            _this2.execute('indent', false, true);break;
+            _this2.execute('indent', false, true);
+            break;
           case 'Escape':
             _this2.el.classList.remove('is-fullscreen');
             exitFullscreen();

@@ -1,19 +1,21 @@
 export default class Selection {
+  /* eslint-disable */
   static _current = null;
   static textRange = null;
   static range = null;
+  /* eslint-enable */
 
   static get current () {
     return Selection._current || window.getSelection();
   }
-  static selectRange(range = Selection.textRange) {
+  static selectRange (range = Selection.textRange) {
     if (!range) return;
     const sel = Selection.current;
     sel.removeAllRanges();
     sel.addRange(range);
   }
 
-  static selectElement(el) {
+  static selectElement (el) {
     if (!el) return;
     const range = document.createRange();
     range.selectNodeContents(el);
@@ -22,12 +24,12 @@ export default class Selection {
     sel.addRange(range);
   }
 
-  static clear() {
+  static clear () {
     const sel = Selection.current;
     sel.empty();
   }
 
-  static update() {
+  static update () {
     const sel = Selection.current;
     // check if the range is inside a section
     if (
