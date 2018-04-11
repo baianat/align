@@ -33,7 +33,7 @@ export default class Section {
   }
 
   static config(align) {
-    return new Styler(align, {
+    align.$sectionToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: ['_sectionUp', '_sectionDown',

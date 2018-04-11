@@ -10,7 +10,7 @@ export default class Table {
   }
 
   static config(align) {
-    return new Styler(align, {
+    align.$tableToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: [

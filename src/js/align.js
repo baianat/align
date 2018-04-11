@@ -74,9 +74,9 @@ export default class Align {
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
 
-    this.$sectionToolbar = Section.config(this);
-    this.$figureToolbar = Figure.config(this);
-    this.$tableToolbar = Table.config(this);
+    Section.config(this);
+    Figure.config(this);
+    Table.config(this);
 
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';

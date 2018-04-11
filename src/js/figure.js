@@ -12,7 +12,7 @@ export default class Figure {
   }
 
   static config(align) {
-    return new Styler(align, {
+    align.$figureToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: [
