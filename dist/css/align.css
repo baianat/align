@@ -294,7 +294,7 @@
   width: 100%;
 }
 .align-editor {
-  padding: 50px 0;
+  padding: 60px 0;
   background-color: #fff;
 }
 .align-editor:focus {
@@ -383,6 +383,9 @@
 }
 .align [data-align-html] {
   whiteSpace: pre-wrap;
+}
+.align-title {
+  margin: 10px 0;
 }
 .align-title:empty::after {
   font-style: italic;

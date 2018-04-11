@@ -12,7 +12,7 @@ export default class Section {
     if (content && content.nodeName === 'BR') {
       return;
     }
-    this.id = Section.id++;
+    this.id = Section.id++
     this.type = type;
     this.isHTMLView = false;
     this.generateEl(content);
@@ -89,13 +89,14 @@ export default class Section {
         break;
 
       case 'title':
-        this.titleDiv = this.el.querySelector('.align-title') || document.createElement('div');
-        this.titleDiv.classList.add('align-title');
-        this.titleDiv.contentEditable = true;
-        this.title = document.createElement('h1');
-        this.title.innerHTML = content;
-        this.titleDiv.appendChild(this.title);
-        this.el.appendChild(this.titleDiv);
+        this.title = this.el.querySelector('.align-title') || document.createElement('h1');
+        this.title.classList.add('align-title');
+        this.title.contentEditable = true;
+        this.title.innerText = content;
+        this.el.appendChild(this.title);
+        this.title.addEventListener('blur', () => {
+          this.title.innerHTML = this.title.innerText
+        })
         break;
 
       default:

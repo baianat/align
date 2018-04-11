@@ -1726,6 +1726,8 @@ var Section = function () {
   createClass(Section, [{
     key: 'generateEl',
     value: function generateEl(content) {
+      var _this2 = this;
+
       this.el = content && content.nodeName === 'DIV' ? content : document.createElement('div');
       this.el.classList.add('align-section');
 
@@ -1748,13 +1750,14 @@ var Section = function () {
           break;
 
         case 'title':
-          this.titleDiv = this.el.querySelector('.align-title') || document.createElement('div');
-          this.titleDiv.classList.add('align-title');
-          this.titleDiv.contentEditable = true;
-          this.title = document.createElement('h1');
-          this.title.innerHTML = content;
-          this.titleDiv.appendChild(this.title);
-          this.el.appendChild(this.titleDiv);
+          this.title = this.el.querySelector('.align-title') || document.createElement('h1');
+          this.title.classList.add('align-title');
+          this.title.contentEditable = true;
+          this.title.innerText = content;
+          this.el.appendChild(this.title);
+          this.title.addEventListener('blur', function () {
+            _this2.title.innerHTML = _this2.title.innerText;
+          });
           break;
 
         default:
@@ -1783,12 +1786,12 @@ var Section = function () {
   }, {
     key: 'generateAddSectionButton',
     value: function generateAddSectionButton() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.addSectionButton = document.createElement('button');
       this.addSectionButton.classList.add('align-newSection');
       this.addSectionButton.addEventListener('click', function () {
-        return new Section('', _this2.el);
+        return new Section('', _this3.el);
       });
       this.addSectionButton.contentEditable = false;
       this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
@@ -1806,10 +1809,10 @@ var Section = function () {
   }, {
     key: 'getIndex',
     value: function getIndex() {
-      var _this3 = this;
+      var _this4 = this;
 
       return Section.allSections.findIndex(function (el) {
-        return el === _this3;
+        return el === _this4;
       });
     }
   }, {
@@ -1839,7 +1842,7 @@ var Section = function () {
   }, {
     key: 'backgroundImage',
     value: function backgroundImage(cmdSchema, event) {
-      var _this4 = this;
+      var _this5 = this;
 
       var input = event.target;
       var file = input.files[0];
@@ -1850,7 +1853,7 @@ var Section = function () {
         this.el.insertAdjacentElement('afterBegin', this.bgImage);
       }
       var update = function update(src) {
-        _this4.bgImage.style.backgroundImage = 'url(' + src + ')';
+        _this5.bgImage.style.backgroundImage = 'url(' + src + ')';
       };
       this.bgImage.style.backgroundImage = 'url(' + URL.createObjectURL(file) + ')';
       this.el.classList.add('is-bgImage');
