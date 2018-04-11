@@ -1,18 +1,18 @@
 import Styler from './styler';
 
 export default class Figure {
-  constructor(figure) {
+  constructor(align, figure) {
     if (!figure) {
       return {
         el: null
       }
     }
+    this.$align = align;
     this._init(figure);
   }
 
-  static config(align, settings) {
-    this.$align = align;
-    this.$optionsBar = new Styler(align, {
+  static config(align) {
+    return new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: [
@@ -20,7 +20,7 @@ export default class Figure {
         '_remove'
       ],
       tooltip: true,
-      ...settings
+      ...align.settings.figure
     });
   }
 
@@ -49,7 +49,7 @@ export default class Figure {
     this.el.appendChild(this.img);
     this.el.appendChild(this.caption);
     this.el.addEventListener('click', () => {
-      Figure.$optionsBar.update(this)
+      this.$align.$figureToolbar.update(this)
     });
 
   }
@@ -65,7 +65,7 @@ export default class Figure {
       this.img.src = reader.result;
 
       this.img.dataset.alignFilename = file.name;
-      Figure.$align.$bus.emit('imageAdded', {
+      this.$align.$bus.emit('imageAdded', {
         file,
         update: this.update.bind(this)
       });
@@ -93,7 +93,7 @@ export default class Figure {
   };
 
   remove() {
-    Figure.$optionsBar.hide();
+    this.$align.$figureToolbar.hide();
     this.el.remove();
   }
 }

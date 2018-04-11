@@ -6,33 +6,34 @@ import Link from './link';
 
 export default class Section {
   static id = 0;
-  static allSections = [];
 
-  constructor (content, position, type = 'text') {
+  constructor (align, content, {
+    position,
+    type = 'text'
+  } = {}) {
     if (content && content.nodeName === 'BR') {
       return;
     }
     this.id = Section.id++
     this.type = type;
     this.isHTMLView = false;
+    this.$align = align;
     this.generateEl(content);
     if (type === 'text') {
       this.el.addEventListener('click', () => {
-        Section.$align.activeSection = this.el;
-        Section.$optionsBar.update(this);
+        this.$align.$sectionToolbar.update(this);
       });
     }
     if (typeof position === 'object') {
-      Section.$align.editor.insertBefore(this.el, position)
+      this.$align.editor.insertBefore(this.el, position)
       return;
     }
-    Section.$align.editor.appendChild(this.el);
-    Section.allSections.push(this);
+    this.$align.editor.appendChild(this.el);
+    this.$align.sections.push(this);
   }
 
-  static config (align, settings) {
-    this.$align = align;
-    this.$optionsBar = new Styler(align, {
+  static config(align) {
+    return new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: ['_sectionUp', '_sectionDown',
@@ -42,7 +43,7 @@ export default class Section {
       ],
       tooltip: true,
       position: 'left-top',
-      ...settings
+      ...align.settings.section
     });
   }
 
@@ -109,9 +110,9 @@ export default class Section {
     const tables = Array.from(this.contentDiv.querySelectorAll('table'));
     const links = Array.from(this.contentDiv.querySelectorAll('a'));
 
-    figures.forEach(figure => new Figure(figure));
-    tables.forEach(table => new Table(table));
-    links.forEach(link => new Link(link));
+    figures.forEach(figure => new Figure(this.$align, figure));
+    tables.forEach(table => new Table(this.$align, table));
+    links.forEach(link => new Link(this.$align, link));
     this.generateAddSectionButton();
     this.generateBackground();
   }
@@ -119,7 +120,7 @@ export default class Section {
   generateAddSectionButton () {
     this.addSectionButton = document.createElement('button');
     this.addSectionButton.classList.add('align-newSection');
-    this.addSectionButton.addEventListener('click', () => new Section('', this.el));
+    this.addSectionButton.addEventListener('click', () => new Section(this.$align, '', { position: this.el }));
     this.addSectionButton.contentEditable = false;
     this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
   }
@@ -134,7 +135,7 @@ export default class Section {
   }
 
   getIndex () {
-    return Section.allSections.findIndex(el => el === this);
+    return this.$align.sections.findIndex(el => el === this);
   }
 
   toggleHTML () {
@@ -147,7 +148,7 @@ export default class Section {
       pre.dataset.alignHtml = true;
       pre.appendChild(content);
       this.contentDiv.appendChild(pre);
-      Section.$align.highlight();
+      this.$align.highlight();
       return;
     }
     this.generateEl(this.el);
@@ -173,8 +174,8 @@ export default class Section {
     };
     this.bgImage.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
     this.el.classList.add('is-bgImage');
-    Section.$align.update();
-    Section.$align.$bus.emit('imageAdded', { file, update });
+    this.$align.update();
+    this.$align.$bus.emit('imageAdded', { file, update });
     input.value = null;
   }
 
@@ -199,37 +200,37 @@ export default class Section {
     const update = (src) => {
       source.src = src;
     };
-    Section.$align.update();
-    Section.$align.$bus.emit('videoAdded', { file, update });
+    this.$align.update();
+    this.$align.$bus.emit('videoAdded', { file, update });
     input.value = null;
   }
 
   moveUp () {
     const index = this.getIndex();
     if (
-      !this.el.previousSibling ||
-      Section.allSections[index - 1].type === 'title'
+      !this.$align.sections[index - 1] ||
+      this.$align.sections[index - 1].type === 'title'
     ) return;
 
-    Section.$align.editor.insertBefore(this.el, Section.allSections[index - 1].el);
-    swapArrayItems(Section.allSections, index, index - 1);
+    this.$align.editor.insertBefore(this.el, this.$align.sections[index - 1].el);
+    swapArrayItems(this.$align.sections, index, index - 1);
   }
 
   moveDown () {
     const index = this.getIndex();
-    if (!this.el.nextSibling) return;
-    Section.$align.editor.insertBefore(this.el, Section.allSections[index + 1].el.nextSibling);
-    swapArrayItems(Section.allSections, index, index + 1);
+    if (!this.$align.sections[index + 1]) return;
+    this.$align.editor.insertBefore(this.el, this.$align.sections[index + 1].el.nextSibling);
+    swapArrayItems(this.$align.sections, index, index + 1);
   }
 
   active () {
-    Section.$optionsBar.update(this);
+    this.$align.$sectionToolbar.update(this);
     this.el.focus();
   }
 
   remove () {
-    Section.$optionsBar.hide();
+    this.$align.$sectionToolbar.hide();
     this.el.remove();
-    Section.allSections.splice(this.getIndex(), 1);
+    this.$align.sections.splice(this.getIndex(), 1);
   }
 }

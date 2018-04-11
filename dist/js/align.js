@@ -264,7 +264,7 @@ var Selection = function () {
       var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Selection.textRange;
 
       if (!range) return;
-      var sel = Selection.current = window.getSelection();
+      var sel = Selection.current;
       sel.removeAllRanges();
       sel.addRange(range);
     }
@@ -274,14 +274,20 @@ var Selection = function () {
       if (!el) return;
       var range = document.createRange();
       range.selectNodeContents(el);
-      var sel = Selection.current = window.getSelection();
+      var sel = Selection.current;
       sel.removeAllRanges();
       sel.addRange(range);
     }
   }, {
+    key: 'clear',
+    value: function clear() {
+      var sel = Selection.current;
+      sel.empty();
+    }
+  }, {
     key: 'update',
     value: function update() {
-      var sel = Selection.current = window.getSelection();
+      var sel = Selection.current;
       // check if the range is inside a section
       if (sel.anchorNode && !sel.anchorNode.parentNode.closest('.align-content')) {
         return;
@@ -293,22 +299,26 @@ var Selection = function () {
         Selection.range = sel.getRangeAt(0);
       }
     }
+  }, {
+    key: 'current',
+    get: function get$$1() {
+      return Selection._current || window.getSelection();
+    }
   }]);
   return Selection;
 }();
 
-Selection.current = null;
+Selection._current = null;
 Selection.textRange = null;
 Selection.range = null;
 
 var Prompt = function () {
-  function Prompt() {
-    var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-    var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
-        _ref$wrapper = _ref.wrapper,
-        wrapper = _ref$wrapper === undefined ? document.body : _ref$wrapper,
+  function Prompt(align) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$message = _ref.message,
+        message = _ref$message === undefined ? '' : _ref$message,
+        _ref$data = _ref.data,
+        data = _ref$data === undefined ? '' : _ref$data,
         _ref$position = _ref.position,
         position = _ref$position === undefined ? null : _ref$position,
         _ref$inputsCount = _ref.inputsCount,
@@ -319,11 +329,11 @@ var Prompt = function () {
     classCallCheck(this, Prompt);
 
     this.settings = {
-      wrapper: wrapper,
       position: position,
       inputsCount: inputsCount,
       inputsPlaceholders: inputsPlaceholders
     };
+    this.$align = align;
     this._init(message, data);
   }
 
@@ -352,7 +362,7 @@ var Prompt = function () {
           this.selectionReference = Selection.range.startContainer;
         }
         setTimeout(function () {
-          updatePosition(_this.selectionReference, _this.el, _this.settings.wrapper, 'left-top');
+          updatePosition(_this.selectionReference, _this.el, _this.$align.el, 'left-top');
         }, 1);
       }
       this.message.innerText = message;
@@ -369,7 +379,7 @@ var Prompt = function () {
 
       this.inputs[0].value = data;
 
-      this.settings.wrapper.appendChild(this.el);
+      this.$align.el.appendChild(this.el);
       setTimeout(function () {
         document.addEventListener('click', function (event) {
           if (isElementClosest(event.target, _this.el)) return;
@@ -1437,7 +1447,7 @@ var Styler = function () {
 }();
 
 var Figure = function () {
-  function Figure(figure) {
+  function Figure(align, figure) {
     classCallCheck(this, Figure);
 
     if (!figure) {
@@ -1445,6 +1455,7 @@ var Figure = function () {
         el: null
       };
     }
+    this.$align = align;
     this._init(figure);
   }
 
@@ -1476,7 +1487,7 @@ var Figure = function () {
       this.el.appendChild(this.img);
       this.el.appendChild(this.caption);
       this.el.addEventListener('click', function () {
-        Figure.$optionsBar.update(_this);
+        _this.$align.$figureToolbar.update(_this);
       });
     }
   }, {
@@ -1494,7 +1505,7 @@ var Figure = function () {
         _this2.img.src = reader.result;
 
         _this2.img.dataset.alignFilename = file.name;
-        Figure.$align.$bus.emit('imageAdded', {
+        _this2.$align.$bus.emit('imageAdded', {
           file: file,
           update: _this2.update.bind(_this2)
         });
@@ -1525,29 +1536,29 @@ var Figure = function () {
   }, {
     key: 'remove',
     value: function remove() {
-      Figure.$optionsBar.hide();
+      this.$align.$figureToolbar.hide();
       this.el.remove();
     }
   }], [{
     key: 'config',
-    value: function config(align, settings) {
-      this.$align = align;
-      this.$optionsBar = new Styler(align, Object.assign({
+    value: function config(align) {
+      return new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
         tooltip: true
-      }, settings));
+      }, align.settings.figure));
     }
   }]);
   return Figure;
 }();
 
 var Table = function () {
-  function Table(table) {
+  function Table(align, table) {
     classCallCheck(this, Table);
 
     if (!table) return;
+    this.$align = align;
     this._init(table);
     this._initEvents();
     this.activeCell = this.el.rows[0].cells[0];
@@ -1577,7 +1588,7 @@ var Table = function () {
 
       this.el.addEventListener('click', function (event) {
         _this.activeCell = event.target;
-        Table.$optionsBar.update(_this);
+        _this.$align.$tableToolbar.update(_this);
       });
     }
   }, {
@@ -1620,28 +1631,28 @@ var Table = function () {
   }, {
     key: 'remove',
     value: function remove() {
-      Table.$optionsBar.hide();
+      this.$align.$tableToolbar.hide();
       this.el.remove();
     }
   }], [{
     key: 'config',
-    value: function config(align, settings) {
-      this.$align = align;
-      this.$optionsBar = new Styler(align, Object.assign({
+    value: function config(align) {
+      return new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter', 'separator', '_tableDeleteRow', '_tableDeleteColumn', 'separator', '_remove'],
         tooltip: true
-      }, settings));
+      }, align.settings.table));
     }
   }]);
   return Table;
 }();
 
 var Link = function () {
-  function Link(link) {
+  function Link(align, link) {
     classCallCheck(this, Link);
 
+    this.$align = align;
     this._init(link);
   }
 
@@ -1660,8 +1671,9 @@ var Link = function () {
     value: function edit() {
       var _this = this;
 
-      var prompt = new Prompt('Enter link:', this.el.href, {
-        wrapper: Link.$align.el
+      var prompt = new Prompt(this.$align, {
+        message: 'Enter link:',
+        data: this.el.href
       });
       prompt.onSubmit(function () {
         var link = prompt.inputs[0].value;
@@ -1686,20 +1698,19 @@ var Link = function () {
       this.el.insertAdjacentHTML('beforebegin', content);
       this.el.remove();
     }
-  }], [{
-    key: 'config',
-    value: function config(align) {
-      this.$align = align;
-    }
   }]);
   return Link;
 }();
 
 var Section = function () {
-  function Section(content, position) {
+  function Section(align, content) {
     var _this = this;
 
-    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'text';
+    var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        position = _ref.position,
+        _ref$type = _ref.type,
+        type = _ref$type === undefined ? 'text' : _ref$type;
+
     classCallCheck(this, Section);
 
     if (content && content.nodeName === 'BR') {
@@ -1708,19 +1719,19 @@ var Section = function () {
     this.id = Section.id++;
     this.type = type;
     this.isHTMLView = false;
+    this.$align = align;
     this.generateEl(content);
     if (type === 'text') {
       this.el.addEventListener('click', function () {
-        Section.$align.activeSection = _this.el;
-        Section.$optionsBar.update(_this);
+        _this.$align.$sectionToolbar.update(_this);
       });
     }
     if ((typeof position === 'undefined' ? 'undefined' : _typeof(position)) === 'object') {
-      Section.$align.editor.insertBefore(this.el, position);
+      this.$align.editor.insertBefore(this.el, position);
       return;
     }
-    Section.$align.editor.appendChild(this.el);
-    Section.allSections.push(this);
+    this.$align.editor.appendChild(this.el);
+    this.$align.sections.push(this);
   }
 
   createClass(Section, [{
@@ -1767,18 +1778,20 @@ var Section = function () {
   }, {
     key: 'generateSectionElements',
     value: function generateSectionElements() {
+      var _this3 = this;
+
       var figures = Array.from(this.contentDiv.querySelectorAll('figure'));
       var tables = Array.from(this.contentDiv.querySelectorAll('table'));
       var links = Array.from(this.contentDiv.querySelectorAll('a'));
 
       figures.forEach(function (figure) {
-        return new Figure(figure);
+        return new Figure(_this3.$align, figure);
       });
       tables.forEach(function (table) {
-        return new Table(table);
+        return new Table(_this3.$align, table);
       });
       links.forEach(function (link) {
-        return new Link(link);
+        return new Link(_this3.$align, link);
       });
       this.generateAddSectionButton();
       this.generateBackground();
@@ -1786,12 +1799,12 @@ var Section = function () {
   }, {
     key: 'generateAddSectionButton',
     value: function generateAddSectionButton() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.addSectionButton = document.createElement('button');
       this.addSectionButton.classList.add('align-newSection');
       this.addSectionButton.addEventListener('click', function () {
-        return new Section('', _this3.el);
+        return new Section(_this4.$align, '', { position: _this4.el });
       });
       this.addSectionButton.contentEditable = false;
       this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
@@ -1809,10 +1822,10 @@ var Section = function () {
   }, {
     key: 'getIndex',
     value: function getIndex() {
-      var _this4 = this;
+      var _this5 = this;
 
-      return Section.allSections.findIndex(function (el) {
-        return el === _this4;
+      return this.$align.sections.findIndex(function (el) {
+        return el === _this5;
       });
     }
   }, {
@@ -1827,7 +1840,7 @@ var Section = function () {
         pre.dataset.alignHtml = true;
         pre.appendChild(content);
         this.contentDiv.appendChild(pre);
-        Section.$align.highlight();
+        this.$align.highlight();
         return;
       }
       this.generateEl(this.el);
@@ -1842,7 +1855,7 @@ var Section = function () {
   }, {
     key: 'backgroundImage',
     value: function backgroundImage(cmdSchema, event) {
-      var _this5 = this;
+      var _this6 = this;
 
       var input = event.target;
       var file = input.files[0];
@@ -1853,12 +1866,12 @@ var Section = function () {
         this.el.insertAdjacentElement('afterBegin', this.bgImage);
       }
       var update = function update(src) {
-        _this5.bgImage.style.backgroundImage = 'url(' + src + ')';
+        _this6.bgImage.style.backgroundImage = 'url(' + src + ')';
       };
       this.bgImage.style.backgroundImage = 'url(' + URL.createObjectURL(file) + ')';
       this.el.classList.add('is-bgImage');
-      Section.$align.update();
-      Section.$align.$bus.emit('imageAdded', { file: file, update: update });
+      this.$align.update();
+      this.$align.$bus.emit('imageAdded', { file: file, update: update });
       input.value = null;
     }
   }, {
@@ -1884,39 +1897,39 @@ var Section = function () {
       var update = function update(src) {
         source.src = src;
       };
-      Section.$align.update();
-      Section.$align.$bus.emit('videoAdded', { file: file, update: update });
+      this.$align.update();
+      this.$align.$bus.emit('videoAdded', { file: file, update: update });
       input.value = null;
     }
   }, {
     key: 'moveUp',
     value: function moveUp() {
       var index = this.getIndex();
-      if (!this.el.previousSibling || Section.allSections[index - 1].type === 'title') return;
+      if (!this.$align.sections[index - 1] || this.$align.sections[index - 1].type === 'title') return;
 
-      Section.$align.editor.insertBefore(this.el, Section.allSections[index - 1].el);
-      swapArrayItems(Section.allSections, index, index - 1);
+      this.$align.editor.insertBefore(this.el, this.$align.sections[index - 1].el);
+      swapArrayItems(this.$align.sections, index, index - 1);
     }
   }, {
     key: 'moveDown',
     value: function moveDown() {
       var index = this.getIndex();
-      if (!this.el.nextSibling) return;
-      Section.$align.editor.insertBefore(this.el, Section.allSections[index + 1].el.nextSibling);
-      swapArrayItems(Section.allSections, index, index + 1);
+      if (!this.$align.sections[index + 1]) return;
+      this.$align.editor.insertBefore(this.el, this.$align.sections[index + 1].el.nextSibling);
+      swapArrayItems(this.$align.sections, index, index + 1);
     }
   }, {
     key: 'active',
     value: function active() {
-      Section.$optionsBar.update(this);
+      this.$align.$sectionToolbar.update(this);
       this.el.focus();
     }
   }, {
     key: 'remove',
     value: function remove() {
-      Section.$optionsBar.hide();
+      this.$align.$sectionToolbar.hide();
       this.el.remove();
-      Section.allSections.splice(this.getIndex(), 1);
+      this.$align.sections.splice(this.getIndex(), 1);
     }
   }, {
     key: 'content',
@@ -1941,22 +1954,20 @@ var Section = function () {
     }
   }], [{
     key: 'config',
-    value: function config(align, settings) {
-      this.$align = align;
-      this.$optionsBar = new Styler(align, Object.assign({
+    value: function config(align) {
+      return new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_sectionUp', '_sectionDown', '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML', { '_sectionClasses': ['normal', 'full'] }, '_remove'],
         tooltip: true,
         position: 'left-top'
-      }, settings));
+      }, align.settings.section));
     }
   }]);
   return Section;
 }();
 
 Section.id = 0;
-Section.allSections = [];
 
 var EventBus = function () {
   function EventBus() {
@@ -2059,10 +2070,9 @@ var Align = function () {
       this.startContent = Array.from(this.el.children);
       this.el.innerText = '';
 
-      Section.config(this, this.settings.section);
-      Figure.config(this, this.settings.figure);
-      Table.config(this, this.settings.table);
-      Link.config(this, this.settings.link);
+      this.$sectionToolbar = Section.config(this);
+      this.$figureToolbar = Figure.config(this);
+      this.$tableToolbar = Table.config(this);
 
       if (this.settings.toolbar) {
         this.settings.toolbar.mode = 'toolbar';
@@ -2105,19 +2115,21 @@ var Align = function () {
     value: function _initSections() {
       var _this = this;
 
-      this.activeSection = '';
+      this.sections = [];
 
       if (this.settings.postTitle !== false) {
-        this.postTitle = new Section(this.settings.postTitle, '', 'title');
+        this.postTitle = new Section(this, this.settings.postTitle, {
+          type: 'title'
+        });
       }
-      this.startContent.forEach(function (e) {
-        return new Section(e);
+      this.startContent.forEach(function (content) {
+        return new Section(_this, content);
       });
       this.newSectionButton = document.createElement('button');
       this.newSectionButton.classList.add('align-addButton');
       this.el.appendChild(this.newSectionButton);
       this.newSectionButton.addEventListener('click', function () {
-        var newSection = new Section();
+        var newSection = new Section(_this);
         newSection.active();
         Selection.selectElement(newSection.contentDiv.querySelector('p'));
         _this.update();
@@ -2244,7 +2256,6 @@ var Align = function () {
     key: 'toggleFullScreen',
     value: function toggleFullScreen() {
       var state = document.fullscreenElement || document.webkitIsFullScreen;
-      console.log(this);
       if (!state) {
         launchFullscreen(this.el);
         this.el.classList.add('is-fullscreen');
@@ -2293,7 +2304,7 @@ var Align = function () {
       var input = event.target;
       var file = input.files[0];
       if (!file || !Selection.range) return;
-      var figure = new Figure(file);
+      var figure = new Figure(this, file);
       input.value = null;
       if (figure.el) {
         Selection.range.insertNode(figure.el);
@@ -2302,9 +2313,8 @@ var Align = function () {
   }, {
     key: 'createVideo',
     value: function createVideo() {
-      var prompt = new Prompt('Enter video link:', '', {
-        wrapper: this.el,
-        position: this.position
+      var prompt = new Prompt(this, {
+        message: 'Enter video link:'
       });
       prompt.onSubmit(function () {
         var link = prompt.inputs[0].value;
@@ -2329,9 +2339,8 @@ var Align = function () {
   }, {
     key: 'createColumn',
     value: function createColumn() {
-      var prompt = new Prompt('Enter columns count:', '', {
-        wrapper: this.el,
-        position: this.position,
+      var prompt = new Prompt(this, {
+        message: 'Enter columns count:',
         inputsCount: 1
       });
       prompt.onSubmit(function () {
@@ -2342,13 +2351,15 @@ var Align = function () {
   }, {
     key: 'createTable',
     value: function createTable() {
-      var prompt = new Prompt('Enter post link:', '', {
-        wrapper: this.el,
+      var _this4 = this;
+
+      var prompt = new Prompt(this, {
+        message: 'Enter post link:',
         inputsCount: 2,
         inputsPlaceholders: ['rows', 'columns']
       });
       prompt.onSubmit(function () {
-        var table = new Table({
+        var table = new Table(_this4, {
           rows: prompt.inputs[0].value,
           columns: prompt.inputs[1].value
         }).el;
@@ -2363,9 +2374,8 @@ var Align = function () {
   }, {
     key: 'createPost',
     value: function createPost() {
-      var prompt = new Prompt('Enter post link:', '', {
-        wrapper: this.el,
-        position: this.position
+      var prompt = new Prompt(this, {
+        message: 'Enter post link:'
       });
       prompt.onSubmit(function () {
         var postUrl = prompt.inputs[0].value;
@@ -2384,9 +2394,8 @@ var Align = function () {
   }, {
     key: 'createEmbed',
     value: function createEmbed() {
-      var prompt = new Prompt('Add embeded:', '', {
-        wrapper: this.el,
-        position: this.position
+      var prompt = new Prompt(this, {
+        message: 'Add an embedded:'
       });
       prompt.onSubmit(function () {
         var data = prompt.inputs[0].value;
@@ -2400,13 +2409,13 @@ var Align = function () {
   }, {
     key: 'createLink',
     value: function createLink() {
-      var link = new Link();
+      var link = new Link(this);
       link.edit();
     }
   }, {
     key: 'content',
     get: function get$$1() {
-      return Section.allSections.reduce(function (acc, section) {
+      return this.sections.reduce(function (acc, section) {
         if (section.type !== 'text') {
           return acc;
         }

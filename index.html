@@ -22,7 +22,6 @@
       float: left;
     }
   </style>
-
   <div class="align" id="align1">
     <div class="align-section">
       <h2 style="text-align: center;">I was born in
@@ -110,16 +109,11 @@
     </div>
   </div>
 
-
-  <div class="align" id="align2">
-    <div class="align-section"></div>
-  </div>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script src="https://unpkg.com/@baianat/colorpicker/dist/js/colorpicker.js"></script>
   <script src="dist/js/align.js"></script>
   <script>
-    new Align('#align2')
-    var myEditor = new Align('#align1', {
+    let myEditor = new Align('#align1', {
       shortcuts: true,
       postTitle: 'Hello there, I\'m Align',
       toolbar: {

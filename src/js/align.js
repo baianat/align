@@ -43,7 +43,7 @@ export default class Align {
    * Get editor's content
    */
   get content () {
-    return Section.allSections.reduce((acc, section) => {
+    return this.sections.reduce((acc, section) => {
       if (section.type !== 'text') {
         return acc;
       }
@@ -74,10 +74,9 @@ export default class Align {
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
 
-    Section.config(this, this.settings.section);
-    Figure.config(this, this.settings.figure);
-    Table.config(this, this.settings.table);
-    Link.config(this, this.settings.link);
+    this.$sectionToolbar = Section.config(this);
+    this.$figureToolbar = Figure.config(this);
+    this.$tableToolbar = Table.config(this);
 
     if (this.settings.toolbar) {
       this.settings.toolbar.mode = 'toolbar';
@@ -114,17 +113,19 @@ export default class Align {
   }
 
   _initSections () {
-    this.activeSection = '';
+    this.sections = [];
 
     if (this.settings.postTitle !== false) {
-      this.postTitle = new Section(this.settings.postTitle, '', 'title');
+      this.postTitle = new Section(this, this.settings.postTitle, {
+        type: 'title'
+      });
     }
-    this.startContent.forEach(e => new Section(e));
+    this.startContent.forEach(content => new Section(this, content));
     this.newSectionButton = document.createElement('button');
     this.newSectionButton.classList.add('align-addButton');
     this.el.appendChild(this.newSectionButton);
     this.newSectionButton.addEventListener('click', () => {
-      const newSection = new Section();
+      const newSection = new Section(this);
       newSection.active();
       Selection.selectElement(newSection.contentDiv.querySelector('p'));
       this.update();
@@ -240,7 +241,6 @@ export default class Align {
    */
   toggleFullScreen () {
     const state = document.fullscreenElement || document.webkitIsFullScreen;
-    console.log(this)
     if (!state) {
       launchFullscreen(this.el);
       this.el.classList.add('is-fullscreen');
@@ -281,7 +281,7 @@ export default class Align {
     const input = event.target;
     const file = input.files[0];
     if (!file || !Selection.range) return;
-    const figure = new Figure(file);
+    const figure = new Figure(this, file);
     input.value = null;
     if (figure.el) {
       Selection.range.insertNode(figure.el);
@@ -289,10 +289,9 @@ export default class Align {
   }
 
   createVideo() {
-    const prompt = new Prompt('Enter video link:', '', {
-      wrapper: this.el,
-      position: this.position
-    })
+    const prompt = new Prompt(this, {
+      message: 'Enter video link:'
+    });
     prompt.onSubmit(() => {
       const link = prompt.inputs[0].value
       if (!link) return;
@@ -321,9 +320,8 @@ export default class Align {
   }
 
   createColumn() {
-    const prompt = new Prompt('Enter columns count:', '', {
-      wrapper: this.el,
-      position: this.position,
+    const prompt = new Prompt(this, {
+      message: 'Enter columns count:',
       inputsCount: 1
     })
     prompt.onSubmit(() => {
@@ -335,13 +333,13 @@ export default class Align {
   }
 
   createTable() {
-    const prompt = new Prompt('Enter post link:', '', {
-      wrapper: this.el,
+    const prompt = new Prompt(this, {
+      message: 'Enter post link:',
       inputsCount: 2,
       inputsPlaceholders: ['rows', 'columns']
     })
     prompt.onSubmit(() => {
-      const table = new Table({
+      const table = new Table(this, {
         rows: prompt.inputs[0].value,
         columns: prompt.inputs[1].value
       }).el;
@@ -354,10 +352,9 @@ export default class Align {
   }
 
   createPost() {
-    const prompt = new Prompt('Enter post link:', '', {
-      wrapper: this.el,
-      position: this.position
-    })
+    const prompt = new Prompt(this, {
+      message: 'Enter post link:'
+    });
     prompt.onSubmit(() => {
       const postUrl = prompt.inputs[0].value
       if (!postUrl) return;
@@ -374,9 +371,8 @@ export default class Align {
   }
 
   createEmbed() {
-    const prompt = new Prompt('Add embeded:', '', {
-      wrapper: this.el,
-      position: this.position
+    const prompt = new Prompt(this, {
+      message: 'Add an embedded:',
     })
     prompt.onSubmit(() => {
       const data = prompt.inputs[0].value
@@ -389,7 +385,7 @@ export default class Align {
   }
 
   createLink() {
-    const link = new Link();
+    const link = new Link(this);
     link.edit();
   }
 }

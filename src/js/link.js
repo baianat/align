@@ -2,12 +2,9 @@ import Prompt from './prompt';
 import Selection from './selection';
 
 export default class Link {
-  constructor(link) {
-    this._init(link);
-  }
-
-  static config(align) {
+  constructor(align, link) {
     this.$align = align;
+    this._init(link);
   }
 
   _init(link) {
@@ -20,12 +17,10 @@ export default class Link {
   }
 
   edit() {
-    const prompt = new Prompt(
-      'Enter link:', this.el.href,
-      {
-        wrapper: Link.$align.el
-      }
-    )
+    const prompt = new Prompt(this.$align, {
+      message: 'Enter link:',
+      data: this.el.href,
+    });
     prompt.onSubmit(() => {
       const link = prompt.inputs[0].value;
       if (!link) return;

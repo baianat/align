@@ -1,16 +1,16 @@
 import Styler from './styler';
 
 export default class Table {
-  constructor (table) {
+  constructor (align, table) {
     if (!table) return;
+    this.$align = align;
     this._init(table);
     this._initEvents();
     this.activeCell = this.el.rows[0].cells[0];
   }
 
-  static config(align, settings) {
-    this.$align = align;
-    this.$optionsBar = new Styler(align, {
+  static config(align) {
+    return new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: [
@@ -21,7 +21,7 @@ export default class Table {
         '_remove'
       ],
       tooltip: true,
-      ...settings
+      ...align.settings.table
     });
   }
 
@@ -48,7 +48,7 @@ export default class Table {
   _initEvents () {
     this.el.addEventListener('click', event => {
       this.activeCell = event.target;
-      Table.$optionsBar.update(this);
+      this.$align.$tableToolbar.update(this);
     })
   }
 
@@ -86,7 +86,7 @@ export default class Table {
   }
 
   remove() {
-    Table.$optionsBar.hide();
+    this.$align.$tableToolbar.hide();
     this.el.remove();
   }
 }

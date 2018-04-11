@@ -2,18 +2,19 @@ import { isElementClosest, updatePosition } from './partial/util';
 import Selection from './selection';
 
 export default class Prompt {
-  constructor (message = '', data = '', {
-    wrapper = document.body,
+  constructor (align, {
+    message = '',
+    data = '',
     position = null,
     inputsCount = 1,
     inputsPlaceholders = []
   } = {}) {
     this.settings = {
-      wrapper,
       position,
       inputsCount,
       inputsPlaceholders
     };
+    this.$align = align;
     this._init(message, data);
   }
 
@@ -38,7 +39,7 @@ export default class Prompt {
         this.selectionReference = Selection.range.startContainer;
       }
       setTimeout(() => {
-        updatePosition(this.selectionReference, this.el, this.settings.wrapper, 'left-top');
+        updatePosition(this.selectionReference, this.el, this.$align.el, 'left-top');
       }, 1);
     }
     this.message.innerText = message;
@@ -55,7 +56,7 @@ export default class Prompt {
 
     this.inputs[0].value = data;
 
-    this.settings.wrapper.appendChild(this.el);
+    this.$align.el.appendChild(this.el);
     setTimeout(() => {
       document.addEventListener('click', (event) => {
         if (

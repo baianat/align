@@ -1,11 +1,14 @@
 export default class Selection {
-  static current = null;
+  static _current = null;
   static textRange = null;
   static range = null;
 
+  static get current () {
+    return Selection._current || window.getSelection();
+  }
   static selectRange(range = Selection.textRange) {
     if (!range) return;
-    const sel = Selection.current = window.getSelection();
+    const sel = Selection.current;
     sel.removeAllRanges();
     sel.addRange(range);
   }
@@ -14,13 +17,18 @@ export default class Selection {
     if (!el) return;
     const range = document.createRange();
     range.selectNodeContents(el);
-    const sel = Selection.current = window.getSelection();
+    const sel = Selection.current;
     sel.removeAllRanges();
     sel.addRange(range);
   }
 
+  static clear() {
+    const sel = Selection.current;
+    sel.empty();
+  }
+
   static update() {
-    const sel = Selection.current = window.getSelection();
+    const sel = Selection.current;
     // check if the range is inside a section
     if (
       sel.anchorNode &&
