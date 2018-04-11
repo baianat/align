@@ -125,8 +125,8 @@ export function updatePosition(reference, element, align, mode = 'middle-left') 
   const alignRect = align.getBoundingClientRect();
   const alignScroll = align.scrollTop;
   const position = {x: 0, y: 0}
-  const startBoundary = alignRect.left;
-  const endBoundary = alignRect.left + alignRect.width - elmRect.width;
+  const startBoundary = 0;
+  const endBoundary = alignRect.width - elmRect.width;
   modes.forEach(mode => {
     switch (mode) {
       case 'center':

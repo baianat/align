@@ -180,8 +180,8 @@ function updatePosition(reference, element, align) {
   var alignRect = align.getBoundingClientRect();
   var alignScroll = align.scrollTop;
   var position = { x: 0, y: 0 };
-  var startBoundary = alignRect.left;
-  var endBoundary = alignRect.left + alignRect.width - elmRect.width;
+  var startBoundary = 0;
+  var endBoundary = alignRect.width - elmRect.width;
   modes.forEach(function (mode) {
     switch (mode) {
       case 'center':
