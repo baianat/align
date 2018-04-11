@@ -837,7 +837,7 @@ var cmdsSchema = {
 };
 
 function icons(name) {
-  return '\n    <svg class="icon" viewBox="0 0 24 24">\n      <path d="' + iconsPath[name] + '"/>\n    </svg>';
+  return '\n    <svg class="align-icon" viewBox="0 0 24 24">\n      <path d="' + iconsPath[name] + '"/>\n    </svg>';
 }
 
 var iconsPath = {
@@ -1127,7 +1127,7 @@ var Styler = function () {
       this.el.appendChild(this.menu);
       this.menu.classList.add('styler-menu');
       this.cmds = {};
-      this.visiable = false;
+      this.visible = false;
 
       this.settings.commands.forEach(function (command) {
         _this.generateCmdElement(command);
@@ -1329,10 +1329,10 @@ var Styler = function () {
     value: function show() {
       var _this5 = this;
 
-      if (this.visiable) {
+      if (this.visible) {
         return;
       }
-      this.visiable = true;
+      this.visible = true;
       this.updateTemp = null;
       this.el.style.transition = 'opacity 0.2s';
       this.el.classList.add('is-visible');
@@ -1354,7 +1354,7 @@ var Styler = function () {
       this.el.classList.remove('is-visible');
       this.el.classList.remove('is-active');
       this.el.classList.add('is-hidden');
-      this.visiable = false;
+      this.visible = false;
       if (this.settings.hideWhenClickOut) {
         document.removeEventListener('click', this.clickCallback);
       }
@@ -1542,7 +1542,7 @@ var Figure = function () {
   }], [{
     key: 'config',
     value: function config(align) {
-      return new Styler(align, Object.assign({
+      align.$figureToolbar = new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: [{ '_figureClasses': ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
@@ -1637,7 +1637,7 @@ var Table = function () {
   }], [{
     key: 'config',
     value: function config(align) {
-      return new Styler(align, Object.assign({
+      align.$tableToolbar = new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter', 'separator', '_tableDeleteRow', '_tableDeleteColumn', 'separator', '_remove'],
@@ -1955,7 +1955,7 @@ var Section = function () {
   }], [{
     key: 'config',
     value: function config(align) {
-      return new Styler(align, Object.assign({
+      align.$sectionToolbar = new Styler(align, Object.assign({
         mode: 'bubble',
         hideWhenClickOut: true,
         commands: ['_sectionUp', '_sectionDown', '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML', { '_sectionClasses': ['normal', 'full'] }, '_remove'],
@@ -2070,9 +2070,9 @@ var Align = function () {
       this.startContent = Array.from(this.el.children);
       this.el.innerText = '';
 
-      this.$sectionToolbar = Section.config(this);
-      this.$figureToolbar = Figure.config(this);
-      this.$tableToolbar = Table.config(this);
+      Section.config(this);
+      Figure.config(this);
+      Table.config(this);
 
       if (this.settings.toolbar) {
         this.settings.toolbar.mode = 'toolbar';
@@ -2228,6 +2228,12 @@ var Align = function () {
         }
         setTimeout(_this2.update.bind(_this2), 1);
       }, true);
+    }
+  }, {
+    key: 'clearContent',
+    value: function clearContent() {
+      this.sections = [];
+      this.editor.innerHTML = '';
     }
 
     /**

@@ -559,7 +559,7 @@
 .styler-select select:focus {
   outline: none;
 }
-.styler.is-visiable {
+.styler.is-visible {
   display: -ms-flexbox;
   display: flex;
 }
