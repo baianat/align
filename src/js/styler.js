@@ -51,7 +51,7 @@ export default class Styler {
     this.el.appendChild(this.menu);
     this.menu.classList.add('styler-menu');
     this.cmds = {};
-    this.visiable = false;
+    this.visible = false;
 
     this.settings.commands.forEach((command) => {
       this.generateCmdElement(command);
@@ -255,10 +255,10 @@ export default class Styler {
   }
 
   show () {
-    if (this.visiable) {
+    if (this.visible) {
       return;
     }
-    this.visiable = true;
+    this.visible = true;
     this.updateTemp = null;
     this.el.style.transition = 'opacity 0.2s';
     this.el.classList.add('is-visible');
@@ -279,7 +279,7 @@ export default class Styler {
     this.el.classList.remove('is-visible');
     this.el.classList.remove('is-active');
     this.el.classList.add('is-hidden');
-    this.visiable = false;
+    this.visible = false;
     if (this.settings.hideWhenClickOut) {
       document.removeEventListener('click', this.clickCallback)
     }
