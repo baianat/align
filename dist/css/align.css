@@ -374,6 +374,10 @@
 .align-section.is-active .align-column:not(:last-child) {
   border-right: 1px solid rgba(0,0,0,0.05);
 }
+.align-icon {
+  width: 20px;
+  height: 20px;
+}
 .align p:empty::after {
   font-style: italic;
   color: #aaa;
@@ -485,9 +489,11 @@
   border: 0;
   outline: none;
 }
-.styler-button .icon {
+.styler-button .align-icon {
   fill: inherit;
 }
+.styler-button:hover,
+.styler-button:focus,
 .styler-button.is-active {
   fill: #eb008b;
 }
@@ -521,10 +527,6 @@
   right: 0;
   bottom: 0;
   left: 0;
-}
-.styler .icon {
-  width: 20px;
-  height: 20px;
 }
 .styler-select {
   position: relative;
@@ -575,7 +577,7 @@
 .styler.is-dark .styler-select {
   color: #fff;
 }
-.styler.is-dark .styler-icon {
+.styler.is-dark .align-icon {
   color: #fff !important;
 }
 .styler.is-dark .picker-guide svg {

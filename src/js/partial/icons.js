@@ -1,6 +1,6 @@
 export default function icons(name) {
   return `
-    <svg class="icon" viewBox="0 0 24 24">
+    <svg class="align-icon" viewBox="0 0 24 24">
       <path d="${iconsPath[name]}"/>
     </svg>`
 };
