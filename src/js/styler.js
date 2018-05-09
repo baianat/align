@@ -2,7 +2,8 @@ import {
   cloneObject,
   camelCase,
   isElementClosest,
-  updatePosition
+  updatePosition,
+  userOS
 } from './partial/util';
 import {
   setElementsPrefix,
@@ -23,6 +24,7 @@ export default class Styler {
     hideWhenClickOut = false,
     tooltip = false,
     theme = 'light',
+    shortcuts = false,
     position = 'center-top'
   } = {}) {
     this.$align = align;
@@ -32,6 +34,7 @@ export default class Styler {
       hideWhenClickOut,
       tooltip,
       theme,
+      shortcuts,
       position
     };
     this._init();
@@ -50,6 +53,7 @@ export default class Styler {
     this.menu.classList.add('styler-menu');
     this.cmds = {};
     this.visible = false;
+    this.shortcuts = [];
 
     this.settings.commands.forEach((command) => {
       this.generateCmdElement(command);
@@ -60,6 +64,9 @@ export default class Styler {
     }
     if (this.settings.mode === 'creator') {
       this._initCreator();
+    }
+    if (this.settings.mode === 'toolbar' && this.settings.shortcuts) {
+      this.keyboardShortcuts();
     }
     if (this.settings.hideWhenClickOut) {
       this.clickCallback = (event) => {
@@ -115,7 +122,11 @@ export default class Styler {
     switch (cmdSchema.element) {
       case 'button':
         currentCmd.el = button(icon, this.getTooltip(cmdSchema));
-        currentCmd.el.addEventListener('click', () => this.cmdCallback(cmdSchema, cmdSchema.value));
+        const callback = () => this.cmdCallback(cmdSchema, cmdSchema.value);
+        currentCmd.el.addEventListener('click', callback);
+        if (cmdSchema.shortcut) {
+          this.shortcuts.push({ ...cmdSchema.shortcut, callback });
+        }
         li.appendChild(currentCmd.el);
         break;
 
@@ -207,6 +218,29 @@ export default class Styler {
     this.update();
   }
 
+  keyboardShortcuts () {
+    this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
+    window.addEventListener(
+      'keydown',
+      (event) => {
+        // Do nothing if the event was already processed
+        if (event.defaultPrevented) {
+          return;
+        }
+        const keyPressed = event.key.toUpperCase();
+        this.shortcuts.forEach(shortcut => {
+          if (
+            keyPressed === shortcut.key &&
+            event[this.cmdKey] === !!shortcut.cmdKey &&
+            event.shiftKey === !!shortcut.shiftKey
+          ) {
+            event.preventDefault();
+            shortcut.callback();
+          }
+        });
+      }
+    );
+  }
   /**
    * Execute command for the selected button
    * @param {String} cmd

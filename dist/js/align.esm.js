@@ -1855,13 +1855,19 @@ var cmdsSchema = {
   bold: {
     element: 'button',
     command: 'bold',
-    tooltip: 'Bold (' + symbols.cmdKey + ' B)'
+    tooltip: 'Bold (' + symbols.cmdKey + ' B)',
+    shortcut: {
+      key: 'B'
+    }
   },
 
   italic: {
     element: 'button',
     command: 'italic',
-    tooltip: 'Italic (' + symbols.cmdKey + ' I)'
+    tooltip: 'Italic (' + symbols.cmdKey + ' I)',
+    shortcut: {
+      key: 'I'
+    }
   },
 
   underline: {
@@ -2504,6 +2510,8 @@ var Styler = function () {
         tooltip = _ref$tooltip === undefined ? false : _ref$tooltip,
         _ref$theme = _ref.theme,
         theme = _ref$theme === undefined ? 'light' : _ref$theme,
+        _ref$shortcuts = _ref.shortcuts,
+        shortcuts = _ref$shortcuts === undefined ? false : _ref$shortcuts,
         _ref$position = _ref.position,
         position = _ref$position === undefined ? 'center-top' : _ref$position;
 
@@ -2516,6 +2524,7 @@ var Styler = function () {
       hideWhenClickOut: hideWhenClickOut,
       tooltip: tooltip,
       theme: theme,
+      shortcuts: shortcuts,
       position: position
     };
     this._init();
@@ -2540,6 +2549,7 @@ var Styler = function () {
       this.menu.classList.add('styler-menu');
       this.cmds = {};
       this.visible = false;
+      this.shortcuts = [];
 
       this.settings.commands.forEach(function (command) {
         _this.generateCmdElement(command);
@@ -2550,6 +2560,9 @@ var Styler = function () {
       }
       if (this.settings.mode === 'creator') {
         this._initCreator();
+      }
+      if (this.settings.mode === 'toolbar' && this.settings.shortcuts) {
+        this.keyboardShortcuts();
       }
       if (this.settings.hideWhenClickOut) {
         this.clickCallback = function (event) {
@@ -2611,9 +2624,13 @@ var Styler = function () {
       switch (cmdSchema.element) {
         case 'button':
           currentCmd.el = button(icon, this.getTooltip(cmdSchema));
-          currentCmd.el.addEventListener('click', function () {
+          var callback = function callback() {
             return _this4.cmdCallback(cmdSchema, cmdSchema.value);
-          });
+          };
+          currentCmd.el.addEventListener('click', callback);
+          if (cmdSchema.shortcut) {
+            this.shortcuts.push('ss');
+          }
           li.appendChild(currentCmd.el);
           break;
 
@@ -2701,7 +2718,30 @@ var Styler = function () {
       }
       this.update();
     }
+  }, {
+    key: 'keyboardShortcuts',
+    value: function keyboardShortcuts() {
+      var _this5 = this;
 
+      console.log(this.shortcuts);
+      window.addEventListener('keydown', function (event) {
+        // Do nothing if the event was already processed
+        if (event.defaultPrevented) {
+          return;
+        }
+        console.log(_this5.shortcuts);
+        event.preventDefault();
+        if (!event[_this5.cmdKey]) return;
+        var keyPressed = event.key.toUpperCase();
+        _this5.shortcuts.forEach(function (shortcut) {
+          if (keyPressed === shortcut.key) {
+            console.log('asdf');
+            event.preventDefault();
+            shortcut.callback();
+          }
+        });
+      });
+    }
     /**
      * Execute command for the selected button
      * @param {String} cmd
@@ -2739,7 +2779,7 @@ var Styler = function () {
   }, {
     key: 'show',
     value: function show() {
-      var _this5 = this;
+      var _this6 = this;
 
       if (this.visible) {
         return;
@@ -2750,7 +2790,7 @@ var Styler = function () {
       this.el.classList.add('is-visible');
       this.el.classList.remove('is-hidden');
       setTimeout(function () {
-        _this5.el.style.transition = '';
+        _this6.el.style.transition = '';
       }, 200);
       if (this.settings.hideWhenClickOut) {
         document.addEventListener('click', this.clickCallback);
@@ -2839,7 +2879,7 @@ var Styler = function () {
     key: 'toggleClass',
     value: function toggleClass(currentClass, allClasses) {
       var _currentItem$el$class,
-          _this6 = this;
+          _this7 = this;
 
       if (!this.currentItem) return;
       var prefixedClasses = allClasses.map(function (cls) {
@@ -2849,8 +2889,8 @@ var Styler = function () {
       this.currentItem.el.classList.toggle(currentClass);
       this.update();
       var updateTemp = function updateTemp() {
-        _this6.update();
-        _this6.currentItem.el.removeEventListener('transitionend', updateTemp);
+        _this7.update();
+        _this7.currentItem.el.removeEventListener('transitionend', updateTemp);
       };
       this.currentItem.el.addEventListener('transitionend', updateTemp);
     }

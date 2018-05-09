@@ -84,10 +84,10 @@ Creator
 
 ```js
 new Align('.editor', {
-  shortcuts: true, // enable or disable keyboard shortcuts, default is (false)
   postTitle: 'title placeholder', // add title post placeholder, default is (false)
   toolbar: {
     tooltip: true, // show or hide commands tooltip, default is (false)
+    shortcuts: true, // enable or disable keyboard shortcuts, default is (false)
     commands: [
       {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
       {'fontName': ['Poppins', 'Raleway', 'Roboto']},

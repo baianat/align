@@ -8,19 +8,31 @@ const cmdsSchema = {
   bold: {
     element: 'button',
     command: 'bold',
-    tooltip: `Bold (${symbols.cmdKey} B)`
+    tooltip: `Bold (${symbols.cmdKey} B)`,
+    shortcut: {
+      cmdKey: true,
+      key: 'B'
+    }
   },
 
   italic: {
     element: 'button',
     command: 'italic',
-    tooltip: `Italic (${symbols.cmdKey} I)`
+    tooltip: `Italic (${symbols.cmdKey} I)`,
+    shortcut: {
+      cmdKey: true,
+      key: 'I'
+    }
   },
 
   underline: {
     element: 'button',
     command: 'underline',
-    tooltip: `Underline (${symbols.cmdKey} U)`
+    tooltip: `Underline (${symbols.cmdKey} U)`,
+    shortcut: {
+      cmdKey: true,
+      key: 'U'
+    }
   },
 
   strikeThrough: {
@@ -32,42 +44,72 @@ const cmdsSchema = {
   undo: {
     element: 'button',
     command: 'undo',
-    tooltip: `Undo (${symbols.cmdKey} Z)`
+    tooltip: `Undo (${symbols.cmdKey} Z)`,
+    shortcut: {
+      cmdKey: true,
+      key: 'Z'
+    }
   },
 
   redo: {
     element: 'button',
     command: 'redo',
-    tooltip: `Redo (${symbols.cmdKey} ${symbols.shift} Z)`
+    tooltip: `Redo (${symbols.cmdKey} ${symbols.shift} Z)`,
+    shortcut: {
+      cmdKey: true,
+      shiftKey: true,
+      key: 'Z'
+    }
   },
 
   removeFormat: {
     element: 'button',
     command: 'removeFormat',
-    tooltip: `Remove format (${symbols.cmdKey} \\)`
+    tooltip: `Remove format (${symbols.cmdKey} \\)`,
+    shortcut: {
+      cmdKey: true,
+      key: '\\'
+    }
   },
 
   justifyLeft: {
     element: 'button',
     command: 'justifyLeft',
-    tooltip: `Align left (${symbols.cmdKey} L)`
+    tooltip: `Align left (${symbols.cmdKey} L)`,
+    shortcut: {
+      cmdKey: true,
+      key: 'L'
+    }
   },
 
   justifyCenter: {
     element: 'button',
     command: 'justifyCenter',
-    tooltip: `Align center (${symbols.cmdKey} E)`
+    tooltip: `Align center (${symbols.cmdKey} E)`,
+    shortcut: {
+      cmdKey: true,
+      key: 'E'
+    }
   },
 
   justifyRight: {
     element: 'button',
     command: 'justifyRight',
-    tooltip: `Align right (${symbols.cmdKey} R)`
+    tooltip: `Align right (${symbols.cmdKey} R)`,
+    shortcut: {
+      cmdKey: true,
+      key: 'R'
+    }
   },
 
   selectContent: {
     element: 'button',
     tooltip: `Select all content (${symbols.cmdKey} ${symbols.shift} A)`,
+    shortcut: {
+      cmdKey: true,
+      shiftKey: true,
+      key: 'A'
+    },
     func (styler) {
       Selection.selectElement(styler.$align.editor);
     }
@@ -76,7 +118,11 @@ const cmdsSchema = {
   justifyFull: {
     element: 'button',
     command: 'justifyFull',
-    tooltip: `Justify full (${symbols.cmdKey} J)`
+    tooltip: `Justify full (${symbols.cmdKey} J)`,
+    shortcut: {
+      cmdKey: true,
+      key: 'J'
+    }
   },
 
   h1: {
@@ -137,26 +183,42 @@ const cmdsSchema = {
     element: 'button',
     command: 'indent',
     useCSS: true,
-    tooltip: `Indent (${symbols.tab})`
+    tooltip: `Indent (${symbols.tab})`,
+    shortcut: {
+      key: 'TAB'
+    }
   },
 
   outdent: {
     element: 'button',
     command: 'outdent',
     useCSS: true,
-    tooltip: `Outdent (${symbols.shift} ${symbols.tab})`
+    tooltip: `Outdent (${symbols.shift} ${symbols.tab})`,
+    shortcut: {
+      shiftKey: true,
+      key: 'TAB'
+    }
   },
 
   superscript: {
     element: 'button',
     command: 'superscript',
-    tooltip: `Superscript (${symbols.cmdKey} ${symbols.shift} =)`
+    tooltip: `Superscript (${symbols.cmdKey} ${symbols.shift} =)`,
+    shortcut: {
+      cmdKey: true,
+      shiftKey: true,
+      key: '+'
+    }
   },
 
   subscript: {
     element: 'button',
     command: 'subscript',
-    tooltip: `Subscript (${symbols.cmdKey} =)`
+    tooltip: `Subscript (${symbols.cmdKey} =)`,
+    shortcut: {
+      cmdKey: true,
+      key: '='
+    }
   },
 
   pre: {
@@ -187,7 +249,12 @@ const cmdsSchema = {
   fullscreen: {
     element: 'button',
     func: 'toggleFullScreen',
-    tooltip: `Fullscreen (${symbols.cmdKey} ${symbols.shift} F)`
+    tooltip: `Fullscreen (${symbols.cmdKey} ${symbols.shift} F)`,
+    shortcut: {
+      cmdKey: true,
+      shiftKey: true,
+      key: 'F'
+    }
   },
 
   color: {

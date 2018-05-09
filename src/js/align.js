@@ -129,102 +129,6 @@ export default class Align {
     });
 
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
-
-    window.addEventListener(
-      'keydown',
-      (event) => {
-        // Do nothing if the event was already processed
-        if (event.defaultPrevented) {
-          return;
-        }
-
-        if (event[this.cmdKey] && this.settings.shortcuts) {
-          switch (event.key.toUpperCase()) {
-            case 'B':
-              event.preventDefault();
-              this.execute('bold');
-              break;
-            case 'I':
-              event.preventDefault();
-              this.execute('italic');
-              break;
-            case 'U':
-              event.preventDefault();
-              this.execute('underline');
-              break;
-            case 'E':
-              event.preventDefault();
-              this.execute('justifyCenter');
-              break;
-            case 'R':
-              event.preventDefault();
-              this.execute('justifyRight');
-              break;
-            case 'L':
-              event.preventDefault();
-              this.execute('justifyLeft');
-              break;
-            case 'J':
-              event.preventDefault();
-              this.execute('justifyFull');
-              break;
-            case 'A':
-              if (event.shiftKey) {
-                event.preventDefault();
-                Selection.selectElement(this.editor);
-              }
-              break;
-            case 'F':
-              event.preventDefault();
-              if (event.shiftKey) {
-                this.toggleFullScreen();
-              }
-              break;
-            case 'Z':
-              event.preventDefault();
-              if (event.shiftKey) {
-                this.execute('redo');
-                break;
-              }
-              this.execute('undo');
-              break;
-            case '\\':
-              event.preventDefault();
-              this.execute('removeFormat');
-              break;
-            case '=':
-              event.preventDefault();
-              if (event.shiftKey) {
-                this.execute('superscript');
-                break;
-              }
-              this.execute('subscript');
-              break;
-            default:
-              break;
-          }
-        }
-
-        switch (event.key) {
-          case 'Tab':
-            event.preventDefault();
-            if (event.shiftKey) {
-              this.execute('outdent', false, true);
-              break;
-            }
-            this.execute('indent', false, true);
-            break;
-          case 'Escape':
-            this.el.classList.remove('is-fullscreen');
-            exitFullscreen();
-            break;
-          default:
-            break;
-        }
-        setTimeout(this.update.bind(this), 1);
-      },
-      true
-    );
   }
 
   clearContent () {
@@ -251,14 +155,7 @@ export default class Align {
    * Toggle on/off HTML
    */
   toggleFullScreen () {
-    const state = document.fullscreenElement || document.webkitIsFullScreen;
-    if (!state) {
-      launchFullscreen(this.el);
-      this.el.classList.add('is-fullscreen');
-      return;
-    }
-    this.el.classList.remove('is-fullscreen');
-    exitFullscreen();
+    this.el.classList.toggle('is-fullscreen');
   }
 
   update () {

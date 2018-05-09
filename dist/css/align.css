@@ -4,6 +4,9 @@
 .align {
   position: relative;
   width: 100%;
+  -webkit-transition: 0.5s;
+  -o-transition: 0.5s;
+  transition: 0.5s;
 }
 .align-editor {
   padding: 60px 0;
@@ -15,6 +18,12 @@
 .align.is-fullscreen {
   height: 100vh;
   width: 100%;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 99999;
   overflow: auto;
 }
 .align-addButton {

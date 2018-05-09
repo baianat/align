@@ -145,28 +145,6 @@
     return position;
   }
 
-  function launchFullscreen(element) {
-    if (element.requestFullscreen) {
-      element.requestFullscreen();
-    } else if (element.mozRequestFullScreen) {
-      element.mozRequestFullScreen();
-    } else if (element.webkitRequestFullscreen) {
-      element.webkitRequestFullscreen();
-    } else if (element.msRequestFullscreen) {
-      element.msRequestFullscreen();
-    }
-  }
-
-  function exitFullscreen() {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
-  }
-
   function getVideoId(url, hoster) {
     var regExp = hoster === 'youtube' ? /(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/ : hoster === 'vimeo' ? /vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/ : null;
 
@@ -1861,19 +1839,31 @@
     bold: {
       element: 'button',
       command: 'bold',
-      tooltip: 'Bold (' + symbols.cmdKey + ' B)'
+      tooltip: 'Bold (' + symbols.cmdKey + ' B)',
+      shortcut: {
+        cmdKey: true,
+        key: 'B'
+      }
     },
 
     italic: {
       element: 'button',
       command: 'italic',
-      tooltip: 'Italic (' + symbols.cmdKey + ' I)'
+      tooltip: 'Italic (' + symbols.cmdKey + ' I)',
+      shortcut: {
+        cmdKey: true,
+        key: 'I'
+      }
     },
 
     underline: {
       element: 'button',
       command: 'underline',
-      tooltip: 'Underline (' + symbols.cmdKey + ' U)'
+      tooltip: 'Underline (' + symbols.cmdKey + ' U)',
+      shortcut: {
+        cmdKey: true,
+        key: 'U'
+      }
     },
 
     strikeThrough: {
@@ -1885,42 +1875,72 @@
     undo: {
       element: 'button',
       command: 'undo',
-      tooltip: 'Undo (' + symbols.cmdKey + ' Z)'
+      tooltip: 'Undo (' + symbols.cmdKey + ' Z)',
+      shortcut: {
+        cmdKey: true,
+        key: 'Z'
+      }
     },
 
     redo: {
       element: 'button',
       command: 'redo',
-      tooltip: 'Redo (' + symbols.cmdKey + ' ' + symbols.shift + ' Z)'
+      tooltip: 'Redo (' + symbols.cmdKey + ' ' + symbols.shift + ' Z)',
+      shortcut: {
+        cmdKey: true,
+        shiftKey: true,
+        key: 'Z'
+      }
     },
 
     removeFormat: {
       element: 'button',
       command: 'removeFormat',
-      tooltip: 'Remove format (' + symbols.cmdKey + ' \\)'
+      tooltip: 'Remove format (' + symbols.cmdKey + ' \\)',
+      shortcut: {
+        cmdKey: true,
+        key: '\\'
+      }
     },
 
     justifyLeft: {
       element: 'button',
       command: 'justifyLeft',
-      tooltip: 'Align left (' + symbols.cmdKey + ' L)'
+      tooltip: 'Align left (' + symbols.cmdKey + ' L)',
+      shortcut: {
+        cmdKey: true,
+        key: 'L'
+      }
     },
 
     justifyCenter: {
       element: 'button',
       command: 'justifyCenter',
-      tooltip: 'Align center (' + symbols.cmdKey + ' E)'
+      tooltip: 'Align center (' + symbols.cmdKey + ' E)',
+      shortcut: {
+        cmdKey: true,
+        key: 'E'
+      }
     },
 
     justifyRight: {
       element: 'button',
       command: 'justifyRight',
-      tooltip: 'Align right (' + symbols.cmdKey + ' R)'
+      tooltip: 'Align right (' + symbols.cmdKey + ' R)',
+      shortcut: {
+        cmdKey: true,
+        key: 'R'
+      }
     },
 
     selectContent: {
       element: 'button',
       tooltip: 'Select all content (' + symbols.cmdKey + ' ' + symbols.shift + ' A)',
+      shortcut: {
+        cmdKey: true,
+        shiftKey: true,
+        key: 'A'
+      },
       func: function func(styler) {
         Selection.selectElement(styler.$align.editor);
       }
@@ -1929,7 +1949,11 @@
     justifyFull: {
       element: 'button',
       command: 'justifyFull',
-      tooltip: 'Justify full (' + symbols.cmdKey + ' J)'
+      tooltip: 'Justify full (' + symbols.cmdKey + ' J)',
+      shortcut: {
+        cmdKey: true,
+        key: 'J'
+      }
     },
 
     h1: {
@@ -1990,26 +2014,42 @@
       element: 'button',
       command: 'indent',
       useCSS: true,
-      tooltip: 'Indent (' + symbols.tab + ')'
+      tooltip: 'Indent (' + symbols.tab + ')',
+      shortcut: {
+        key: 'TAB'
+      }
     },
 
     outdent: {
       element: 'button',
       command: 'outdent',
       useCSS: true,
-      tooltip: 'Outdent (' + symbols.shift + ' ' + symbols.tab + ')'
+      tooltip: 'Outdent (' + symbols.shift + ' ' + symbols.tab + ')',
+      shortcut: {
+        shiftKey: true,
+        key: 'TAB'
+      }
     },
 
     superscript: {
       element: 'button',
       command: 'superscript',
-      tooltip: 'Superscript (' + symbols.cmdKey + ' ' + symbols.shift + ' =)'
+      tooltip: 'Superscript (' + symbols.cmdKey + ' ' + symbols.shift + ' =)',
+      shortcut: {
+        cmdKey: true,
+        shiftKey: true,
+        key: '+'
+      }
     },
 
     subscript: {
       element: 'button',
       command: 'subscript',
-      tooltip: 'Subscript (' + symbols.cmdKey + ' =)'
+      tooltip: 'Subscript (' + symbols.cmdKey + ' =)',
+      shortcut: {
+        cmdKey: true,
+        key: '='
+      }
     },
 
     pre: {
@@ -2040,7 +2080,12 @@
     fullscreen: {
       element: 'button',
       func: 'toggleFullScreen',
-      tooltip: 'Fullscreen (' + symbols.cmdKey + ' ' + symbols.shift + ' F)'
+      tooltip: 'Fullscreen (' + symbols.cmdKey + ' ' + symbols.shift + ' F)',
+      shortcut: {
+        cmdKey: true,
+        shiftKey: true,
+        key: 'F'
+      }
     },
 
     color: {
@@ -2510,6 +2555,8 @@
           tooltip = _ref$tooltip === undefined ? false : _ref$tooltip,
           _ref$theme = _ref.theme,
           theme = _ref$theme === undefined ? 'light' : _ref$theme,
+          _ref$shortcuts = _ref.shortcuts,
+          shortcuts = _ref$shortcuts === undefined ? false : _ref$shortcuts,
           _ref$position = _ref.position,
           position = _ref$position === undefined ? 'center-top' : _ref$position;
 
@@ -2522,6 +2569,7 @@
         hideWhenClickOut: hideWhenClickOut,
         tooltip: tooltip,
         theme: theme,
+        shortcuts: shortcuts,
         position: position
       };
       this._init();
@@ -2546,6 +2594,7 @@
         this.menu.classList.add('styler-menu');
         this.cmds = {};
         this.visible = false;
+        this.shortcuts = [];
 
         this.settings.commands.forEach(function (command) {
           _this.generateCmdElement(command);
@@ -2556,6 +2605,9 @@
         }
         if (this.settings.mode === 'creator') {
           this._initCreator();
+        }
+        if (this.settings.mode === 'toolbar' && this.settings.shortcuts) {
+          this.keyboardShortcuts();
         }
         if (this.settings.hideWhenClickOut) {
           this.clickCallback = function (event) {
@@ -2617,9 +2669,13 @@
         switch (cmdSchema.element) {
           case 'button':
             currentCmd.el = button(icon, this.getTooltip(cmdSchema));
-            currentCmd.el.addEventListener('click', function () {
+            var callback = function callback() {
               return _this4.cmdCallback(cmdSchema, cmdSchema.value);
-            });
+            };
+            currentCmd.el.addEventListener('click', callback);
+            if (cmdSchema.shortcut) {
+              this.shortcuts.push(Object.assign({}, cmdSchema.shortcut, { callback: callback }));
+            }
             li.appendChild(currentCmd.el);
             break;
 
@@ -2707,7 +2763,26 @@
         }
         this.update();
       }
+    }, {
+      key: 'keyboardShortcuts',
+      value: function keyboardShortcuts() {
+        var _this5 = this;
 
+        this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
+        window.addEventListener('keydown', function (event) {
+          // Do nothing if the event was already processed
+          if (event.defaultPrevented) {
+            return;
+          }
+          var keyPressed = event.key.toUpperCase();
+          _this5.shortcuts.forEach(function (shortcut) {
+            if (keyPressed === shortcut.key && event[_this5.cmdKey] === !!shortcut.cmdKey && event.shiftKey === !!shortcut.shiftKey) {
+              event.preventDefault();
+              shortcut.callback();
+            }
+          });
+        });
+      }
       /**
        * Execute command for the selected button
        * @param {String} cmd
@@ -2745,7 +2820,7 @@
     }, {
       key: 'show',
       value: function show() {
-        var _this5 = this;
+        var _this6 = this;
 
         if (this.visible) {
           return;
@@ -2756,7 +2831,7 @@
         this.el.classList.add('is-visible');
         this.el.classList.remove('is-hidden');
         setTimeout(function () {
-          _this5.el.style.transition = '';
+          _this6.el.style.transition = '';
         }, 200);
         if (this.settings.hideWhenClickOut) {
           document.addEventListener('click', this.clickCallback);
@@ -2845,7 +2920,7 @@
       key: 'toggleClass',
       value: function toggleClass(currentClass, allClasses) {
         var _currentItem$el$class,
-            _this6 = this;
+            _this7 = this;
 
         if (!this.currentItem) return;
         var prefixedClasses = allClasses.map(function (cls) {
@@ -2855,8 +2930,8 @@
         this.currentItem.el.classList.toggle(currentClass);
         this.update();
         var updateTemp = function updateTemp() {
-          _this6.update();
-          _this6.currentItem.el.removeEventListener('transitionend', updateTemp);
+          _this7.update();
+          _this7.currentItem.el.removeEventListener('transitionend', updateTemp);
         };
         this.currentItem.el.addEventListener('transitionend', updateTemp);
       }
@@ -3694,98 +3769,6 @@
         });
 
         this.editor.addEventListener('mouseup', this.update.bind(this), true);
-
-        window.addEventListener('keydown', function (event) {
-          // Do nothing if the event was already processed
-          if (event.defaultPrevented) {
-            return;
-          }
-
-          if (event[_this2.cmdKey] && _this2.settings.shortcuts) {
-            switch (event.key.toUpperCase()) {
-              case 'B':
-                event.preventDefault();
-                _this2.execute('bold');
-                break;
-              case 'I':
-                event.preventDefault();
-                _this2.execute('italic');
-                break;
-              case 'U':
-                event.preventDefault();
-                _this2.execute('underline');
-                break;
-              case 'E':
-                event.preventDefault();
-                _this2.execute('justifyCenter');
-                break;
-              case 'R':
-                event.preventDefault();
-                _this2.execute('justifyRight');
-                break;
-              case 'L':
-                event.preventDefault();
-                _this2.execute('justifyLeft');
-                break;
-              case 'J':
-                event.preventDefault();
-                _this2.execute('justifyFull');
-                break;
-              case 'A':
-                if (event.shiftKey) {
-                  event.preventDefault();
-                  Selection.selectElement(_this2.editor);
-                }
-                break;
-              case 'F':
-                event.preventDefault();
-                if (event.shiftKey) {
-                  _this2.toggleFullScreen();
-                }
-                break;
-              case 'Z':
-                event.preventDefault();
-                if (event.shiftKey) {
-                  _this2.execute('redo');
-                  break;
-                }
-                _this2.execute('undo');
-                break;
-              case '\\':
-                event.preventDefault();
-                _this2.execute('removeFormat');
-                break;
-              case '=':
-                event.preventDefault();
-                if (event.shiftKey) {
-                  _this2.execute('superscript');
-                  break;
-                }
-                _this2.execute('subscript');
-                break;
-              default:
-                break;
-            }
-          }
-
-          switch (event.key) {
-            case 'Tab':
-              event.preventDefault();
-              if (event.shiftKey) {
-                _this2.execute('outdent', false, true);
-                break;
-              }
-              _this2.execute('indent', false, true);
-              break;
-            case 'Escape':
-              _this2.el.classList.remove('is-fullscreen');
-              exitFullscreen();
-              break;
-            default:
-              break;
-          }
-          setTimeout(_this2.update.bind(_this2), 1);
-        }, true);
       }
     }, {
       key: 'clearContent',
@@ -3819,14 +3802,7 @@
     }, {
       key: 'toggleFullScreen',
       value: function toggleFullScreen() {
-        var state = document.fullscreenElement || document.webkitIsFullScreen;
-        if (!state) {
-          launchFullscreen(this.el);
-          this.el.classList.add('is-fullscreen');
-          return;
-        }
-        this.el.classList.remove('is-fullscreen');
-        exitFullscreen();
+        this.el.classList.toggle('is-fullscreen');
       }
     }, {
       key: 'update',
