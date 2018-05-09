@@ -1,14 +1,11 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from '../selection';
-import { generateKeysSymbols } from './util';
-
-const symbols = generateKeysSymbols();
 
 const cmdsSchema = {
   bold: {
     element: 'button',
     command: 'bold',
-    tooltip: `Bold (${symbols.cmdKey} B)`,
+    tooltip: 'Bold',
     shortcut: {
       cmdKey: true,
       key: 'B'
@@ -18,7 +15,7 @@ const cmdsSchema = {
   italic: {
     element: 'button',
     command: 'italic',
-    tooltip: `Italic (${symbols.cmdKey} I)`,
+    tooltip: 'Italic',
     shortcut: {
       cmdKey: true,
       key: 'I'
@@ -28,7 +25,7 @@ const cmdsSchema = {
   underline: {
     element: 'button',
     command: 'underline',
-    tooltip: `Underline (${symbols.cmdKey} U)`,
+    tooltip: 'Underline',
     shortcut: {
       cmdKey: true,
       key: 'U'
@@ -38,13 +35,13 @@ const cmdsSchema = {
   strikeThrough: {
     element: 'button',
     command: 'strikeThrough',
-    tooltip: `Strike through`
+    tooltip: 'Strike through'
   },
 
   undo: {
     element: 'button',
     command: 'undo',
-    tooltip: `Undo (${symbols.cmdKey} Z)`,
+    tooltip: 'Undo',
     shortcut: {
       cmdKey: true,
       key: 'Z'
@@ -54,7 +51,7 @@ const cmdsSchema = {
   redo: {
     element: 'button',
     command: 'redo',
-    tooltip: `Redo (${symbols.cmdKey} ${symbols.shift} Z)`,
+    tooltip: 'Redo',
     shortcut: {
       cmdKey: true,
       shiftKey: true,
@@ -65,7 +62,7 @@ const cmdsSchema = {
   removeFormat: {
     element: 'button',
     command: 'removeFormat',
-    tooltip: `Remove format (${symbols.cmdKey} \\)`,
+    tooltip: 'Remove format',
     shortcut: {
       cmdKey: true,
       key: '\\'
@@ -75,7 +72,7 @@ const cmdsSchema = {
   justifyLeft: {
     element: 'button',
     command: 'justifyLeft',
-    tooltip: `Align left (${symbols.cmdKey} L)`,
+    tooltip: 'Align left',
     shortcut: {
       cmdKey: true,
       key: 'L'
@@ -85,7 +82,7 @@ const cmdsSchema = {
   justifyCenter: {
     element: 'button',
     command: 'justifyCenter',
-    tooltip: `Align center (${symbols.cmdKey} E)`,
+    tooltip: 'Align center',
     shortcut: {
       cmdKey: true,
       key: 'E'
@@ -95,7 +92,7 @@ const cmdsSchema = {
   justifyRight: {
     element: 'button',
     command: 'justifyRight',
-    tooltip: `Align right (${symbols.cmdKey} R)`,
+    tooltip: 'Align right',
     shortcut: {
       cmdKey: true,
       key: 'R'
@@ -104,7 +101,7 @@ const cmdsSchema = {
 
   selectContent: {
     element: 'button',
-    tooltip: `Select all content (${symbols.cmdKey} ${symbols.shift} A)`,
+    tooltip: 'Select all content',
     shortcut: {
       cmdKey: true,
       shiftKey: true,
@@ -118,7 +115,7 @@ const cmdsSchema = {
   justifyFull: {
     element: 'button',
     command: 'justifyFull',
-    tooltip: `Justify full (${symbols.cmdKey} J)`,
+    tooltip: 'Justify full',
     shortcut: {
       cmdKey: true,
       key: 'J'
@@ -183,7 +180,7 @@ const cmdsSchema = {
     element: 'button',
     command: 'indent',
     useCSS: true,
-    tooltip: `Indent (${symbols.tab})`,
+    tooltip: 'Indent',
     shortcut: {
       key: 'TAB'
     }
@@ -193,7 +190,7 @@ const cmdsSchema = {
     element: 'button',
     command: 'outdent',
     useCSS: true,
-    tooltip: `Outdent (${symbols.shift} ${symbols.tab})`,
+    tooltip: 'Outdent',
     shortcut: {
       shiftKey: true,
       key: 'TAB'
@@ -203,7 +200,7 @@ const cmdsSchema = {
   superscript: {
     element: 'button',
     command: 'superscript',
-    tooltip: `Superscript (${symbols.cmdKey} ${symbols.shift} =)`,
+    tooltip: 'Superscript',
     shortcut: {
       cmdKey: true,
       shiftKey: true,
@@ -214,7 +211,7 @@ const cmdsSchema = {
   subscript: {
     element: 'button',
     command: 'subscript',
-    tooltip: `Subscript (${symbols.cmdKey} =)`,
+    tooltip: 'Subscript',
     shortcut: {
       cmdKey: true,
       key: '='
@@ -249,7 +246,7 @@ const cmdsSchema = {
   fullscreen: {
     element: 'button',
     func: 'toggleFullScreen',
-    tooltip: `Fullscreen (${symbols.cmdKey} ${symbols.shift} F)`,
+    tooltip: 'Fullscreen',
     shortcut: {
       cmdKey: true,
       shiftKey: true,

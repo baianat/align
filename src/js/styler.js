@@ -3,7 +3,8 @@ import {
   camelCase,
   isElementClosest,
   updatePosition,
-  userOS
+  userOS,
+  generateKeysSymbols
 } from './partial/util';
 import {
   setElementsPrefix,
@@ -16,6 +17,7 @@ import {
 } from './partial/elements';
 import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
+const symbols = generateKeysSymbols();
 
 export default class Styler {
   constructor (align, {
@@ -339,7 +341,16 @@ export default class Styler {
     if (!schema.tooltip || !this.settings.tooltip) {
       return false;
     }
-    return this.$align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
+    if (this.settings.shortcuts && schema.shortcut) {
+      const obj = schema.shortcut;
+      const shortcut = [
+        obj.cmdKey ? symbols.cmdKey : '',
+        obj.shiftKey ? symbols.shift : '',
+        obj.key === 'TAB' ? symbols.tab : obj.key
+      ].join(' ');
+      return `${schema.tooltip} (${shortcut})`;
+    }
+    return schema.tooltip;
   }
 
   /**

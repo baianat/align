@@ -1833,13 +1833,11 @@
   Selection.textRange = null;
   Selection.range = null;
 
-  var symbols = generateKeysSymbols();
-
   var cmdsSchema = {
     bold: {
       element: 'button',
       command: 'bold',
-      tooltip: 'Bold (' + symbols.cmdKey + ' B)',
+      tooltip: 'Bold',
       shortcut: {
         cmdKey: true,
         key: 'B'
@@ -1849,7 +1847,7 @@
     italic: {
       element: 'button',
       command: 'italic',
-      tooltip: 'Italic (' + symbols.cmdKey + ' I)',
+      tooltip: 'Italic',
       shortcut: {
         cmdKey: true,
         key: 'I'
@@ -1859,7 +1857,7 @@
     underline: {
       element: 'button',
       command: 'underline',
-      tooltip: 'Underline (' + symbols.cmdKey + ' U)',
+      tooltip: 'Underline',
       shortcut: {
         cmdKey: true,
         key: 'U'
@@ -1875,7 +1873,7 @@
     undo: {
       element: 'button',
       command: 'undo',
-      tooltip: 'Undo (' + symbols.cmdKey + ' Z)',
+      tooltip: 'Undo',
       shortcut: {
         cmdKey: true,
         key: 'Z'
@@ -1885,7 +1883,7 @@
     redo: {
       element: 'button',
       command: 'redo',
-      tooltip: 'Redo (' + symbols.cmdKey + ' ' + symbols.shift + ' Z)',
+      tooltip: 'Redo',
       shortcut: {
         cmdKey: true,
         shiftKey: true,
@@ -1896,7 +1894,7 @@
     removeFormat: {
       element: 'button',
       command: 'removeFormat',
-      tooltip: 'Remove format (' + symbols.cmdKey + ' \\)',
+      tooltip: 'Remove format',
       shortcut: {
         cmdKey: true,
         key: '\\'
@@ -1906,7 +1904,7 @@
     justifyLeft: {
       element: 'button',
       command: 'justifyLeft',
-      tooltip: 'Align left (' + symbols.cmdKey + ' L)',
+      tooltip: 'Align left',
       shortcut: {
         cmdKey: true,
         key: 'L'
@@ -1916,7 +1914,7 @@
     justifyCenter: {
       element: 'button',
       command: 'justifyCenter',
-      tooltip: 'Align center (' + symbols.cmdKey + ' E)',
+      tooltip: 'Align center',
       shortcut: {
         cmdKey: true,
         key: 'E'
@@ -1926,7 +1924,7 @@
     justifyRight: {
       element: 'button',
       command: 'justifyRight',
-      tooltip: 'Align right (' + symbols.cmdKey + ' R)',
+      tooltip: 'Align right',
       shortcut: {
         cmdKey: true,
         key: 'R'
@@ -1935,7 +1933,7 @@
 
     selectContent: {
       element: 'button',
-      tooltip: 'Select all content (' + symbols.cmdKey + ' ' + symbols.shift + ' A)',
+      tooltip: 'Select all content',
       shortcut: {
         cmdKey: true,
         shiftKey: true,
@@ -1949,7 +1947,7 @@
     justifyFull: {
       element: 'button',
       command: 'justifyFull',
-      tooltip: 'Justify full (' + symbols.cmdKey + ' J)',
+      tooltip: 'Justify full',
       shortcut: {
         cmdKey: true,
         key: 'J'
@@ -2014,7 +2012,7 @@
       element: 'button',
       command: 'indent',
       useCSS: true,
-      tooltip: 'Indent (' + symbols.tab + ')',
+      tooltip: 'Indent',
       shortcut: {
         key: 'TAB'
       }
@@ -2024,7 +2022,7 @@
       element: 'button',
       command: 'outdent',
       useCSS: true,
-      tooltip: 'Outdent (' + symbols.shift + ' ' + symbols.tab + ')',
+      tooltip: 'Outdent',
       shortcut: {
         shiftKey: true,
         key: 'TAB'
@@ -2034,7 +2032,7 @@
     superscript: {
       element: 'button',
       command: 'superscript',
-      tooltip: 'Superscript (' + symbols.cmdKey + ' ' + symbols.shift + ' =)',
+      tooltip: 'Superscript',
       shortcut: {
         cmdKey: true,
         shiftKey: true,
@@ -2045,7 +2043,7 @@
     subscript: {
       element: 'button',
       command: 'subscript',
-      tooltip: 'Subscript (' + symbols.cmdKey + ' =)',
+      tooltip: 'Subscript',
       shortcut: {
         cmdKey: true,
         key: '='
@@ -2080,7 +2078,7 @@
     fullscreen: {
       element: 'button',
       func: 'toggleFullScreen',
-      tooltip: 'Fullscreen (' + symbols.cmdKey + ' ' + symbols.shift + ' F)',
+      tooltip: 'Fullscreen',
       shortcut: {
         cmdKey: true,
         shiftKey: true,
@@ -2542,6 +2540,8 @@
     };
   }
 
+  var symbols = generateKeysSymbols();
+
   var Styler = function () {
     function Styler(align) {
       var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
@@ -2876,7 +2876,12 @@
         if (!schema.tooltip || !this.settings.tooltip) {
           return false;
         }
-        return this.$align.settings.shortcuts ? schema.tooltip : schema.tooltip.replace(/(\([^)]+\))/g, '');
+        if (this.settings.shortcuts && schema.shortcut) {
+          var obj = schema.shortcut;
+          var shortcut = [obj.cmdKey ? symbols.cmdKey : '', obj.shiftKey ? symbols.shift : '', obj.key === 'TAB' ? symbols.tab : obj.key].join(' ');
+          return schema.tooltip + ' (' + shortcut + ')';
+        }
+        return schema.tooltip;
       }
 
       /**
@@ -3762,13 +3767,9 @@
     }, {
       key: '_initEvents',
       value: function _initEvents() {
-        var _this2 = this;
-
-        this.editor.addEventListener('focus', function () {
-          _this2.highlight();
-        });
-
+        this.editor.addEventListener('focus', this.highlight.bind(this));
         this.editor.addEventListener('mouseup', this.update.bind(this), true);
+        window.addEventListener('keyup', this.update.bind(this), true);
       }
     }, {
       key: 'clearContent',
@@ -3807,18 +3808,18 @@
     }, {
       key: 'update',
       value: function update() {
-        var _this3 = this;
+        var _this2 = this;
 
         Selection.update();
         setTimeout(function () {
-          if (_this3.settings.toolbar) {
-            _this3.toolbar.update();
+          if (_this2.settings.toolbar) {
+            _this2.toolbar.update();
           }
-          if (_this3.settings.bubble) {
-            _this3.bubble.update();
+          if (_this2.settings.bubble) {
+            _this2.bubble.update();
           }
-          if (_this3.settings.creator) {
-            _this3.creator.update();
+          if (_this2.settings.creator) {
+            _this2.creator.update();
           }
         }, 16);
       }
@@ -3891,7 +3892,7 @@
     }, {
       key: 'createTable',
       value: function createTable() {
-        var _this4 = this;
+        var _this3 = this;
 
         var prompt = new Prompt(this, {
           message: 'Enter post link:',
@@ -3899,7 +3900,7 @@
           inputsPlaceholders: ['rows', 'columns']
         });
         prompt.onSubmit(function () {
-          var table = new Table(_this4, {
+          var table = new Table(_this3, {
             rows: prompt.inputs[0].value,
             columns: prompt.inputs[1].value
           }).el;
