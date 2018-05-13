@@ -2,11 +2,11 @@
 # yarn lockfile v1
 
 
-"@baianat/colorpicker@0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@baianat/colorpicker/-/colorpicker-0.0.12.tgz#cd329febf7d71459201f21abc34da0593a06cf04"
+"@baianat/colorpicker@0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@baianat/colorpicker/-/colorpicker-0.0.13.tgz#6c9022e0ae4d0c272262d301ed2cdf02538fc670"
   dependencies:
-    color-fns "^0.0.1"
+    color-fns "^0.0.4"
 
 "@types/acorn@^4.0.3":
   version "4.0.3"
@@ -942,9 +942,9 @@ color-convert@^1.9.0:
   dependencies:
     color-name "^1.1.1"
 
-color-fns@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/color-fns/-/color-fns-0.0.1.tgz#2598a70a1be237b2a13a524670ab05875226d148"
+color-fns@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/color-fns/-/color-fns-0.0.4.tgz#065f20675ba0ec923580759dcd0f1d172f8df612"
 
 color-name@^1.1.1:
   version "1.1.3"
