@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[4],{56:function(n,t,e){},59:function(n,t,e){"use strict";var i=e(56);e.n(i).a},65:function(n,t,e){"use strict";e.r(t);e(59);var i=e(0),s=Object(i.a)({},function(){var n=this.$createElement,t=this._self._c||n;return t("div",{staticClass:"content"},[t("AlignEditor")],1)},[],!1,null,null,null);t.default=s.exports}}]);
