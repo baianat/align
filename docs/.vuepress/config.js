@@ -12,7 +12,7 @@ module.exports = {
       '/',
       '/getting-started',
       '/customization',
-      '/getting-data',
+      '/API',
     ],
     head: [
       ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Poppins|Raleway|Roboto' }]

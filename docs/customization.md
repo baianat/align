@@ -1,23 +1,38 @@
 # Customization
 
-## Config Object
+## Styler
 
-Align comes with three styling bars(stylers), the main toolbar (`toolbar`) and the pop-up toolbar (`bubble`) that pops when you select a text.
+To give more flexibility, Align comes with three styling bars (`styler`s), all of them can configure the same way, the difference between them is the use case each one is designed to use within.
 
-You can choose to work with either of the toolbars, or both of them, by passing the `toolbar` object and/or the `bubble` object to the `Align` settings object.
+* `toolbar`
+  * **usage**: it uses for all commands you want to be available in your editor.
+  * **active**: always active and sticky at the top.
+* `bubble`
+  * **usage**: it uses for frequently used commands for quick and easy access.
+  * **active**: when you select a range of text, it pops up on top of text.
+* `creator`
+  * **usage**: it's dedicated only to adding new items like images, tables, etc...
+  * **active**: when you enter a new empty line.
 
-You can choose what commands you'd like both of the stylers to include, by passing the desired commands through the `commands` array.
+You can choose to work with one of the `styler`s, or all of them depends on your application needs and behavior.
+Simply pass `toolbar`, `bubble` and/or `creator` object to the `Align` settings object.
 
-Align also shipped with creator bar(`creator`), which dedicated to add items like images, tables, posts, etc...
-
-Creator
+## Settings
 
 ```js
 new Align('.editor', {
-  postTitle: 'title placeholder', // add title post placeholder, default is (false)
+  // enables post title, default (false)
+  // uses the string for the placeholder
+  postTitle: 'title placeholder',
+  // enables toolbar styler
   toolbar: {
-    tooltip: true, // show or hide commands tooltip, default is (false)
-    shortcuts: true, // enable or disable keyboard shortcuts, default is (false)
+    // shows or hide commands tooltip, default (false)
+    tooltip: true,
+    // enables or disable keyboard shortcuts, default (false)
+    shortcuts: true,
+    // shows the styler theme (light/dark), default (light)
+    theme: 'light',
+    // array of commands to show in this styler
     commands: [
       {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
       {'fontName': ['Poppins', 'Raleway', 'Roboto']},
@@ -36,18 +51,13 @@ new Align('.editor', {
       'selectContent', 'removeFormat', 'undo', 'redo', 'fullscreen'
     ]
   },
+  // enables bubble styler
   bubble: {
-    theme: 'dark',
-    commands: [
-      'bold', 'italic', 'underline', 'strikeThrough',
-      'separator',
-      'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
-    ]
+    ...
   },
+  // enables creator styler
   creator: {
-    mode: 'toolbar', // inline or toolbar defaults (toolbar)
-    theme: 'light',
-    items: ['figure', 'video', 'facebook', 'embed']
+    ...
   }
 });
 ```
@@ -56,10 +66,10 @@ new Align('.editor', {
 
 | COMMAND       | SHORTCUT | DESCRIPTION |
 |---------------|----------| ----------- |
-| font          | | changes the font name for the selection or at the insertion point.|
+| font          | | ***[dropdown]*** changes the font name for the selection or at the insertion point.|
+| fontSize      | | ***[dropdown]*** changes the font size for the selection or at the insertion point. |
 | color         | | changes a font color for the selection or at the insertion point. |
 | backColor     | | changes the element background color. |
-| fontSize      | | changes the font size for the selection or at the insertion point. |
 | bold          | Mac: ⌘ B <br/> Win: Ctrl B | toggles bold on/off for the selection or at the insertion point. |
 | italic        | Mac: ⌘ I <br/> Win: Ctrl I | toggles italics on/off for the selection or at the insertion point. |
 | underline     | Mac: ⌘ U <br/> Win: Ctrl U | toggles underline on/off for the selection or at the insertion point. |
@@ -165,21 +175,21 @@ Align.extend('addImage', {
 
 If you want to change `Align`'s [icons](https://github.com/baianat/align/blob/master/src/js/partial/icons.js) or add a new one, use `Align.extendIcon('iconName', 'svg path')`
 
-::: warning
-Your icon should be `SVG` and only one path.
-:::
-
 ```js
 // change bold command icon
 Align.extendIcons('bold', 'M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z');
 ```
+
+::: warning
+Icons should be only an `SVG` icon and contains just one path.
+:::
 
 ### highlight
 
 We using [highlight.js](https://highlightjs.org/) plug-in to highlight pre tags.
 To enable syntax highlighting you have to include `highlight.js` as external dependence before `Align`
 
-```html
+```html{3,7}
 <head>
   <link rel="stylesheet" href="dist/css/align.css">
   <link rel="stylesheet" href="path-to/highlight.min.css">

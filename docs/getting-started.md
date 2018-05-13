@@ -13,7 +13,7 @@ yarn add @baianat/align
 
 ## Include necessary files
 
-``` html{2,5}
+``` html{2,5,13}
 <head>
   <link rel="stylesheet" href="dist/css/align.css">
   <!-- use editor's theme -->
@@ -35,21 +35,17 @@ yarn add @baianat/align
 You need a div to render `Align` in it.
 
 ``` html
-<div class="align"></div>
+<div class="align">
+  <p>Hello, World.</p>
+</div>
 
 <script>
+  // pass the element CSS selector
   new Align('.align', {
     // settings
   });
-</script>
-```
 
-You can also pass the element directly to the constructor
-
-``` html
-<div class="align"></div>
-
-<script>
+  // or pass the element node directly
   const myAlign = document.querySelector('.align');
   new Align(myAlign, {
     // settings
