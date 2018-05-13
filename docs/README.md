@@ -9,7 +9,7 @@ A simple text editor with expandable commands.
 * Built-in, fully-integrated colorpicker
 * The ability to add more custom commands
 
-[example](https://baianat.github.io/align/)
+[example](/example.html)
 
 ## License
 

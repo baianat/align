@@ -1,0 +1,158 @@
+
+<template>
+  <div class="align" id="align1">
+    <div class="align-section">
+      <h2 style="text-align: center;">I was born in
+        <span style="background-color: rgb(0, 0, 0);">
+          <span style="color: rgb(255, 255, 255);">&nbsp;</span>
+          <a href="https://github.com/baianat" style="color: rgb(252, 251, 251);">Baianat</a>
+        </span>.
+      </h2>
+    </div>
+    <div class="align-section is-bgImage is-full is-bgVideo" style="background-color: rgb(1, 0, 0);">
+      <video autoplay="" muted="" loop="" class="align-bgVideo">
+        <source src="https://media.giphy.com/media/BHNfhgU63qrks/giphy.mp4">
+      </video>
+      <p>
+        <br>
+      </p>
+      <p>
+        <br>
+      </p>
+      <p>
+        <span style="color: rgb(255, 255, 255);">
+          <font size="5">Our innovative solutions transcend business excellency to influence societies, through authentic, culture-changing
+            standards.</font>
+        </span>
+      </p>
+      <p>
+        <span style="color: rgb(255, 255, 255);">
+          <font size="5">We are a brand-driven foundation agency, crafting unique brands.</font>
+        </span>
+      </p>
+      <p>
+        <br>
+      </p>
+      <p>
+        <br>
+      </p>
+    </div>
+    <div class="align-section">
+      <h3>Why should you use it?</h3>
+      <ul>
+        <li>Built using vanilla ES6</li>
+        <li>Customizable using an array of settings</li>
+        <li>Built-in, fully-integrated colorpicker</li>
+        <li>The ability to add more custom commands</li>
+      </ul>
+    </div>
+    <div class="align-section">
+      <h3>Tables friendly</h3>
+      <table class="align-table">
+        <tbody>
+          <tr>
+            <td>Awesome header</td>
+            <td>Awesome header</td>
+          </tr>
+          <tr>
+            <td>Awesome content</td>
+            <td>Awesome content</td>
+          </tr>
+          <tr>
+            <td>Awesome content</td>
+            <td>Awesome content</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="align-section">
+      <h3>Where does it come from?</h3>
+    </div>
+    <div class="align-section">
+      <p style="text-align: justify;">Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature
+        from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia,
+        looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of
+        the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33
+        of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise
+        on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..",
+        comes from a line in section 1.10.32.</p>
+    </div>
+    <div class="align-section">
+      <p style="text-align: justify;">The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33
+        from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English
+        versions from the 1914 translation by H. Rackham.</p>
+    </div>
+  </div>
+</template>
+
+<script>
+import Colorpicker from '@baianat/colorpicker';
+import Align from '../../../dist/js/align.esm.js';
+
+export default {
+
+  data() {
+    return {
+      count: 0
+    }
+  },
+  mounted () {
+    this.$align = new Align('#align1', {
+      postTitle: 'Hello there, I\'m Align',
+      toolbar: {
+        tooltip: true,
+        theme: 'light',
+        shortcuts: true,
+        commands: [
+          {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
+          {'fontName': ['Poppins', 'Raleway', 'Roboto']},
+          'separator', 
+          'bold', 'italic', 'underline', 'strikeThrough', 
+          'separator', 
+          'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 
+          'separator', 
+          'h2', 'h3', 'h4', 'p', 'blockquote', 'pre', 'createLink',
+          'separator',
+          'orderedList', 'unorderedList', 'indent', 'outdent',
+          'superscript', 'subscript',
+          'separator',
+          'color', 'backColor',
+          'separator',
+          'selectContent', 'removeFormat', 'undo', 'redo', 'fullscreen',
+          'separator',
+          'createTable', 'createFigure', 'createPost', 'createColumn', 'createVideo', 'createEmbed', 'createLine'
+        ]
+      },
+      bubble: {
+        theme: 'light',
+        commands: [
+          'bold', 'italic', 'underline', 'strikeThrough',
+          'separator',
+          'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
+        ]
+      },
+      creator: {
+        theme: 'light',
+        commands: [
+          'createTable', 'createFigure', 'createPost', 'createColumn', 'createVideo', 'createEmbed', 'createLine'
+        ]
+      },
+    });
+    this.$align.$bus.on('imageAdded', ({ file, update }) => {
+      console.log(file);
+    })
+  }
+}
+</script>
+
+
+<style lang="stylus" scoped>
+@import '~@baianat/colorpicker/dist/css/colorpicker.css'
+@import '../../../dist/css/align.css'
+@import '../../../dist/css/default-theme.css'
+</style>
+
+<style lang="stylus">
+.styler.is-toolbar
+  top: 57px
+</style>
