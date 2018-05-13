@@ -1,7 +1,7 @@
 {
   "name": "@baianat/align",
   "version": "0.0.22",
-  "description": "ES6 text editor",
+  "description": "A simple text editor with expandable commands.",
   "main": "dist/js/align.js",
   "module": "dist/js/align.esm.js",
   "dependencies": {
@@ -16,7 +16,9 @@
     "build:scripts": "MODE=production node build/scripts",
     "build:styles": "MODE=production node build/styles",
     "build": "npm run build:styles && npm run build:scripts",
-    "dev": "MODE=dev node build/watcher"
+    "dev": "MODE=dev node build/watcher",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "devDependencies": {
     "autoprefixer-stylus": "^0.14.0",
