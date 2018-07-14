@@ -13,10 +13,10 @@
   ],
   "scripts": {
     "lint": "eslint ./src --fix",
-    "build:scripts": "MODE=production node build/scripts",
-    "build:styles": "MODE=production node build/styles",
+    "build:scripts": "MODE=production node scripts/scripts",
+    "build:styles": "MODE=production node scripts/styles",
     "build": "npm run build:styles && npm run build:scripts",
-    "dev": "MODE=dev node build/watcher"
+    "dev": "MODE=dev node scripts/watcher"
   },
   "devDependencies": {
     "autoprefixer-stylus": "^0.14.0",
