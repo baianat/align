@@ -158,6 +158,11 @@ export default class Section {
 
   backgroundColor (cmdSchema, color) {
     this.el.style.backgroundColor = color;
+    if (this.el.style.backgroundColor !== 'rgb(255, 255, 255)') {
+      this.el.classList.add('has-bgColor');
+      return;
+    }
+    this.el.classList.remove('has-bgColor');
   }
 
   backgroundImage (cmdSchema, event) {
@@ -173,7 +178,7 @@ export default class Section {
       this.bgImage.style.backgroundImage = `url(${src})`;
     };
     this.bgImage.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
-    this.el.classList.add('is-bgImage');
+    this.el.classList.add('has-bgImage');
     this.$align.update();
     this.$align.$bus.emit('imageAdded', { file, update });
     input.value = null;
@@ -195,7 +200,7 @@ export default class Section {
     if (this.bgVideo) {
       source = this.bgVideo.querySelector('source');
     }
-    this.el.classList.add('is-bgVideo');
+    this.el.classList.add('has-bgVideo');
     source.src = url;
     const update = (src) => {
       source.src = src;
