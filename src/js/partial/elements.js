@@ -79,7 +79,7 @@ export function fileButton (name, tooltip) {
   input.classList.add(`${NAMING_PREFIX}input`);
   input.id = name;
   input.type = 'file';
-  return { input: input, el: wrapper };
+  return { input, el: wrapper };
 }
 
 export function menuButton (name, func, tooltip) {

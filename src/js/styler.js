@@ -134,11 +134,11 @@ export default class Styler {
 
       case 'file':
         const fileBtn = fileButton(icon, this.getTooltip(cmdSchema));
-        currentCmd.el = fileBtn.input;
-        currentCmd.el.addEventListener('change', (event) => {
+        currentCmd.el = fileBtn.el;
+        fileBtn.input.addEventListener('change', (event) => {
           this.cmdCallback(cmdSchema, event);
         });
-        li.appendChild(fileBtn.el);
+        li.appendChild(currentCmd.el);
         break;
 
       case 'input':
@@ -209,6 +209,8 @@ export default class Styler {
       this.execute(cmdSchema.command, value, cmdSchema.useCSS);
     }
     if (typeof cmdSchema.func === 'string') {
+      // check if the cmd calls a function for align
+      // otherwise it calls a function for the element class itself
       let callbackFunc = this.$align[cmdSchema.func]
         ? this.$align[cmdSchema.func].bind(this.$align)
         : this.currentItem[cmdSchema.func].bind(this.currentItem);
@@ -358,35 +360,47 @@ export default class Styler {
    */
   updateCommandsStates () {
     Object.values(this.cmds).forEach((cmd) => {
-      const currentCmd = cmd;
-      const command = currentCmd.schema.command;
-      const value = currentCmd.schema.value;
-      const init = currentCmd.schema.init;
+      const schema = cmd.schema;
+      const command = schema.command;
+
+      if (schema.active) {
+        const path = schema.active.split('.');
+        const condition = path.reduce((acc, current) => {
+          return acc[current];
+        }, this);
+        console.log(cmd.el);
+        if (condition) {
+          cmd.el.classList.add('is-active');
+          return;
+        }
+        cmd.el.classList.remove('is-active');
+      }
+
       if (!command) {
         return;
       }
       if (document.queryCommandState(command)) {
-        currentCmd.el.classList.add('is-active');
+        cmd.el.classList.add('is-active');
         return;
       }
-      if (document.queryCommandValue(command) === value) {
-        currentCmd.el.classList.add('is-active');
+      if (document.queryCommandValue(command) === schema.value) {
+        cmd.el.classList.add('is-active');
         return;
       }
-      if (init) {
+      if (schema.init) {
         const selectedElement = Selection.current.anchorNode.type === 1
           ? Selection.current.anchorNode
           : Selection.current.anchorNode.parentNode;
         if (selectedElement.closest('.align-content')) {
           document.queryCommandValue(command);
-          init.selectColor(document.queryCommandValue(command), true);
+          schema.init.selectColor(document.queryCommandValue(command), true);
         }
         return;
       }
       if (document.queryCommandValue(command)) {
-        currentCmd.el.value = document.queryCommandValue(command);
+        cmd.el.value = document.queryCommandValue(command);
       }
-      currentCmd.el.classList.remove('is-active');
+      cmd.el.classList.remove('is-active');
     });
   }
 

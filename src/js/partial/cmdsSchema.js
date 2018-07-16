@@ -426,6 +426,7 @@ const cmdsSchema = {
     element: 'file',
     func: 'backgroundImage',
     tooltip: 'Add background image',
+    active: 'currentItem.bgImage',
     icon: 'image'
   },
 
@@ -433,6 +434,7 @@ const cmdsSchema = {
     element: 'file',
     func: 'backgroundVideo',
     tooltip: 'Add background video',
+    active: 'currentItem.bgVideo',
     icon: 'video'
   },
 
