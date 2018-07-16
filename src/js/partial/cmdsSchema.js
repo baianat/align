@@ -382,7 +382,7 @@ const cmdsSchema = {
     func: 'createLink'
   },
 
-  // internal functions don't use it
+  // internal functions don't override it
 
   _figureClasses: {
     element: 'classes',
@@ -427,7 +427,7 @@ const cmdsSchema = {
     func: 'backgroundImage',
     tooltip: 'Add background image',
     active: 'currentItem.bgImage',
-    icon: 'image'
+    icon: 'imagePlus'
   },
 
   _sectionVideo: {
@@ -435,7 +435,14 @@ const cmdsSchema = {
     func: 'backgroundVideo',
     tooltip: 'Add background video',
     active: 'currentItem.bgVideo',
-    icon: 'video'
+    icon: 'videoPlus'
+  },
+
+  _sectionRemoveBg: {
+    element: 'button',
+    func: 'removeBackground',
+    tooltip: 'Remove backgrounds',
+    icon: 'imageOff'
   },
 
   _sectionColor: {

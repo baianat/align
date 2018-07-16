@@ -37,7 +37,7 @@ export default class Section {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: ['_sectionUp', '_sectionDown',
-        '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionToggleHTML',
+        '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionRemoveBg','_sectionToggleHTML',
         { '_sectionClasses': ['normal', 'full'] },
         '_remove'
       ],
@@ -156,7 +156,7 @@ export default class Section {
     this.isHTMLView = false;
   }
 
-  backgroundColor (cmdSchema, color) {
+  backgroundColor (_remove, color) {
     this.el.style.backgroundColor = color;
     if (this.el.style.backgroundColor !== 'rgb(255, 255, 255)') {
       this.el.classList.add('has-bgColor');
@@ -165,7 +165,20 @@ export default class Section {
     this.el.classList.remove('has-bgColor');
   }
 
-  backgroundImage (cmdSchema, event) {
+  removeBackground (_, event) {
+    if (this.bgImage) {
+      this.bgImage.remove();
+      this.bgImage = null;
+      this.el.classList.remove('has-bgImage');
+    }
+    if (this.bgVideo) {
+      this.bgVideo.remove();
+      this.bgVideo = null;
+      this.el.classList.remove('has-bgVideo');
+    }
+  }
+  
+  backgroundImage (_, event) {
     const input = event.target;
     const file = input.files[0];
     if (!file) return;
@@ -184,7 +197,7 @@ export default class Section {
     input.value = null;
   }
 
-  backgroundVideo (cmdSchema, event) {
+  backgroundVideo (_, event) {
     const input = event.target;
     const file = input.files[0];
     if (!file) return;
