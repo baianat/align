@@ -1,4 +1,4 @@
-import { select, userOS, launchFullscreen, exitFullscreen, getVideoId, stringToDOM } from './partial/util';
+import { select, userOS, getVideoId, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './selection';
@@ -208,9 +208,9 @@ export default class Align {
       }
       const videoId = getVideoId(link, videoHoster);
       const iframe = document.createElement('iframe');
+      const video = document.createElement('div');
 
-      iframe.width = 560;
-      iframe.height = 315;
+      video.classList.add('align-video');
       iframe.allowfullscreen = true;
       iframe.contentEditable = false;
       iframe.src =
@@ -218,7 +218,8 @@ export default class Align {
           ? `//www.youtube.com/embed/${videoId}`
           : videoHoster === 'vimeo' ? `//player.vimeo.com/video/${videoId}` : '';
 
-      Selection.range.insertNode(iframe);
+      video.appendChild(iframe);
+      Selection.range.insertNode(video);
     });
   }
 
