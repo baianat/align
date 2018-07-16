@@ -1,11 +1,4 @@
-export default function icons (name) {
-  return `
-    <svg class="align-icon" viewBox="0 0 24 24">
-      <path d="${iconsPath[name]}"/>
-    </svg>`;
-};
-
-const iconsPath = {
+const icons = new Proxy({
   blockquote: 'M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z',
 
   bold: 'M13.5,15.5H10V12.5H13.5A1.5,1.5 0 0,1 15,14A1.5,1.5 0 0,1 13.5,15.5M10,6.5H13A1.5,1.5 0 0,1 14.5,8A1.5,1.5 0 0,1 13,9.5H10M15.6,10.79C16.57,10.11 17.25,9 17.25,8C17.25,5.74 15.5,4 13.25,4H7V18H14.04C16.14,18 17.75,16.3 17.75,14.21C17.75,12.69 16.89,11.39 15.6,10.79Z',
@@ -121,4 +114,17 @@ const iconsPath = {
   caretDown: 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z',
 
   toggleHTML: 'M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z'
-};
+}, {
+  get: function getIcon (icons, name) {
+    return `
+      <svg class="align-icon" viewBox="0 0 24 24">
+        <path d="${icons[name]}"/>
+      </svg>`;
+  },
+  set: function setIcon (icons, name, val) {
+    icons[name] = val;
+    return true;
+  }
+});
+
+export default icons;

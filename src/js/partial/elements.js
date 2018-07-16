@@ -16,7 +16,7 @@ export function button (name, tooltip) {
   if (tooltip) {
     button.dataset.tooltip = tooltip;
   }
-  button.insertAdjacentHTML('afterbegin', icons(name));
+  button.insertAdjacentHTML('afterbegin', icons[name]);
   return button;
 }
 
@@ -75,7 +75,7 @@ export function fileButton (name, tooltip) {
   wrapper.classList.add(`${NAMING_PREFIX}button`);
   wrapper.id = name;
   wrapper.appendChild(input);
-  wrapper.insertAdjacentHTML('afterbegin', icons(name));
+  wrapper.insertAdjacentHTML('afterbegin', icons[name]);
   input.classList.add(`${NAMING_PREFIX}input`);
   input.id = name;
   input.type = 'file';
