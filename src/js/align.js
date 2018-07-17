@@ -190,7 +190,8 @@ export default class Align {
     const figure = new Figure(this, file);
     input.value = null;
     if (figure.el) {
-      Selection.range.insertNode(figure.el);
+      const el = Selection.range.startContainer;
+      el.parentNode.insertBefore(figure.el, el);
     }
   }
 
@@ -219,7 +220,8 @@ export default class Align {
           : videoHoster === 'vimeo' ? `//player.vimeo.com/video/${videoId}` : '';
 
       video.appendChild(iframe);
-      Selection.range.insertNode(video);
+      const el = Selection.range.startContainer;
+      el.parentNode.insertBefore(video, el);
     });
   }
 
@@ -230,9 +232,10 @@ export default class Align {
     });
     prompt.onSubmit(() => {
       const grid = stringToDOM(`<div class="align-grid">
-        ${'<div class="align-column"><br></div>'.repeat(prompt.inputs[0].value)}
+        ${'<div class="align-column"><p><br></p></div>'.repeat(prompt.inputs[0].value)}
       </div>`);
-      Selection.range.insertNode(grid);
+      const el = Selection.range.startContainer;
+      el.parentNode.insertBefore(grid, el);
     });
   }
 
@@ -247,12 +250,14 @@ export default class Align {
         rows: prompt.inputs[0].value,
         columns: prompt.inputs[1].value
       }).el;
-      Selection.range.insertNode(table);
+      const el = Selection.range.startContainer;
+      el.parentNode.insertBefore(table, el);
     });
   }
 
   createLine (styler, line) {
-    Selection.range.insertNode(stringToDOM(line));
+    const el = Selection.range.startContainer;
+    el.parentNode.insertBefore(stringToDOM(line), el);
   }
 
   createPost () {
@@ -284,7 +289,8 @@ export default class Align {
       const div = document.createElement('div');
       div.insertAdjacentHTML('afterbegin', data);
 
-      Selection.range.insertNode(div);
+      const el = Selection.range.startContainer;
+      el.parentNode.insertBefore(div, el);
     });
   }
 
