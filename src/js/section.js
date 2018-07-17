@@ -53,11 +53,13 @@ export default class Section {
       output = this.el.cloneNode(true);
       const addButton = output.querySelector('.align-newSection');
       const contentDiv = output.querySelector('.align-content');
+      const contentEditable = output.querySelector('[contenteditable]');
       if (this.isHTMLView) {
         contentDiv.innerHTML = contentDiv.innerText;
       }
       output.classList.remove('is-active');
       output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
+      contentEditable.forEach(el => el.contentEditable = '');
       contentDiv.remove();
       addButton.remove();
     }
