@@ -39,17 +39,30 @@
   &-newSection
     position: absolute
     z-index: 30
-    top: -3px
+    top: 0
     left: 50%
-    transform: translateX(-50%)
+    transform: translate(-50%, 0)
     width: 70%
     max-width: 600px
-    height: 6px
-    background-color: gray
+    height: 3px
+    background-color: $gray
     border: 0
-    opacity: 0.01
-    transition: 0.5s 0.2s
+    opacity: 1
+    transition: 0.5s 0.1s
     cursor: pointer
+    content: '+'
+    &:after
+      content: '+'
+      display: block
+      color: white
+      width: 20px
+      height: 20px
+      background-color: $gray
+      text-align: center
+      line-height: 20px
+      font-size: 15px
+      border-radius: 0 0 10px 10px
+      margin: auto 
     &.is-main
       opacity: 1
       position: static
