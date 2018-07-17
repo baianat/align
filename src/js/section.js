@@ -25,7 +25,8 @@ export default class Section {
       });
     }
     if (typeof position === 'object') {
-      this.$align.editor.insertBefore(this.el, position)
+      this.$align.editor.insertBefore(this.el, position);
+      this.$align.sections.splice(this.getIndex, 0, this);
       return;
     }
     this.$align.editor.appendChild(this.el);
@@ -53,13 +54,13 @@ export default class Section {
       output = this.el.cloneNode(true);
       const addButton = output.querySelector('.align-newSection');
       const contentDiv = output.querySelector('.align-content');
-      const contentEditable = output.querySelector('[contenteditable]');
+      const contentEditable = Array.from(output.querySelectorAll('[contenteditable]'));
       if (this.isHTMLView) {
         contentDiv.innerHTML = contentDiv.innerText;
       }
       output.classList.remove('is-active');
       output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
-      contentEditable.forEach(el => el.contentEditable = '');
+      contentEditable.forEach(el => el.contentEditable = 'inherit');
       contentDiv.remove();
       addButton.remove();
     }

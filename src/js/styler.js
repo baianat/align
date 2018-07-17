@@ -368,7 +368,6 @@ export default class Styler {
         const condition = path.reduce((acc, current) => {
           return acc[current];
         }, this);
-        console.log(cmd.el);
         if (condition) {
           cmd.el.classList.add('is-active');
           return;
