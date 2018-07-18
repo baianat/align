@@ -19,7 +19,7 @@ export default class Link {
   edit () {
     const prompt = new Prompt(this.$align, {
       message: 'Enter link:',
-      data: this.el.href
+      data: this.el.getAttribute('href')
     });
     prompt.onSubmit(() => {
       const link = prompt.inputs[0].value;
