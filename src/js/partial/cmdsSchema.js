@@ -422,6 +422,13 @@ const cmdsSchema = {
     icon: 'caretDown'
   },
 
+  _sectionDuplicate: {
+    element: 'button',
+    func: 'duplicate',
+    tooltip: 'Duplicate section',
+    icon: 'duplicate'
+  },
+
   _sectionImage: {
     element: 'file',
     func: 'backgroundImage',

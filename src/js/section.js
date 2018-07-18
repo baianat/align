@@ -38,7 +38,12 @@ export default class Section {
       mode: 'bubble',
       hideWhenClickOut: true,
       commands: ['_sectionUp', '_sectionDown',
-        '_sectionColor', '_sectionImage', '_sectionVideo', '_sectionRemoveBg','_sectionToggleHTML',
+        '_sectionColor',
+        '_sectionImage',
+        '_sectionVideo',
+        '_sectionRemoveBg',
+        '_sectionToggleHTML',
+        '_sectionDuplicate',
         { '_sectionClasses': ['normal', 'full'] },
         '_remove'
       ],
@@ -71,6 +76,9 @@ export default class Section {
   }
 
   generateEl (content) {
+    if (typeof content === 'string') {
+      content = stringToDOM(content);
+    }
     this.el = (content && content.nodeName === 'DIV') ? content : document.createElement('div');
     this.el.classList.add('align-section');
 
@@ -253,5 +261,10 @@ export default class Section {
     this.$align.$sectionToolbar.hide();
     this.el.remove();
     this.$align.sections.splice(this.getIndex(), 1);
+  }
+
+  duplicate () {
+    const content = this.content;
+    new Section(this.$align, content, { position: this.el });
   }
 }
