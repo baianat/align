@@ -298,4 +298,10 @@ export default class Align {
     const link = new Link(this);
     link.edit();
   }
+
+  createElement (_, $schema) {
+    const domElement = stringToDOM($schema.args);
+    const el = Selection.range.startContainer;
+    el.parentNode.insertBefore(domElement, el);
+  }
 }
