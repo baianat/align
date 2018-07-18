@@ -366,6 +366,9 @@ export default class Styler {
       if (schema.active) {
         const path = schema.active.split('.');
         const condition = path.reduce((acc, current) => {
+          if (!acc) {
+            return;
+          }
           return acc[current];
         }, this);
         if (condition) {

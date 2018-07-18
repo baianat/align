@@ -259,6 +259,7 @@ export default class Section {
 
   remove () {
     this.$align.$sectionToolbar.hide();
+    this.$align.update();
     this.el.remove();
     this.$align.sections.splice(this.getIndex(), 1);
   }
