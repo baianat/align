@@ -9,6 +9,7 @@ export default class Link {
 
   _init (link) {
     this.el = link || document.createElement('a');
+    this.el.target = '_blank';
     if (!link) {
       this.el.appendChild(Selection.range.extractContents());
       Selection.range.insertNode(this.el);
@@ -21,13 +22,13 @@ export default class Link {
       message: 'Enter link:',
       data: this.el.getAttribute('href')
     });
-    prompt.onSubmit(() => {
+    prompt.on('save', () => {
       const link = prompt.inputs[0].value;
       if (!link) return;
       this.update(link);
     });
     if (this.el.href) {
-      prompt.onDelete(() => {
+      prompt.on('remove', () => {
         this.remove();
       });
     }
