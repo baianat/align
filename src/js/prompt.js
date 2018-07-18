@@ -23,6 +23,7 @@ export default class Prompt {
     this.el = document.createElement('div');
     this.message = document.createElement('label');
     this.inputs = [];
+    this.buttons = {};
 
     this.el.classList.add('prompt');
     this.message.classList.add('prompt-message');
@@ -57,45 +58,43 @@ export default class Prompt {
     this.inputs[0].value = data;
 
     this.$align.el.appendChild(this.el);
+    this.callbackFunc = (event) => {
+      if (isElementClosest(event.target, this.el)) {
+        return;
+      }
+      this.remove();
+    };
     setTimeout(() => {
-      document.addEventListener('click', (event) => {
-        if (
-          isElementClosest(event.target, this.el)
-        ) return;
-        this.remove();
-      });
+      document.addEventListener('click', this.callbackFunc);
     }, 1);
   }
 
-  _generateButton (name) {
-    this[name] = document.createElement('button');
-    this[name].classList.add(`prompt-button`);
-    this[name].innerText = name;
-    this[name].addEventListener('click', this.remove.bind(this));
-    this.el.appendChild(this[name]);
+  on (name, func, args) {
+    this.buttons[name] = document.createElement('button');
+    this.buttons[name].classList.add('prompt-button');
+    this.buttons[name].innerText = name;
+    this.buttons[name].addEventListener('click', () => {
+      func(args);
+      this.remove();
+    });
+    this.el.appendChild(this.buttons[name]);
+    return this;
   }
 
   onSubmit (func, args) {
-    this._generateButton('submit');
-    this.submit.addEventListener('click', () => func(args));
-    return this;
+    return this.on('submit', func, args);
   }
 
   onDelete (func, args) {
-    this._generateButton('delete');
-    this.delete.addEventListener('click', () => func(args));
-    return this;
+    return this.on('delete', func, args);
   }
 
   onCancel (func, args) {
-    this._generateButton('cancel');
-    this.cancel.addEventListener('click', () => func(args));
-    return this;
+    return this.on('cancel', func, args);
   }
 
   remove () {
-    setTimeout(() => {
-      this.el.remove();
-    }, 1);
+    this.el.remove();
+    document.removeEventListener('click', this.callbackFunc);
   }
 }
