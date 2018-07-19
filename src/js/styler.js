@@ -390,6 +390,9 @@ export default class Styler {
         return;
       }
       if (schema.init) {
+        if (!Selection.current.anchorNode) {
+          return;
+        }
         const selectedElement = Selection.current.anchorNode.type === 1
           ? Selection.current.anchorNode
           : Selection.current.anchorNode.parentNode;

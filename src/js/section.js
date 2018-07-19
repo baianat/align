@@ -59,13 +59,13 @@ export default class Section {
       output = this.el.cloneNode(true);
       const addButton = output.querySelector('.align-newSection');
       const contentDiv = output.querySelector('.align-content');
-      const contentEditable = Array.from(output.querySelectorAll('[contenteditable]'));
+      const figures = Array.from(contentDiv.querySelectorAll('figure'));
       if (this.isHTMLView) {
         contentDiv.innerHTML = contentDiv.innerText;
       }
+      figures.forEach(fig => Figure.render(fig));
       output.classList.remove('is-active');
       output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
-      contentEditable.forEach(el => el.contentEditable = 'inherit');
       contentDiv.remove();
       addButton.remove();
     }

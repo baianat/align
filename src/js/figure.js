@@ -25,7 +25,7 @@ export default class Figure {
     // check if it's the figure element
     if (figure.nodeType === 1) {
       this.el = figure;
-      this.caption = figure.querySelector('figcaption');
+      this.caption = figure.querySelector('figcaption') || document.createElement('figcaption');
       this.img = figure.querySelector('img');
     }
 
@@ -85,6 +85,19 @@ export default class Figure {
 
   update (newSrc) {
     this.img.src = newSrc;
+  }
+
+  static render (element) {
+    const figure = element;
+    const caption = element.querySelector('figcaption');
+    const img = element.querySelector('img');
+    figure.contentEditable = 'inherit';
+    caption.contentEditable = 'inherit';
+    caption.removeAttribute('data-default-value');
+    img.removeAttribute('data-align-filename');
+    if (caption.innerText === '') {
+      caption.remove();
+    }
   }
 
   remove () {
