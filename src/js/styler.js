@@ -310,7 +310,6 @@ export default class Styler {
 
   hide () {
     if (this.currentItem) {
-      this.currentItem.el.classList.remove('is-active');
       this.currentItem = null;
     }
     this.el.classList.remove('is-visible');
@@ -323,12 +322,8 @@ export default class Styler {
   }
 
   update (item) {
-    if (this.currentItem) {
-      this.currentItem.el.classList.remove('is-active');
-    }
     if (item) {
       this.currentItem = item;
-      this.currentItem.el.classList.add('is-active');
     }
     this.updateCommandsStates();
     if (this.settings.mode === 'bubble') {

@@ -7,6 +7,7 @@ import Link from './link';
 
 export default class Section {
   static id = 0; // eslint-disable-line
+  static activeSection = null;
 
   constructor (align, content, {
     position,
@@ -22,7 +23,7 @@ export default class Section {
     this.generateEl(content);
     if (type === 'text') {
       this.el.addEventListener('click', () => {
-        this.$align.$sectionToolbar.update(this);
+        this.active();
       });
     }
     if (typeof position === 'number') {
@@ -265,16 +266,46 @@ export default class Section {
     swapArrayItems(this.$align.sections, index, index + 1);
   }
 
+
   active () {
+    if (Section.activeSection) {
+      Section.activeSection.inactive();
+    }
+    Section.activeSection = this;
+    this.el.classList.add('is-active');
     this.$align.$sectionToolbar.update(this);
-    this.el.focus();
+    this.contentDiv.focus();
+
+    this.keydownCallback = (event) => {
+      // Do nothing if the event was already processed
+      if (event.defaultPrevented) {
+        return;
+      }
+      const keyPressed = event.key.toUpperCase();
+      if (keyPressed === 'ENTER' & !event.shiftKey) {
+        event.preventDefault();
+        const newSection = new Section(this.$align, '', {
+          position: this.getIndex() + 1
+        });
+        this.inactive();
+        newSection.active();
+      }
+    }
+
+    window.addEventListener('keydown', this.keydownCallback);
+  }
+
+  inactive () {
+    this.el.classList.remove('is-active');
+    window.removeEventListener('keydown', this.keydownCallback);
   }
 
   remove () {
-    this.$align.$sectionToolbar.hide();
-    this.$align.update();
+    this.inactive();
     this.el.remove();
     this.$align.sections.splice(this.getIndex(), 1);
+    this.$align.$sectionToolbar.hide();
+    this.$align.update();
   }
 
   duplicate () {

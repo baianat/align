@@ -65,9 +65,6 @@
       font-size: 15px
       border-radius: 0 0 10px 10px
       margin: auto 
-    &.is-main
-      opacity: 1
-      position: static
     &:hover
       opacity: 1
 
@@ -100,13 +97,15 @@
   p:empty
     &::after
       font-style: italic
-      color: $gray
+      color: alpha($gray, 50%)
+      display: inline-block
       content: 'Content here...'
       font-size: 20px
       z-index: -1
+      user-select: none
 
   [data-align-html]
-    whiteSpace: pre-wrap
+    white-space: pre-wrap
 
   &-title
     margin: 10px 0
