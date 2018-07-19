@@ -24,9 +24,10 @@ export default class Section {
         this.$align.$sectionToolbar.update(this);
       });
     }
-    if (typeof position === 'object') {
-      this.$align.editor.insertBefore(this.el, position);
-      this.$align.sections.splice(this.getIndex, 0, this);
+    if (typeof position === 'number') {
+      const before = this.$align.sections[position];
+      this.$align.editor.insertBefore(this.el, before.el);
+      this.$align.sections.splice(position, 0, this);
       return;
     }
     this.$align.editor.appendChild(this.el);
@@ -131,7 +132,9 @@ export default class Section {
   generateAddSectionButton () {
     this.addSectionButton = document.createElement('button');
     this.addSectionButton.classList.add('align-newSection');
-    this.addSectionButton.addEventListener('click', () => new Section(this.$align, '', { position: this.el }));
+    this.addSectionButton.addEventListener('click', () => {
+      new Section(this.$align, '', { position: this.getIndex() })
+    });
     this.addSectionButton.contentEditable = false;
     this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
   }
@@ -266,6 +269,6 @@ export default class Section {
 
   duplicate () {
     const content = this.content;
-    new Section(this.$align, content, { position: this.el });
+    new Section(this.$align, content, { position: this.getIndex() });
   }
 }
