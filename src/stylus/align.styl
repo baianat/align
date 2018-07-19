@@ -19,24 +19,26 @@
     z-index: 99999
     overflow: auto
 
-  &-addButton
-    display: block
-    font-size: 18px
+  &-sectionUp
+  &-sectionDown
+    position: absolute
+    top: 0
+    left: 0
+    display: none
+    fill: $gray
+    border: none
+    background: transparent
     padding: 10px
-    width: 70%
-    margin: 20px auto
-    border: 2px dashed $gray
-    color: $gray
-    background: $white
-    &:after
+    ~/-section.is-active &
       display: block
-      content: 'Add section'
-    &:active
-      outline: 0
     &:hover
-      color: $black
+      fill: darken($gray, 30%)
+  &-sectionDown
+    top: auto
+    top: initial
+    bottom: 0
 
-  &-newSection
+  &-sectionAdd
     position: absolute
     z-index: 30
     top: 0

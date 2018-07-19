@@ -408,20 +408,6 @@ const cmdsSchema = {
     icon: 'remove'
   },
 
-  _sectionUp: {
-    element: 'button',
-    func: 'moveUp',
-    tooltip: 'Move section up',
-    icon: 'caretUp'
-  },
-
-  _sectionDown: {
-    element: 'button',
-    func: 'moveDown',
-    tooltip: 'Move section down',
-    icon: 'caretDown'
-  },
-
   _sectionDuplicate: {
     element: 'button',
     func: 'duplicate',

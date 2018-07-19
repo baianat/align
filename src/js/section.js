@@ -1,4 +1,5 @@
 import { stringToDOM, swapArrayItems } from './partial/util'
+import icons from './partial/icons';
 import Styler from './styler';
 import Figure from './figure';
 import Table from './table';
@@ -38,7 +39,7 @@ export default class Section {
     align.$sectionToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
-      commands: ['_sectionUp', '_sectionDown',
+      commands: [
         '_sectionColor',
         '_sectionImage',
         '_sectionVideo',
@@ -98,7 +99,7 @@ export default class Section {
         this.contentDiv.innerHTML = content
         this.bgImage = this.bgImage || this.contentDiv.querySelector('.align-bgImage');
         this.bgVideo = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
-        this.generateSectionElements();
+        this.generateElements();
         break;
 
       case 'title':
@@ -117,7 +118,7 @@ export default class Section {
     }
   }
 
-  generateSectionElements () {
+  generateElements () {
     const figures = Array.from(this.contentDiv.querySelectorAll('figure'));
     const tables = Array.from(this.contentDiv.querySelectorAll('table'));
     const links = Array.from(this.contentDiv.querySelectorAll('a'));
@@ -125,18 +126,27 @@ export default class Section {
     figures.forEach(figure => new Figure(this.$align, figure));
     tables.forEach(table => new Table(this.$align, table));
     links.forEach(link => new Link(this.$align, link));
-    this.generateAddSectionButton();
+    this.generateControllers();
     this.generateBackground();
   }
 
-  generateAddSectionButton () {
-    this.addSectionButton = document.createElement('button');
-    this.addSectionButton.classList.add('align-newSection');
-    this.addSectionButton.addEventListener('click', () => {
+  generateControllers () {
+    this.addButton = document.createElement('button');
+    this.upButton = document.createElement('button');
+    this.downButton = document.createElement('button');
+    this.addButton.classList.add('align-sectionAdd');
+    this.upButton.classList.add('align-sectionUp');
+    this.downButton.classList.add('align-sectionDown');
+
+    this.upButton.insertAdjacentHTML('afterbegin', icons.caretUp);
+    this.downButton.insertAdjacentHTML('afterbegin', icons.caretDown);
+
+    this.addButton.addEventListener('click', () => {
       new Section(this.$align, '', { position: this.getIndex() })
     });
-    this.addSectionButton.contentEditable = false;
-    this.el.insertAdjacentElement('afterBegin', this.addSectionButton);
+    this.upButton.addEventListener('click', this.moveUp.bind(this));
+    this.downButton.addEventListener('click', this.moveDown.bind(this));
+    [this.addButton, this.upButton, this.downButton].forEach(btn => this.el.appendChild(btn));
   }
 
   generateBackground () {
