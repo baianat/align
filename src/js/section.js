@@ -4,6 +4,7 @@ import Styler from './styler';
 import Figure from './figure';
 import Table from './table';
 import Link from './link';
+import Selection from './selection';
 
 export default class Section {
   static id = 0; // eslint-disable-line
@@ -26,6 +27,7 @@ export default class Section {
         this.active();
       });
     }
+
     if (typeof position === 'number') {
       const before = this.$align.sections[position];
       this.$align.editor.insertBefore(this.el, before.el);
@@ -143,7 +145,11 @@ export default class Section {
     this.downButton.insertAdjacentHTML('afterbegin', icons.caretDown);
 
     this.addButton.addEventListener('click', () => {
-      new Section(this.$align, '', { position: this.getIndex() })
+      const newSection = new Section(this.$align, '', { position: this.getIndex() })
+      setTimeout(() => {
+        newSection.active();
+        Selection.selectElement(newSection.contentDiv.querySelector('p'));
+      }, 1);
     });
     this.upButton.addEventListener('click', this.moveUp.bind(this));
     this.downButton.addEventListener('click', this.moveDown.bind(this));
@@ -287,8 +293,8 @@ export default class Section {
         const newSection = new Section(this.$align, '', {
           position: this.getIndex() + 1
         });
-        this.inactive();
         newSection.active();
+        Selection.selectElement(newSection.contentDiv.querySelector('p'));
       }
     }
 
