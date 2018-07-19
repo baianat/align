@@ -13,6 +13,7 @@ export default class Table {
     align.$tableToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
+      addActiveClass: true,
       commands: [
         '_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter',
         'separator',

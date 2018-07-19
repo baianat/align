@@ -20,24 +20,22 @@ import Selection from './selection';
 const symbols = generateKeysSymbols();
 
 export default class Styler {
-  constructor (align, {
-    mode = 'toolbar',
-    commands = ['bold', 'italic', 'underline'],
-    hideWhenClickOut = false,
-    tooltip = false,
-    theme = 'light',
-    shortcuts = false,
-    position = 'center-top'
-  } = {}) {
+  static defaults = {
+    mode: 'toolbar',
+    commands: ['bold', 'italic', 'underline'],
+    hideWhenClickOut: false,
+    tooltip: false,
+    theme: 'light',
+    shortcuts: false,
+    addActiveClass: false,
+    position: 'center-top'
+  }
+  
+  constructor (align, settings) {
     this.$align = align;
     this.settings = {
-      mode,
-      commands,
-      hideWhenClickOut,
-      tooltip,
-      theme,
-      shortcuts,
-      position
+      ...Styler.defaults,
+      ...settings
     };
     this._init();
   }
@@ -85,20 +83,6 @@ export default class Styler {
 
   _initBubble () {
     this.el.classList.add('is-hidden');
-    this.currentPosition = null;
-    let ticking = false;
-    this.bubbleScrollCallback = () => {
-      this.scrollY = window.scrollY;
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (!this.currentPosition) {
-            this.updateBubble();
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
   }
 
   _initCreator () {
@@ -309,6 +293,9 @@ export default class Styler {
   }
 
   hide () {
+    if (this.currentItem && this.settings.addActiveClass) {
+      this.currentItem.el.classList.remove('is-active');
+    }
     if (this.currentItem) {
       this.currentItem = null;
     }
@@ -322,6 +309,12 @@ export default class Styler {
   }
 
   update (item) {
+    if (this.currentItem && this.settings.addActiveClass) {
+      this.currentItem.el.classList.remove('is-active');
+    }
+    if (item && this.settings.addActiveClass) {
+      item.el.classList.add('is-active');
+    }
     if (item) {
       this.currentItem = item;
     }

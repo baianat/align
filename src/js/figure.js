@@ -15,6 +15,7 @@ export default class Figure {
     align.$figureToolbar = new Styler(align, {
       mode: 'bubble',
       hideWhenClickOut: true,
+      addActiveClass: true,
       commands: [{ _figureClasses: ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
       tooltip: true,
       ...align.settings.figure
