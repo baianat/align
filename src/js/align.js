@@ -109,15 +109,6 @@ export default class Align {
       });
     }
     this.startContent.forEach((content) => new Section(this, content));
-    this.newSectionButton = document.createElement('button');
-    this.newSectionButton.classList.add('align-addButton');
-    this.el.appendChild(this.newSectionButton);
-    this.newSectionButton.addEventListener('click', () => {
-      const newSection = new Section(this);
-      newSection.active();
-      Selection.selectElement(newSection.contentDiv.querySelector('p'));
-      this.update();
-    });
   }
 
   /**
@@ -127,6 +118,22 @@ export default class Align {
     this.editor.addEventListener('focus', this.highlight.bind(this));
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
     window.addEventListener('keyup', this.update.bind(this), true);
+    window.addEventListener('keydown',
+      (event) => {
+        // Do nothing if the event was already processed
+        if (event.defaultPrevented) {
+          return;
+        }
+        const keyPressed = event.key.toUpperCase();
+        if (keyPressed === 'ENTER' & !event.shiftKey) {
+          event.preventDefault();
+          const newSection = new Section(this);
+          newSection.active();
+          Selection.selectElement(newSection.contentDiv.querySelector('p'));
+          this.update();
+        }
+      }
+    );
   }
 
   clearContent () {
