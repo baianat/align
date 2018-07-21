@@ -42,7 +42,7 @@ export default class Align {
 
   get title () {
     if (this.postTitle) {
-      const title = Section.allSections.find((sec) => sec.type === 'title');
+      const title = this.sections.find((sec) => sec.type === 'title');
       return title.content;
     }
   }
