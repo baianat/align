@@ -21,8 +21,11 @@ export default class Section {
     this.type = type;
     this.isHTMLView = false;
     this.$align = align;
-    this.generateEl(content);
+    this.generateWrapper(content);
+    this.generateContent(content);
     if (type === 'text') {
+      this.generateControllers();
+      this.generateBackground();
       this.el.addEventListener('click', () => {
         this.active();
       });
@@ -62,7 +65,7 @@ export default class Section {
     let output;
     if (this.type === 'text') {
       output = this.el.cloneNode(true);
-      const addButton = output.querySelector('.align-newSection');
+      const controllers = output.querySelector('.align-sectionControllers');
       const contentDiv = output.querySelector('.align-content');
       const figures = Array.from(contentDiv.querySelectorAll('figure'));
       if (this.isHTMLView) {
@@ -72,7 +75,7 @@ export default class Section {
       output.classList.remove('is-active');
       output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
       contentDiv.remove();
-      addButton.remove();
+      controllers.remove();
     }
     if (this.type === 'title') {
       return this.title.innerText;
@@ -80,28 +83,40 @@ export default class Section {
     return output.outerHTML;
   }
 
-  generateEl (content) {
+  generateWrapper (content) {
+    this.el = document.createElement('div');
+    this.el.classList.add('align-section');
+    let classes = content.classList;
+    if (!classes) {
+      return;
+    }
+    classes = Array.from(classes);
+    if (classes.includes('align-section')) {
+      const modifiers = classes.filter(cls => cls.startsWith('is-'));
+      this.el.classList.add(...modifiers);
+      this.bgColor = content.style.backgroundColor;
+    }
+  }
+
+  generateContent (content) {
     if (typeof content === 'string') {
       content = stringToDOM(content);
     }
-    this.el = (content && content.nodeName === 'DIV') ? content : document.createElement('div');
-    this.el.classList.add('align-section');
-
     switch (this.type) {
       case 'text':
-        this.contentDiv = this.el.querySelector('.align-content') || document.createElement('div');
-        this.contentDiv.classList.add('align-content');
-        this.contentDiv.contentEditable = true;
-        content = content ? this.contentDiv.innerHTML || this.el.innerHTML || content.outerHTML : '<p></p>';
-        if (this.contentDiv.querySelector('pre[data-align-html]')) {
-          content = this.contentDiv.innerText;
+        if (!this.contentDiv) {
+          this.contentDiv = document.createElement('div');
+          this.contentDiv.classList.add('align-content');
+          this.contentDiv.contentEditable = true;
         }
-
-        this.el.innerHTML = '';
+        if (this.isHTMLView) {
+          content = content.innerText;
+        }
+        if (!this.isHTMLView) {
+          content = content ? content.innerHTML : '<p></p>';
+        }
+        this.contentDiv.innerHTML = content;
         this.el.appendChild(this.contentDiv);
-        this.contentDiv.innerHTML = content
-        this.bgImage = this.bgImage || this.contentDiv.querySelector('.align-bgImage');
-        this.bgVideo = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
         this.generateElements();
         break;
 
@@ -129,14 +144,14 @@ export default class Section {
     figures.forEach(figure => new Figure(this.$align, figure));
     tables.forEach(table => new Table(this.$align, table));
     links.forEach(link => new Link(this.$align, link));
-    this.generateControllers();
-    this.generateBackground();
   }
 
   generateControllers () {
+    this.controllers = document.createElement('div');
     this.addButton = document.createElement('button');
     this.upButton = document.createElement('button');
     this.downButton = document.createElement('button');
+    this.controllers.classList.add('align-sectionControllers');
     this.addButton.classList.add('align-sectionAdd');
     this.upButton.classList.add('align-sectionUp');
     this.downButton.classList.add('align-sectionDown');
@@ -153,15 +168,25 @@ export default class Section {
     });
     this.upButton.addEventListener('click', this.moveUp.bind(this));
     this.downButton.addEventListener('click', this.moveDown.bind(this));
-    [this.addButton, this.upButton, this.downButton].forEach(btn => this.el.appendChild(btn));
+    [this.addButton, this.upButton, this.downButton].forEach(btn => this.controllers.appendChild(btn));
+    this.el.appendChild(this.controllers);
   }
 
   generateBackground () {
+    this.bgImage = this.bgImage || this.contentDiv.querySelector('.align-bgImage');
+    this.bgVideo = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
+    this.bgCol = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
     if (this.bgImage) {
+      this.el.classList.add('has-bgImage');
       this.el.insertAdjacentElement('afterBegin', this.bgImage);
     }
     if (this.bgVideo) {
+      this.el.classList.add('has-bgVideo');
       this.el.insertAdjacentElement('afterBegin', this.bgVideo);
+    }
+    if (this.bgColor) {
+      this.el.classList.add('has-bgColor');
+      this.el.style.backgroundColor = this.bgColor;
     }
   }
 
@@ -182,17 +207,21 @@ export default class Section {
       this.$align.highlight();
       return;
     }
-    this.generateEl(this.el);
-    this.contentDiv.focus();
+    this.generateContent(this.contentDiv);
     this.isHTMLView = false;
   }
 
   backgroundColor (_remove, color) {
     this.el.style.backgroundColor = color;
+    // color value maybe in hex, hsl or rgb model
+    // so I have to check for background inline style value
     if (this.el.style.backgroundColor !== 'rgb(255, 255, 255)') {
+      this.bgColor = color;
       this.el.classList.add('has-bgColor');
       return;
     }
+    this.bgColor = null;
+    this.el.style.backgroundColor = '';
     this.el.classList.remove('has-bgColor');
   }
 
