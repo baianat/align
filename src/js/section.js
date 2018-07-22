@@ -21,6 +21,9 @@ export default class Section {
     this.type = type;
     this.isHTMLView = false;
     this.$align = align;
+    if (typeof content === 'string') {
+      content = stringToDOM(content);
+    }
     this.generateWrapper(content);
     this.generateContent(content);
     if (type === 'text') {
@@ -99,9 +102,6 @@ export default class Section {
   }
 
   generateContent (content) {
-    if (typeof content === 'string') {
-      content = stringToDOM(content);
-    }
     switch (this.type) {
       case 'text':
         if (!this.contentDiv) {
