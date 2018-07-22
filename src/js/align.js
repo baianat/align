@@ -121,6 +121,10 @@ export default class Align {
   _initEvents () {
     this.editor.addEventListener('focus', this.highlight.bind(this));
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
+    this.editor.addEventListener('input', () => {
+      console.log('input')
+      this.$bus.emit('changed');
+    });
     window.addEventListener('keyup', this.update.bind(this), true);
   }
 

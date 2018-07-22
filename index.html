@@ -155,7 +155,13 @@
       },
     });
     myEditor.$bus.on('imageAdded', ({ file, update }) => {
-      console.log(file);
+      console.log({ file, update });
+    });
+    myEditor.$bus.on('sectionChanged', ({ from, to }) => {
+      console.log({ from, to });
+    });
+    myEditor.$bus.on('changed', () => {
+      console.log('changed');
     })
   </script>
 </body>

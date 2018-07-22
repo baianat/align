@@ -402,11 +402,13 @@ export default class Styler {
     const prefixedClasses = allClasses.map(cls => `is-${cls}`);
     this.currentItem.el.classList.remove(...prefixedClasses);
     this.currentItem.el.classList.toggle(currentClass);
-    this.update();
     const updateTemp = () => {
       this.update();
       this.currentItem.el.removeEventListener('transitionend', updateTemp);
     };
     this.currentItem.el.addEventListener('transitionend', updateTemp);
+
+    // emit events
+    this.$align.$bus.emit('changed');
   }
 }

@@ -223,6 +223,11 @@ export default class Section {
     this.bgColor = null;
     this.el.style.backgroundColor = '';
     this.el.classList.remove('has-bgColor');
+
+    // emit events
+    const index = this.getIndex();
+    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
+    this.$align.$bus.emit('changed');
   }
 
   removeBackground (_, event) {
@@ -236,6 +241,11 @@ export default class Section {
       this.bgVideo = null;
       this.el.classList.remove('has-bgVideo');
     }
+
+    // emit events
+    const index = this.getIndex();
+    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
+    this.$align.$bus.emit('changed');
   }
   
   backgroundImage (_, event) {
@@ -252,9 +262,14 @@ export default class Section {
     };
     this.bgImage.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
     this.el.classList.add('has-bgImage');
-    this.$align.update();
-    this.$align.$bus.emit('imageAdded', { file, update });
     input.value = null;
+    this.$align.update();
+
+    // emit events
+    const index = this.getIndex();
+    this.$align.$bus.emit('imageAdded', { file, update });
+    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
+    this.$align.$bus.emit('changed');
   }
 
   backgroundVideo (_, event) {
@@ -278,27 +293,44 @@ export default class Section {
     const update = (src) => {
       source.src = src;
     };
-    this.$align.update();
-    this.$align.$bus.emit('videoAdded', { file, update });
     input.value = null;
+    this.$align.update();
+
+    // emit events
+    const index = this.getIndex();
+    this.$align.$bus.emit('videoAdded', { file, update });
+    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
+    this.$align.$bus.emit('changed');
   }
 
   moveUp () {
-    const index = this.getIndex();
+    const oldIndx = this.getIndex();
     if (
-      !this.$align.sections[index - 1] ||
-      this.$align.sections[index - 1].type === 'title'
+      !this.$align.sections[oldIndx - 1] ||
+      this.$align.sections[oldIndx - 1].type === 'title'
     ) return;
 
-    this.$align.editor.insertBefore(this.el, this.$align.sections[index - 1].el);
-    swapArrayItems(this.$align.sections, index, index - 1);
+    this.$align.editor.insertBefore(this.el, this.$align.sections[oldIndx - 1].el);
+    swapArrayItems(this.$align.sections, oldIndx, oldIndx - 1);
+
+    //emit events
+    this.$align.$bus.emit('sectionChanged', { 
+      from: oldIndx, to: this.getIndex()
+    });
+    this.$align.$bus.emit('changed');
   }
 
   moveDown () {
-    const index = this.getIndex();
-    if (!this.$align.sections[index + 1]) return;
-    this.$align.editor.insertBefore(this.el, this.$align.sections[index + 1].el.nextSibling);
-    swapArrayItems(this.$align.sections, index, index + 1);
+    const oldIndx = this.getIndex();
+    if (!this.$align.sections[oldIndx + 1]) return;
+    this.$align.editor.insertBefore(this.el, this.$align.sections[oldIndx + 1].el.nextSibling);
+    swapArrayItems(this.$align.sections, oldIndx, oldIndx + 1);
+
+    //emit events
+    this.$align.$bus.emit('sectionChanged', { 
+      from: oldIndx, to: this.getIndex()
+    });
+    this.$align.$bus.emit('changed');
   }
 
 
@@ -317,15 +349,28 @@ export default class Section {
   }
 
   remove () {
+    const oldIndx = this.getIndex();
     this.inactive();
     this.el.remove();
-    this.$align.sections.splice(this.getIndex(), 1);
+    this.$align.sections.splice(oldIndx, 1);
     this.$align.$sectionToolbar.hide();
     this.$align.update();
+
+    //emit events
+    this.$align.$bus.emit('sectionChanged', {
+      from: oldIndx, to: null
+    });
+    this.$align.$bus.emit('changed');
   }
 
   duplicate () {
     const content = this.content;
     new Section(this.$align, content, { position: this.getIndex() });
+
+    //emit events
+    this.$align.$bus.emit('sectionChanged', {
+      from: null, to: this.getIndex()
+    });
+    this.$align.$bus.emit('changed');
   }
 }
