@@ -197,7 +197,6 @@ export default class Styler {
       // check if the cmd calls a function from align
       // otherwise it calls the function from the element itself
       let callbackFunc = null
-      console.log(this.$align[cmdSchema.func])
       if (this.$align[cmdSchema.func]) {
         callbackFunc = this.$align[cmdSchema.func].bind(this.$align);
       }

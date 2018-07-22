@@ -1,4 +1,4 @@
-import { select, userOS, getVideoId, stringToDOM } from './partial/util';
+import { select, userOS, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './selection';
@@ -194,36 +194,6 @@ export default class Align {
     }
   }
 
-  createVideo () {
-    const prompt = new Prompt(this, {
-      message: 'Enter video link:'
-    });
-    prompt.onSubmit(() => {
-      const link = prompt.inputs[0].value;
-      if (!link) return;
-      const videoHoster = link.includes('yout') ? 'youtube' : link.includes('vimeo') ? 'vimeo' : '';
-
-      if (!videoHoster) {
-        return;
-      }
-      const videoId = getVideoId(link, videoHoster);
-      const iframe = document.createElement('iframe');
-      const video = document.createElement('div');
-
-      video.classList.add('align-video');
-      iframe.allowfullscreen = true;
-      iframe.contentEditable = false;
-      iframe.src =
-        videoHoster === 'youtube'
-          ? `//www.youtube.com/embed/${videoId}`
-          : videoHoster === 'vimeo' ? `//player.vimeo.com/video/${videoId}` : '';
-
-      video.appendChild(iframe);
-      const el = Selection.range.startContainer;
-      el.parentNode.insertBefore(video, el);
-    });
-  }
-
   createColumn () {
     const prompt = new Prompt(this, {
       message: 'Enter columns count:',
@@ -298,9 +268,16 @@ export default class Align {
     link.edit();
   }
 
-  addHTML (...element) {
-    const domElement = stringToDOM(element);
+  addHTML (args) {
+    const domElement = stringToDOM(args[0]);
     const el = Selection.range.startContainer;
     el.parentNode.insertBefore(domElement, el);
+  }
+
+  addElement (args) {
+    args[0].add(this).then((newElement) => {
+      const el = Selection.range.startContainer;
+      el.parentNode.insertBefore(newElement.el, el);
+    });
   }
 }

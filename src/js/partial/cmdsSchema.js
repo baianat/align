@@ -1,5 +1,7 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from '../selection';
+import Youtube from '../elements/youtube';
+import Vimeo from '../elements/vimeo';
 
 const cmdsSchema = {
   bold: {
@@ -351,13 +353,6 @@ const cmdsSchema = {
     tooltip: 'Add columns'
   },
 
-  createVideo: {
-    element: 'button',
-    icon: 'video',
-    func: 'createVideo',
-    tooltip: 'Add video'
-  },
-
   createLine: {
     element: 'dropdown',
     items: [
@@ -380,6 +375,22 @@ const cmdsSchema = {
     element: 'button',
     tooltip: 'Hyperlink',
     func: 'createLink'
+  },
+
+  addYoutube: {
+    element: 'button',
+    tooltip: 'Hyperlink',
+    func: 'addElement',
+    icon: 'youtube',
+    args: [Youtube]
+  },
+
+  addVimeo: {
+    element: 'button',
+    tooltip: 'Hyperlink',
+    func: 'addElement',
+    icon: 'vimeo',
+    args: [Vimeo]
   },
 
   // internal functions don't override it
