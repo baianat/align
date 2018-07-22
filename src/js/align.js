@@ -182,7 +182,7 @@ export default class Align {
     this.update();
   }
 
-  createFigure (styler, event) {
+  createFigure (event) {
     const input = event.target;
     const file = input.files[0];
     if (!file || !Selection.range) return;
@@ -254,7 +254,7 @@ export default class Align {
     });
   }
 
-  createLine (styler, line) {
+  createLine (line) {
     const el = Selection.range.startContainer;
     el.parentNode.insertBefore(stringToDOM(line), el);
   }
@@ -298,8 +298,8 @@ export default class Align {
     link.edit();
   }
 
-  createElement (_, $schema) {
-    const domElement = stringToDOM($schema.args);
+  addHTML (...element) {
+    const domElement = stringToDOM(element);
     const el = Selection.range.startContainer;
     el.parentNode.insertBefore(domElement, el);
   }

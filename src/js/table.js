@@ -53,8 +53,8 @@ export default class Table {
     });
   }
 
-  insertRow ($styler, $schema) {
-    const position = $schema.args[0];
+  insertRow (args) {
+    const position = args[0];
     const columnsLength = this.el.rows[0].cells.length;
     const newIndex = this.activeCell.parentNode.rowIndex + (position === 'after' ? 1 : 0);
     const row = this.el.insertRow(newIndex);
@@ -68,8 +68,8 @@ export default class Table {
     this.el.deleteRow(this.activeCell.parentNode.rowIndex);
   }
 
-  insertColumn ($styler, $schema) {
-    const position = $schema.args[0];
+  insertColumn (args) {
+    const position = args[0];
     const rowsLength = this.el.rows.length;
     const columnIndex = this.activeCell.cellIndex + (position === 'after' ? 1 : 0);
     for (let i = 0; i < rowsLength; i++) {

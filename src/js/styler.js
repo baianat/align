@@ -173,7 +173,7 @@ export default class Styler {
         break;
 
       default:
-        console.warn(cmd + ' element not found');
+        console.warn(cmd, ' element not found');
     }
 
     if (typeof cmdSchema.init === 'function') {
@@ -192,17 +192,29 @@ export default class Styler {
     if (cmdSchema.command) {
       this.execute(cmdSchema.command, value, cmdSchema.useCSS);
     }
+
     if (typeof cmdSchema.func === 'string') {
-      // check if the cmd calls a function for align
-      // otherwise it calls a function for the element class itself
-      let callbackFunc = this.$align[cmdSchema.func]
-        ? this.$align[cmdSchema.func].bind(this.$align)
-        : this.currentItem[cmdSchema.func].bind(this.currentItem);
-      callbackFunc(this, value || cmdSchema);
+      // check if the cmd calls a function from align
+      // otherwise it calls the function from the element itself
+      let callbackFunc = null
+      console.log(this.$align[cmdSchema.func])
+      if (this.$align[cmdSchema.func]) {
+        callbackFunc = this.$align[cmdSchema.func].bind(this.$align);
+      }
+      else if (this.currentItem && this.currentItem[cmdSchema.func]) {
+        callbackFunc = this.currentItem[cmdSchema.func].bind(this.currentItem);
+      }
+      if (!callbackFunc) {
+        console.warn(cmdSchema.func, ' is not found');
+        return;
+      }
+      callbackFunc(cmdSchema.args || value);
     }
+
     if (typeof cmdSchema.func === 'function') {
-      cmdSchema.func(this, value || cmdSchema);
+      cmdSchema.func(cmdSchema.args || value);
     }
+
     this.update();
   }
 

@@ -211,7 +211,7 @@ export default class Section {
     this.isHTMLView = false;
   }
 
-  backgroundColor (_remove, color) {
+  backgroundColor (color) {
     this.el.style.backgroundColor = color;
     // color value maybe in hex, hsl or rgb model
     // so I have to check for background inline style value
@@ -230,7 +230,7 @@ export default class Section {
     this.$align.$bus.emit('changed');
   }
 
-  removeBackground (_, event) {
+  removeBackground () {
     if (this.bgImage) {
       this.bgImage.remove();
       this.bgImage = null;
@@ -248,7 +248,7 @@ export default class Section {
     this.$align.$bus.emit('changed');
   }
   
-  backgroundImage (_, event) {
+  backgroundImage (event) {
     const input = event.target;
     const file = input.files[0];
     if (!file) return;
@@ -272,7 +272,7 @@ export default class Section {
     this.$align.$bus.emit('changed');
   }
 
-  backgroundVideo (_, event) {
+  backgroundVideo (event) {
     const input = event.target;
     const file = input.files[0];
     if (!file) return;
