@@ -86,7 +86,7 @@ export default class Section {
   generateWrapper (content) {
     this.el = document.createElement('div');
     this.el.classList.add('align-section');
-    let classes = content.classList;
+    let classes = content ? content.classList : '';
     if (!classes) {
       return;
     }
@@ -310,29 +310,10 @@ export default class Section {
     this.el.classList.add('is-active');
     this.$align.$sectionToolbar.update(this);
     this.contentDiv.focus();
-
-    this.keydownCallback = (event) => {
-      // Do nothing if the event was already processed
-      if (event.defaultPrevented) {
-        return;
-      }
-      const keyPressed = event.key.toUpperCase();
-      if (keyPressed === 'ENTER' & !event.shiftKey) {
-        event.preventDefault();
-        const newSection = new Section(this.$align, '', {
-          position: this.getIndex() + 1
-        });
-        newSection.active();
-        Selection.selectElement(newSection.contentDiv.querySelector('p'));
-      }
-    }
-
-    window.addEventListener('keydown', this.keydownCallback);
   }
 
   inactive () {
     this.el.classList.remove('is-active');
-    window.removeEventListener('keydown', this.keydownCallback);
   }
 
   remove () {

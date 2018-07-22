@@ -109,6 +109,10 @@ export default class Align {
       });
     }
     this.startContent.forEach((content) => new Section(this, content));
+    const addSection = document.createElement('button');
+    addSection.classList.add('align-sectionAdd', 'is-main');
+    this.el.appendChild(addSection);
+    addSection.addEventListener('click', () => new Section(this));
   }
 
   /**

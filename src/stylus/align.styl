@@ -53,6 +53,7 @@
     transition: 0.5s 0.1s
     cursor: pointer
     content: '+'
+    outline: none
     &:after
       content: '+'
       display: block
@@ -67,6 +68,19 @@
       margin: auto 
     &:hover
       opacity: 1
+    &.is-main
+      position: static
+      transform: none
+      opacity: 1
+      margin: 0 auto 50px
+      display: block
+      height: auto
+      background: transparent
+      &:after
+        border-radius: 20px
+        border: 2px solid $gray
+        background: $white
+        color: $gray
 
   &-content
     width: 100%
