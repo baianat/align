@@ -19,18 +19,7 @@ import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
 const symbols = generateKeysSymbols();
 
-export default class Styler {
-  static defaults = {
-    mode: 'toolbar',
-    commands: ['bold', 'italic', 'underline'],
-    hideWhenClickOut: false,
-    tooltip: false,
-    theme: 'light',
-    shortcuts: false,
-    addActiveClass: false,
-    position: 'center-top'
-  }
-  
+export default class Styler {  
   constructor (align, settings) {
     this.$align = align;
     this.settings = {
@@ -196,11 +185,10 @@ export default class Styler {
     if (typeof cmdSchema.func === 'string') {
       // check if the cmd calls a function from align
       // otherwise it calls the function from the element itself
-      let callbackFunc = null
+      let callbackFunc = null;
       if (this.$align[cmdSchema.func]) {
         callbackFunc = this.$align[cmdSchema.func].bind(this.$align);
-      }
-      else if (this.currentItem && this.currentItem[cmdSchema.func]) {
+      } else if (this.currentItem && this.currentItem[cmdSchema.func]) {
         callbackFunc = this.currentItem[cmdSchema.func].bind(this.currentItem);
       }
       if (!callbackFunc) {
@@ -421,5 +409,16 @@ export default class Styler {
 
     // emit events
     this.$align.$bus.emit('changed');
+  }
+
+  static defaults = {
+    mode: 'toolbar',
+    commands: ['bold', 'italic', 'underline'],
+    hideWhenClickOut: false,
+    tooltip: false,
+    theme: 'light',
+    shortcuts: false,
+    addActiveClass: false,
+    position: 'center-top'
   }
 }

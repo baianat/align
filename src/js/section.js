@@ -1,15 +1,12 @@
 import { stringToDOM, swapArrayItems } from './partial/util'
 import icons from './partial/icons';
+import Figure from './elements/figure';
+import Table from './elements/table';
+import Link from './elements/link';
 import Styler from './styler';
-import Figure from './figure';
-import Table from './table';
-import Link from './link';
 import Selection from './selection';
 
 export default class Section {
-  static id = 0; // eslint-disable-line
-  static activeSection = null;
-
   constructor (align, content, {
     position,
     type = 'text'
@@ -313,7 +310,7 @@ export default class Section {
     this.$align.editor.insertBefore(this.el, this.$align.sections[oldIndx - 1].el);
     swapArrayItems(this.$align.sections, oldIndx, oldIndx - 1);
 
-    //emit events
+    // emit events
     this.$align.$bus.emit('sectionChanged', { 
       from: oldIndx, to: this.getIndex()
     });
@@ -326,13 +323,12 @@ export default class Section {
     this.$align.editor.insertBefore(this.el, this.$align.sections[oldIndx + 1].el.nextSibling);
     swapArrayItems(this.$align.sections, oldIndx, oldIndx + 1);
 
-    //emit events
+    // emit events
     this.$align.$bus.emit('sectionChanged', { 
       from: oldIndx, to: this.getIndex()
     });
     this.$align.$bus.emit('changed');
   }
-
 
   active () {
     if (Section.activeSection) {
@@ -356,7 +352,7 @@ export default class Section {
     this.$align.$sectionToolbar.hide();
     this.$align.update();
 
-    //emit events
+    // emit events
     this.$align.$bus.emit('sectionChanged', {
       from: oldIndx, to: null
     });
@@ -365,12 +361,15 @@ export default class Section {
 
   duplicate () {
     const content = this.content;
-    new Section(this.$align, content, { position: this.getIndex() });
+    const newSection = new Section(this.$align, content, { position: this.getIndex() });
 
-    //emit events
+    // emit events
     this.$align.$bus.emit('sectionChanged', {
       from: null, to: this.getIndex()
     });
     this.$align.$bus.emit('changed');
   }
+
+  static id = 0; // eslint-disable-line
+  static activeSection = null;
 }

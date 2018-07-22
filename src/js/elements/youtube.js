@@ -3,6 +3,8 @@ import Prompt from '../prompt';
 export default class Youtube {
   constructor (link) {
     this.el = document.createElement('div');
+    this.el.classList.add('align-video');
+
     this._init(link);
   }
 
@@ -35,7 +37,6 @@ export default class Youtube {
     iframe.contentEditable = false;
     iframe.src = `//www.youtube.com/embed/${videoId}`;
 
-    this.el.classList.add('align-video');
     this.el.appendChild(iframe);
   }
 }

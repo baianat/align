@@ -3,6 +3,8 @@ import Prompt from '../prompt';
 export default class Vimeo {
   constructor (link) {
     this.el = document.createElement('div');
+    this.el.classList.add('align-video');
+
     this._init(link);
   }
 
@@ -35,7 +37,6 @@ export default class Vimeo {
     iframe.contentEditable = false;
     iframe.src = `//player.vimeo.com/video/${videoId}`;
 
-    this.el.classList.add('align-video');
     this.el.appendChild(iframe);
   }
 }

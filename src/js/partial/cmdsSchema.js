@@ -1,7 +1,12 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from '../selection';
-import Youtube from '../elements/youtube';
+import Grid from '../elements/grid';
+import Table from '../elements/table';
+import Link from '../elements/link';
+import Embed from '../elements/embed';
+import Facebook from '../elements/facebook';
 import Vimeo from '../elements/vimeo';
+import Youtube from '../elements/youtube';
 
 const cmdsSchema = {
   bold: {
@@ -318,13 +323,6 @@ const cmdsSchema = {
     }
   },
 
-  createTable: {
-    element: 'button',
-    func: 'createTable',
-    icon: 'table',
-    tooltip: 'Add Table'
-  },
-
   createFigure: {
     element: 'file',
     icon: 'figure',
@@ -332,28 +330,23 @@ const cmdsSchema = {
     tooltip: 'Add Figure'
   },
 
-  createPost: {
-    element: 'button',
-    icon: 'facebook',
-    func: 'createPost',
-    tooltip: 'Add post'
-  },
-
-  createEmbed: {
+  addEmbed: {
     element: 'button',
     icon: 'embed',
-    func: 'createEmbed',
+    func: 'addElement',
+    args: Embed,
     tooltip: 'Add embed'
   },
 
-  createColumn: {
+  addGrid: {
     element: 'button',
     icon: 'column',
-    func: 'createColumn',
+    func: 'addElement',
+    args: Grid,
     tooltip: 'Add columns'
   },
 
-  createLine: {
+  addLine: {
     element: 'dropdown',
     items: [
       '<hr class="align-line">',
@@ -367,30 +360,47 @@ const cmdsSchema = {
       '<hr class="align-line is-bold is-double">'
     ],
     icon: 'insertLine',
-    func: 'createLine',
+    func: 'addHTML',
     tooltip: 'Add line'
   },
 
-  createLink: {
+  addLink: {
     element: 'button',
     tooltip: 'Hyperlink',
-    func: 'createLink'
+    func: 'addElement',
+    icon: 'link',
+    args: Link
   },
 
-  addYoutube: {
+  addTable: {
+    element: 'button',
+    func: 'addElement',
+    args: Table,
+    icon: 'table',
+    tooltip: 'Add Table'
+  },
+
+  facebook: {
+    element: 'button',
+    func: 'addElement',
+    args: Facebook,
+    tooltip: 'Add post'
+  },
+
+  youtube: {
     element: 'button',
     tooltip: 'Hyperlink',
     func: 'addElement',
     icon: 'youtube',
-    args: [Youtube]
+    args: Youtube
   },
 
-  addVimeo: {
+  vimeo: {
     element: 'button',
     tooltip: 'Hyperlink',
     func: 'addElement',
     icon: 'vimeo',
-    args: [Vimeo]
+    args: Vimeo
   },
 
   // internal functions don't override it

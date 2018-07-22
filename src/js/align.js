@@ -1,28 +1,19 @@
 import { select, userOS, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
+import Figure from './elements/figure';
+import Table from './elements/table';
 import Selection from './selection';
 import Section from './section';
 import EventBus from './events';
 import Styler from './styler';
-import Prompt from './prompt';
-import Figure from './figure';
-import Table from './table';
-import Link from './link';
 
 export default class Align {
-  constructor (
-    selector,
-    { toolbar = null, bubble = null, creator = null, section = null, shortcuts = false, postTitle = false } = {}
-  ) {
+  constructor (selector, settings) {
     this.el = select(selector);
     this.settings = {
-      toolbar,
-      bubble,
-      creator,
-      section,
-      shortcuts,
-      postTitle
+      ...Align.defaults,
+      ...settings
     };
     this._init();
   }
@@ -61,24 +52,36 @@ export default class Align {
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
-
     Section.config(this);
-    Figure.config(this);
-    Table.config(this);
+
+    this.$figureToolbar = new Styler(this, {
+      ...Figure.defaults,
+      ...this.settings.figure
+    });
+    this.$tableToolbar = new Styler(this, {
+      ...Table.defaults,
+      ...this.settings.table
+    });
 
     if (this.settings.toolbar) {
-      this.settings.toolbar.mode = 'toolbar';
-      this.toolbar = new Styler(this, this.settings.toolbar);
+      this.toolbar = new Styler(this, {
+        ...this.settings.toolbar,
+        mode: 'toolbar'
+      });
     }
     if (this.settings.bubble) {
-      this.settings.bubble.mode = 'bubble';
-      this.settings.bubble.tooltip = false;
-      this.bubble = new Styler(this, this.settings.bubble);
+      this.bubble = new Styler(this, {
+        ...this.settings.bubble,
+        mode: 'bubble',
+        tooltip: false
+      });
     }
     if (this.settings.creator) {
-      this.settings.creator.mode = 'creator';
-      this.settings.creator.position = 'middle-left';
-      this.creator = new Styler(this, this.settings.creator);
+      this.creator = new Styler(this, {
+        ...this.settings.creator,
+        mode: 'creator',
+        position: 'middle-left'
+      });
     }
     this._initEditor();
     this._initSections();
@@ -194,90 +197,41 @@ export default class Align {
     }
   }
 
-  createColumn () {
-    const prompt = new Prompt(this, {
-      message: 'Enter columns count:',
-      inputsCount: 1
-    });
-    prompt.onSubmit(() => {
-      const grid = stringToDOM(`<div class="align-grid">
-        ${'<div class="align-column"><p><br></p></div>'.repeat(prompt.inputs[0].value)}
-      </div>`);
-      const el = Selection.range.startContainer;
-      el.parentNode.insertBefore(grid, el);
-    });
-  }
-
-  createTable () {
-    const prompt = new Prompt(this, {
-      message: 'Enter post link:',
-      inputsCount: 2,
-      inputsPlaceholders: ['rows', 'columns']
-    });
-    prompt.onSubmit(() => {
-      const table = new Table(this, {
-        rows: prompt.inputs[0].value,
-        columns: prompt.inputs[1].value
-      }).el;
-      const el = Selection.range.startContainer;
-      el.parentNode.insertBefore(table, el);
-    });
-  }
-
-  createLine (line) {
-    const el = Selection.range.startContainer;
-    el.parentNode.insertBefore(stringToDOM(line), el);
-  }
-
-  createPost () {
-    const prompt = new Prompt(this, {
-      message: 'Enter post link:'
-    });
-    prompt.onSubmit(() => {
-      const postUrl = prompt.inputs[0].value;
-      if (!postUrl) return;
-      const iframe = document.createElement('iframe');
-
-      iframe.width = 500;
-      iframe.height = 200;
-      iframe.scrolling = 'no';
-      iframe.contentEditable = false;
-      iframe.allowTransparency = true;
-      iframe.src = `//www.facebook.com/plugins/post.php?href=${postUrl}`;
-      Selection.range.insertNode(iframe);
-    });
-  }
-
-  createEmbed () {
-    const prompt = new Prompt(this, {
-      message: 'Add an embedded:'
-    });
-    prompt.onSubmit(() => {
-      const data = prompt.inputs[0].value;
-      if (!data) return;
-      const div = document.createElement('div');
-      div.insertAdjacentHTML('afterbegin', data);
-
-      const el = Selection.range.startContainer;
-      el.parentNode.insertBefore(div, el);
-    });
-  }
-
-  createLink () {
-    const link = new Link(this);
-    link.edit();
-  }
-
   addHTML (args) {
-    const domElement = stringToDOM(args[0]);
+    let elHTML = '';
+    if (Array.isArray(args)) {
+      elHTML = args[0];
+    }
+    if (typeof args === 'string') {
+      elHTML = args;
+    }
+    const domElement = stringToDOM(elHTML);
+    if (!domElement) return;
     const el = Selection.range.startContainer;
     el.parentNode.insertBefore(domElement, el);
   }
 
   addElement (args) {
-    args[0].add(this).then((newElement) => {
+    let elClass = '';
+    if (Array.isArray(args)) {
+      elClass = args[0];
+    }
+    if (typeof args === 'function') {
+      elClass = args;
+    }
+    elClass.add(this).then((newElement) => {
+      if (!newElement.el) return;
       const el = Selection.range.startContainer;
       el.parentNode.insertBefore(newElement.el, el);
     });
+  }
+
+  static defaults = {
+    toolbar: null,
+    bubble: null,
+    creator: null,
+    section: null,
+    shortcuts: false,
+    postTitle: false
   }
 }
