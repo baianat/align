@@ -19,7 +19,7 @@ import cmdsSchema from './partial/cmdsSchema';
 import Selection from './selection';
 const symbols = generateKeysSymbols();
 
-export default class Styler {  
+export default class Styler {
   constructor (align, settings) {
     this.$align = align;
     this.settings = {

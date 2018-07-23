@@ -148,13 +148,16 @@ export default class Section {
     this.addButton = document.createElement('button');
     this.upButton = document.createElement('button');
     this.downButton = document.createElement('button');
+    this.settingsButton = document.createElement('button');
+    this.settingsButton.classList.add('align-sectionSettings');
     this.controllers.classList.add('align-sectionControllers');
     this.addButton.classList.add('align-sectionAdd');
     this.upButton.classList.add('align-sectionUp');
     this.downButton.classList.add('align-sectionDown');
-
+    
     this.upButton.insertAdjacentHTML('afterbegin', icons.caretUp);
     this.downButton.insertAdjacentHTML('afterbegin', icons.caretDown);
+    this.settingsButton.insertAdjacentHTML('afterbegin', icons.dotsVertical);
 
     this.addButton.addEventListener('click', () => {
       const newSection = new Section(this.$align, '', { position: this.getIndex() })
@@ -165,8 +168,15 @@ export default class Section {
     });
     this.upButton.addEventListener('click', this.moveUp.bind(this));
     this.downButton.addEventListener('click', this.moveDown.bind(this));
-    [this.addButton, this.upButton, this.downButton].forEach(btn => this.controllers.appendChild(btn));
+    [this.addButton, this.upButton, this.downButton, this.settingsButton].forEach(btn => {
+      this.controllers.appendChild(btn);
+    });
     this.el.appendChild(this.controllers);
+  }
+
+  generateSettingsMenu () {
+    this.settingsMenu = document.createElement('div');
+
   }
 
   generateBackground () {
@@ -274,19 +284,22 @@ export default class Section {
     const file = input.files[0];
     if (!file) return;
     const url = window.URL.createObjectURL(event.target.files[0]);
-    let source = null;
 
     if (!this.bgVideo) {
-      this.bgVideo = stringToDOM(`<video autoplay muted loop class="align-bgVideo"></video>`);
-      source = document.createElement('source');
-      this.bgVideo.appendChild(source);
-      this.el.insertAdjacentElement('afterBegin', this.bgVideo);
+      this.bgVideo = document.createElement('div');
+      this.bgVideo.classList.add('align-bgVideo');
+      this.bgVideo.insertAdjacentHTML('afterbegin', `<video autoplay muted loop></video>`);
+      this.el.insertAdjacentElement('afterbegin', this.bgVideo);
     }
-    if (this.bgVideo) {
-      source = this.bgVideo.querySelector('source');
-    }
-    this.el.classList.add('has-bgVideo');
+    const source = 
+      this.bgVideo.querySelector('source') ||
+      document.createElement('source');
+    const video = this.bgVideo.querySelector('video');
+    video.appendChild(source);
     source.src = url;
+    video.load();
+    video.play();
+    this.el.classList.add('has-bgVideo');
     const update = (src) => {
       source.src = src;
     };

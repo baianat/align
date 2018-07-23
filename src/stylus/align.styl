@@ -19,23 +19,40 @@
     z-index: 99999
     overflow: auto
 
+  &-settingsMenu
+    position: fixed
+    top: 0
+    right: 0
+    height: 100%
+    width: 200px
+    max-width: 100%
+    background-color: $white
+    z-index: 999
+    box-shadow: -10px 0 25px -20px alpha($black, 20%)
+
+  &-sectionSettings
   &-sectionUp
   &-sectionDown
     position: absolute
-    top: 0
-    left: 0
-    display: none
     fill: $gray
     border: none
+    display: none
     background: transparent
     padding: 10px
+    cursor: pointer
+    &:hover
+      fill: darken($gray, 40%)
     ~/-section.is-active &
       display: block
-    &:hover
-      fill: darken($gray, 30%)
+
+  &-sectionSettings
+    top: 0
+    right: 0
+  &-sectionUp
+    top: 0
+    left: 0
   &-sectionDown
-    top: auto
-    top: initial
+    left: 0
     bottom: 0
 
   &-sectionAdd
@@ -43,44 +60,39 @@
     z-index: 30
     top: 0
     left: 50%
-    transform: translate(-50%, 0)
-    width: 70%
-    max-width: 600px
-    height: 3px
-    background-color: $gray
+    transform: translate(-50%, -50%)
+    width: 300px
+    max-width: 70%
+    height: 4px
+    padding: 0
+    background-color: alpha($gray, 80%)
     border: 0
     opacity: 0
     transition: 0.5s 0.1s
     cursor: pointer
-    content: '+'
     outline: none
-    &:after
-      content: '+'
-      display: block
-      color: white
-      width: 20px
-      height: 20px
-      background-color: $gray
-      text-align: center
-      line-height: 20px
-      font-size: 15px
-      border-radius: 0 0 10px 10px
-      margin: auto 
+    color: $gray
     &:hover
       opacity: 1
+      color: darken($gray, 40%)
     &.is-main
       position: static
       transform: none
       opacity: 1
       margin: 0 auto 50px
       display: block
-      height: auto
+      height: 25px
+      width: 25px
+      border-radius: 20px
+      border: 2px solid $gray
+      background: $white
       background: transparent
+      color: $gray
+      line-height: 23px
+      font-size: 15px
+      text-align: center
       &:after
-        border-radius: 20px
-        border: 2px solid $gray
-        background: $white
-        color: $gray
+        content: '+'
 
   &-content
     width: 100%
@@ -94,7 +106,6 @@
   &-section
     position: relative
     z-index: 1
-    overflow: hidden
     transition: 0.2s
     *:focus
       outline: none
