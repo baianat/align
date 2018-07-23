@@ -93,7 +93,7 @@ export default class Figure {
     this.el.remove();
   }
 
-  static defults = {
+  static defaults = {
     mode: 'bubble',
     hideWhenClickOut: true,
     addActiveClass: true,
