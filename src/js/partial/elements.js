@@ -13,6 +13,7 @@ export function button (name, tooltip) {
   const button = document.createElement('button');
   button.classList.add(`${NAMING_PREFIX}button`);
   button.id = name;
+  button.type = 'button';
   if (tooltip) {
     button.dataset.tooltip = tooltip;
   }
