@@ -3,7 +3,6 @@ import icons from './partial/icons';
 import Figure from './elements/figure';
 import Table from './elements/table';
 import Link from './elements/link';
-import Styler from './styler';
 import Selection from './selection';
 
 export default class Section {
@@ -18,6 +17,7 @@ export default class Section {
     this.type = type;
     this.isHTMLView = false;
     this.$align = align;
+    this.elements = [];
     if (typeof content === 'string') {
       content = stringToDOM(content);
     }
@@ -39,26 +39,6 @@ export default class Section {
     }
     this.$align.editor.appendChild(this.el);
     this.$align.sections.push(this);
-  }
-
-  static config (align) {
-    align.$sectionToolbar = new Styler(align, {
-      mode: 'bubble',
-      hideWhenClickOut: true,
-      commands: [
-        '_sectionColor',
-        '_sectionImage',
-        '_sectionVideo',
-        '_sectionRemoveBg',
-        '_sectionToggleHTML',
-        '_sectionDuplicate',
-        { '_sectionClasses': ['normal', 'full'] },
-        '_remove'
-      ],
-      tooltip: true,
-      position: 'left-top',
-      ...align.settings.section
-    });
   }
 
   get content () {
@@ -168,7 +148,7 @@ export default class Section {
     });
     this.upButton.addEventListener('click', this.moveUp.bind(this));
     this.downButton.addEventListener('click', this.moveDown.bind(this));
-    [this.addButton, this.upButton, this.downButton, this.settingsButton].forEach(btn => {
+    [this.addButton, this.upButton, this.downButton].forEach(btn => {
       this.controllers.appendChild(btn);
     });
     this.el.appendChild(this.controllers);
@@ -385,4 +365,20 @@ export default class Section {
 
   static id = 0; // eslint-disable-line
   static activeSection = null;
+  static defaults = {
+    mode: 'bubble',
+    hideWhenClickOut: true,
+    commands: [
+      '_sectionColor',
+      '_sectionImage',
+      '_sectionVideo',
+      '_sectionRemoveBg',
+      '_sectionToggleHTML',
+      '_sectionDuplicate',
+      { '_sectionClasses': ['normal', 'full'] },
+      '_remove'
+    ],
+    tooltip: true,
+    position: 'left-top'
+  }
 }

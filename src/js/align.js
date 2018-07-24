@@ -52,8 +52,21 @@ export default class Align {
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
-    Section.config(this);
 
+    this._initStylers();
+    this._initEditor();
+    this._initSections();
+    this._initEvents();
+  }
+
+  /**
+   * create all stylers instances
+   */
+  _initStylers () {
+    this.$sectionToolbar = new Styler(this, {
+      ...Section.defaults,
+      ...this.settings.section
+    });
     this.$figureToolbar = new Styler(this, {
       ...Figure.defaults,
       ...this.settings.figure
@@ -83,22 +96,21 @@ export default class Align {
         position: 'middle-left'
       });
     }
-    this._initEditor();
-    this._initSections();
-    this._initEvents();
   }
-
   /**
    * Create the editor
    */
   _initEditor () {
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
+    this.wrapper = document.createElement('div');
     this.editor = document.createElement('div');
+    this.wrapper.classList.add('align-wrapper');
     this.editor.classList.add('align-editor');
     this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
     this.cmdKeyPressed = false;
-    this.el.appendChild(this.editor);
+    this.wrapper.appendChild(this.editor);
+    this.el.appendChild(this.wrapper);
     this.editor.focus();
     Selection.update();
   }
@@ -114,7 +126,7 @@ export default class Align {
     this.startContent.forEach((content) => new Section(this, content));
     const addSection = document.createElement('button');
     addSection.classList.add('align-sectionAdd', 'is-main');
-    this.el.appendChild(addSection);
+    this.wrapper.appendChild(addSection);
     addSection.addEventListener('click', () => new Section(this));
   }
 
@@ -195,6 +207,7 @@ export default class Align {
       const el = Selection.range.startContainer;
       el.parentNode.insertBefore(figure.el, el);
     }
+    this.update();
   }
 
   addHTML (args) {
@@ -209,6 +222,7 @@ export default class Align {
     if (!domElement) return;
     const el = Selection.range.startContainer;
     el.parentNode.insertBefore(domElement, el);
+    this.update();
   }
 
   addElement (args) {
@@ -223,6 +237,8 @@ export default class Align {
       if (!newElement.el) return;
       const el = Selection.range.startContainer;
       el.parentNode.insertBefore(newElement.el, el);
+      Section.activeSection.elements.push(newElement);
+      this.update();
     });
   }
 

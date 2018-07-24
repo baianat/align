@@ -9,6 +9,19 @@ export default class Figure {
     this._init(figure);
   }
 
+  static render (element) {
+    const figure = element;
+    const caption = element.querySelector('figcaption');
+    const img = element.querySelector('img');
+    figure.contentEditable = 'inherit';
+    caption.contentEditable = 'inherit';
+    caption.removeAttribute('data-default-value');
+    img.removeAttribute('data-align-filename');
+    if (caption.innerText === '') {
+      caption.remove();
+    }
+  }
+
   _init (figure) {
     // check if it's the figure element
     if (figure.nodeType === 1) {
@@ -73,19 +86,6 @@ export default class Figure {
 
   update (newSrc) {
     this.img.src = newSrc;
-  }
-
-  static render (element) {
-    const figure = element;
-    const caption = element.querySelector('figcaption');
-    const img = element.querySelector('img');
-    figure.contentEditable = 'inherit';
-    caption.contentEditable = 'inherit';
-    caption.removeAttribute('data-default-value');
-    img.removeAttribute('data-align-filename');
-    if (caption.innerText === '') {
-      caption.remove();
-    }
   }
 
   remove () {
