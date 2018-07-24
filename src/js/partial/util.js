@@ -117,35 +117,36 @@ export function camelCase (string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function updatePosition (reference, element, align, mode = 'middle-left') {
+export function updatePosition (reference, element, mode = 'middle-left') {
   if (typeof reference.getBoundingClientRect !== 'function') return;
+  const wrapper = element.parentNode;
   const modes = mode.split('-');
   const refRect = reference.getBoundingClientRect();
   const elmRect = element.getBoundingClientRect();
-  const alignRect = align.getBoundingClientRect();
-  const alignScroll = align.scrollTop;
+  const wrapperRect = wrapper.getBoundingClientRect();
+  const wrapperScroll = wrapper.scrollTop;
   const position = { x: 0, y: 0 };
   const startBoundary = 0;
-  const endBoundary = alignRect.width - elmRect.width;
+  const endBoundary = wrapperRect.width - elmRect.width;
   modes.forEach(mode => {
     switch (mode) {
       case 'center':
-        position.x = refRect.left - alignRect.left + (refRect.width / 2) - (elmRect.width / 2);
+        position.x = refRect.left - wrapperRect.left + (refRect.width / 2) - (elmRect.width / 2);
         break;
       case 'left':
-        position.x = refRect.left - alignRect.left;
+        position.x = refRect.left - wrapperRect.left;
         break;
       case 'right':
-        position.x = refRect.left - alignRect.left - refRect.width;
+        position.x = refRect.left - wrapperRect.left - refRect.width;
         break;
       case 'middle':
-        position.y = refRect.top - alignRect.top + alignScroll + (refRect.height / 2) - (elmRect.height / 2);
+        position.y = refRect.top - wrapperRect.top + wrapperScroll + (refRect.height / 2) - (elmRect.height / 2);
         break;
       case 'top':
-        position.y = refRect.top - alignRect.top + alignScroll - elmRect.height;
+        position.y = refRect.top - wrapperRect.top + wrapperScroll - elmRect.height;
         break;
       case 'bottom':
-        position.y = refRect.bottom - alignRect.top + alignScroll;
+        position.y = refRect.bottom - wrapperRect.top + wrapperScroll;
         break;
     }
   });

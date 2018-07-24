@@ -40,7 +40,7 @@ export default class Prompt {
         this.selectionReference = Selection.range.startContainer;
       }
       setTimeout(() => {
-        updatePosition(this.selectionReference, this.el, this.$align.el, 'left-top');
+        updatePosition(this.selectionReference, this.el, 'left-top');
       }, 1);
     }
     this.message.innerText = message;
@@ -57,7 +57,7 @@ export default class Prompt {
 
     this.inputs[0].value = data;
 
-    this.$align.el.appendChild(this.el);
+    this.$align.wrapper.appendChild(this.el);
     this.callbackFunc = (event) => {
       if (isElementClosest(event.target, this.el)) {
         return;

@@ -47,7 +47,6 @@ export default class Styler {
     this.settings.commands.forEach((command) => {
       this.generateCmdElement(command);
     });
-    this.$align.el.appendChild(this.el);
     if (this.settings.mode === 'bubble') {
       this._initBubble();
     }
@@ -247,7 +246,6 @@ export default class Styler {
       this.currentPosition = updatePosition(
         element,
         this.el,
-        this.$align.el,
         newPosition || this.settings.position
       );
       this.show();
@@ -266,7 +264,6 @@ export default class Styler {
       this.position = updatePosition(
         Selection.range.startContainer,
         this.el,
-        this.$align.el,
         newPosition || this.settings.position);
       this.show();
       return;

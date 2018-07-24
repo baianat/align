@@ -52,6 +52,10 @@ export default class Align {
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
+    this.wrapper = document.createElement('div');
+    this.editor = document.createElement('div');
+    this.wrapper.classList.add('align-wrapper');
+    this.editor.classList.add('align-editor');
 
     this._initStylers();
     this._initEditor();
@@ -75,12 +79,17 @@ export default class Align {
       ...Table.defaults,
       ...this.settings.table
     });
+    [this.$sectionToolbar, this.$figureToolbar, this.$tableToolbar].forEach(obj => {
+      this.wrapper.appendChild(obj.el);
+    })
+
 
     if (this.settings.toolbar) {
       this.toolbar = new Styler(this, {
         ...this.settings.toolbar,
         mode: 'toolbar'
       });
+      this.el.appendChild(this.toolbar.el);
     }
     if (this.settings.bubble) {
       this.bubble = new Styler(this, {
@@ -88,6 +97,7 @@ export default class Align {
         mode: 'bubble',
         tooltip: false
       });
+      this.wrapper.appendChild(this.bubble.el);
     }
     if (this.settings.creator) {
       this.creator = new Styler(this, {
@@ -95,6 +105,7 @@ export default class Align {
         mode: 'creator',
         position: 'middle-left'
       });
+      this.wrapper.appendChild(this.creator.el);
     }
   }
   /**
@@ -103,10 +114,6 @@ export default class Align {
   _initEditor () {
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
-    this.wrapper = document.createElement('div');
-    this.editor = document.createElement('div');
-    this.wrapper.classList.add('align-wrapper');
-    this.editor.classList.add('align-editor');
     this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
     this.cmdKeyPressed = false;
     this.wrapper.appendChild(this.editor);

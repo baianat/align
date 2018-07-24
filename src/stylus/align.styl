@@ -2,6 +2,7 @@
   position: relative
   width: 100%
   transition: 0.5s
+  height: 100vh
   &-editor
     padding: 60px 0
     background-color: $white
@@ -19,16 +20,11 @@
     z-index: 99999
     overflow: auto
 
-  &-settingsMenu
-    position: fixed
-    top: 0
-    right: 0
-    height: 100%
-    width: 200px
-    max-width: 100%
-    background-color: $white
-    z-index: 999
-    box-shadow: -10px 0 25px -20px alpha($black, 20%)
+
+  &-wrapper
+    position: relative
+    height: calc(100% - 100px)
+    overflow: auto
 
   &-separator
     position: relative
