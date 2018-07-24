@@ -10,6 +10,13 @@ import Youtube from '../elements/youtube';
 import Separator from '../elements/separator';
 
 const cmdsSchema = {
+  sidebar: {
+    element: 'button',
+    tooltip: 'Show sidebar',
+    func: 'toggleSidebar',
+    icon: 'gear'
+  },
+
   bold: {
     element: 'button',
     command: 'bold',
@@ -409,7 +416,6 @@ const cmdsSchema = {
     func: 'addElement',
     args: Vimeo
   },
-
 
   // internal functions don't override it
 

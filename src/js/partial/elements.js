@@ -124,3 +124,18 @@ export function dropdown (name, itemsContent, callbackFunc) {
     items
   };
 }
+
+export function field (name, description, type = 'text') {
+  const wrapper = document.createElement('div');
+  const input = document.createElement('input');
+  const label = document.createElement('label');
+
+  wrapper.classList.add(`${NAMING_PREFIX}field`);
+  input.id = name;
+  input.type = type;
+  label.innerText = description;
+  label.for = name;
+  wrapper.appendChild(label);
+  wrapper.appendChild(input);
+  return { input, el: wrapper };
+}

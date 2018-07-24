@@ -14,16 +14,20 @@ export default class Section {
       return;
     }
     this.id = Section.id++
-    this.type = type;
-    this.isHTMLView = false;
     this.$align = align;
     this.elements = [];
+    this.settings = {
+      type: type,
+      isHTMLView: false,
+    }
+
     if (typeof content === 'string') {
       content = stringToDOM(content);
     }
+    this.createLayout();
     this.generateWrapper(content);
     this.generateContent(content);
-    if (type === 'text') {
+    if (this.settings.type === 'text') {
       this.generateControllers();
       this.generateBackground();
       this.el.addEventListener('click', () => {
@@ -43,12 +47,12 @@ export default class Section {
 
   get content () {
     let output;
-    if (this.type === 'text') {
+    if (this.settings.type === 'text') {
       output = this.el.cloneNode(true);
       const controllers = output.querySelector('.align-sectionControllers');
       const contentDiv = output.querySelector('.align-content');
       const figures = Array.from(contentDiv.querySelectorAll('figure'));
-      if (this.isHTMLView) {
+      if (this.settings.isHTMLView) {
         contentDiv.innerHTML = contentDiv.innerText;
       }
       figures.forEach(fig => Figure.render(fig));
@@ -57,7 +61,7 @@ export default class Section {
       contentDiv.remove();
       controllers.remove();
     }
-    if (this.type === 'title') {
+    if (this.settings.type === 'title') {
       return this.title.innerText;
     }
     return output.outerHTML;
@@ -74,22 +78,23 @@ export default class Section {
     if (classes.includes('align-section')) {
       const modifiers = classes.filter(cls => cls.startsWith('is-'));
       this.el.classList.add(...modifiers);
+      this.el.setAttribute('style', content.getAttribute('style'));
       this.bgColor = content.style.backgroundColor;
     }
   }
 
   generateContent (content) {
-    switch (this.type) {
+    switch (this.settings.type) {
       case 'text':
         if (!this.contentDiv) {
           this.contentDiv = document.createElement('div');
           this.contentDiv.classList.add('align-content');
           this.contentDiv.contentEditable = true;
         }
-        if (this.isHTMLView) {
+        if (this.settings.isHTMLView) {
           content = content.innerText;
         }
-        if (!this.isHTMLView) {
+        if (!this.settings.isHTMLView) {
           content = content ? content.innerHTML : '<p></p>';
         }
         this.contentDiv.innerHTML = content;
@@ -181,9 +186,23 @@ export default class Section {
     return this.$align.sections.findIndex(el => el === this);
   }
 
+  createLayout () {
+    const _self = this;
+    this.layout = new Proxy({}, {
+      get(settings, name) {
+        return settings[name] || Number(_self.el.style[name].slice(0, -2)) || 0
+      },
+      set(settings, name, val) {
+        settings[name] = val;
+        _self.updateStyle(name, val);
+        return true
+      }
+    });
+  }
+
   toggleHTML () {
-    if (!this.isHTMLView) {
-      this.isHTMLView = true;
+    if (!this.settings.isHTMLView) {
+      this.settings.isHTMLView = true;
       const content = document.createTextNode(this.contentDiv.innerHTML);
       const pre = document.createElement('pre');
 
@@ -195,7 +214,11 @@ export default class Section {
       return;
     }
     this.generateContent(this.contentDiv);
-    this.isHTMLView = false;
+    this.settings.isHTMLView = false;
+  }
+
+  updateStyle (style, value) {
+    this.el.style[style] = `${value}px`;
   }
 
   backgroundColor (color) {
@@ -330,6 +353,7 @@ export default class Section {
     Section.activeSection = this;
     this.el.classList.add('is-active');
     this.$align.$sectionToolbar.update(this);
+    this.$align.update();
     this.contentDiv.focus();
   }
 
@@ -363,7 +387,7 @@ export default class Section {
     this.$align.$bus.emit('changed');
   }
 
-  static id = 0; // eslint-disable-line
+  static id = 0;
   static activeSection = null;
   static defaults = {
     mode: 'bubble',

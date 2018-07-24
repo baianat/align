@@ -7,6 +7,7 @@ import Selection from './selection';
 import Section from './section';
 import EventBus from './events';
 import Styler from './styler';
+import Sidebar from './sidebar';
 
 export default class Align {
   constructor (selector, settings) {
@@ -23,7 +24,7 @@ export default class Align {
    */
   get content () {
     return this.sections.reduce((acc, section) => {
-      if (section.type !== 'text') {
+      if (section.settings.type !== 'text') {
         return acc;
       }
       acc += section.content;
@@ -52,13 +53,12 @@ export default class Align {
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
-    this.wrapper = document.createElement('div');
-    this.editor = document.createElement('div');
-    this.wrapper.classList.add('align-wrapper');
-    this.editor.classList.add('align-editor');
+    document.execCommand('defaultParagraphSeparator', false, 'p');
+    this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
+    this.cmdKeyPressed = false;
 
-    this._initStylers();
     this._initEditor();
+    this._initStylers();
     this._initSections();
     this._initEvents();
   }
@@ -89,7 +89,7 @@ export default class Align {
         ...this.settings.toolbar,
         mode: 'toolbar'
       });
-      this.el.appendChild(this.toolbar.el);
+      this.el.insertAdjacentElement('afterbegin', this.toolbar.el);
     }
     if (this.settings.bubble) {
       this.bubble = new Styler(this, {
@@ -112,11 +112,14 @@ export default class Align {
    * Create the editor
    */
   _initEditor () {
-    document.execCommand('defaultParagraphSeparator', false, 'p');
+    this.wrapper = document.createElement('div');
+    this.editor = document.createElement('div');
+    this.wrapper.classList.add('align-wrapper');
+    this.editor.classList.add('align-editor');
+    this.sidebar = new Sidebar(this);
 
-    this.cmdKey = userOS() === 'Mac' ? 'metaKey' : 'ctrlKey';
-    this.cmdKeyPressed = false;
     this.wrapper.appendChild(this.editor);
+    this.el.appendChild(this.sidebar.el);
     this.el.appendChild(this.wrapper);
     this.editor.focus();
     Selection.update();
@@ -177,8 +180,13 @@ export default class Align {
     this.el.classList.toggle('is-fullscreen');
   }
 
+  toggleSidebar () {
+    this.el.classList.toggle('is-sidebar-active');
+  }
+
   update () {
     Selection.update();
+    this.sidebar.update();
     setTimeout(() => {
       if (this.settings.toolbar) {
         this.toolbar.update();
@@ -189,7 +197,7 @@ export default class Align {
       if (this.settings.creator) {
         this.creator.update();
       }
-    }, 16);
+    }, 1);
   }
 
   applyFont (schema, cmd) {
