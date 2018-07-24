@@ -7,6 +7,7 @@ import Embed from '../elements/embed';
 import Facebook from '../elements/facebook';
 import Vimeo from '../elements/vimeo';
 import Youtube from '../elements/youtube';
+import Separator from '../elements/separator';
 
 const cmdsSchema = {
   bold: {
@@ -380,28 +381,35 @@ const cmdsSchema = {
     tooltip: 'Add Table'
   },
 
+  addSeparator: {
+    element: 'button',
+    tooltip: 'Vimeo',
+    func: 'addElement',
+    icon: 'split',
+    args: Separator
+  },
+
   facebook: {
     element: 'button',
     func: 'addElement',
     args: Facebook,
-    tooltip: 'Add post'
+    tooltip: 'Facebook post'
   },
 
   youtube: {
     element: 'button',
-    tooltip: 'Hyperlink',
+    tooltip: 'Youtube',
     func: 'addElement',
-    icon: 'youtube',
     args: Youtube
   },
 
   vimeo: {
     element: 'button',
-    tooltip: 'Hyperlink',
+    tooltip: 'Vimeo',
     func: 'addElement',
-    icon: 'vimeo',
     args: Vimeo
   },
+
 
   // internal functions don't override it
 
