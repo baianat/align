@@ -20,16 +20,15 @@ export default class Section {
       type: type,
       isHTMLView: false,
     }
-
+    Section.activeSection = this;
     if (typeof content === 'string') {
       content = stringToDOM(content);
     }
-    this.createLayout();
-    this.generateWrapper(content);
-    this.generateContent(content);
+    this._initWrapper(content);
+    this._initContent(content);
     if (this.settings.type === 'text') {
-      this.generateControllers();
-      this.generateBackground();
+      this._initControllers();
+      this._initBackground();
       this.el.addEventListener('click', () => {
         this.active();
       });
@@ -43,6 +42,7 @@ export default class Section {
     }
     this.$align.editor.appendChild(this.el);
     this.$align.sections.push(this);
+    this.createLayout();
   }
 
   get content () {
@@ -67,7 +67,7 @@ export default class Section {
     return output.outerHTML;
   }
 
-  generateWrapper (content) {
+  _initWrapper (content) {
     this.el = document.createElement('div');
     this.el.classList.add('align-section');
     let classes = content ? content.classList : '';
@@ -83,42 +83,42 @@ export default class Section {
     }
   }
 
-  generateContent (content) {
+  _initContent (content) {
     switch (this.settings.type) {
-      case 'text':
-        if (!this.contentDiv) {
-          this.contentDiv = document.createElement('div');
-          this.contentDiv.classList.add('align-content');
-          this.contentDiv.contentEditable = true;
-        }
-        if (this.settings.isHTMLView) {
-          content = content.innerText;
-        }
-        if (!this.settings.isHTMLView) {
-          content = content ? content.innerHTML : '<p></p>';
-        }
-        this.contentDiv.innerHTML = content;
-        this.el.appendChild(this.contentDiv);
-        this.generateElements();
-        break;
+    case 'text':
+      if (!this.contentDiv) {
+        this.contentDiv = document.createElement('div');
+        this.contentDiv.classList.add('align-content');
+        this.contentDiv.contentEditable = true;
+      }
+      if (this.settings.isHTMLView) {
+        content = content.innerText;
+      }
+      if (!this.settings.isHTMLView) {
+        content = content ? content.innerHTML : '<p></p>';
+      }
+      this.contentDiv.innerHTML = content;
+      this.el.appendChild(this.contentDiv);
+      this._initElements();
+      break;
 
-      case 'title':
-        this.title = this.el.querySelector('.align-title') || document.createElement('h1');
-        this.title.classList.add('align-title');
-        this.title.contentEditable = true;
-        this.title.innerText = content;
-        this.el.appendChild(this.title);
-        this.title.addEventListener('blur', () => {
-          this.title.innerHTML = this.title.innerText
-        })
-        break;
+    case 'title':
+      this.title = this.el.querySelector('.align-title') || document.createElement('h1');
+      this.title.classList.add('align-title');
+      this.title.contentEditable = true;
+      this.title.innerText = content;
+      this.el.appendChild(this.title);
+      this.title.addEventListener('blur', () => {
+        this.title.innerHTML = this.title.innerText
+      })
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
   }
 
-  generateElements () {
+  _initElements () {
     const figures = Array.from(this.contentDiv.querySelectorAll('figure'));
     const tables = Array.from(this.contentDiv.querySelectorAll('table'));
     const links = Array.from(this.contentDiv.querySelectorAll('a'));
@@ -128,7 +128,7 @@ export default class Section {
     links.forEach(link => new Link(this.$align, link));
   }
 
-  generateControllers () {
+  _initControllers () {
     this.controllers = document.createElement('div');
     this.addButton = document.createElement('button');
     this.upButton = document.createElement('button');
@@ -153,18 +153,16 @@ export default class Section {
     });
     this.upButton.addEventListener('click', this.moveUp.bind(this));
     this.downButton.addEventListener('click', this.moveDown.bind(this));
-    [this.addButton, this.upButton, this.downButton].forEach(btn => {
+    this.settingsButton.addEventListener('click', () => {
+      this.$align.toggleSidebar();
+    });
+    [this.addButton, this.upButton, this.downButton, this.settingsButton].forEach(btn => {
       this.controllers.appendChild(btn);
     });
     this.el.appendChild(this.controllers);
   }
 
-  generateSettingsMenu () {
-    this.settingsMenu = document.createElement('div');
-
-  }
-
-  generateBackground () {
+  _initBackground () {
     this.bgImage = this.bgImage || this.contentDiv.querySelector('.align-bgImage');
     this.bgVideo = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
     this.bgCol = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
@@ -187,18 +185,45 @@ export default class Section {
   }
 
   createLayout () {
-    const _self = this;
-    this.layout = new Proxy({}, {
-      get(settings, name) {
-        return settings[name] || Number(_self.el.style[name].slice(0, -2)) || 0
+    const el = this.el;
+    const styleObj = {};
+    const handler = {
+      get (style, name) {
+        this.update();
+        return style[name] || '';
       },
-      set(settings, name, val) {
-        settings[name] = val;
-        _self.updateStyle(name, val);
+      set (style, name, val) {
+        if (val) {
+          style[name] = val;
+          el.style[name] =  val;
+          return true
+        }
+        delete style[name];
+        el.style[name] =  '';
         return true
+      },
+      update () {
+        const sectionStyle = window.getComputedStyle(el);
+        [
+          'margin-top',
+          'margin-right',
+          'margin-bottom',
+          'margin-left',
+          'padding-top',
+          'padding-right',
+          'padding-bottom',
+          'padding-left'
+        ].forEach(styl => {
+          const value = el.style[styl] ||sectionStyle[styl];
+          if (value) {
+            styleObj[styl] = value;
+          }
+        });
       }
-    });
+    }
+    this.style = new Proxy(styleObj, handler);
   }
+
 
   toggleHTML () {
     if (!this.settings.isHTMLView) {
@@ -213,13 +238,10 @@ export default class Section {
       this.$align.highlight();
       return;
     }
-    this.generateContent(this.contentDiv);
+    this._initContent(this.contentDiv);
     this.settings.isHTMLView = false;
   }
 
-  updateStyle (style, value) {
-    this.el.style[style] = `${value}px`;
-  }
 
   backgroundColor (color) {
     this.el.style.backgroundColor = color;
@@ -347,12 +369,16 @@ export default class Section {
   }
 
   active () {
+    if (Section.activeSection === this) {
+      return;
+    }
     if (Section.activeSection) {
       Section.activeSection.inactive();
     }
     Section.activeSection = this;
     this.el.classList.add('is-active');
     this.$align.$sectionToolbar.update(this);
+    this.$align.sidebar.update();
     this.$align.update();
     this.contentDiv.focus();
   }

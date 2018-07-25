@@ -14,17 +14,18 @@ export default class Sidebar {
     this.layout = document.createElement('div');
     this.layout.classList.add('align-layout');
     this.layout.insertAdjacentHTML('afterbegin', `
+      <label>Section layout</label>
       <div class="align-layout-margin">
-        <input class="align-layout-input is-top" data-align-margin-top type="number">
-        <input class="align-layout-input is-left" data-align-margin-left type="number">
-        <input class="align-layout-input is-right" data-align-margin-right type="number">
-        <input class="align-layout-input is-bottom" data-align-margin-bottom type="number">
+        <input class="align-layout-input is-top" placeholder="-" data-align-margin-top type="text">
+        <input class="align-layout-input is-left" placeholder="-" data-align-margin-left type="text">
+        <input class="align-layout-input is-right" placeholder="-" data-align-margin-right type="text">
+        <input class="align-layout-input is-bottom" placeholder="-" data-align-margin-bottom type="text">
       </div>
       <div class="align-layout-padding">
-        <input class="align-layout-input is-top" data-align-padding-top type="number">
-        <input class="align-layout-input is-left" data-align-padding-left type="number">
-        <input class="align-layout-input is-right" data-align-padding-right type="number">
-        <input class="align-layout-input is-bottom" data-align-padding-bottom type="number">
+        <input class="align-layout-input is-top" placeholder="-" data-align-padding-top type="text">
+        <input class="align-layout-input is-left" placeholder="-" data-align-padding-left type="text">
+        <input class="align-layout-input is-right" placeholder="-" data-align-padding-right type="text">
+        <input class="align-layout-input is-bottom" placeholder="-" data-align-padding-bottom type="text">
       </div>
     `);
     this.el.appendChild(this.layout);
@@ -40,23 +41,28 @@ export default class Sidebar {
       bottom: this.layout.querySelector('[data-align-padding-bottom]'),
       left: this.layout.querySelector('[data-align-padding-left]')
     };
-  }
-
-  update () {
-    const currentLayout = Section.activeSection.layout;
     Object.keys(this.marginInputs).forEach(key => {
       const property = `margin-${key}`;
-      this.marginInputs[key].value = currentLayout[property];
       this.marginInputs[key].addEventListener('input', (evnt) => {
-        currentLayout[property] = evnt.target.value;
+        Section.activeSection.style[property] = evnt.target.value;
       });
     });
     Object.keys(this.paddingInputs).forEach(key => {
       const property = `padding-${key}`;
-      this.paddingInputs[key].value = currentLayout[property];
       this.paddingInputs[key].addEventListener('input', (evnt) => {
-        currentLayout[property] = evnt.target.value;
+        Section.activeSection.style[property] = evnt.target.value;
       });
+    });
+  }
+
+  update () {
+    Object.keys(this.marginInputs).forEach(key => {
+      const property = `margin-${key}`;
+      this.marginInputs[key].value = Section.activeSection.style[property];
+    });
+    Object.keys(this.paddingInputs).forEach(key => {
+      const property = `padding-${key}`;
+      this.paddingInputs[key].value = Section.activeSection.style[property];
     });
   }
 }

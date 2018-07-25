@@ -61,6 +61,8 @@ export default class Align {
     this._initStylers();
     this._initSections();
     this._initEvents();
+    this.sidebar = new Sidebar(this);
+    this.el.appendChild(this.sidebar.el);
   }
 
   /**
@@ -116,10 +118,8 @@ export default class Align {
     this.editor = document.createElement('div');
     this.wrapper.classList.add('align-wrapper');
     this.editor.classList.add('align-editor');
-    this.sidebar = new Sidebar(this);
 
     this.wrapper.appendChild(this.editor);
-    this.el.appendChild(this.sidebar.el);
     this.el.appendChild(this.wrapper);
     this.editor.focus();
     Selection.update();
@@ -186,7 +186,6 @@ export default class Align {
 
   update () {
     Selection.update();
-    this.sidebar.update();
     setTimeout(() => {
       if (this.settings.toolbar) {
         this.toolbar.update();

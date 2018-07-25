@@ -2,12 +2,12 @@
   position: absolute
   top: 0
   right: 0
-  width: 200px
+  width: 220px
   height: 100%
   transform: translateX(100%)
   transition: 0.2s
-  background-color: lighten($gray, 80%)
-  padding: 90px 0
+  background-color: $white
+  padding: 90px 10px
 
   &-field
     background: $white
@@ -28,38 +28,49 @@
   .align-sidebar
     transform: translateX(0)
   .align-wrapper
-    margin-right: 200px
+    margin-right: 220px
 
 .align-layout
   position: relative
-  width: 150px
+  width: 200px
   height: 150px
   background: $white
   margin: auto
+  &:hover
+    *:not(input)
+      background: $white
   &-padding
     position: absolute
     top: 0
     left: 0
-    margin: 25%
+    margin: 37.5px 50px
     width: 50%
     height: 50%
     background: $white
+    border: 1px dashed $black
+    background: lighten($green, 90%)
     &:hover
-      background: alpha($green, 10%)
+      background: lighten($green, 90%) !important
   &-margin
     position: absolute
     top: 0
     left: 0
     width: 100%
     height: 100%
+    border: 1px dashed $black
+    background: lighten($orange, 90%)
+    .align-layout-input
+      height: 30px
     &:hover
-      background: alpha($orange, 10%)
+      background: lighten($orange, 90%) !important
   &-input
     position: absolute
     border: none
     text-align: center
     background: transparent
-    width: 30px
+    outline: none
+    width: 40px
+    font-size: 10px
     &.is-top
       left: 50%
       top: 3px
