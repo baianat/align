@@ -248,6 +248,7 @@ export default class Align {
       elClass = args;
     }
     elClass.add(this).then((newElement) => {
+      console.log(newElement)
       if (!newElement.el) return;
       const el = Selection.range.startContainer;
       el.parentNode.insertBefore(newElement.el, el);

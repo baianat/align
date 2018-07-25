@@ -8,6 +8,7 @@ import Facebook from '../elements/facebook';
 import Vimeo from '../elements/vimeo';
 import Youtube from '../elements/youtube';
 import Separator from '../elements/separator';
+import Gallery from '../elements/gallery';
 
 const cmdsSchema = {
   sidebar: {
@@ -344,6 +345,14 @@ const cmdsSchema = {
     func: 'addElement',
     args: Embed,
     tooltip: 'Add embed'
+  },
+
+  addGallery: {
+    element: 'button',
+    icon: 'imageMultiple',
+    func: 'addElement',
+    args: Gallery,
+    tooltip: 'Add gallery'
   },
 
   addGrid: {
