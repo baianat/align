@@ -1,14 +1,14 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from '../selection';
-import Grid from '../elements/grid';
-import Table from '../elements/table';
-import Link from '../elements/link';
-import Embed from '../elements/embed';
-import Facebook from '../elements/facebook';
-import Vimeo from '../elements/vimeo';
-import Youtube from '../elements/youtube';
-import Separator from '../elements/separator';
-import Gallery from '../elements/gallery';
+import Grid from '../components/grid';
+import Table from '../components/table';
+import Link from '../components/link';
+import Embed from '../components/embed';
+import Facebook from '../components/facebook';
+import Vimeo from '../components/vimeo';
+import Youtube from '../components/youtube';
+import Separator from '../components/separator';
+import Gallery from '../components/gallery';
 
 const cmdsSchema = {
   sidebar: {

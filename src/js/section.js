@@ -1,8 +1,8 @@
 import { stringToDOM, swapArrayItems } from './partial/util'
 import icons from './partial/icons';
-import Figure from './elements/figure';
-import Table from './elements/table';
-import Link from './elements/link';
+import Figure from './components/figure';
+import Table from './components/table';
+import Link from './components/link';
 import Selection from './selection';
 
 export default class Section {
@@ -75,12 +75,20 @@ export default class Section {
       return;
     }
     classes = Array.from(classes);
-    if (classes.includes('align-section')) {
-      const modifiers = classes.filter(cls => cls.startsWith('is-'));
-      this.el.classList.add(...modifiers);
-      this.el.setAttribute('style', content.getAttribute('style'));
-      this.bgColor = content.style.backgroundColor;
-    }
+    classes.splice(classes.indexOf('align-section'), 1);
+    this.modifiers = [];
+    this.custom = [];
+    classes.forEach(cls => {
+      if (cls.startsWith('is-')) {
+        this.modifiers.push(cls);
+        return;
+      }
+      this.custom.push(cls);
+    });
+    const _self = this;
+    this.el.classList.add(...this.modifiers);
+    this.el.setAttribute('style', content.getAttribute('style'));
+    this.bgColor = content.style.backgroundColor;
   }
 
   _initContent (content) {
@@ -192,7 +200,8 @@ export default class Section {
         this.update();
         return style[name] || '';
       },
-      set (style, name, val) {
+      set (style, name, val, receiver) {
+        console.log(receiver)
         if (val) {
           style[name] = val;
           el.style[name] =  val;

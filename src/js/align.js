@@ -1,8 +1,8 @@
 import { select, userOS, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
-import Figure from './elements/figure';
-import Table from './elements/table';
+import Figure from './components/figure';
+import Table from './components/table';
 import Selection from './selection';
 import Section from './section';
 import EventBus from './events';
