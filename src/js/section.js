@@ -76,17 +76,35 @@ export default class Section {
     }
     classes = Array.from(classes);
     classes.splice(classes.indexOf('align-section'), 1);
-    this.modifiers = [];
-    this.custom = [];
+    this.classes = {
+      modifiers: [],
+      custom: []
+    }
     classes.forEach(cls => {
       if (cls.startsWith('is-')) {
-        this.modifiers.push(cls);
+        this.classes.modifiers.push(cls);
         return;
       }
-      this.custom.push(cls);
+      if (cls.startsWith('has-')) {
+        return;
+      }
+      this.classes.custom.push(cls);
     });
     const _self = this;
-    this.el.classList.add(...this.modifiers);
+    this.el.classList.add(...this.classes.modifiers, ...this.classes.custom);
+    this.classes = new Proxy(this.classes, {
+      get (classes, type) {
+        return classes[type] || '';
+      },
+      set (classes, type, value) {
+        _self.el.classList.remove(...classes[type]);
+        console.log(classes[type])
+        classes[type] = value;
+        console.log(classes[type])
+        _self.el.classList.add(...classes[type]);
+        return true;
+      }
+    });
     this.el.setAttribute('style', content.getAttribute('style'));
     this.bgColor = content.style.backgroundColor;
   }

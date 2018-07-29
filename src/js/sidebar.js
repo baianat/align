@@ -11,24 +11,38 @@ export default class Sidebar {
     setElementsPrefix('align-sidebar-');
     this.el = document.createElement('div');
     this.el.classList.add('align-sidebar');
-    this.layout = document.createElement('div');
-    this.layout.classList.add('align-layout');
-    this.layout.insertAdjacentHTML('afterbegin', `
-      <label>Section layout</label>
-      <div class="align-layout-margin">
-        <input class="align-layout-input is-top" placeholder="-" data-align-margin-top type="text">
-        <input class="align-layout-input is-left" placeholder="-" data-align-margin-left type="text">
-        <input class="align-layout-input is-right" placeholder="-" data-align-margin-right type="text">
-        <input class="align-layout-input is-bottom" placeholder="-" data-align-margin-bottom type="text">
-      </div>
-      <div class="align-layout-padding">
-        <input class="align-layout-input is-top" placeholder="-" data-align-padding-top type="text">
-        <input class="align-layout-input is-left" placeholder="-" data-align-padding-left type="text">
-        <input class="align-layout-input is-right" placeholder="-" data-align-padding-right type="text">
-        <input class="align-layout-input is-bottom" placeholder="-" data-align-padding-bottom type="text">
+    this.customClass = this.generateElement(
+      'custom class:',
+      `<input class="align-sidebar-input" data-align-input type="text">`
+    );
+    this.customClass = this.customClass.querySelector('[data-align-input]');
+    this.customClass.addEventListener('input', (evnt) => {
+      Section.activeSection.classes.custom = (() => {
+        let values = evnt.target.value.split(/[ ,]+/);
+        values = values.map(val => val.trim()).filter(val => val !== '');
+        return values;
+      })();
+    });
+    this._initLayout();
+  }
+
+  _initLayout () {
+    this.layout = this.generateElement('layout:', `
+      <div class="align-layout">
+        <div class="align-layout-margin">
+          <input class="align-layout-input is-top" placeholder="-" data-align-margin-top type="text">
+          <input class="align-layout-input is-left" placeholder="-" data-align-margin-left type="text">
+          <input class="align-layout-input is-right" placeholder="-" data-align-margin-right type="text">
+          <input class="align-layout-input is-bottom" placeholder="-" data-align-margin-bottom type="text">
+        </div>
+        <div class="align-layout-padding">
+          <input class="align-layout-input is-top" placeholder="-" data-align-padding-top type="text">
+          <input class="align-layout-input is-left" placeholder="-" data-align-padding-left type="text">
+          <input class="align-layout-input is-right" placeholder="-" data-align-padding-right type="text">
+          <input class="align-layout-input is-bottom" placeholder="-" data-align-padding-bottom type="text">
+        </div>
       </div>
     `);
-    this.el.appendChild(this.layout);
     this.marginInputs = {
       top: this.layout.querySelector('[data-align-margin-top]'),
       right: this.layout.querySelector('[data-align-margin-right]'),
@@ -55,14 +69,28 @@ export default class Sidebar {
     });
   }
 
+  generateElement (label, markup) {
+    const el = document.createElement('div');
+    const labelEl = document.createElement('label');
+    el.classList.add('align-sidebar-field');
+    labelEl.classList.add('align-sidebar-label');
+    labelEl.innerText = label;
+    this.el.appendChild(el);
+    el.appendChild(labelEl);
+    el.insertAdjacentHTML('beforeend', markup);
+    return el;
+  }
+
   update () {
+    const current = Section.activeSection;
     Object.keys(this.marginInputs).forEach(key => {
       const property = `margin-${key}`;
-      this.marginInputs[key].value = Section.activeSection.style[property];
+      this.marginInputs[key].value = current.style[property];
     });
     Object.keys(this.paddingInputs).forEach(key => {
       const property = `padding-${key}`;
-      this.paddingInputs[key].value = Section.activeSection.style[property];
+      this.paddingInputs[key].value = current.style[property];
     });
+    this.customClass.value = current.classes.custom;
   }
 }
