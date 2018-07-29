@@ -49,12 +49,15 @@ export default class Styler {
     });
     if (this.settings.mode === 'bubble') {
       this._initBubble();
+      this.$align.wrapper.appendChild(this.el);
     }
     if (this.settings.mode === 'creator') {
       this._initCreator();
+      this.$align.wrapper.appendChild(this.el);
     }
     if (this.settings.mode === 'toolbar' && this.settings.shortcuts) {
       this.keyboardShortcuts();
+      this.$align.el.insertAdjacentElement('afterbegin', this.el);
     }
     if (this.settings.hideWhenClickOut) {
       this.clickCallback = (event) => {
@@ -322,6 +325,12 @@ export default class Styler {
       this.updateCreator();
     }
   };
+
+  remove () {
+    setTimeout(() => {
+      this.el.remove();
+    }, 1);
+  }
 
   getTooltip (schema) {
     if (!schema.tooltip || !this.settings.tooltip) {

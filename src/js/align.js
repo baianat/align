@@ -2,7 +2,6 @@ import { select, userOS, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Figure from './components/figure';
-import Table from './components/table';
 import Selection from './selection';
 import Section from './section';
 import EventBus from './events';
@@ -73,41 +72,25 @@ export default class Align {
       ...Section.defaults,
       ...this.settings.section
     });
-    this.$figureToolbar = new Styler(this, {
-      ...Figure.defaults,
-      ...this.settings.figure
-    });
-    this.$tableToolbar = new Styler(this, {
-      ...Table.defaults,
-      ...this.settings.table
-    });
-    [this.$sectionToolbar, this.$figureToolbar, this.$tableToolbar].forEach(obj => {
-      this.wrapper.appendChild(obj.el);
-    })
-
 
     if (this.settings.toolbar) {
       this.toolbar = new Styler(this, {
         ...this.settings.toolbar,
         mode: 'toolbar'
       });
-      this.el.insertAdjacentElement('afterbegin', this.toolbar.el);
     }
     if (this.settings.bubble) {
       this.bubble = new Styler(this, {
         ...this.settings.bubble,
         mode: 'bubble',
         tooltip: false
-      });
-      this.wrapper.appendChild(this.bubble.el);
-    }
+      });    }
     if (this.settings.creator) {
       this.creator = new Styler(this, {
         ...this.settings.creator,
         mode: 'creator',
         position: 'middle-left'
       });
-      this.wrapper.appendChild(this.creator.el);
     }
   }
   /**

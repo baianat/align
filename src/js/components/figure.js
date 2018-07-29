@@ -1,3 +1,5 @@
+import Styler from '../styler';
+
 export default class Figure {
   constructor (align, figure) {
     if (!figure) {
@@ -24,6 +26,7 @@ export default class Figure {
 
   _init (figure) {
     // check if it's the figure element
+    this.toolbar = new Styler(this.$align, Figure.defaults);
     if (figure.nodeType === 1) {
       this.el = figure;
       this.caption = figure.querySelector('figcaption') || document.createElement('figcaption');
@@ -46,7 +49,7 @@ export default class Figure {
     this.el.appendChild(this.img);
     this.el.appendChild(this.caption);
     this.el.addEventListener('click', () => {
-      this.$align.$figureToolbar.update(this);
+      this.toolbar.update(this);
     });
   }
 
@@ -89,7 +92,7 @@ export default class Figure {
   }
 
   remove () {
-    this.$align.$figureToolbar.hide();
+    this.toolbar.remove();
     this.el.remove();
   }
 

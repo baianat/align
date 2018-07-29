@@ -1,4 +1,5 @@
 import Prompt from '../prompt';
+import Styler from '../styler';
 
 export default class Table {
   constructor (align, table) {
@@ -28,6 +29,7 @@ export default class Table {
   }
 
   _init (table) {
+    this.toolbar = new Styler(this.$align, Table.defaults);
     if (table.nodeName === 'TABLE') {
       this.el = table;
       this.el.classList.add('align-table');
@@ -50,7 +52,7 @@ export default class Table {
   _initEvents () {
     this.el.addEventListener('click', event => {
       this.activeCell = event.target;
-      this.$align.$tableToolbar.update(this);
+      this.toolbar.update(this);
     });
   }
 
@@ -88,7 +90,7 @@ export default class Table {
   }
 
   remove () {
-    this.$align.$tableToolbar.hide();
+    this.toolbar.remove();
     this.el.remove();
   }
 
