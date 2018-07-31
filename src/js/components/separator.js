@@ -50,4 +50,9 @@ export default class Separator {
     window.addEventListener('mousemove', handleDrag);
     window.addEventListener('mouseup', handleRelease);
   }
+
+  static schema = {
+    tooltip: 'Vimeo',
+    icon: 'split'
+  }
 }

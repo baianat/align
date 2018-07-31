@@ -34,4 +34,9 @@ export default class Facebook {
     this.el.classList.add('align-post');
     this.el.appendChild(iframe);
   }
+
+  static schema = {
+    icon: 'facebook',
+    tooltip: 'Facebook post'
+  }
 }

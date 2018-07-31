@@ -39,4 +39,9 @@ export default class Vimeo {
 
     this.el.appendChild(iframe);
   }
+
+  static schema = {
+    tooltip: 'Vimeo',
+    icon: 'vimeo'
+  }
 }

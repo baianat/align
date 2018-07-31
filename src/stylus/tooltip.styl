@@ -11,10 +11,9 @@
 
   &:before
     position: absolute
-    top: calc(100% - 4px)
+    bottom: -5px
     left: 50%
     z-index: 99999
-    display: block
     display: none
     width: 0
     height: 0
@@ -27,7 +26,7 @@
 
   &:after
     position: absolute
-    top: 100%
+    bottom: -5px
     left: 50%
     z-index: 99999
     display: none
@@ -38,5 +37,5 @@
     content: attr(data-tooltip)
     white-space: nowrap
     font-size: 12px
-    transform: translate(-50%, 0)
+    transform: translate(-50%, 100%)
     user-select: none

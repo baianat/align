@@ -39,4 +39,9 @@ export default class Youtube {
 
     this.el.appendChild(iframe);
   }
+
+  static schema = {
+    tooltip: 'Youtube',
+    icon: 'youtube'
+  }
 }

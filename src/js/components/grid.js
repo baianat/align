@@ -25,4 +25,9 @@ export default class Grid {
       });
     });
   }
+
+  static schema = {
+    icon: 'column',
+    tooltip: 'Add columns'
+  }
 }

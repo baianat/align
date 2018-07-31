@@ -6,11 +6,11 @@
   &-menu
     &,
     ul
+      display: flex
       margin: 0
       padding: 0
       width: auto
       list-style: none
-      display: flex
       flex-wrap: wrap
       justify-content: center
       align-items: center
@@ -135,18 +135,6 @@
     box-shadow: 0 0 25px alpha($black, 5%)
     transition: 0.2s
     transition-timing-function: cubic-bezier(0.39, 0.58, 0.57, 1)
-
-  &.is-creator
-    top: 0
-    left: 0
-    position: absolute
-    z-index: 30
-    .styler-menu
-      display: none
-
-  &.is-active
-    .styler-menu
-      display: flex
 
   &.is-visible
     opacity: 1

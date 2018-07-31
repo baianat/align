@@ -51,10 +51,6 @@ export default class Styler {
       this._initBubble();
       this.$align.wrapper.appendChild(this.el);
     }
-    if (this.settings.mode === 'creator') {
-      this._initCreator();
-      this.$align.wrapper.appendChild(this.el);
-    }
     if (this.settings.mode === 'toolbar' && this.settings.shortcuts) {
       this.keyboardShortcuts();
       this.$align.el.insertAdjacentElement('afterbegin', this.el);
@@ -74,15 +70,6 @@ export default class Styler {
 
   _initBubble () {
     this.el.classList.add('is-hidden');
-  }
-
-  _initCreator () {
-    this.toggleButton = button('plus');
-    this.toggleButton.addEventListener('click', () => {
-      this.el.classList.toggle('is-active');
-    });
-    this.el.insertBefore(this.toggleButton, this.menu);
-    this.hide();
   }
 
   generateCmdElement (command) {
@@ -257,23 +244,6 @@ export default class Styler {
     this.hide();
   }
 
-  updateCreator (newPosition) {
-    if (
-      Selection.range &&
-      Selection.range.collapsed &&
-      Selection.range.startContainer.nodeType === 1 &&
-      Selection.range.startContainer.childNodes.length <= 1
-    ) {
-      this.position = updatePosition(
-        Selection.range.startContainer,
-        this.el,
-        newPosition || this.settings.position);
-      this.show();
-      return;
-    }
-    this.hide();
-  }
-
   show () {
     if (this.visible) {
       return;
@@ -320,9 +290,6 @@ export default class Styler {
     this.updateCommandsStates();
     if (this.settings.mode === 'bubble') {
       this.updateBubble();
-    }
-    if (this.settings.mode === 'creator') {
-      this.updateCreator();
     }
   };
 

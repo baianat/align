@@ -52,4 +52,9 @@ export default class Link {
     this.el.insertAdjacentHTML('beforebegin', content);
     this.el.remove();
   }
+
+  static schema = {
+    tooltip: 'Hyperlink',
+    icon: 'link'
+  }
 }

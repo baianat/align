@@ -26,4 +26,9 @@ export default class Gallery {
       });
     });
   }
+
+  static schema = {
+    icon: 'imageMultiple',
+    tooltip: 'Add gallery'
+  }
 }

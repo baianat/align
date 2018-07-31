@@ -6,6 +6,7 @@ import Selection from './selection';
 import Section from './section';
 import EventBus from './events';
 import Styler from './styler';
+import Inserter from './inserter';
 import Sidebar from './sidebar';
 
 export default class Align {
@@ -85,13 +86,7 @@ export default class Align {
         mode: 'bubble',
         tooltip: false
       });    }
-    if (this.settings.creator) {
-      this.creator = new Styler(this, {
-        ...this.settings.creator,
-        mode: 'creator',
-        position: 'middle-left'
-      });
-    }
+    this.inserter = new Inserter(this, {});
   }
   /**
    * Create the editor
@@ -176,9 +171,7 @@ export default class Align {
       if (this.settings.bubble) {
         this.bubble.update();
       }
-      if (this.settings.creator) {
-        this.creator.update();
-      }
+      this.inserter.update();
     }, 1);
   }
 
@@ -194,18 +187,6 @@ export default class Align {
     this.update();
   }
 
-  createFigure (event) {
-    const input = event.target;
-    const file = input.files[0];
-    if (!file || !Selection.range) return;
-    const figure = new Figure(this, file);
-    input.value = null;
-    if (figure.el) {
-      const el = Selection.range.startContainer;
-      el.parentNode.insertBefore(figure.el, el);
-    }
-    this.update();
-  }
 
   addHTML (args) {
     let elHTML = '';
@@ -219,6 +200,7 @@ export default class Align {
     if (!domElement) return;
     const el = Selection.range.startContainer;
     el.parentNode.insertBefore(domElement, el);
+    this.inserter.hide();
     this.update();
   }
 
@@ -231,11 +213,11 @@ export default class Align {
       elClass = args;
     }
     elClass.add(this).then((newElement) => {
-      console.log(newElement)
       if (!newElement.el) return;
       const el = Selection.range.startContainer;
       el.parentNode.insertBefore(newElement.el, el);
       Section.activeSection.elements.push(newElement);
+      this.inserter.hide();
       this.update();
     });
   }
@@ -243,7 +225,6 @@ export default class Align {
   static defaults = {
     toolbar: null,
     bubble: null,
-    creator: null,
     section: null,
     shortcuts: false,
     postTitle: false

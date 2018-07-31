@@ -21,4 +21,9 @@ export default class Embed {
       });
     });
   }
+
+  static schema =  {
+    icon: 'embed',
+    tooltip: 'Add embed'
+  }
 }

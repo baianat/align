@@ -1,0 +1,94 @@
+.inserter
+  top: 0
+  left: 0
+  position: absolute
+  z-index: 30
+  &-button
+    width: 70px
+    padding: 5px
+    margin: 5px
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    color: $dark
+    fill: $dark
+    background: $lightGray
+    border: 0
+    outline: none
+    border-radius: 4px
+    span
+      margin-top: 5px
+    &:hover
+      fill: $magenta
+      color: $magenta
+      border-color: $magenta
+
+  &-plus
+    width: 22px
+    height: 22px
+    padding: 0
+    background: $white
+    border: 2px solid $gray
+    fill: $gray
+    border-radius: 22px
+  &-list
+    max-height: 400px
+    width: 280px
+    margin: 0
+    padding: 10px
+    display: flex
+    list-style: none
+    flex-wrap: wrap
+    justify-content: center
+    align-items: center
+    overflow: auto
+  &-menu
+    position: absolute
+    top: -10px
+    left: 0
+    border-radius: 4px
+    display: none
+    background: white
+    border: 1px solid $gray
+    transform: translate(0, -100%)
+    user-select: none
+    &:before
+      position: absolute
+      bottom: 0
+      left: 16px
+      display: block
+      width: 0
+      height: 0
+      border-width: 8px 8px 0 8px
+      border-style: solid
+      border-color: $gray transparent transparent transparent
+      content: ''
+      transform: translate(-50%, 100%)
+      user-select: none
+    &:after
+      position: absolute
+      bottom: 1px
+      left: 16px
+      display: block
+      width: 0
+      height: 0
+      border-width: 7px 7px 0 7px
+      border-style: solid
+      border-color: $white transparent transparent transparent
+      content: ''
+      transform: translate(-50%, 100%)
+      user-select: none
+    ~/.is-active &
+      display: block
+    ~/.is-inactive &
+      display: none
+
+  &.is-visible
+    opacity: 1
+    visibility: visible
+
+  &.is-hidden
+    visibility: hidden
+    opacity: 0
+

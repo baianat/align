@@ -1,14 +1,5 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from '../selection';
-import Grid from '../components/grid';
-import Table from '../components/table';
-import Link from '../components/link';
-import Embed from '../components/embed';
-import Facebook from '../components/facebook';
-import Vimeo from '../components/vimeo';
-import Youtube from '../components/youtube';
-import Separator from '../components/separator';
-import Gallery from '../components/gallery';
 
 const cmdsSchema = {
   sidebar: {
@@ -330,100 +321,6 @@ const cmdsSchema = {
         }
       }
     }
-  },
-
-  createFigure: {
-    element: 'file',
-    icon: 'figure',
-    func: 'createFigure',
-    tooltip: 'Add Figure'
-  },
-
-  addEmbed: {
-    element: 'button',
-    icon: 'embed',
-    func: 'addElement',
-    args: Embed,
-    tooltip: 'Add embed'
-  },
-
-  addGallery: {
-    element: 'button',
-    icon: 'imageMultiple',
-    func: 'addElement',
-    args: Gallery,
-    tooltip: 'Add gallery'
-  },
-
-  addGrid: {
-    element: 'button',
-    icon: 'column',
-    func: 'addElement',
-    args: Grid,
-    tooltip: 'Add columns'
-  },
-
-  addLine: {
-    element: 'dropdown',
-    items: [
-      '<hr class="align-line">',
-      '<hr class="align-line is-dashed">',
-      '<hr class="align-line is-dotted">',
-      '<hr class="align-line is-double">',
-      '<hr class="align-line is-dots">',
-      '<hr class="align-line is-bold">',
-      '<hr class="align-line is-bold is-dashed">',
-      '<hr class="align-line is-bold is-dotted">',
-      '<hr class="align-line is-bold is-double">'
-    ],
-    icon: 'insertLine',
-    func: 'addHTML',
-    tooltip: 'Add line'
-  },
-
-  addLink: {
-    element: 'button',
-    tooltip: 'Hyperlink',
-    func: 'addElement',
-    icon: 'link',
-    args: Link
-  },
-
-  addTable: {
-    element: 'button',
-    func: 'addElement',
-    args: Table,
-    icon: 'table',
-    tooltip: 'Add Table'
-  },
-
-  addSeparator: {
-    element: 'button',
-    tooltip: 'Vimeo',
-    func: 'addElement',
-    icon: 'split',
-    args: Separator
-  },
-
-  facebook: {
-    element: 'button',
-    func: 'addElement',
-    args: Facebook,
-    tooltip: 'Facebook post'
-  },
-
-  youtube: {
-    element: 'button',
-    tooltip: 'Youtube',
-    func: 'addElement',
-    args: Youtube
-  },
-
-  vimeo: {
-    element: 'button',
-    tooltip: 'Vimeo',
-    func: 'addElement',
-    args: Vimeo
   },
 
   // internal functions don't override it

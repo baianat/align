@@ -1,4 +1,5 @@
 import Styler from '../styler';
+import Prompt from '../prompt';
 
 export default class Figure {
   constructor (align, figure) {
@@ -9,6 +10,22 @@ export default class Figure {
     }
     this.$align = align;
     this._init(figure);
+  }
+
+  static add (align) {
+    const prompt = new Prompt(align, {
+      message: 'Chose image figure:',
+      inputsTypes: ['file']
+    });
+    return new Promise((resolve, reject) => {
+      prompt.onSubmit(() => {
+        const file = prompt.inputs[0].files[0];
+        if (!file) {
+          reject('no file provided');
+        };
+        resolve(new Figure(align, file));
+      });
+    });
   }
 
   static render (element) {
@@ -26,13 +43,12 @@ export default class Figure {
 
   _init (figure) {
     // check if it's the figure element
-    this.toolbar = new Styler(this.$align, Figure.defaults);
     if (figure.nodeType === 1) {
       this.el = figure;
       this.caption = figure.querySelector('figcaption') || document.createElement('figcaption');
       this.img = figure.querySelector('img');
     }
-
+    
     // check if it's the figure image url
     if (figure.nodeType !== 1) {
       this.el = document.createElement('figure');
@@ -40,7 +56,8 @@ export default class Figure {
       this.img = document.createElement('img');
       this.readFileContent(figure);
     }
-
+    
+    this.toolbar = new Styler(this.$align, Figure.defaults);
     this.el.contentEditable = false;
     this.caption.contentEditable = true;
     this.caption.dataset.defaultValue = 'Figure caption';
@@ -102,5 +119,10 @@ export default class Figure {
     addActiveClass: true,
     commands: [{ _figureClasses: ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
     tooltip: true
+  }
+
+  static schema = {
+    icon: 'figure',
+    tooltip: 'Add Figure'
   }
 }

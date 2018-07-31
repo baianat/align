@@ -107,4 +107,9 @@ export default class Table {
     ],
     tooltip: true
   }
+
+  static schema = {
+    icon: 'table',
+    tooltip: 'Add Table'
+  }
 }
