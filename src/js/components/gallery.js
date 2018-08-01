@@ -1,17 +1,24 @@
 import Selection from '../selection';
 
 import { dropzone } from '../partial/elements';
+import { stringToDOM } from '../partial/util';
+
 export default class Gallery {
-  constructor (images) {
+  constructor (align, images) {
+    this.$align = align;
     this.el = document.createElement('div');
     this.el.classList.add('align-gallery');
     Array.from(images).forEach(img => {
-      const reader = new FileReader();
-      reader.onload = (evnt) => {
-        const imgElm = `<img class="align-gallery-image" src="${evnt.target.result}"/>`;
-        this.el.insertAdjacentHTML('beforeend', imgElm);
-      };
-      reader.readAsDataURL(img);
+      const url = URL.createObjectURL(img);
+      const imgElm = stringToDOM('<img class="align-gallery-image"/>');
+      imgElm.src = url;
+      this.el.appendChild(imgElm);
+      this.$align.$bus.emit('imageAdded', {
+        file: img,
+        update(newSrc) {
+          imgElm.src = newSrc;
+        }
+      });
     });
   }
 
@@ -22,7 +29,7 @@ export default class Gallery {
     return new Promise((resolve, reject) => {
       input.addEventListener('change', () => {
         el.remove();
-        resolve(new Gallery(input.files));
+        resolve(new Gallery(align, input.files));
       });
     });
   }

@@ -33,6 +33,7 @@ export default class Figure {
     const caption = element.querySelector('figcaption');
     const img = element.querySelector('img');
     figure.contentEditable = 'inherit';
+    figure.classList.remove('is-active');
     caption.contentEditable = 'inherit';
     caption.removeAttribute('data-default-value');
     img.removeAttribute('data-align-filename');
@@ -76,17 +77,15 @@ export default class Figure {
         el: null
       };
     }
-    const reader = new FileReader(); // eslint-disable-line
-    reader.addEventListener('load', () => {
-      this.img.src = reader.result;
 
-      this.img.dataset.alignFilename = file.name;
-      this.$align.$bus.emit('imageAdded', {
-        file,
-        update: this.update.bind(this)
-      });
+    this.img.src = URL.createObjectURL(file);
+
+    this.$align.$bus.emit('imageAdded', {
+      file,
+      update() {
+        this.img.src = newSrc;
+      }
     });
-    reader.readAsDataURL(file);
   }
 
   isImage (filename) {
@@ -104,9 +103,6 @@ export default class Figure {
     return false;
   }
 
-  update (newSrc) {
-    this.img.src = newSrc;
-  }
 
   remove () {
     this.toolbar.remove();
