@@ -3,6 +3,7 @@ import facebook from './facebook';
 import figure from './figure';
 import gallery from './gallery';
 import grid from './grid';
+import line from './line';
 import link from './link';
 import separator from './separator';
 import table from './table';
@@ -15,6 +16,7 @@ export default {
   figure,
   gallery,
   grid,
+  line,
   link,
   separator,
   table,
