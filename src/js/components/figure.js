@@ -117,7 +117,8 @@ export default class Figure {
     commands: [
       { 
         element: 'classes',
-        values: ['floatLeft', 'center', 'floatRight', 'full'] 
+        values: ['floatLeft', 'center', 'floatRight', 'full'],
+        icons: ['figureLeft', 'figureCenter', 'figureRight', 'figureFull'],
       },
       'remove'
     ]

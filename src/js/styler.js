@@ -73,6 +73,37 @@ export default class Styler {
     this.el.classList.add('is-hidden');
   }
 
+  _initClasses ({ el, schema }) {
+    const values = schema.values;
+    if (!Array.isArray(values)) {
+      const element = input('counter', 'number');
+      element.addEventListener('change', () => {
+        if (!this.currentItem) {
+          return;
+        }
+        const lastValue = this.currentItem.currentValue || 0
+        this.toggleClass(element.value, [...lastValue]);
+        this.currentItem.currentValue = element.value;
+      })
+      el.appendChild(element);
+      return;
+    }
+    values.forEach((value, indx) => {
+      const className = value;
+      const iconName = schema.icons ? schema.icons[indx] : value;
+      const icon = icons[iconName] || value;
+      const li = menuButton(
+        className,
+        icon,
+        () => {
+          this.toggleClass(className, values)
+        },
+        className
+      );
+      el.appendChild(li);
+    });
+  }
+
   generateCmdElement (command) {
     const cmd = typeof command === 'string' ? command : Object.keys(command)[0];
     const cmdSchema = this.cmdsSchema[cmd] || command;
@@ -140,21 +171,7 @@ export default class Styler {
 
       case 'classes':
         elementToAdd = currentCmd.el = document.createElement('ul');
-        const values = cmdSchema.values;
-        values.forEach((value, indx) => {
-          const className = value;
-          const iconName = cmdSchema.icons ? cmdSchema.icons[indx] : value;
-          const icon = icons[iconName] || value;
-          const li = menuButton(
-            className,
-            icon,
-            () => {
-              this.toggleClass(className, values)
-            },
-            className
-          );
-          currentCmd.el.appendChild(li);
-        });
+        this._initClasses(currentCmd)
         break;
 
       default:

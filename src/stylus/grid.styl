@@ -1,7 +1,25 @@
+$columns = 12
+
 .align
   &-grid
     display: flex
+    flex-wrap: wrap
     margin: 0 -20px
+    &.is-center
+      justify-content: center
+
+    &.is-shrink
+      >.aling-column:not([class*='is-'])
+        flex: 0 0 auto
+
+    &.is-relaxed
+      margin-right: 0
+      margin-left: 0
+
   &-column
-    padding: 20px
-    flex: 1
+    padding: 10px
+    for $n in (0 .. $columns)
+      &.is-{$n}
+        flex: 0 0 ($n / $columns * 100)%
+        min-width: ($n / $columns * 100)%
+
