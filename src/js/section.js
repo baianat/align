@@ -397,6 +397,7 @@ export default class Section {
 
   active () {
     if (Section.activeSection === this) {
+      this.$align.$sectionToolbar.update(this);
       return;
     }
     if (Section.activeSection) {
@@ -452,10 +453,15 @@ export default class Section {
       '_sectionRemoveBg',
       '_sectionToggleHTML',
       '_sectionDuplicate',
-      { '_sectionClasses': ['normal', 'full'] },
-      '_remove'
+      { 
+        element: 'classes',
+        values: ['normal', 'full'],
+        icons: ['sectionNormal', 'sectionFull']
+      },
+      'remove'
     ],
     tooltip: true,
     position: 'left-top'
   }
+  
 }

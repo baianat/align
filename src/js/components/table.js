@@ -99,11 +99,39 @@ export default class Table {
     hideWhenClickOut: true,
     addActiveClass: true,
     commands: [
-      '_tableRowTop', '_tableRowBottom', '_tableColumnBefore', '_tableColumnAfter',
+      {
+        element: 'button',
+        func: 'insertRow',
+        args: ['before'],
+        icon: 'tableRowTop'
+      }, {
+        element: 'button',
+        func: 'insertRow',
+        args: ['after'],
+        icon: 'tableRowBottom'
+      }, {
+        element: 'button',
+        func: 'insertColumn',
+        args: ['before'],
+        icon: 'tableColumnBefore'
+      }, {
+        element: 'button',
+        func: 'insertColumn',
+        args: ['after'],
+        icon: 'tableColumnAfter'
+      },
       'separator',
-      '_tableDeleteRow', '_tableDeleteColumn',
+      {
+        element: 'button',
+        func: 'deleteRow',
+        icon: 'tableDeleteRow'
+      }, {
+        element: 'button',
+        func: 'deleteColumn',
+        icon: 'tableDeleteColumn'
+      },
       'separator',
-      '_remove'
+      'remove'
     ],
     tooltip: true
   }

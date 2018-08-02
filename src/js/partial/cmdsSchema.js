@@ -323,30 +323,20 @@ const cmdsSchema = {
     }
   },
 
+  remove: {
+    element: 'button',
+    func: 'remove',
+    tooltip: 'Remove section',
+    icon: 'remove'
+  },
+
   // internal functions don't override it
-
-  _figureClasses: {
-    element: 'classes',
-    command: 'figure'
-  },
-
-  _sectionClasses: {
-    element: 'classes',
-    command: 'section'
-  },
 
   _sectionToggleHTML: {
     element: 'button',
     func: 'toggleHTML',
     tooltip: 'Edit as HTMl',
     icon: 'toggleHTML'
-  },
-
-  _remove: {
-    element: 'button',
-    func: 'remove',
-    tooltip: 'Remove section',
-    icon: 'remove'
   },
 
   _sectionDuplicate: {
@@ -396,41 +386,6 @@ const cmdsSchema = {
         </svg>
       `
     }
-  },
-
-  _tableRowTop: {
-    element: 'button',
-    func: 'insertRow',
-    args: ['before'],
-    icon: 'tableRowTop'
-  },
-  _tableRowBottom: {
-    element: 'button',
-    func: 'insertRow',
-    args: ['after'],
-    icon: 'tableRowBottom'
-  },
-  _tableColumnBefore: {
-    element: 'button',
-    func: 'insertColumn',
-    args: ['before'],
-    icon: 'tableColumnBefore'
-  },
-  _tableColumnAfter: {
-    element: 'button',
-    func: 'insertColumn',
-    args: ['after'],
-    icon: 'tableColumnAfter'
-  },
-  _tableDeleteRow: {
-    element: 'button',
-    func: 'deleteRow',
-    icon: 'tableDeleteRow'
-  },
-  _tableDeleteColumn: {
-    element: 'button',
-    func: 'deleteColumn',
-    icon: 'tableDeleteColumn'
   }
 };
 

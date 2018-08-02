@@ -26,7 +26,7 @@ export default class Inserter {
     this.el = document.createElement('div');
     this.menu = document.createElement('div');
     this.list = document.createElement('ul');
-    this.toggleButton = button('plus');
+    this.toggleButton = button('inserter-toggle', 'plus');
 
     this.el.classList.add('inserter');
     this.menu.classList.add('inserter-menu');
@@ -51,7 +51,7 @@ export default class Inserter {
       const title = document.createElement('span');
       const cmdSchema = components[name].schema;
       const icon = cmdSchema.icon;
-      const el = button(icon);
+      const el = button(name, icon);
       el.addEventListener('click', () => {
         this.$align.addElement(components[name]);
       });

@@ -9,7 +9,7 @@ export function setElementsPrefix (prefix) {
   * Create button HTML element
   * @param {String} name
   */
-export function button (name, tooltip) {
+export function button (name, icon, tooltip) {
   const button = document.createElement('button');
   button.classList.add(`${NAMING_PREFIX}button`);
   button.id = name;
@@ -17,7 +17,7 @@ export function button (name, tooltip) {
   if (tooltip) {
     button.dataset.tooltip = tooltip;
   }
-  button.insertAdjacentHTML('afterbegin', icons[name]);
+  button.insertAdjacentHTML('afterbegin', icons[icon] || icon);
   return button;
 }
 
@@ -27,7 +27,7 @@ export function button (name, tooltip) {
  * @param {Object} options
  */
 export function select (name, options) {
-  const selectWrapper = document.createElement('div');
+  const wrapper = document.createElement('div');
   const select = document.createElement('select');
   const icon = `
     <svg viewBox="0 0 24 24">
@@ -35,7 +35,7 @@ export function select (name, options) {
       <polygon points="8,9 12,5 16,9 "/>
     </svg>`;
 
-  selectWrapper.classList.add(`${NAMING_PREFIX}select`);
+  wrapper.classList.add(`${NAMING_PREFIX}select`);
   select.id = name;
   options.forEach((option) => {
     const optionElement = document.createElement('option');
@@ -43,9 +43,9 @@ export function select (name, options) {
     optionElement.innerText = option === false ? name : option;
     select.appendChild(optionElement);
   });
-  selectWrapper.appendChild(select);
-  selectWrapper.insertAdjacentHTML('beforeend', icon);
-  return selectWrapper;
+  wrapper.appendChild(select);
+  wrapper.insertAdjacentHTML('beforeend', icon);
+  return { wrapper, el: select };
 }
 
 /**
@@ -66,7 +66,7 @@ export function input (name, type) {
  * @param {String} name
  * @param {String} type
  */
-export function fileButton (name, tooltip) {
+export function fileButton (name, icon, tooltip) {
   const wrapper = document.createElement('div');
   const input = document.createElement('input');
 
@@ -76,16 +76,16 @@ export function fileButton (name, tooltip) {
   wrapper.classList.add(`${NAMING_PREFIX}button`);
   wrapper.id = name;
   wrapper.appendChild(input);
-  wrapper.insertAdjacentHTML('afterbegin', icons[name]);
+  wrapper.insertAdjacentHTML('afterbegin', icon);
   input.classList.add(`${NAMING_PREFIX}input`);
   input.id = name;
   input.type = 'file';
   return { input, el: wrapper };
 }
 
-export function menuButton (name, func, tooltip) {
+export function menuButton (name, icon, func, tooltip) {
   const menuItem = document.createElement('li');
-  const currentButton = button(name, tooltip);
+  const currentButton = button(name, icon, tooltip);
   currentButton.addEventListener('click', func);
   menuItem.appendChild(currentButton);
   return menuItem;

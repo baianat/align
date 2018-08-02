@@ -16,6 +16,7 @@ import {
   dropdown
 } from './partial/elements';
 import cmdsSchema from './partial/cmdsSchema';
+import icons from './partial/icons';
 import Selection from './selection';
 const symbols = generateKeysSymbols();
 
@@ -73,58 +74,60 @@ export default class Styler {
   }
 
   generateCmdElement (command) {
-    const li = document.createElement('li');
     const cmd = typeof command === 'string' ? command : Object.keys(command)[0];
-    const cmdSchema = this.cmdsSchema[cmd];
+    const cmdSchema = this.cmdsSchema[cmd] || command;
     if (!cmdSchema) {
       console.warn(cmd + ' is not found');
       return;
     }
 
+    let elementToAdd = '';
+    const li = document.createElement('li');
+    const icon = icons[cmdSchema.icon] || icons[cmd] || cmd;
+    const tooltip = this.getTooltip(cmdSchema);
     const currentCmd = this.cmds[cmd] = { schema: cmdSchema };
-    const icon = cmdSchema.icon || cmd;
+
     switch (cmdSchema.element) {
       case 'button':
-        currentCmd.el = button(icon, this.getTooltip(cmdSchema));
+        elementToAdd = currentCmd.el = button(cmd, icon, tooltip);
         const callback = () => this.cmdCallback(cmdSchema, cmdSchema.value);
         currentCmd.el.addEventListener('click', callback);
         if (cmdSchema.shortcut) {
           this.shortcuts.push({ ...cmdSchema.shortcut, callback });
         }
-        li.appendChild(currentCmd.el);
         break;
 
       case 'file':
-        const fileBtn = fileButton(icon, this.getTooltip(cmdSchema));
-        currentCmd.el = fileBtn.el;
+        const fileBtn = fileButton(cmd, icon, tooltip);
+        elementToAdd = currentCmd.el = fileBtn.el;
         fileBtn.input.addEventListener('change', (event) => {
           this.cmdCallback(cmdSchema, event);
         });
-        li.appendChild(currentCmd.el);
         break;
 
       case 'input':
-        currentCmd.el = input(icon, cmdSchema.type, this.getTooltip(cmdSchema));
+        elementToAdd = currentCmd.el = input(cmd, cmdSchema.type, tooltip);
         currentCmd.el.addEventListener('change', () => {
           this.cmdCallback(cmdSchema, currentCmd.el.value);
         });
-        li.appendChild(currentCmd.el);
         break;
 
       case 'select':
-        const selectWrapper = select(icon, command[cmd]);
-        const temp = currentCmd.el = selectWrapper.querySelector('select');
-        temp.addEventListener('change',
-          () => this.cmdCallback(cmdSchema, temp[temp.selectedIndex].value)
+        const { wrapper, el } = select(cmd, command[cmd]);
+        currentCmd.el = el;
+        elementToAdd = wrapper;
+        el.addEventListener('change',
+          () => this.cmdCallback(cmdSchema, el[el.selectedIndex].value)
         );
-        li.appendChild(selectWrapper);
         break;
 
       case 'dropdown':
-        const ddown = dropdown(icon, cmdSchema.items, (value) => this.cmdCallback(cmdSchema, value)
+        const ddown = dropdown(
+          cmd,
+          cmdSchema.items,
+          (value) => this.cmdCallback(cmdSchema, value)
         );
-        li.appendChild(ddown.dropdown);
-
+        elementToAdd = currentCmd.el = ddown.dropdown;
         break;
 
       case 'styling':
@@ -132,26 +135,34 @@ export default class Styler {
         break;
 
       case 'custom':
-        const markup = cmdSchema.create(this);
-        li.appendChild(markup);
+        elementToAdd = cmdSchema.create(this);
         break;
 
       case 'classes':
-        currentCmd.el = document.createElement('ul');
-        command[cmd].forEach(className => {
-          const li = menuButton(`${cmdSchema.command}${camelCase(className)}`,
+        elementToAdd = currentCmd.el = document.createElement('ul');
+        const values = cmdSchema.values;
+        values.forEach((value, indx) => {
+          const className = value;
+          const iconName = cmdSchema.icons ? cmdSchema.icons[indx] : value;
+          const icon = icons[iconName] || value;
+          const li = menuButton(
+            className,
+            icon,
             () => {
-              this.toggleClass(`is-${className}`, command[cmd]);
+              this.toggleClass(className, values)
             },
-            `${camelCase(cmdSchema.command)} ${className}`
+            className
           );
           currentCmd.el.appendChild(li);
         });
-        li.appendChild(currentCmd.el);
         break;
 
       default:
-        console.warn(cmd, ' element not found');
+        console.warn(cmd, ' is not found');
+    }
+
+    if (elementToAdd) {
+      li.appendChild(elementToAdd);
     }
 
     if (typeof cmdSchema.init === 'function') {
@@ -373,7 +384,10 @@ export default class Styler {
     if (!this.currentItem) return;
     const prefixedClasses = allClasses.map(cls => `is-${cls}`);
     this.currentItem.el.classList.remove(...prefixedClasses);
-    this.currentItem.el.classList.toggle(currentClass);
+    if (!currentClass) {
+      return;
+    }
+    this.currentItem.el.classList.toggle(`is-${currentClass}`);
     const updateTemp = () => {
       this.update();
       this.currentItem.el.removeEventListener('transitionend', updateTemp);

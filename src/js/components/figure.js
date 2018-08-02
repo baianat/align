@@ -113,8 +113,14 @@ export default class Figure {
     mode: 'bubble',
     hideWhenClickOut: true,
     addActiveClass: true,
-    commands: [{ _figureClasses: ['floatLeft', 'center', 'floatRight', 'full'] }, '_remove'],
-    tooltip: true
+    tooltip: true,
+    commands: [
+      { 
+        element: 'classes',
+        values: ['floatLeft', 'center', 'floatRight', 'full'] 
+      },
+      'remove'
+    ]
   }
 
   static schema = {
