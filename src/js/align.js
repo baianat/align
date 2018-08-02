@@ -215,8 +215,12 @@ export default class Align {
     elClass.add(this).then((newElement) => {
       if (!newElement.el) return;
       const el = Selection.range.startContainer;
-      el.parentNode.insertBefore(newElement.el, el);
-      Section.activeSection.elements.push(newElement);
+      if (el.tagName === 'P') {
+        el.parentNode.replaceChild(newElement.el, el);
+      }
+      if (el.tagName !== 'P') {
+        el.appendChild(newElement.el);
+      }
       this.inserter.hide();
       this.update();
     });
