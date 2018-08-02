@@ -1,4 +1,4 @@
-import { field, setElementsPrefix } from './partial/elements';
+import { setElementsPrefix } from './partial/elements';
 import Section from './section';
 
 export default class Sidebar {
@@ -16,11 +16,11 @@ export default class Sidebar {
       `<input class="align-sidebar-input" data-align-input type="text">`
     );
     this.customClass = this.customClass.querySelector('[data-align-input]');
-    this.customClass.addEventListener('input', (evnt) => {
-      Section.activeSection.classes.custom = (() => {
-        let values = evnt.target.value.split(/[ ,]+/);
-        values = values.map(val => val.trim()).filter(val => val !== '');
-        return values;
+    this.customClass.addEventListener('input', function () {
+      const active = Section.activeSection;
+      active.settings.customClass = (() => {
+        let values = this.value.split(/[ ,]+/);
+        return values.map(val => val.trim()).filter(val => val !== '');
       })();
     });
     this._initLayout();
@@ -91,6 +91,6 @@ export default class Sidebar {
       const property = `padding-${key}`;
       this.paddingInputs[key].value = current.style[property];
     });
-    this.customClass.value = current.classes.custom;
+    this.customClass.value = current.settings.customClass;
   }
 }

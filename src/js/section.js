@@ -4,6 +4,7 @@ import Figure from './components/figure';
 import Table from './components/table';
 import Link from './components/link';
 import Selection from './selection';
+import Dep from './dep';
 
 export default class Section {
   constructor (align, content, {
@@ -29,6 +30,7 @@ export default class Section {
     if (this.settings.type === 'text') {
       this._initControllers();
       this._initBackground();
+      this._initSettings();
       this.el.addEventListener('click', () => {
         this.active();
       });
@@ -90,21 +92,7 @@ export default class Section {
       }
       this.classes.custom.push(cls);
     });
-    const _self = this;
-    this.el.classList.add(...this.classes.modifiers, ...this.classes.custom);
-    this.classes = new Proxy(this.classes, {
-      get (classes, type) {
-        return classes[type] || '';
-      },
-      set (classes, type, value) {
-        _self.el.classList.remove(...classes[type]);
-        console.log(classes[type])
-        classes[type] = value;
-        console.log(classes[type])
-        _self.el.classList.add(...classes[type]);
-        return true;
-      }
-    });
+    this.el.classList.add(...this.classes.modifiers);
     this.el.setAttribute('style', content.getAttribute('style'));
     this.bgColor = content.style.backgroundColor;
   }
@@ -206,6 +194,38 @@ export default class Section {
     }
   }
 
+  _initSettings () {
+    this.settings = {
+      customClass: this.classes.custom,
+      modifiers: [],
+    }
+    Object.keys(this.settings).forEach(key => {
+      let internalValue = this.settings[key]
+      const dep = new Dep();
+      
+      Object.defineProperty(this.settings, key, {
+        get() {
+          dep.depend();
+          return internalValue;
+        },
+        set(newVal) {
+          const oldVal = internalValue;
+          internalValue = newVal;
+          dep.notify(oldVal);
+        }
+      });
+    });
+    Dep.watcher((oldVal) => {
+      if (this.settings.customClass.length === 0) {
+        return;
+      }
+      if (oldVal && oldVal.length > 0) {
+        this.el.classList.remove(...oldVal);
+      }
+      this.el.classList.add(...this.settings.customClass);
+    });
+  }
+
   getIndex () {
     return this.$align.sections.findIndex(el => el === this);
   }
@@ -218,8 +238,7 @@ export default class Section {
         this.update();
         return style[name] || '';
       },
-      set (style, name, val, receiver) {
-        console.log(receiver)
+      set (style, name, val) {
         if (val) {
           style[name] = val;
           el.style[name] =  val;
