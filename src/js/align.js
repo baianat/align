@@ -1,7 +1,6 @@
 import { select, userOS, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
-import Figure from './components/figure';
 import Selection from './selection';
 import Section from './section';
 import EventBus from './events';
@@ -178,15 +177,6 @@ export default class Align {
   applyFont (schema, cmd) {
     this.el.style.fontFamily = cmd.fontName[0];
   }
-
-  execute (cmd, value, useCSS = false) {
-    this.editor.focus();
-    document.execCommand('styleWithCSS', false, useCSS);
-    document.execCommand(cmd, false, value);
-    document.execCommand('styleWithCSS', false, false);
-    this.update();
-  }
-
 
   addHTML (args) {
     let elHTML = '';

@@ -49,7 +49,7 @@ export default class Styler {
       this.generateCmdElement(command);
     });
     if (this.settings.mode === 'bubble') {
-      this._initBubble();
+      this.el.classList.add('is-hidden');
       this.$align.wrapper.appendChild(this.el);
     }
     if (this.settings.mode === 'toolbar' && this.settings.shortcuts) {
@@ -69,15 +69,11 @@ export default class Styler {
     }
   }
 
-  _initBubble () {
-    this.el.classList.add('is-hidden');
-  }
-
   _initClasses ({ el, schema }) {
     const values = schema.values;
     if (!Array.isArray(values)) {
       const element = input('counter', 'number');
-      element.addEventListener('change', () => {
+      element.addEventListener('input', () => {
         if (!this.currentItem) {
           return;
         }
@@ -251,7 +247,11 @@ export default class Styler {
    * @param {String|Number} value
    */
   execute (cmd, value, useCSS = false) {
-    this.$align.execute(...arguments);
+    this.$align.editor.focus();
+    document.execCommand('styleWithCSS', false, useCSS);
+    document.execCommand(cmd, false, value);
+    document.execCommand('styleWithCSS', false, false);
+    this.$align.update();
   }
 
   updateBubble (newPosition) {
@@ -277,13 +277,14 @@ export default class Styler {
       return;
     }
     this.visible = true;
-    this.updateTemp = null;
     this.el.style.transition = 'opacity 0.2s';
     this.el.classList.add('is-visible');
     this.el.classList.remove('is-hidden');
-    setTimeout(() => {
+    const updateTemp = () => {
       this.el.style.transition = '';
-    }, 200);
+      this.el.removeEventListener('transitionend', updateTemp);
+    };
+    this.currentItem.el.addEventListener('transitionend', updateTemp);
     if (this.settings.hideWhenClickOut) {
       document.addEventListener('click', this.clickCallback);
     }
@@ -417,7 +418,7 @@ export default class Styler {
 
   static defaults = {
     mode: 'toolbar',
-    commands: ['bold', 'italic', 'underline'],
+    commands: [],
     hideWhenClickOut: false,
     tooltip: false,
     theme: 'light',
