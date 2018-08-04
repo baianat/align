@@ -84,7 +84,8 @@ export default class Align {
         ...this.settings.bubble,
         mode: 'bubble',
         tooltip: false
-      });    }
+      });
+    }
     this.inserter = new Inserter(this, {});
   }
   /**

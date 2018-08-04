@@ -80,11 +80,13 @@ export default class Figure {
 
     this.img.src = URL.createObjectURL(file);
 
+    const update = (src) => {
+      source.src = src;
+    };
+
     this.$align.$bus.emit('imageAdded', {
       file,
-      update() {
-        this.img.src = newSrc;
-      }
+      update
     });
   }
 

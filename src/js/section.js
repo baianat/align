@@ -349,11 +349,6 @@ export default class Section {
     let url = '';
     if (file instanceof File) {
       url = URL.createObjectURL(file);
-      // emit events
-      const index = this.getIndex();
-      this.$align.$bus.emit('imageAdded', { file, update });
-      this.$align.$bus.emit('sectionChanged', { from: index, to: index });
-      this.$align.$bus.emit('changed');
     } else { 
       url = file;
     }
@@ -369,6 +364,12 @@ export default class Section {
     this.bgImage.style.backgroundImage = `url(${url})`;
     this.el.classList.add('has-bgImage');
     this.$align.update();
+
+    // emit events
+    const index = this.getIndex();
+    this.$align.$bus.emit('imageAdded', { file, update });
+    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
+    this.$align.$bus.emit('changed');
   }
 
   backgroundVideo (file) {
@@ -382,11 +383,6 @@ export default class Section {
     let url = '';
     if (file instanceof File) {
       url = URL.createObjectURL(file);
-      // emit events
-      const index = this.getIndex();
-      this.$align.$bus.emit('imageAdded', { file, update });
-      this.$align.$bus.emit('sectionChanged', { from: index, to: index });
-      this.$align.$bus.emit('changed');
     } else { 
       url = file;
     }

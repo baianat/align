@@ -53,7 +53,7 @@ export default class Styler {
     }
     if (this.settings.mode === 'toolbar' && this.settings.shortcuts) {
       this.keyboardShortcuts();
-      this.$align.el.insertAdjacentElement('afterbegin', this.el);
+      this.$align.el.insertBefore(this.el, this.$align.wrapper);
     }
     if (this.settings.hideWhenClickOut) {
       this.clickCallback = (event) => {

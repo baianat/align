@@ -11,13 +11,14 @@ export default class Gallery {
     Array.from(images).forEach(img => {
       const url = URL.createObjectURL(img);
       const imgElm = stringToDOM('<img class="align-gallery-image"/>');
+      const update = (newSrc) => {
+        imgElm.src = newSrc;
+      }
       imgElm.src = url;
       this.el.appendChild(imgElm);
       this.$align.$bus.emit('imageAdded', {
         file: img,
-        update(newSrc) {
-          imgElm.src = newSrc;
-        }
+        update
       });
     });
   }
