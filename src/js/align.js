@@ -114,7 +114,13 @@ export default class Align {
     const addSection = document.createElement('button');
     addSection.classList.add('align-sectionAdd', 'is-main');
     this.wrapper.appendChild(addSection);
-    addSection.addEventListener('click', () => new Section(this));
+    addSection.addEventListener('click', () => {
+      const newSection = new Section(this);
+      setTimeout(() => {
+        newSection.active();
+        Selection.selectElement(newSection.contentDiv.querySelector('p'));
+      }, 1);
+    });
   }
 
   /**
@@ -124,7 +130,6 @@ export default class Align {
     this.editor.addEventListener('focus', this.highlight.bind(this));
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
     this.editor.addEventListener('input', () => {
-      console.log('input')
       this.$bus.emit('changed');
     });
     window.addEventListener('keyup', this.update.bind(this), true);

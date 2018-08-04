@@ -175,13 +175,14 @@ export default class Sidebar {
     this.customClass.value = current.settings.customClass;
     this.backgroundImage.label.innerText =
       current.settings.backgroundImage
-        ? current.settings.backgroundImage.name
+        ? current.settings.backgroundImage.name || current.settings.backgroundImage
         : 'Add image';
     this.backgroundVideo.label.innerText =
       current.settings.backgroundVideo
-        ? current.settings.backgroundVideo.name
+        ? current.settings.backgroundVideo.name || current.settings.backgroundVideo
         : 'Add video';
 
     this.backgroundColor.colorpikcer.selectColor(current.settings.backgroundColor || '#fff', true);
+    console.log(current.settings);
   }
 }

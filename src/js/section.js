@@ -18,10 +18,14 @@ export default class Section {
     this.$align = align;
     this.elements = [];
     this.settings = {
-      type: type,
+      customClass: [],
+      modifiers: [],
+      backgroundColor: '',
+      backgroundVideo: '',
+      backgroundImage: '',
       isHTMLView: false,
+      type
     }
-    Section.activeSection = this;
     if (typeof content === 'string') {
       content = stringToDOM(content);
     }
@@ -31,6 +35,7 @@ export default class Section {
       this._initControllers();
       this._initBackground();
       this._initSettings();
+      this.createLayout();
       this.el.addEventListener('click', () => {
         this.active();
       });
@@ -44,7 +49,6 @@ export default class Section {
     }
     this.$align.editor.appendChild(this.el);
     this.$align.sections.push(this);
-    this.createLayout();
   }
 
   get content () {
@@ -159,7 +163,7 @@ export default class Section {
     this.settingsButton.insertAdjacentHTML('afterbegin', icons.dotsVertical);
 
     this.addButton.addEventListener('click', () => {
-      const newSection = new Section(this.$align, '', { position: this.getIndex() })
+      const newSection = new Section(this.$align, '', { position: this.getIndex() });
       setTimeout(() => {
         newSection.active();
         Selection.selectElement(newSection.contentDiv.querySelector('p'));
@@ -179,29 +183,25 @@ export default class Section {
   _initBackground () {
     this.bgImage = this.bgImage || this.contentDiv.querySelector('.align-bgImage');
     this.bgVideo = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
-    this.bgCol = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
+
     if (this.bgImage) {
       this.el.classList.add('has-bgImage');
       this.el.insertAdjacentElement('afterBegin', this.bgImage);
+      this.settings.backgroundImage = this.bgImage.url;
     }
     if (this.bgVideo) {
       this.el.classList.add('has-bgVideo');
       this.el.insertAdjacentElement('afterBegin', this.bgVideo);
+      this.settings.backgroundVideo = this.bgVideo.querySelector('source').src;
     }
     if (this.bgColor) {
       this.el.classList.add('has-bgColor');
       this.el.style.backgroundColor = this.bgColor;
+      this.settings.backgroundColor = this.bgColor;
     }
   }
 
   _initSettings () {
-    this.settings = {
-      customClass: this.classes.custom,
-      modifiers: [],
-      backgroundColor: '',
-      backgroundVideo: '',
-      backgroundImage: ''
-    }
     Object.keys(this.settings).forEach(key => {
       let internalValue = this.settings[key]
       const dep = new Dep();
@@ -231,7 +231,6 @@ export default class Section {
       this.backgroundColor(this.settings.backgroundColor);
     });
     Dep.watcher(() => {
-      console.log(this.settings.backgroundImage);
       this.backgroundImage(this.settings.backgroundImage);
     });
     Dep.watcher(() => {
@@ -342,10 +341,22 @@ export default class Section {
   backgroundImage (file) {
     if (!file) {
       if (this.bgImage) {
-        this.bgImage.style.backgroundImage = '';
+        this.bgImage.remove();
+        this.bgImage = null;
       }
       return;
     };
+    let url = '';
+    if (file instanceof File) {
+      url = URL.createObjectURL(file);
+      // emit events
+      const index = this.getIndex();
+      this.$align.$bus.emit('imageAdded', { file, update });
+      this.$align.$bus.emit('sectionChanged', { from: index, to: index });
+      this.$align.$bus.emit('changed');
+    } else { 
+      url = file;
+    }
 
     if (!this.bgImage) {
       this.bgImage = document.createElement('div');
@@ -355,26 +366,30 @@ export default class Section {
     const update = (src) => {
       this.bgImage.style.backgroundImage = `url(${src})`;
     };
-    this.bgImage.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
+    this.bgImage.style.backgroundImage = `url(${url})`;
     this.el.classList.add('has-bgImage');
     this.$align.update();
-
-    // emit events
-    const index = this.getIndex();
-    this.$align.$bus.emit('imageAdded', { file, update });
-    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
-    this.$align.$bus.emit('changed');
   }
 
   backgroundVideo (file) {
     if (!file) {
       if (this.bgVideo) {
-        this.bgVideo.style.backgroundImage = '';
+        this.bgVideo.remove();
+        this.bgVideo = null;
       }
       return;
     }
-    const url = URL.createObjectURL(event.target.files[0]);
-
+    let url = '';
+    if (file instanceof File) {
+      url = URL.createObjectURL(file);
+      // emit events
+      const index = this.getIndex();
+      this.$align.$bus.emit('imageAdded', { file, update });
+      this.$align.$bus.emit('sectionChanged', { from: index, to: index });
+      this.$align.$bus.emit('changed');
+    } else { 
+      url = file;
+    }
     if (!this.bgVideo) {
       this.bgVideo = document.createElement('div');
       this.bgVideo.classList.add('align-bgVideo');
