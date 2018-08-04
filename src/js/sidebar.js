@@ -1,5 +1,8 @@
 import { setElementsPrefix } from './partial/elements';
+import { stringToDOM } from './partial/util';
+import Colorpicker from '@baianat/colorpicker';
 import Section from './section';
+import icons from './partial/icons';
 
 export default class Sidebar {
   constructor (align) {
@@ -11,8 +14,11 @@ export default class Sidebar {
     setElementsPrefix('align-sidebar-');
     this.el = document.createElement('div');
     this.el.classList.add('align-sidebar');
+    this.backgroundImage = this.field('background-image', 'Background image:', 'file');
+    this.backgroundVideo = this.field('background-video', 'Background video:', 'file');
+    this.backgroundColor = this.field('background-color', 'Background color:', 'color');
     this.customClass = this.generateElement(
-      'custom class:',
+      'Custom class:',
       `<input class="align-sidebar-input" data-align-input type="text">`
     );
     this.customClass = this.customClass.querySelector('[data-align-input]');
@@ -22,6 +28,28 @@ export default class Sidebar {
         let values = this.value.split(/[ ,]+/);
         return values.map(val => val.trim()).filter(val => val !== '');
       })();
+    });
+    this.backgroundImage.input.addEventListener('change', (evnt) => {
+      const active = Section.activeSection;
+      active.settings.backgroundImage = evnt.target.files[0];
+      this.update();
+    });
+    this.backgroundVideo.input.addEventListener('change', (evnt) => {
+      const active = Section.activeSection;
+      active.settings.backgroundVideo = evnt.target.files[0];
+      this.update();
+    });
+    this.backgroundColor.input.addEventListener('change', (evnt) => {
+      const active = Section.activeSection;
+      active.settings.backgroundColor = evnt.target.value;
+      this.update();
+    });
+    this.backgroundColor.colors.forEach(color => {
+      color.el.addEventListener('click', () => {
+        const active = Section.activeSection;
+        active.settings.backgroundColor = color.color;
+        this.update();
+      });
     });
     this._initLayout();
   }
@@ -69,6 +97,59 @@ export default class Sidebar {
     });
   }
 
+  field (name, desc, type) {
+    const el = document.createElement('div');
+    const labelEl = document.createElement('label');
+    el.classList.add('align-sidebar-field');
+    labelEl.classList.add('align-sidebar-label');
+    labelEl.innerText = desc;
+    el.appendChild(labelEl);
+    this.el.appendChild(el);
+    if (type === 'file') {
+      const elm = stringToDOM('<div class="align-sidebar-file"></div>');
+      const label = stringToDOM(`<label class="align-sidebar-label" for="${name}"></label>`);
+      const input = stringToDOM(`<input class="align-sidebar-input" id="${name}" type="file">`);
+      const close = stringToDOM(`<button>${icons['close']}</button>`);
+      [label, input, close].forEach(comp => {
+        elm.appendChild(comp);
+      });
+      el.appendChild(elm);
+      close.addEventListener('click', () => {
+        label.innerText = 'Add image';
+        input.value = '';
+        input.dispatchEvent(new window.Event('change'));
+      });
+      return { input, label, close };
+    }
+    if (type === 'color') {
+      const elm = stringToDOM('<div class="align-sidebar-colors"></div>');
+      const input = stringToDOM(`<input class="align-sidebar-input" id="${name}" type="text">`);
+      let colors = ['black', 'white', 'gray'];
+      colors = colors.map(color => {
+        return {
+          el: stringToDOM(`<button class="align-sidebar-color is-${color}" type="text"><button>`),
+          color
+        };
+      });
+      colors.forEach(color => {
+        elm.appendChild(color.el);
+      })
+      elm.appendChild(input);
+      const colorpikcer = new Colorpicker(input, {
+        defaultColor: '#fff',
+        mode: 'hex',
+        picker: { mode: 'square' },
+        guideIcon: `
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="11"></circle>
+          </svg>
+        `
+      });
+      el.appendChild(elm);
+      return { input, colorpikcer, colors: colors };
+    }
+  }
+
   generateElement (label, markup) {
     const el = document.createElement('div');
     const labelEl = document.createElement('label');
@@ -92,5 +173,15 @@ export default class Sidebar {
       this.paddingInputs[key].value = current.style[property];
     });
     this.customClass.value = current.settings.customClass;
+    this.backgroundImage.label.innerText =
+      current.settings.backgroundImage
+        ? current.settings.backgroundImage.name
+        : 'Add image';
+    this.backgroundVideo.label.innerText =
+      current.settings.backgroundVideo
+        ? current.settings.backgroundVideo.name
+        : 'Add video';
+
+    this.backgroundColor.colorpikcer.selectColor(current.settings.backgroundColor || '#fff', true);
   }
 }

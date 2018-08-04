@@ -9,22 +9,82 @@
   background-color: $white
   padding: 90px 10px
 
+  .picker
+    &-guide
+      stroke: $black
+      stroke-width: 2px
+    &-menu
+      z-index: 99999
   &-field
     background: $white
     padding-bottom: 10px
     margin-bottom: 10px
     &:not(:last-child)
-      border-bottom: 1px solid $gray
+      border-bottom: 1px solid $white
   &-label
     display: block
-    font-size: 18px
+    font-size: 14px
     line-height: 1em
-    margin-bottom: 0.5em
-    color: $gray
+    margin-bottom: 1em
+    color: $dark
   &-input
     border: 1px solid $gray
     background: $white
+    width: 100%
+    height: 30px
+    padding: 0 10px
+  &-colors
+    display: flex
+    justify-content: space-between
+    input[type="color"]
+      display: none
+  &-color
+    width: 24px
+    height: 24px
+    padding: 0
+    border: 2px solid $black
+    border-radius: 24px
+    &.is-black
+      background: $black
+    &.is-white
+      background: $white
+    &.is-gray
+      background: $gray
+      
+      
+  &-file
+    position: relative
+    width: 100%
+    height: 30px
+    border: 1px solid $gray
 
+    input[type="file"]
+      display: none
+
+    label
+      display: inline-block
+      color: $gray
+      padding: 0 30px 0 10px
+      width: 100%
+      height: 100%
+      text-overflow: ellipsis
+      white-space: nowrap
+      overflow: hidden
+      font-size: 12px
+      margin: 0
+      line-height: 30px
+
+    button
+      position: absolute
+      top: 0
+      right: 0
+      height: 30px
+      width: 30px
+      border: 0
+      fill: $gray
+      background: transparent
+      &:hover
+        fill: $red
 
 .align.is-sidebar-active
   .align-sidebar

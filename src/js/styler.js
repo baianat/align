@@ -1,6 +1,5 @@
 import {
   cloneObject,
-  camelCase,
   isElementClosest,
   updatePosition,
   userOS,
@@ -46,7 +45,7 @@ export default class Styler {
     this.shortcuts = [];
 
     this.settings.commands.forEach((command) => {
-      this.generateCmdElement(command);
+      this._initCmdElement(command);
     });
     if (this.settings.mode === 'bubble') {
       this.el.classList.add('is-hidden');
@@ -69,7 +68,7 @@ export default class Styler {
     }
   }
 
-  _initClasses ({ el, schema }) {
+  _initClassesElement ({ el, schema }) {
     const values = schema.values;
     if (!Array.isArray(values)) {
       const element = input('counter', 'number');
@@ -100,7 +99,7 @@ export default class Styler {
     });
   }
 
-  generateCmdElement (command) {
+  _initCmdElement (command) {
     const cmd = typeof command === 'string' ? command : Object.keys(command)[0];
     const cmdSchema = this.cmdsSchema[cmd] || command;
     if (!cmdSchema) {
@@ -167,7 +166,7 @@ export default class Styler {
 
       case 'classes':
         elementToAdd = currentCmd.el = document.createElement('ul');
-        this._initClasses(currentCmd)
+        this._initClassesElement(currentCmd)
         break;
 
       default:

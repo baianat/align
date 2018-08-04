@@ -198,6 +198,9 @@ export default class Section {
     this.settings = {
       customClass: this.classes.custom,
       modifiers: [],
+      backgroundColor: '',
+      backgroundVideo: '',
+      backgroundImage: ''
     }
     Object.keys(this.settings).forEach(key => {
       let internalValue = this.settings[key]
@@ -223,6 +226,16 @@ export default class Section {
         this.el.classList.remove(...oldVal);
       }
       this.el.classList.add(...this.settings.customClass);
+    });
+    Dep.watcher(() => {
+      this.backgroundColor(this.settings.backgroundColor);
+    });
+    Dep.watcher(() => {
+      console.log(this.settings.backgroundImage);
+      this.backgroundImage(this.settings.backgroundImage);
+    });
+    Dep.watcher(() => {
+      this.backgroundVideo(this.settings.backgroundVideo);
     });
   }
 
@@ -326,10 +339,14 @@ export default class Section {
     this.$align.$bus.emit('changed');
   }
   
-  backgroundImage (event) {
-    const input = event.target;
-    const file = input.files[0];
-    if (!file) return;
+  backgroundImage (file) {
+    if (!file) {
+      if (this.bgImage) {
+        this.bgImage.style.backgroundImage = '';
+      }
+      return;
+    };
+
     if (!this.bgImage) {
       this.bgImage = document.createElement('div');
       this.bgImage.classList.add('align-bgImage');
@@ -340,7 +357,6 @@ export default class Section {
     };
     this.bgImage.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
     this.el.classList.add('has-bgImage');
-    input.value = null;
     this.$align.update();
 
     // emit events
@@ -350,11 +366,14 @@ export default class Section {
     this.$align.$bus.emit('changed');
   }
 
-  backgroundVideo (event) {
-    const input = event.target;
-    const file = input.files[0];
-    if (!file) return;
-    const url = window.URL.createObjectURL(event.target.files[0]);
+  backgroundVideo (file) {
+    if (!file) {
+      if (this.bgVideo) {
+        this.bgVideo.style.backgroundImage = '';
+      }
+      return;
+    }
+    const url = URL.createObjectURL(event.target.files[0]);
 
     if (!this.bgVideo) {
       this.bgVideo = document.createElement('div');
@@ -374,7 +393,6 @@ export default class Section {
     const update = (src) => {
       source.src = src;
     };
-    input.value = null;
     this.$align.update();
 
     // emit events
@@ -466,10 +484,6 @@ export default class Section {
     mode: 'bubble',
     hideWhenClickOut: true,
     commands: [
-      '_sectionColor',
-      '_sectionImage',
-      '_sectionVideo',
-      '_sectionRemoveBg',
       '_sectionToggleHTML',
       '_sectionDuplicate',
       { 
