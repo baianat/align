@@ -91,6 +91,7 @@ export default class Sidebar {
     Object.keys(this.marginInputs).forEach(key => {
       const property = `margin-${key}`;
       this.marginInputs[key].addEventListener('input', (evnt) => {
+        console.log(!!evnt.target.value);
         const newObj = Object.assign(
           Section.activeSection.props.layout,
           { [property]: evnt.target.value }
@@ -180,11 +181,11 @@ export default class Sidebar {
     const currentLayout = current.props.layout;
     Object.keys(this.marginInputs).forEach(key => {
       const property = `margin-${key}`;
-      this.marginInputs[key].value = currentLayout[property];
+      this.marginInputs[key].value = currentLayout[property] || '';
     });
     Object.keys(this.paddingInputs).forEach(key => {
       const property = `padding-${key}`;
-      this.paddingInputs[key].value = currentLayout[property];
+      this.paddingInputs[key].value = currentLayout[property] || '';
     });
     this.customClass.value = current.props.customClass;
     this.backgroundImage.label.innerText =

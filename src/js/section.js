@@ -94,6 +94,22 @@ export default class Section {
     });
     this.el.classList.add(...this.props.modifiers);
     this.el.setAttribute('style', content.getAttribute('style'));
+    [
+      'margin-top',
+      'margin-right',
+      'margin-bottom',
+      'margin-left',
+      'padding-top',
+      'padding-right',
+      'padding-bottom',
+      'padding-left'
+    ].forEach(styl => {
+      const value = this.el.style[styl];
+      if (value) {
+        this.props.layout[styl] = value;
+        return;
+      }
+    });
   }
 
   _initContent (content) {
@@ -223,27 +239,16 @@ export default class Section {
     return this.$align.sections.findIndex(el => el === this);
   }
 
-  updateLayout (layout) {
-    const sectionStyle = window.getComputedStyle(this.el);
-    const styles = [
-      'margin-top',
-      'margin-right',
-      'margin-bottom',
-      'margin-left',
-      'padding-top',
-      'padding-right',
-      'padding-bottom',
-      'padding-left'
-    ];
-    styles.forEach(styl => {
-      const value = layout[styl] || this.el.style[styl] || sectionStyle[styl];
+  updateLayout () {
+    Object.keys(this.props.layout).forEach(styl => {
+      const value = this.props.layout[styl];
       if (value) {
-        layout[styl] = value;
-        this.el.style[styl] =  value;
+        this.props.layout[styl] = value;
+        this.el.style[styl] = value;
         return;
       }
-      delete layout[styl];
-      this.el.style[styl] =  '';
+      delete this.props.layout[styl];
+      this.el.style[styl] = '';
     });
   }
 
