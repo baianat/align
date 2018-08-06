@@ -1,6 +1,7 @@
+import Component from './component';
 import Prompt from '../prompt';
 
-export default class Separator {
+export default class Separator extends Component {
   constructor (height) {
     this.el = document.createElement('div');
     this.el.classList.add('align-separator');

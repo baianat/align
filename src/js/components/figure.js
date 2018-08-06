@@ -1,7 +1,8 @@
+import Component from './component';
 import Styler from '../styler';
 import Prompt from '../prompt';
 
-export default class Figure {
+export default class Figure extends Component {
   constructor (align, figure) {
     if (!figure) {
       return {
@@ -58,7 +59,7 @@ export default class Figure {
       this.readFileContent(figure);
     }
     
-    this.toolbar = new Styler(this.$align, Figure.defaults);
+    this.toolbar = new Styler(this.$align, Figure.toolbar);
     this.el.contentEditable = false;
     this.caption.contentEditable = true;
     this.caption.dataset.defaultValue = 'Figure caption';
@@ -105,13 +106,7 @@ export default class Figure {
     return false;
   }
 
-
-  remove () {
-    this.toolbar.remove();
-    this.el.remove();
-  }
-
-  static defaults = {
+  static toolbar = {
     mode: 'bubble',
     hideWhenClickOut: true,
     addActiveClass: true,

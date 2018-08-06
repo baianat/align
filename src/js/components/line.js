@@ -1,6 +1,7 @@
+import Component from './component';
 import Styler from '../styler';
 
-export default class Line {
+export default class Line extends Component {
   constructor (align) {
     this.$align = align;
     this.el = document.createElement('hr');
@@ -15,18 +16,13 @@ export default class Line {
   }
 
   _init () {
-    this.toolbar = new Styler(this.$align, Line.defaults);
+    this.toolbar = new Styler(this.$align, Line.toolbar);
     this.el.addEventListener('click', () => {
       this.toolbar.update(this);
     });
   }
 
-  remove () {
-    this.toolbar.remove();
-    this.el.remove();
-  }
-
-  static defaults = {
+  static toolbar = {
     mode: 'bubble',
     hideWhenClickOut: true,
     commands: [

@@ -1,7 +1,8 @@
+import Component from './component';
 import Prompt from '../prompt';
 import Styler from '../styler';
 
-export default class Table {
+export default class Table extends Component {
   constructor (align, table) {
     if (!table) return;
     this.$align = align;
@@ -29,7 +30,7 @@ export default class Table {
   }
 
   _init (table) {
-    this.toolbar = new Styler(this.$align, Table.defaults);
+    this.toolbar = new Styler(this.$align, Table.toolbar);
     if (table.nodeName === 'TABLE') {
       this.el = table;
       this.el.classList.add('align-table');
@@ -94,7 +95,7 @@ export default class Table {
     this.el.remove();
   }
 
-  static defaults = {
+  static toolbar = {
     mode: 'bubble',
     hideWhenClickOut: true,
     addActiveClass: true,

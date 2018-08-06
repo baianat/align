@@ -1,7 +1,8 @@
+import Component from './component';
 import Prompt from '../prompt';
 import Selection from '../selection';
 
-export default class Link {
+export default class Link extends Component {
   constructor (align, link) {
     this.$align = align;
     this._init(link);
@@ -50,7 +51,7 @@ export default class Link {
   remove () {
     const content = this.el.innerHTML;
     this.el.insertAdjacentHTML('beforebegin', content);
-    this.el.remove();
+    super.remove();
   }
 
   static schema = {

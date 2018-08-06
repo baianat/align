@@ -1,9 +1,10 @@
+import Component from './component';
 import Selection from '../selection';
 
 import { dropzone } from '../partial/elements';
 import { stringToDOM } from '../partial/util';
 
-export default class Gallery {
+export default class Gallery extends Component {
   constructor (align, images) {
     this.$align = align;
     this.el = document.createElement('div');

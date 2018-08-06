@@ -1,6 +1,7 @@
+import Component from './component';
 import Prompt from '../prompt';
 
-export default class Embed {
+export default class Embed extends Component {
   constructor (data) {
     this.el = document.createElement('div');
     this.el.classList.add('align-embed');

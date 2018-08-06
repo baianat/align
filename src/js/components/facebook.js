@@ -1,6 +1,7 @@
+import Component from './component';
 import Prompt from '../prompt';
 
-export default class Facebook {
+export default class Facebook extends Component {
   constructor (link) {
     this.el = document.createElement('div');
     this._init(link);

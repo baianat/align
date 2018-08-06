@@ -1,7 +1,8 @@
+import Component from './component';
 import Prompt from '../prompt';
 import Styler from '../styler';
 
-export default class Grid {
+export default class Grid extends Component {
   constructor (align, count) {
     this.$align = align;
     this.el = document.createElement('div');
@@ -59,7 +60,7 @@ export default class Grid {
   remove () {
     this.gridToolbar.remove();
     this.columnToolbar.remove();
-    this.el.remove();
+    super.remove();
   }
 
   static gridToolbar = {

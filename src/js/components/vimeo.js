@@ -1,6 +1,7 @@
+import Component from './component';
 import Prompt from '../prompt';
 
-export default class Vimeo {
+export default class Vimeo extends Component {
   constructor (link) {
     this.el = document.createElement('div');
     this.el.classList.add('align-video');
