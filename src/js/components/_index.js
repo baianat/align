@@ -5,6 +5,7 @@ import gallery from './gallery';
 import grid from './grid';
 import line from './line';
 import link from './link';
+import quote from './quote';
 import separator from './separator';
 import table from './table';
 import vimeo from './vimeo';
@@ -18,6 +19,7 @@ export default {
   grid,
   line,
   link,
+  quote,
   separator,
   table,
   vimeo,
