@@ -47,7 +47,12 @@ export default class Sidebar {
     this.backgroundColor.colors.forEach(color => {
       color.el.addEventListener('click', () => {
         const active = Section.activeSection;
-        active.settings.backgroundColor = color.color;
+        if (color.color !== 'clear') {
+          active.settings.backgroundColor = color.color;
+        }
+        if (color.color === 'clear') {
+          active.settings.backgroundColor = null;
+        }
         this.update();
       });
     });
@@ -124,7 +129,7 @@ export default class Sidebar {
     if (type === 'color') {
       const elm = stringToDOM('<div class="align-sidebar-colors"></div>');
       const input = stringToDOM(`<input class="align-sidebar-input" id="${name}" type="text">`);
-      let colors = ['black', 'white', 'gray'];
+      let colors = ['black', 'white', 'gray', 'clear'];
       colors = colors.map(color => {
         return {
           el: stringToDOM(`<button class="align-sidebar-color is-${color}" type="text"><button>`),

@@ -286,19 +286,15 @@ export default class Section {
 
   backgroundColor (color) {
     if (!color) {
+      this.bgColor = null;
+      this.el.style.backgroundColor = '';
+      this.el.classList.remove('has-bgColor');
       return;
     }
     this.el.style.backgroundColor = color;
-    // color value maybe in hex, hsl or rgb model
-    // so I have to check for background inline style value
-    if (this.el.style.backgroundColor !== 'rgb(255, 255, 255)') {
-      this.bgColor = color;
-      this.el.classList.add('has-bgColor');
-      return;
-    }
-    this.bgColor = null;
-    this.el.style.backgroundColor = '';
-    this.el.classList.remove('has-bgColor');
+
+    this.bgColor = color;
+    this.el.classList.add('has-bgColor');
 
     // emit events
     const index = this.getIndex();
