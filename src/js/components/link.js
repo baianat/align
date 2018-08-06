@@ -4,6 +4,8 @@ import Selection from '../selection';
 
 export default class Link extends Component {
   constructor (align, link) {
+    super();
+
     this.$align = align;
     this._init(link);
   }

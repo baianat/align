@@ -3,6 +3,8 @@ import Styler from '../styler';
 
 export default class Line extends Component {
   constructor (align) {
+    super();
+
     this.$align = align;
     this.el = document.createElement('hr');
     this.el.classList.add('align-line');

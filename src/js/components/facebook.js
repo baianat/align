@@ -3,6 +3,7 @@ import Prompt from '../prompt';
 
 export default class Facebook extends Component {
   constructor (link) {
+    super();
     this.el = document.createElement('div');
     this._init(link);
   }

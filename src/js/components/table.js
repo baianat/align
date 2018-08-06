@@ -4,6 +4,8 @@ import Styler from '../styler';
 
 export default class Table extends Component {
   constructor (align, table) {
+    super();
+
     if (!table) return;
     this.$align = align;
     this._init(table);

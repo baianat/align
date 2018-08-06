@@ -3,6 +3,8 @@ import Prompt from '../prompt';
 
 export default class Vimeo extends Component {
   constructor (link) {
+    super();
+
     this.el = document.createElement('div');
     this.el.classList.add('align-video');
 

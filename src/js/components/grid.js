@@ -4,6 +4,8 @@ import Styler from '../styler';
 
 export default class Grid extends Component {
   constructor (align, count) {
+    super();
+
     this.$align = align;
     this.el = document.createElement('div');
     this.el.classList.add('align-grid');

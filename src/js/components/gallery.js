@@ -6,6 +6,7 @@ import { stringToDOM } from '../partial/util';
 
 export default class Gallery extends Component {
   constructor (align, images) {
+    super();
     this.$align = align;
     this.el = document.createElement('div');
     this.el.classList.add('align-gallery');

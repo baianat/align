@@ -3,6 +3,7 @@ import Prompt from '../prompt';
 
 export default class Embed extends Component {
   constructor (data) {
+    super();
     this.el = document.createElement('div');
     this.el.classList.add('align-embed');
     this.el.insertAdjacentHTML('afterbegin', data);

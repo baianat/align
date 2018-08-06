@@ -1,4 +1,4 @@
-export default class component {
+export default class Component {
   static add () {
     return false;
   }
@@ -9,4 +9,6 @@ export default class component {
     }
     this.el.remove();
   }
+
+  static list = []
 }

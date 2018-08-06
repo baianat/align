@@ -9,6 +9,7 @@ export default class Figure extends Component {
         el: null
       };
     }
+    super();
     this.$align = align;
     this._init(figure);
   }

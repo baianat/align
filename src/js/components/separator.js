@@ -3,6 +3,8 @@ import Prompt from '../prompt';
 
 export default class Separator extends Component {
   constructor (height) {
+    super();
+
     this.el = document.createElement('div');
     this.el.classList.add('align-separator');
     this._init(height);
