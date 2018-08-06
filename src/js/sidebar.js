@@ -14,49 +14,7 @@ export default class Sidebar {
     setElementsPrefix('align-sidebar-');
     this.el = document.createElement('div');
     this.el.classList.add('align-sidebar');
-    this.backgroundImage = this.field('background-image', 'Background image:', 'file');
-    this.backgroundVideo = this.field('background-video', 'Background video:', 'file');
-    this.backgroundColor = this.field('background-color', 'Background color:', 'color');
-    this.customClass = this.generateElement(
-      'Custom class:',
-      `<input class="align-sidebar-input" data-align-input type="text">`
-    );
-    this.customClass = this.customClass.querySelector('[data-align-input]');
-    this.customClass.addEventListener('input', function () {
-      const active = Section.activeSection;
-      active.props.customClass = (() => {
-        let values = this.value.split(/[ ,]+/);
-        return values.map(val => val.trim()).filter(val => val !== '');
-      })();
-    });
-    this.backgroundImage.input.addEventListener('change', (evnt) => {
-      const active = Section.activeSection;
-      active.props.backgroundImage = evnt.target.files[0];
-      this.update();
-    });
-    this.backgroundVideo.input.addEventListener('change', (evnt) => {
-      const active = Section.activeSection;
-      active.props.backgroundVideo = evnt.target.files[0];
-      this.update();
-    });
-    this.backgroundColor.input.addEventListener('change', (evnt) => {
-      const active = Section.activeSection;
-      active.props.backgroundColor = evnt.target.value;
-      this.update();
-    });
-    this.backgroundColor.colors.forEach(color => {
-      color.el.addEventListener('click', () => {
-        const active = Section.activeSection;
-        if (color.color !== 'clear') {
-          active.props.backgroundColor = color.color;
-        }
-        if (color.color === 'clear') {
-          active.props.backgroundColor = null;
-        }
-        this.update();
-      });
-    });
-    this._initLayout();
+    this.watchers = [];
   }
 
   _initLayout () {
@@ -89,22 +47,23 @@ export default class Sidebar {
       left: this.layout.querySelector('[data-align-padding-left]')
     };
     Object.keys(this.marginInputs).forEach(key => {
-      const property = `margin-${key}`;
+      const prop = `margin-${key}`;
+      this.marginInputs[key].value = this.currentProps.layout[prop] || '';
       this.marginInputs[key].addEventListener('input', (evnt) => {
-        console.log(!!evnt.target.value);
         const newObj = Object.assign(
           Section.activeSection.props.layout,
-          { [property]: evnt.target.value }
+          { [prop]: evnt.target.value }
         );
         Section.activeSection.props.layout = newObj;
       });
     });
     Object.keys(this.paddingInputs).forEach(key => {
-      const property = `padding-${key}`;
+      const prop = `padding-${key}`;
+      this.paddingInputs[key].value = this.currentProps.layout[prop] || '';
       this.paddingInputs[key].addEventListener('input', (evnt) => {
         const newObj = Object.assign(
           Section.activeSection.props.layout,
-          { [property]: evnt.target.value }
+          { [prop]: evnt.target.value }
         );
         Section.activeSection.props.layout = newObj;
       });
@@ -176,27 +135,83 @@ export default class Sidebar {
     return el;
   }
 
-  update () {
-    const current = Section.activeSection;
-    const currentLayout = current.props.layout;
-    Object.keys(this.marginInputs).forEach(key => {
-      const property = `margin-${key}`;
-      this.marginInputs[key].value = currentLayout[property] || '';
-    });
-    Object.keys(this.paddingInputs).forEach(key => {
-      const property = `padding-${key}`;
-      this.paddingInputs[key].value = currentLayout[property] || '';
-    });
-    this.customClass.value = current.props.customClass;
-    this.backgroundImage.label.innerText =
-      current.props.backgroundImage
-        ? current.props.backgroundImage.name || current.props.backgroundImage
-        : 'Add image';
-    this.backgroundVideo.label.innerText =
-      current.props.backgroundVideo
-        ? current.props.backgroundVideo.name || current.props.backgroundVideo
-        : 'Add video';
+  updateFields () {
+    this.el.innerHTML = '';
+    this.fields.forEach(field => {
+      switch (field) {
+        case 'backgroundImage':
+          this.backgroundImage = this.field('background-image', 'Background image:', 'file');
+          this.backgroundImage.input.addEventListener('change', (evnt) => {
+            const active = Section.activeSection;
+            active.props.backgroundImage = evnt.target.files[0];
+            this.update();
+          });
+          this.backgroundImage.label.innerText =
+          this.currentProps.backgroundImage
+            ? this.currentProps.backgroundImage.name || this.currentProps.backgroundImage
+            : 'Add image';
+          break;
 
-    this.backgroundColor.colorpikcer.selectColor(current.props.backgroundColor || '#fff', true);
+        case 'backgroundVideo':
+          this.backgroundVideo = this.field('background-video', 'Background video:', 'file');
+          this.backgroundVideo.input.addEventListener('change', (evnt) => {
+            const active = Section.activeSection;
+            active.props.backgroundVideo = evnt.target.files[0];
+            this.update();
+          });
+          this.backgroundVideo.label.innerText =
+          this.currentProps.backgroundVideo
+            ? this.currentProps.backgroundVideo.name || this.currentProps.backgroundVideo
+            : 'Add video';
+          break;
+
+        case 'backgroundColor':
+          this.backgroundColor = this.field('background-color', 'Background color:', 'color');
+          this.backgroundColor.input.addEventListener('change', (evnt) => {
+            const active = Section.activeSection;
+            active.props.backgroundColor = evnt.target.value;
+            this.update();
+          });
+          this.backgroundColor.colors.forEach(color => {
+            color.el.addEventListener('click', () => {
+              const active = Section.activeSection;
+              if (color.color !== 'clear') {
+                active.props.backgroundColor = color.color;
+              }
+              if (color.color === 'clear') {
+                active.props.backgroundColor = null;
+              }
+              this.update();
+            });
+          });
+          this.backgroundColor.colorpikcer.selectColor(this.currentProps.backgroundColor || '#fff', true);
+          break;
+
+        case 'customClass':
+          this.customClass = this.generateElement(
+            'Custom class:',
+            `<input class="align-sidebar-input" data-align-input type="text">`
+          );
+          this.customClass = this.customClass.querySelector('[data-align-input]');
+          this.customClass.value = this.currentProps.customClass;
+          this.customClass.addEventListener('input', function () {
+            const active = Section.activeSection;
+            active.props.customClass = (() => {
+              let values = this.value.split(/[ ,]+/);
+              return values.map(val => val.trim()).filter(val => val !== '');
+            })();
+          });
+          break;
+
+        case 'layout':
+          this._initLayout();
+      }
+    });
+  }
+
+  update () {
+    this.currentProps = Section.activeSection.props;
+    this.fields = Section.activeSection.fields;
+    this.updateFields();
   }
 }

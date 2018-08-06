@@ -15,6 +15,13 @@ export default class Section {
     }
     this.id = Section.id++
     this.$align = align;
+    this.fields = [
+      'backgroundImage',
+      'backgroundVideo',
+      'backgroundColor',
+      'customClass',
+      'layout'
+    ];
     this.props = {
       customClass: [],
       modifiers: [],
