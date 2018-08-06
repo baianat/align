@@ -24,34 +24,34 @@ export default class Sidebar {
     this.customClass = this.customClass.querySelector('[data-align-input]');
     this.customClass.addEventListener('input', function () {
       const active = Section.activeSection;
-      active.settings.customClass = (() => {
+      active.props.customClass = (() => {
         let values = this.value.split(/[ ,]+/);
         return values.map(val => val.trim()).filter(val => val !== '');
       })();
     });
     this.backgroundImage.input.addEventListener('change', (evnt) => {
       const active = Section.activeSection;
-      active.settings.backgroundImage = evnt.target.files[0];
+      active.props.backgroundImage = evnt.target.files[0];
       this.update();
     });
     this.backgroundVideo.input.addEventListener('change', (evnt) => {
       const active = Section.activeSection;
-      active.settings.backgroundVideo = evnt.target.files[0];
+      active.props.backgroundVideo = evnt.target.files[0];
       this.update();
     });
     this.backgroundColor.input.addEventListener('change', (evnt) => {
       const active = Section.activeSection;
-      active.settings.backgroundColor = evnt.target.value;
+      active.props.backgroundColor = evnt.target.value;
       this.update();
     });
     this.backgroundColor.colors.forEach(color => {
       color.el.addEventListener('click', () => {
         const active = Section.activeSection;
         if (color.color !== 'clear') {
-          active.settings.backgroundColor = color.color;
+          active.props.backgroundColor = color.color;
         }
         if (color.color === 'clear') {
-          active.settings.backgroundColor = null;
+          active.props.backgroundColor = null;
         }
         this.update();
       });
@@ -91,13 +91,21 @@ export default class Sidebar {
     Object.keys(this.marginInputs).forEach(key => {
       const property = `margin-${key}`;
       this.marginInputs[key].addEventListener('input', (evnt) => {
-        Section.activeSection.style[property] = evnt.target.value;
+        const newObj = Object.assign(
+          Section.activeSection.props.layout,
+          { [property]: evnt.target.value }
+        );
+        Section.activeSection.props.layout = newObj;
       });
     });
     Object.keys(this.paddingInputs).forEach(key => {
       const property = `padding-${key}`;
       this.paddingInputs[key].addEventListener('input', (evnt) => {
-        Section.activeSection.style[property] = evnt.target.value;
+        const newObj = Object.assign(
+          Section.activeSection.props.layout,
+          { [property]: evnt.target.value }
+        );
+        Section.activeSection.props.layout = newObj;
       });
     });
   }
@@ -169,24 +177,25 @@ export default class Sidebar {
 
   update () {
     const current = Section.activeSection;
+    const currentLayout = current.props.layout;
     Object.keys(this.marginInputs).forEach(key => {
       const property = `margin-${key}`;
-      this.marginInputs[key].value = current.style[property];
+      this.marginInputs[key].value = currentLayout[property];
     });
     Object.keys(this.paddingInputs).forEach(key => {
       const property = `padding-${key}`;
-      this.paddingInputs[key].value = current.style[property];
+      this.paddingInputs[key].value = currentLayout[property];
     });
-    this.customClass.value = current.settings.customClass;
+    this.customClass.value = current.props.customClass;
     this.backgroundImage.label.innerText =
-      current.settings.backgroundImage
-        ? current.settings.backgroundImage.name || current.settings.backgroundImage
+      current.props.backgroundImage
+        ? current.props.backgroundImage.name || current.props.backgroundImage
         : 'Add image';
     this.backgroundVideo.label.innerText =
-      current.settings.backgroundVideo
-        ? current.settings.backgroundVideo.name || current.settings.backgroundVideo
+      current.props.backgroundVideo
+        ? current.props.backgroundVideo.name || current.props.backgroundVideo
         : 'Add video';
 
-    this.backgroundColor.colorpikcer.selectColor(current.settings.backgroundColor || '#fff', true);
+    this.backgroundColor.colorpikcer.selectColor(current.props.backgroundColor || '#fff', true);
   }
 }

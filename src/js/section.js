@@ -1,5 +1,4 @@
 import { stringToDOM, swapArrayItems } from './partial/util'
-import icons from './partial/icons';
 import Figure from './components/figure';
 import Table from './components/table';
 import Link from './components/link';
@@ -16,30 +15,30 @@ export default class Section {
     }
     this.id = Section.id++
     this.$align = align;
-    this.elements = [];
-    this.settings = {
+    this.props = {
       customClass: [],
       modifiers: [],
       backgroundColor: '',
       backgroundVideo: '',
       backgroundImage: '',
       isHTMLView: false,
+      layout: {},
       type
     }
     if (typeof content === 'string') {
       content = stringToDOM(content);
     }
     this._initWrapper(content);
-    this._initContent(content);
-    if (this.settings.type === 'text') {
+    if (this.props.type === 'text') {
+      this._initBackground(content);
+      this._initContent(content);
+      this._initProps();
       this._initControllers();
-      this._initBackground();
-      this._initSettings();
-      this.createLayout();
       this.el.addEventListener('click', () => {
         this.active();
       });
     }
+    this._initContent(content);
 
     if (typeof position === 'number') {
       const before = this.$align.sections[position];
@@ -49,16 +48,17 @@ export default class Section {
     }
     this.$align.editor.appendChild(this.el);
     this.$align.sections.push(this);
+    this._initWatchers();
   }
 
   get content () {
     let output;
-    if (this.settings.type === 'text') {
+    if (this.props.type === 'text') {
       output = this.el.cloneNode(true);
       const controllers = output.querySelector('.align-sectionControllers');
       const contentDiv = output.querySelector('.align-content');
       const figures = Array.from(contentDiv.querySelectorAll('figure'));
-      if (this.settings.isHTMLView) {
+      if (this.props.isHTMLView) {
         contentDiv.innerHTML = contentDiv.innerText;
       }
       figures.forEach(fig => Figure.render(fig));
@@ -67,7 +67,7 @@ export default class Section {
       contentDiv.remove();
       controllers.remove();
     }
-    if (this.settings.type === 'title') {
+    if (this.props.type === 'title') {
       return this.title.innerText;
     }
     return output.outerHTML;
@@ -82,37 +82,32 @@ export default class Section {
     }
     classes = Array.from(classes);
     classes.splice(classes.indexOf('align-section'), 1);
-    this.classes = {
-      modifiers: [],
-      custom: []
-    }
     classes.forEach(cls => {
       if (cls.startsWith('is-')) {
-        this.classes.modifiers.push(cls);
+        this.props.modifiers.push(cls);
         return;
       }
       if (cls.startsWith('has-')) {
         return;
       }
-      this.classes.custom.push(cls);
+      this.props.customClass.push(cls);
     });
-    this.el.classList.add(...this.classes.modifiers);
+    this.el.classList.add(...this.props.modifiers);
     this.el.setAttribute('style', content.getAttribute('style'));
-    this.bgColor = content.style.backgroundColor;
   }
 
   _initContent (content) {
-    switch (this.settings.type) {
+    switch (this.props.type) {
     case 'text':
       if (!this.contentDiv) {
         this.contentDiv = document.createElement('div');
         this.contentDiv.classList.add('align-content');
         this.contentDiv.contentEditable = true;
       }
-      if (this.settings.isHTMLView) {
+      if (this.props.isHTMLView) {
         content = content.innerText;
       }
-      if (!this.settings.isHTMLView) {
+      if (!this.props.isHTMLView) {
         content = content ? content.innerHTML : '<p></p>';
       }
       this.contentDiv.innerHTML = content;
@@ -163,33 +158,30 @@ export default class Section {
     this.el.appendChild(this.controllers);
   }
 
-  _initBackground () {
-    this.bgImage = this.bgImage || this.contentDiv.querySelector('.align-bgImage');
-    this.bgVideo = this.bgVideo || this.contentDiv.querySelector('.align-bgVideo');
+  _initBackground (content) {
+    this.bgImage = content.querySelector('.align-bgImage');
+    this.bgVideo = content.querySelector('.align-bgVideo');
+    this.bgColor = content.style.backgroundColor;
 
     if (this.bgImage) {
-      this.el.classList.add('has-bgImage');
       this.el.insertAdjacentElement('afterBegin', this.bgImage);
-      this.settings.backgroundImage = this.bgImage.url;
+      this.props.backgroundImage = this.bgImage.url;
     }
     if (this.bgVideo) {
-      this.el.classList.add('has-bgVideo');
       this.el.insertAdjacentElement('afterBegin', this.bgVideo);
-      this.settings.backgroundVideo = this.bgVideo.querySelector('source').src;
+      this.props.backgroundVideo = this.bgVideo.querySelector('source').src;
     }
     if (this.bgColor) {
-      this.el.classList.add('has-bgColor');
-      this.el.style.backgroundColor = this.bgColor;
-      this.settings.backgroundColor = this.bgColor;
+      this.props.backgroundColor = this.bgColor;
     }
   }
 
-  _initSettings () {
-    Object.keys(this.settings).forEach(key => {
-      let internalValue = this.settings[key]
+  _initProps () {
+    Object.keys(this.props).forEach(key => {
+      let internalValue = this.props[key]
       const dep = new Dep();
       
-      Object.defineProperty(this.settings, key, {
+      Object.defineProperty(this.props, key, {
         get() {
           dep.depend();
           return internalValue;
@@ -201,23 +193,29 @@ export default class Section {
         }
       });
     });
+  }
+
+  _initWatchers () {
     Dep.watcher((oldVal) => {
-      if (this.settings.customClass.length === 0) {
+      if (this.props.customClass.length === 0) {
         return;
       }
       if (oldVal && oldVal.length > 0) {
         this.el.classList.remove(...oldVal);
       }
-      this.el.classList.add(...this.settings.customClass);
+      this.el.classList.add(...this.props.customClass);
     });
     Dep.watcher(() => {
-      this.backgroundColor(this.settings.backgroundColor);
+      this.backgroundColor(this.props.backgroundColor);
     });
     Dep.watcher(() => {
-      this.backgroundImage(this.settings.backgroundImage);
+      this.backgroundImage(this.props.backgroundImage);
     });
     Dep.watcher(() => {
-      this.backgroundVideo(this.settings.backgroundVideo);
+      this.backgroundVideo(this.props.backgroundVideo);
+    });
+    Dep.watcher(() => {
+      this.updateLayout(this.props.layout);
     });
   }
 
@@ -225,50 +223,34 @@ export default class Section {
     return this.$align.sections.findIndex(el => el === this);
   }
 
-  createLayout () {
-    const el = this.el;
-    const styleObj = {};
-    const handler = {
-      get (style, name) {
-        this.update();
-        return style[name] || '';
-      },
-      set (style, name, val) {
-        if (val) {
-          style[name] = val;
-          el.style[name] =  val;
-          return true
-        }
-        delete style[name];
-        el.style[name] =  '';
-        return true
-      },
-      update () {
-        const sectionStyle = window.getComputedStyle(el);
-        [
-          'margin-top',
-          'margin-right',
-          'margin-bottom',
-          'margin-left',
-          'padding-top',
-          'padding-right',
-          'padding-bottom',
-          'padding-left'
-        ].forEach(styl => {
-          const value = el.style[styl] ||sectionStyle[styl];
-          if (value) {
-            styleObj[styl] = value;
-          }
-        });
+  updateLayout (layout) {
+    const sectionStyle = window.getComputedStyle(this.el);
+    const styles = [
+      'margin-top',
+      'margin-right',
+      'margin-bottom',
+      'margin-left',
+      'padding-top',
+      'padding-right',
+      'padding-bottom',
+      'padding-left'
+    ];
+    styles.forEach(styl => {
+      const value = layout[styl] || this.el.style[styl] || sectionStyle[styl];
+      if (value) {
+        layout[styl] = value;
+        this.el.style[styl] =  value;
+        return;
       }
-    }
-    this.style = new Proxy(styleObj, handler);
+      delete layout[styl];
+      this.el.style[styl] =  '';
+    });
   }
 
 
   toggleHTML () {
-    if (!this.settings.isHTMLView) {
-      this.settings.isHTMLView = true;
+    if (!this.props.isHTMLView) {
+      this.props.isHTMLView = true;
       const content = document.createTextNode(this.contentDiv.innerHTML);
       const pre = document.createElement('pre');
 
@@ -280,7 +262,7 @@ export default class Section {
       return;
     }
     this._initContent(this.contentDiv);
-    this.settings.isHTMLView = false;
+    this.props.isHTMLView = false;
   }
 
 
