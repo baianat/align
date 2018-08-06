@@ -302,6 +302,9 @@ export default class Section {
 
 
   backgroundColor (color) {
+    if (!color) {
+      return;
+    }
     this.el.style.backgroundColor = color;
     // color value maybe in hex, hsl or rgb model
     // so I have to check for background inline style value
@@ -320,24 +323,6 @@ export default class Section {
     this.$align.$bus.emit('changed');
   }
 
-  removeBackground () {
-    if (this.bgImage) {
-      this.bgImage.remove();
-      this.bgImage = null;
-      this.el.classList.remove('has-bgImage');
-    }
-    if (this.bgVideo) {
-      this.bgVideo.remove();
-      this.bgVideo = null;
-      this.el.classList.remove('has-bgVideo');
-    }
-
-    // emit events
-    const index = this.getIndex();
-    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
-    this.$align.$bus.emit('changed');
-  }
-  
   backgroundImage (file) {
     if (!file) {
       if (this.bgImage) {

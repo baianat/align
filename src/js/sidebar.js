@@ -183,6 +183,5 @@ export default class Sidebar {
         : 'Add video';
 
     this.backgroundColor.colorpikcer.selectColor(current.settings.backgroundColor || '#fff', true);
-    console.log(current.settings);
   }
 }
