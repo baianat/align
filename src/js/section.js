@@ -182,6 +182,9 @@ export default class Section {
   }
 
   _initBackground (content) {
+    if (!content) {
+      return;
+    }
     this.bgImage = content.querySelector('.align-bgImage');
     this.bgVideo = content.querySelector('.align-bgVideo');
     this.bgColor = content.style.backgroundColor;
