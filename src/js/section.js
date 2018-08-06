@@ -149,18 +149,8 @@ export default class Section {
   _initControllers () {
     this.controllers = document.createElement('div');
     this.addButton = document.createElement('button');
-    this.upButton = document.createElement('button');
-    this.downButton = document.createElement('button');
-    this.settingsButton = document.createElement('button');
-    this.settingsButton.classList.add('align-sectionSettings');
     this.controllers.classList.add('align-sectionControllers');
     this.addButton.classList.add('align-sectionAdd');
-    this.upButton.classList.add('align-sectionUp');
-    this.downButton.classList.add('align-sectionDown');
-    
-    this.upButton.insertAdjacentHTML('afterbegin', icons.caretUp);
-    this.downButton.insertAdjacentHTML('afterbegin', icons.caretDown);
-    this.settingsButton.insertAdjacentHTML('afterbegin', icons.dotsVertical);
 
     this.addButton.addEventListener('click', () => {
       const newSection = new Section(this.$align, '', { position: this.getIndex() });
@@ -169,14 +159,7 @@ export default class Section {
         Selection.selectElement(newSection.contentDiv.querySelector('p'));
       }, 1);
     });
-    this.upButton.addEventListener('click', this.moveUp.bind(this));
-    this.downButton.addEventListener('click', this.moveDown.bind(this));
-    this.settingsButton.addEventListener('click', () => {
-      this.$align.toggleSidebar();
-    });
-    [this.addButton, this.upButton, this.downButton, this.settingsButton].forEach(btn => {
-      this.controllers.appendChild(btn);
-    });
+    this.controllers.appendChild(this.addButton);
     this.el.appendChild(this.controllers);
   }
 
@@ -480,6 +463,8 @@ export default class Section {
     mode: 'bubble',
     hideWhenClickOut: true,
     commands: [
+      '_sectionUp',
+      '_sectionDown',
       '_sectionToggleHTML',
       '_sectionDuplicate',
       { 

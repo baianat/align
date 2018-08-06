@@ -328,6 +328,19 @@ const cmdsSchema = {
   },
 
   // internal functions don't override it
+  _sectionUp: {
+    element: 'button',
+    func: 'moveUp',
+    tooltip: 'Move up',
+    icon: 'caretUp'
+  },
+
+  _sectionDown: {
+    element: 'button',
+    func: 'moveDown',
+    tooltip: 'Move down',
+    icon: 'caretDown'
+  },
 
   _sectionToggleHTML: {
     element: 'button',
