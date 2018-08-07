@@ -43,6 +43,7 @@ export default class Styler {
     this.cmds = {};
     this.visible = false;
     this.shortcuts = [];
+    this.watchers = [];
 
     this.settings.commands.forEach((command) => {
       this._initCmdElement(command);
@@ -74,14 +75,23 @@ export default class Styler {
     const values = schema.values;
     if (!Array.isArray(values)) {
       const element = input('counter', 'number');
+      const min = values.min || 0;
+      const max = values.max || 12;
       element.addEventListener('input', () => {
         if (!this.currentItem) {
           return;
         }
-        const lastValue = this.currentItem.currentValue || 0
-        this.toggleClass(element.value, [...lastValue]);
-        this.currentItem.currentValue = element.value;
-      })
+        const currentValue = Math.min(Math.max(element.value, min), max);
+        const lastValue = this.currentItem.currentValue || 0;
+        this.toggleClass(currentValue, [lastValue]);
+        this.currentItem.currentValue = currentValue;
+      });
+      this.watchers.push(() => {
+        if (!this.currentItem) {
+          return;
+        }
+        element.value = this.currentItem.currentValue || '';
+      });
       el.appendChild(element);
       return;
     }
@@ -317,6 +327,7 @@ export default class Styler {
     if (item) {
       this.currentItem = item;
     }
+    this.watchers.forEach(watch => watch());
     this.updateCommandsStates();
     if (this.settings.mode === 'bubble') {
       this.updateBubble();
@@ -400,6 +411,7 @@ export default class Styler {
   }
 
   toggleClass (currentClass, allClasses) {
+    console.log(allClasses)
     if (!this.currentItem) return;
     const prefixedClasses = allClasses.map(cls => `is-${cls}`);
     this.currentItem.el.classList.remove(...prefixedClasses);
