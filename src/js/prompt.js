@@ -26,6 +26,7 @@ export default class Prompt {
       this.el.style.top = `${position.top}px`;
     }
     if (!position) {
+      this.el.style.opacity = 0;
       if (Selection.range.startContainer.nodeType === 3) {
         this.selectionReference = Selection.range;
       }
@@ -34,6 +35,7 @@ export default class Prompt {
       }
       setTimeout(() => {
         updatePosition(this.selectionReference, this.el, 'left-top');
+        this.el.style.opacity = '';
       }, 1);
     }
     this.message.innerText = message;
