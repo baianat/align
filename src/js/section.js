@@ -223,11 +223,11 @@ export default class Section {
 
   _initWatchers () {
     Dep.watcher((oldVal) => {
-      if (this.props.customClass.length === 0) {
-        return;
-      }
       if (oldVal && oldVal.length > 0) {
         this.el.classList.remove(...oldVal);
+      }
+      if (this.props.customClass.length === 0) {
+        return;
       }
       this.el.classList.add(...this.props.customClass);
     });
