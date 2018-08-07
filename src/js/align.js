@@ -210,7 +210,11 @@ export default class Align {
     }
     elClass.add(this).then((newElement) => {
       if (!newElement.el) return;
-      const el = Selection.range.startContainer;
+      let el = Selection.range.startContainer;
+      el = el.closest('p');
+      if (!el || !el.tagName) {
+        return;
+      }
       if (el.tagName === 'P') {
         el.parentNode.replaceChild(newElement.el, el);
       }

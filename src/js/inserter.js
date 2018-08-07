@@ -67,7 +67,8 @@ export default class Inserter {
       Selection.range &&
       Selection.range.collapsed &&
       Selection.range.startContainer.nodeType === 1 &&
-      Selection.range.startContainer.childNodes.length <= 1
+      Selection.range.startContainer.childNodes.length <= 1 &&
+      Selection.range.startContainer.closest('p')
     ) {
       this.position = updatePosition(
         Selection.range.startContainer,
