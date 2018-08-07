@@ -411,7 +411,6 @@ export default class Styler {
   }
 
   toggleClass (currentClass, allClasses) {
-    console.log(allClasses)
     if (!this.currentItem) return;
     const prefixedClasses = allClasses.map(cls => `is-${cls}`);
     this.currentItem.el.classList.remove(...prefixedClasses);
