@@ -323,7 +323,7 @@ const cmdsSchema = {
   remove: {
     element: 'button',
     func: 'remove',
-    tooltip: 'Remove section',
+    tooltip: 'Remove element',
     icon: 'remove'
   },
 

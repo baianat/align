@@ -8,6 +8,7 @@ import link from './link';
 import quote from './quote';
 import separator from './separator';
 import table from './table';
+import button from './button';
 import vimeo from './vimeo';
 import youtube from './youtube';
 
@@ -22,6 +23,7 @@ export default {
   quote,
   separator,
   table,
+  button,
   vimeo,
   youtube
 };
