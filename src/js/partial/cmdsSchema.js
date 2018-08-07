@@ -1,5 +1,6 @@
 import Colorpicker from '@baianat/colorpicker';
 import Selection from '../selection';
+import Link from '../components/link';
 
 const cmdsSchema = {
   sidebar: {
@@ -248,6 +249,13 @@ const cmdsSchema = {
   separator: {
     element: 'styling',
     class: 'styler-separator'
+  },
+
+  addLink: {
+    element: 'button',
+    icon: 'link',
+    func: 'addElement',
+    args: Link
   },
 
   fullscreen: {
