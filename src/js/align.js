@@ -23,7 +23,7 @@ export default class Align {
    */
   get content () {
     return this.sections.reduce((acc, section) => {
-      if (section.settings.type !== 'text') {
+      if (section.props.type !== 'text') {
         return acc;
       }
       acc += section.content;
@@ -33,7 +33,7 @@ export default class Align {
 
   get title () {
     if (this.postTitle) {
-      const title = this.sections.find((sec) => sec.type === 'title');
+      const title = this.sections.find((sec) => sec.props.type === 'title');
       return title.content;
     }
   }
