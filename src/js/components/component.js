@@ -4,11 +4,13 @@ export default class Component {
   }
 
   remove () {
+    const p = document.createElement('p');
+    this.el.parentNode.replaceChild(p, this.el);
+    this.el.remove();
     if (this.toolbar) {
       this.toolbar.remove();
     }
-    this.el.remove();
   }
 
-  static list = []
+  static list = [];
 }
