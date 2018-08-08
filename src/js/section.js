@@ -244,6 +244,15 @@ export default class Section {
         return;
       }
       this.el.classList.add(...this.props.customClass);
+    
+      // emit events
+      const index = this.getIndex();
+      this.$align.$bus.emit('changed');
+      this.$align.$bus.emit('sectionChanged', { 
+        from: index,
+        to: index,
+        props: this.props
+      });
     });
     Dep.watcher(() => {
       this.backgroundColor(this.props.backgroundColor);
@@ -273,6 +282,16 @@ export default class Section {
       }
       delete this.props.layout[styl];
       this.el.style[styl] = '';
+    });
+
+    
+    // emit events
+    const index = this.getIndex();
+    this.$align.$bus.emit('changed');
+    this.$align.$bus.emit('sectionChanged', { 
+      from: index,
+      to: index,
+      props: this.props
     });
   }
 
@@ -309,8 +328,12 @@ export default class Section {
 
     // emit events
     const index = this.getIndex();
-    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
     this.$align.$bus.emit('changed');
+    this.$align.$bus.emit('sectionChanged', { 
+      from: index,
+      to: index,
+      props: this.props
+    });
   }
 
   backgroundImage (file) {
@@ -343,8 +366,12 @@ export default class Section {
     // emit events
     const index = this.getIndex();
     this.$align.$bus.emit('imageAdded', { file, update });
-    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
     this.$align.$bus.emit('changed');
+    this.$align.$bus.emit('sectionChanged', { 
+      from: index,
+      to: index,
+      props: this.props
+    });
   }
 
   backgroundVideo (file) {
@@ -384,8 +411,12 @@ export default class Section {
     // emit events
     const index = this.getIndex();
     this.$align.$bus.emit('videoAdded', { file, update });
-    this.$align.$bus.emit('sectionChanged', { from: index, to: index });
     this.$align.$bus.emit('changed');
+    this.$align.$bus.emit('sectionChanged', { 
+      from: index,
+      to: index,
+      props: this.props
+    });
   }
 
   moveUp () {
@@ -399,10 +430,12 @@ export default class Section {
     swapArrayItems(this.$align.sections, oldIndx, oldIndx - 1);
 
     // emit events
-    this.$align.$bus.emit('sectionChanged', { 
-      from: oldIndx, to: this.getIndex()
-    });
     this.$align.$bus.emit('changed');
+    this.$align.$bus.emit('sectionChanged', { 
+      from: oldIndx,
+      to: this.getIndex(),
+      props: this.props
+    });
   }
 
   moveDown () {
@@ -412,10 +445,12 @@ export default class Section {
     swapArrayItems(this.$align.sections, oldIndx, oldIndx + 1);
 
     // emit events
-    this.$align.$bus.emit('sectionChanged', { 
-      from: oldIndx, to: this.getIndex()
-    });
     this.$align.$bus.emit('changed');
+    this.$align.$bus.emit('sectionChanged', { 
+      from: oldIndx,
+      to: this.getIndex(),
+      props: this.props
+    });
   }
 
   active () {
@@ -447,10 +482,11 @@ export default class Section {
     this.$align.update();
 
     // emit events
-    this.$align.$bus.emit('sectionChanged', {
-      from: oldIndx, to: null
-    });
     this.$align.$bus.emit('changed');
+    this.$align.$bus.emit('sectionChanged', {
+      from: oldIndx,
+      to: null
+    });
   }
 
   duplicate () {
