@@ -295,7 +295,9 @@ export default class Styler {
       this.el.style.transition = '';
       this.el.removeEventListener('transitionend', updateTemp);
     };
-    this.currentItem.el.addEventListener('transitionend', updateTemp);
+    if (this.currentItem && this.currentItem.el) {
+      this.currentItem.el.addEventListener('transitionend', updateTemp);
+    }
     if (this.settings.hideWhenClickOut) {
       document.addEventListener('click', this.clickCallback);
     }
