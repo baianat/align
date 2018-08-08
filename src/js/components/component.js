@@ -1,6 +1,7 @@
 export default class Component {
-  constructor () {
+  constructor (el) {
     this.$align = Component.$align;
+    this.mode = el ? (el.nodeType === 1 ? 'edit' : 'create') : 'create';
   }
 
   static config (align) {

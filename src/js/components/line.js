@@ -2,11 +2,16 @@ import Component from './component';
 import Styler from '../styler';
 
 export default class Line extends Component {
-  constructor () {
-    super();
+  constructor (line) {
+    super(line);
 
-    this.el = document.createElement('hr');
-    this.el.classList.add('align-line');
+    if (this.mode === 'create') {
+      this.el = document.createElement('hr');
+      this.el.classList.add('align-line');
+    }
+    if (this.mode === 'edit') {
+      this.el = line;
+    }
     this._init();
   }
 

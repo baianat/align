@@ -1,33 +1,31 @@
 import Component from './component';
-import Prompt from '../prompt';
 
 export default class Separator extends Component {
-  constructor (height) {
-    super();
+  constructor (separator) {
+    super(separator);
 
-    this.el = document.createElement('div');
-    this.el.classList.add('align-separator');
-    this._init(height);
+    if (this.mode === 'create') {
+      this.el = document.createElement('div');
+      this.el.classList.add('align-separator');
+      this.currentHeigh = 50;
+    }
+    if (this.mode === 'edit') {
+      this.el = separator;
+      this.currentHeigh = Number(this.el.style.height.slice(0, -2));
+    }
+
+
+    this._init();
   }
 
-  static add () {
-    const prompt = new Prompt(this.$align, {
-      message: 'Enter separator height:'
-    });
+  static add () {;
     return new Promise((resolve, reject) => {
-      prompt.onSubmit(() => {
-        const data = prompt.inputs[0].value;
-        if (!data) {
-          reject('not a valid number');
-        };
-        resolve(new Separator(data));
-      });
+      resolve(new Separator());
     });
   }
 
-  _init (height) {
-    this.currentHeigh = Number(height);
-    this.updateHeight(height);
+  _init () {
+    this.updateHeight(this.currentHeigh);
     this.el.addEventListener('mousedown', this.handleClick.bind(this));
   }
 

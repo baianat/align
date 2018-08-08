@@ -1,7 +1,13 @@
 import { stringToDOM, swapArrayItems } from './partial/util'
-import Figure from './components/figure';
-import Table from './components/table';
-import Link from './components/link';
+import {
+  Figure,
+  Grid,
+  Line,
+  Link,
+  Separator,
+  Table,
+  Button,
+} from './components/_index';
 import Selection from './selection';
 import Dep from './dep';
 
@@ -135,7 +141,7 @@ export default class Section {
       }
       this.contentDiv.innerHTML = content;
       this.el.appendChild(this.contentDiv);
-      // this._initElements();
+      this._initComponents();
       break;
 
     case 'title':
@@ -154,14 +160,22 @@ export default class Section {
     }
   }
 
-  _initElements () {
+  _initComponents () {
+    const separators = Array.from(this.contentDiv.querySelectorAll('.align-separator'));
+    const buttons = Array.from(this.contentDiv.querySelectorAll('.align-button'));
+    const grids = Array.from(this.contentDiv.querySelectorAll('.align-grid'));
+    const lines = Array.from(this.contentDiv.querySelectorAll('.align-line'));
     const figures = Array.from(this.contentDiv.querySelectorAll('figure'));
     const tables = Array.from(this.contentDiv.querySelectorAll('table'));
     const links = Array.from(this.contentDiv.querySelectorAll('a'));
 
-    figures.forEach(figure => new Figure(this.$align, figure));
-    tables.forEach(table => new Table(this.$align, table));
-    links.forEach(link => new Link(this.$align, link));
+    separators.forEach(separator => new Separator(separator));
+    buttons.forEach(button => new Button(button));
+    grids.forEach(grid => new Grid(grid));
+    lines.forEach(line => new Line(line));
+    figures.forEach(figure => new Figure(figure));
+    tables.forEach(table => new Table(table));
+    links.forEach(link => new Link(link));
   }
 
   _initControllers () {

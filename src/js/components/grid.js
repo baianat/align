@@ -3,16 +3,21 @@ import Prompt from '../prompt';
 import Styler from '../styler';
 
 export default class Grid extends Component {
-  constructor (count) {
-    super();
+  constructor (grid) {
+    super(grid);
 
-    this.el = document.createElement('div');
-    this.el.classList.add('align-grid');
-    this.el.insertAdjacentHTML(
-      'afterbegin',
-      '<div class="align-column"><p></p></div>'.repeat(count)
-    );
-    this.columns = Array.from(this.el.querySelectorAll('.align-column'));
+    if (this.mode === 'create') {
+      this.el = document.createElement('div');
+      this.el.classList.add('align-grid');
+      this.el.insertAdjacentHTML(
+        'afterbegin',
+        '<div class="align-column"><p></p></div>'.repeat(grid)
+      );
+    }
+
+    if (this.mode === 'edit') {
+      this.el = grid;
+    }
     this._init();
   }
 
@@ -33,6 +38,7 @@ export default class Grid extends Component {
   }
 
   _init () {
+    this.columns = Array.from(this.el.querySelectorAll('.align-column'));
     this.gridToolbar = new Styler(this.$align, Grid.gridToolbar);
     this.columnToolbar = new Styler(this.$align, Grid.columnToolbar);
 

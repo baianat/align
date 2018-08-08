@@ -3,10 +3,21 @@ import Styler from '../styler';
 import Prompt from '../prompt';
 
 export default class Button extends Component {
-  constructor () {
-    super();
+  constructor (button) {
+    super(button);
 
-    this.el = document.createElement('a');
+    if (this.mode === 'create') {
+      this.el = document.createElement('a');
+      this.el.classList.add('align-button');
+      this.span = document.createElement('span');
+      this.span.dataset.defaultValue = 'Button text';
+      this.el.appendChild(this.span);
+    }
+
+    if (this.mode === 'edit') {
+      this.el = button;
+    }
+
     this._init();
   }
 
@@ -19,10 +30,6 @@ export default class Button extends Component {
   _init () {
     this.toolbar = new Styler(this.$align, Button.toolbar);
 
-    this.el.classList.add('align-button');
-    this.span = document.createElement('span');
-    this.span.dataset.defaultValue = 'Button text';
-    this.el.appendChild(this.span);
     this.el.addEventListener('click', () => {
       this.editLink();
       this.toolbar.update(this);

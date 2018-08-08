@@ -1,29 +1,45 @@
-import embed from './embed';
-import facebook from './facebook';
-import figure from './figure';
-import gallery from './gallery';
-import grid from './grid';
-import line from './line';
-import link from './link';
-import quote from './quote';
-import separator from './separator';
-import table from './table';
-import button from './button';
-import vimeo from './vimeo';
-import youtube from './youtube';
+import Embed from './embed';
+import Facebook from './facebook';
+import Figure from './Figure';
+import Gallery from './gallery';
+import Grid from './grid';
+import Line from './line';
+import Link from './link';
+import Quote from './quote';
+import Separator from './separator';
+import Table from './table';
+import Button from './button';
+import Vimeo from './vimeo';
+import Youtube from './youtube';
 
 export default {
-  embed,
-  facebook,
-  figure,
-  gallery,
-  grid,
-  line,
-  link,
-  quote,
-  separator,
-  table,
-  button,
-  vimeo,
-  youtube
+  Embed,
+  Facebook,
+  Figure,
+  Gallery,
+  Grid,
+  Line,
+  Link,
+  Quote,
+  Separator,
+  Table,
+  Button,
+  Vimeo,
+  Youtube
+};
+
+export {
+  Embed,
+  Facebook,
+  Figure,
+  Gallery,
+  Grid,
+  Line,
+  Link,
+  Quote,
+  Separator,
+  Table,
+  Button,
+  Vimeo,
+  Youtube
 };

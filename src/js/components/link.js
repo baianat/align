@@ -4,7 +4,15 @@ import Selection from '../selection';
 
 export default class Link extends Component {
   constructor (link) {
-    super();
+    super(link);
+    if (this.mode === 'create') {
+      this.el = document.createElement('a');
+      this.el.appendChild(Selection.range.extractContents());
+      Selection.range.insertNode(this.el);
+    }
+    if (this.mode === 'edit') {
+      this.el = link;
+    }
 
     this._init(link);
   }
@@ -18,13 +26,8 @@ export default class Link extends Component {
     });
   }
 
-  _init (link) {
-    this.el = link || document.createElement('a');
+  _init () {
     this.el.target = '_blank';
-    if (!link) {
-      this.el.appendChild(Selection.range.extractContents());
-      Selection.range.insertNode(this.el);
-    }
     this.el.addEventListener('click', this.edit.bind(this));
   }
 

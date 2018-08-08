@@ -9,12 +9,26 @@ export default class Figure extends Component {
         el: null
       };
     }
-    super();
-    this._init(figure);
+    super(figure);
+
+    if (this.mode === 'create') {
+      this.el = document.createElement('figure');
+      this.caption = document.createElement('figcaption');
+      this.img = document.createElement('img');
+      this.readFileContent(figure);
+    }
+
+    if (this.mode === 'edit') {
+      this.el = figure;
+      this.caption = figure.querySelector('figcaption') || document.createElement('figcaption');
+      this.img = figure.querySelector('img');
+    }
+
+    this._init();
   }
 
   static add () {
-    const prompt = new Prompt(this.align, {
+    const prompt = new Prompt(this.$align, {
       message: 'Chose image figure:',
       inputsTypes: ['file']
     });
@@ -43,22 +57,7 @@ export default class Figure extends Component {
     }
   }
 
-  _init (figure) {
-    // check if it's the figure element
-    if (figure.nodeType === 1) {
-      this.el = figure;
-      this.caption = figure.querySelector('figcaption') || document.createElement('figcaption');
-      this.img = figure.querySelector('img');
-    }
-    
-    // check if it's the figure image url
-    if (figure.nodeType !== 1) {
-      this.el = document.createElement('figure');
-      this.caption = document.createElement('figcaption');
-      this.img = document.createElement('img');
-      this.readFileContent(figure);
-    }
-    
+  _init () {
     this.toolbar = new Styler(this.$align, Figure.toolbar);
     this.el.contentEditable = false;
     this.caption.contentEditable = true;
