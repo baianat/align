@@ -1,6 +1,7 @@
 import { select, userOS, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
+import Component from './components/component';
 import Selection from './selection';
 import Section from './section';
 import EventBus from './events';
@@ -49,6 +50,7 @@ export default class Align {
    * Create all editor elements
    */
   _init () {
+    Component.config(this);
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
@@ -208,22 +210,24 @@ export default class Align {
     if (typeof args === 'function') {
       elClass = args;
     }
-    elClass.add(this).then((newElement) => {
-      if (!newElement.el) return;
-      let el = Selection.range.startContainer;
-      el = el.closest('p');
-      if (!el || !el.tagName) {
-        return;
-      }
-      if (el.tagName === 'P') {
-        el.parentNode.replaceChild(newElement.el, el);
-      }
-      if (el.tagName !== 'P') {
-        el.appendChild(newElement.el);
-      }
-      this.inserter.hide();
-      this.update();
-    });
+    elClass
+      .add()
+      .then((newElement) => {
+        if (!newElement.el) return;
+        let el = Selection.range.startContainer;
+        el = el.closest('p');
+        if (!el || !el.tagName) {
+          return;
+        }
+        if (el.tagName === 'P') {
+          el.parentNode.replaceChild(newElement.el, el);
+        }
+        if (el.tagName !== 'P') {
+          el.appendChild(newElement.el);
+        }
+        this.inserter.hide();
+        this.update();
+      });
   }
 
   static defaults = {

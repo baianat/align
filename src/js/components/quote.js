@@ -1,10 +1,9 @@
 import Component from './component';
 
 export default class Quote extends Component {
-  constructor (align) {
+  constructor () {
     super();
 
-    this.$align = align;
     this.el = document.createElement('blockquote');
     this.quote = document.createElement('p');
     this.author = document.createElement('cite');
@@ -21,9 +20,9 @@ export default class Quote extends Component {
     this.el.appendChild(this.author);
   }
 
-  static add (align) {
+  static add () {
     return new Promise((resolve, reject) => {
-      resolve(new Quote(align));
+      resolve(new Quote());
     });
   }
 

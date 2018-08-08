@@ -9,8 +9,8 @@ export default class Embed extends Component {
     this.el.insertAdjacentHTML('afterbegin', data);
   }
 
-  static add (align) {
-    const prompt = new Prompt(align, {
+  static add () {
+    const prompt = new Prompt(this.$align, {
       message: 'Add an embedded:'
     });
     return new Promise((resolve, reject) => {

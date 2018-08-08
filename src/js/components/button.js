@@ -3,17 +3,16 @@ import Styler from '../styler';
 import Prompt from '../prompt';
 
 export default class Button extends Component {
-  constructor (align) {
+  constructor () {
     super();
 
-    this.$align = align;
     this.el = document.createElement('a');
     this._init();
   }
 
-  static add (align) {
+  static add () {
     return new Promise((resolve, reject) => {
-      resolve(new Button(align));
+      resolve(new Button());
     });
   }
 

@@ -8,8 +8,8 @@ export default class Facebook extends Component {
     this._init(link);
   }
 
-  static add (align) {
-    const prompt = new Prompt(align, {
+  static add () {
+    const prompt = new Prompt(this.$align, {
       message: 'Enter post link:'
     });
     return new Promise((resolve, reject) => {

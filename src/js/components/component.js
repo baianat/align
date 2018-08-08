@@ -1,4 +1,12 @@
 export default class Component {
+  constructor () {
+    this.$align = Component.$align;
+  }
+
+  static config (align) {
+    this.$align = align;
+  }
+
   static add () {
     return false;
   }

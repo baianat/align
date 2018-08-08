@@ -10,8 +10,8 @@ export default class Separator extends Component {
     this._init(height);
   }
 
-  static add (align) {
-    const prompt = new Prompt(align, {
+  static add () {
+    const prompt = new Prompt(this.$align, {
       message: 'Enter separator height:'
     });
     return new Promise((resolve, reject) => {

@@ -3,16 +3,15 @@ import Prompt from '../prompt';
 import Selection from '../selection';
 
 export default class Link extends Component {
-  constructor (align, link) {
+  constructor (link) {
     super();
 
-    this.$align = align;
     this._init(link);
   }
 
-  static add (align) {
+  static add () {
     return new Promise((resolve, reject) => {
-      const link = new Link(align);
+      const link = new Link();
       link.edit();
       // to stop align from adding element to DOM
       resolve({});

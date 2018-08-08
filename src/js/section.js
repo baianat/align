@@ -135,7 +135,7 @@ export default class Section {
       }
       this.contentDiv.innerHTML = content;
       this.el.appendChild(this.contentDiv);
-      this._initElements();
+      // this._initElements();
       break;
 
     case 'title':

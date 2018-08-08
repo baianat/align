@@ -3,18 +3,17 @@ import Prompt from '../prompt';
 import Styler from '../styler';
 
 export default class Table extends Component {
-  constructor (align, table) {
+  constructor (table) {
     super();
 
     if (!table) return;
-    this.$align = align;
     this._init(table);
     this._initEvents();
     this.activeCell = this.el.rows[0].cells[0];
   }
 
-  static add (align) {
-    const prompt = new Prompt(align, {
+  static add () {
+    const prompt = new Prompt(this.$align, {
       message: 'Enter post link:',
       inputsCount: 2,
       inputsPlaceholders: ['rows', 'columns']
@@ -22,7 +21,7 @@ export default class Table extends Component {
 
     return new Promise((resolve, reject) => {
       prompt.onSubmit(() => {
-        const table = new Table(align, {
+        const table = new Table({
           rows: prompt.inputs[0].value,
           columns: prompt.inputs[1].value
         });

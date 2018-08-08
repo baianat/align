@@ -2,18 +2,17 @@ import Component from './component';
 import Styler from '../styler';
 
 export default class Line extends Component {
-  constructor (align) {
+  constructor () {
     super();
 
-    this.$align = align;
     this.el = document.createElement('hr');
     this.el.classList.add('align-line');
     this._init();
   }
 
-  static add (align) {
+  static add () {
     return new Promise((resolve, reject) => {
-      resolve(new Line(align));
+      resolve(new Line());
     });
   }
 

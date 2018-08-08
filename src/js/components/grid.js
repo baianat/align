@@ -3,10 +3,9 @@ import Prompt from '../prompt';
 import Styler from '../styler';
 
 export default class Grid extends Component {
-  constructor (align, count) {
+  constructor (count) {
     super();
 
-    this.$align = align;
     this.el = document.createElement('div');
     this.el.classList.add('align-grid');
     this.el.insertAdjacentHTML(
@@ -17,8 +16,8 @@ export default class Grid extends Component {
     this._init();
   }
 
-  static add (align) {
-    const prompt = new Prompt(align, {
+  static add () {
+    const prompt = new Prompt(this.$align, {
       message: 'Enter columns count:',
       inputsCount: 1
     });
@@ -28,7 +27,7 @@ export default class Grid extends Component {
         if (isNaN(count)) {
           reject('not a valid number');
         };
-        resolve(new Grid(align, count));
+        resolve(new Grid(count));
       });
     });
   }

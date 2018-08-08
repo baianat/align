@@ -11,8 +11,8 @@ export default class Youtube extends Component {
     this._init(link);
   }
 
-  static add (align) {
-    const prompt = new Prompt(align, {
+  static add () {
+    const prompt = new Prompt(this.$align, {
       message: 'Enter video link:'
     });
     return new Promise((resolve, reject) => {

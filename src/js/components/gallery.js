@@ -5,9 +5,8 @@ import { dropzone } from '../partial/elements';
 import { stringToDOM } from '../partial/util';
 
 export default class Gallery extends Component {
-  constructor (align, images) {
+  constructor (images) {
     super();
-    this.$align = align;
     this.el = document.createElement('div');
     this.el.classList.add('align-gallery');
     Array.from(images).forEach(img => {
@@ -25,14 +24,14 @@ export default class Gallery extends Component {
     });
   }
 
-  static add (align) {
+  static add () {
     const position = Selection.range.startContainer;
     const { el, input } = dropzone('gallery');
     position.appendChild(el, position);
     return new Promise((resolve, reject) => {
       input.addEventListener('change', () => {
         el.remove();
-        resolve(new Gallery(align, input.files));
+        resolve(new Gallery(input.files));
       });
     });
   }
