@@ -205,7 +205,7 @@ export default class Section {
 
     if (this.bgImage) {
       this.el.insertAdjacentElement('afterBegin', this.bgImage);
-      this.props.backgroundImage = this.bgImage.url;
+      this.props.backgroundImage = this.bgImage.style.backgroundImage;
     }
     if (this.bgVideo) {
       this.el.insertAdjacentElement('afterBegin', this.bgVideo);
@@ -484,5 +484,4 @@ export default class Section {
     tooltip: true,
     position: 'left-top'
   }
-  
 }
