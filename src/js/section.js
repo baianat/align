@@ -52,6 +52,7 @@ export default class Section {
       });
     }
     this._initContent(content);
+    this._initWatchers();
 
     if (typeof position === 'number') {
       const before = this.$align.sections[position];
@@ -61,7 +62,6 @@ export default class Section {
     }
     this.$align.editor.appendChild(this.el);
     this.$align.sections.push(this);
-    this._initWatchers();
   }
 
   get content () {
