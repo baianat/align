@@ -144,7 +144,6 @@ export default class Sidebar {
           this.backgroundImage.input.addEventListener('change', (evnt) => {
             const active = Section.activeSection;
             active.props.backgroundImage = evnt.target.files[0];
-            this.update();
           });
           this.backgroundImage.label.innerText =
           this.currentProps.backgroundImage
@@ -157,7 +156,6 @@ export default class Sidebar {
           this.backgroundVideo.input.addEventListener('change', (evnt) => {
             const active = Section.activeSection;
             active.props.backgroundVideo = evnt.target.files[0];
-            this.update();
           });
           this.backgroundVideo.label.innerText =
           this.currentProps.backgroundVideo
@@ -170,7 +168,6 @@ export default class Sidebar {
           this.backgroundColor.input.addEventListener('change', (evnt) => {
             const active = Section.activeSection;
             active.props.backgroundColor = evnt.target.value;
-            this.update();
           });
           this.backgroundColor.colors.forEach(color => {
             color.el.addEventListener('click', () => {
@@ -181,7 +178,6 @@ export default class Sidebar {
               if (color.color === 'clear') {
                 active.props.backgroundColor = null;
               }
-              this.update();
             });
           });
           this.backgroundColor.colorpikcer.selectColor(this.currentProps.backgroundColor || '#fff', true);
