@@ -34,6 +34,7 @@ export default class Section {
       backgroundColor: '',
       backgroundVideo: '',
       backgroundImage: '',
+      parallax: false,
       isHTMLView: false,
       layout: {},
       type
@@ -206,6 +207,7 @@ export default class Section {
     if (this.bgImage) {
       this.el.insertAdjacentElement('afterBegin', this.bgImage);
       this.props.backgroundImage = this.bgImage.style.backgroundImage;
+      this.props.parallax = this.bgImage.classList.contains('is-parallax');
     }
     if (this.bgVideo) {
       this.el.insertAdjacentElement('afterBegin', this.bgVideo);
@@ -265,6 +267,13 @@ export default class Section {
     });
     Dep.watcher(() => {
       this.updateLayout(this.props.layout);
+    });
+    Dep.watcher(() => {
+      const parallax = this.props.parallax;
+      if (!this.bgImage) {
+        return;
+      }
+      this.bgImage.classList.toggle('is-parallax', parallax);
     });
   }
 

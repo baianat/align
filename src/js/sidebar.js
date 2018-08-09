@@ -70,6 +70,22 @@ export default class Sidebar {
     });
   }
 
+  element (name, type) {
+    if (type === 'switcher') {
+      const elm = stringToDOM(`
+        <label class="align-switcher" for="${name}">
+          <span class="align-switcher-info">${name}</span>
+          <input class="align-switcher-input" id="${name}" type="checkbox">
+          <span class="align-switcher-body">
+            <span class="align-switcher-handle"></span>
+          </span>
+        </label>
+      `);
+      const input = elm.querySelector('.align-switcher-input');
+      return { input, elm };
+    }
+  }
+
   field (name, desc, type) {
     const el = document.createElement('div');
     const labelEl = document.createElement('label');
@@ -92,7 +108,7 @@ export default class Sidebar {
         input.value = '';
         input.dispatchEvent(new window.Event('change'));
       });
-      return { input, label, close };
+      return { input, label, close, el };
     }
     if (type === 'color') {
       const elm = stringToDOM('<div class="align-sidebar-colors"></div>');
@@ -149,6 +165,14 @@ export default class Sidebar {
           this.currentProps.backgroundImage
             ? this.currentProps.backgroundImage.name || this.currentProps.backgroundImage
             : 'Add image';
+
+          this.parallax = this.element('parallax', 'switcher');
+          this.backgroundImage.el.insertAdjacentElement('beforeend', this.parallax.elm);
+          this.parallax.input.checked = this.currentProps.parallax;
+          this.parallax.input.addEventListener('change', (evnt) => {
+            const active = Section.activeSection;
+            active.props.parallax = !!evnt.target.checked;
+          });
           break;
 
         case 'backgroundVideo':

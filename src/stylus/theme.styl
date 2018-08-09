@@ -132,7 +132,10 @@
       min-height: 300px
       margin: 20px 0
       padding: 20px
-
+    &.has-bgImage
+    &.has-bgVideo
+    &.has-bgColor
+      text-shadow: 1px 1px 3px alpha($black, 50%)
   &-bgVideo
   &-bgImage
     position: absolute
@@ -148,6 +151,8 @@
     height: 100%
     opacity: 0.5
     object-fit: cover
+    &.is-parallax
+      background-attachment: fixed
   &-bgVideo
     video
       width: 100%
