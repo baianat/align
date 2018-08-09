@@ -290,6 +290,16 @@
   width: 100%;
   max-width: 400px;
 }
+.align-post {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-line-pack: center;
+      align-content: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
 .align-video {
   position: relative;
   width: 100%;

@@ -2676,6 +2676,7 @@ var Facebook = function (_Component) {
     var _this = possibleConstructorReturn(this, (Facebook.__proto__ || Object.getPrototypeOf(Facebook)).call(this));
 
     _this.el = document.createElement('div');
+    _this.el.classList.add('align-post');
     _this._init(link);
     return _this;
   }
@@ -2683,17 +2684,28 @@ var Facebook = function (_Component) {
   createClass(Facebook, [{
     key: '_init',
     value: function _init(link) {
-      var iframe = document.createElement('iframe');
+      this.addFacebookSDK();
+      var post = stringToDOM('<div class="fb-post" data-width="600px" data-href="' + link + '"></div>');
+      this.el.appendChild(post);
 
-      iframe.width = 500;
-      iframe.height = 200;
-      iframe.scrolling = 'no';
-      iframe.contentEditable = false;
-      iframe.allowTransparency = true;
-      iframe.src = '//www.facebook.com/plugins/post.php?href=' + link;
-
-      this.el.classList.add('align-post');
-      this.el.appendChild(iframe);
+      setTimeout(function () {
+        FB.init({
+          appId: 'align',
+          xfbml: true,
+          version: 'v3.1'
+        });
+      }, 300);
+    }
+  }, {
+    key: 'addFacebookSDK',
+    value: function addFacebookSDK() {
+      var id = 'facebook-jssdk';
+      if (document.getElementById(id)) return;
+      var js = document.createElement('script');
+      var fjs = document.getElementsByTagName('script')[0];
+      js.id = id;
+      js.src = "https://connect.facebook.net/es_LA/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
     }
   }], [{
     key: 'add',
