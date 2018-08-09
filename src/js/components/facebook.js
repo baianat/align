@@ -1,10 +1,12 @@
 import Component from './component';
 import Prompt from '../prompt';
+import { stringToDOM } from '../partial/util';
 
 export default class Facebook extends Component {
   constructor (link) {
     super();
     this.el = document.createElement('div');
+    this.el.classList.add('align-post');
     this._init(link);
   }
 
@@ -24,17 +26,27 @@ export default class Facebook extends Component {
   }
 
   _init (link) {
-    const iframe = document.createElement('iframe');
+    this.addFacebookSDK();
+    let post = stringToDOM(`<div class="fb-post" data-width="600px" data-href="${link}"></div>`);
+    this.el.appendChild(post);
 
-    iframe.width = 500;
-    iframe.height = 200;
-    iframe.scrolling = 'no';
-    iframe.contentEditable = false;
-    iframe.allowTransparency = true;
-    iframe.src = `//www.facebook.com/plugins/post.php?href=${link}`;
+    setTimeout(() => {
+      FB.init({
+        appId: 'align',
+        xfbml: true,
+        version: 'v3.1'
+      });
+    }, 300);
+  }
 
-    this.el.classList.add('align-post');
-    this.el.appendChild(iframe);
+  addFacebookSDK () {
+    const id = 'facebook-jssdk';
+    if (document.getElementById(id)) return;
+    let js = document.createElement('script');
+    let fjs = document.getElementsByTagName('script')[0];
+    js.id = id;
+    js.src = "https://connect.facebook.net/es_LA/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
   }
 
   static schema = {
