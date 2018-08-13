@@ -5,7 +5,7 @@
   "main": "dist/js/align.js",
   "module": "dist/js/align.esm.js",
   "dependencies": {
-    "@baianat/colorpicker": "0.0.12"
+    "color-fns": "^0.0.7"
   },
   "files": [
     "dist/js/*.js",
