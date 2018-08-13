@@ -1,5 +1,5 @@
 /**
-    * v0.0.36
+    * v0.0.37
     * (c) 2018 Baianat
     * @license MIT
     */
@@ -211,8 +211,279 @@ function swapArrayItems(array, index1, index2) {
   return array;
 }
 
+function call(func) {
+  var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (typeof func === 'function') {
+    func(args);
+  }
+}
+
 /**
-  * color-fns v0.0.1
+ * Slider class
+ */
+
+var Slider = function () {
+  function Slider(settings) {
+    classCallCheck(this, Slider);
+
+    this.el = document.createElement('input');
+    this.el.type = 'range';
+    this.settings = Object.assign({}, Slider.defaults, settings);
+    this._init();
+  }
+
+  createClass(Slider, [{
+    key: '_init',
+    value: function _init() {
+      this.min = this.el.min = Number(this.settings.min);
+      this.max = this.el.max = Number(this.settings.max);
+      this.step = this.el.step = Number(this.settings.step);
+
+      this._initElements();
+      this._initEvents();
+      this.update();
+    }
+  }, {
+    key: '_initElements',
+    value: function _initElements() {
+      this.wrapper = document.createElement('div');
+      this.track = document.createElement('div');
+
+      this.wrapper.classList.add('slider');
+      if (this.settings.classes) {
+        var _wrapper$classList;
+
+        (_wrapper$classList = this.wrapper.classList).add.apply(_wrapper$classList, toConsumableArray(this.settings.classes));
+      }
+      this.track.classList.add('slider-track');
+      this.el.classList.add('slider-input');
+
+      this.fill = document.createElement('div');
+      this.fill.classList.add('slider-fill');
+      this.track.appendChild(this.fill);
+      this.handle = stringToDOM('<div class="slider-handle"></div>');
+      this.handle.addEventListener('mousedown', this.select.bind(this), false);
+      this.handle.addEventListener('touchstart', this.select.bind(this), false);
+      this.track.appendChild(this.handle);
+
+      this.wrapper.appendChild(this.el);
+      this.wrapper.appendChild(this.track);
+      call(this.settings.created, this);
+    }
+  }, {
+    key: '_initEvents',
+    value: function _initEvents() {
+      var _this = this;
+
+      window.addEventListener('resize', function () {
+        _this.updateWidth();
+        _this.update(undefined, true);
+      });
+      this.track.addEventListener('mousedown', this.select.bind(this), false);
+      this.track.addEventListener('touchstart', this.select.bind(this), false);
+    }
+
+    /**
+     * fire select events
+     */
+
+  }, {
+    key: 'select',
+    value: function select$$1(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      // check if  left mouse is clicked
+      if (event.buttons !== 1) return;
+      this.track.classList.add('is-dragging');
+      this.ticking = false;
+
+      var stepValue = this.getStepValue(event);
+      this.update(stepValue);
+
+      this.tempDrag = this.dragging.bind(this);
+      this.tempRelease = this.release.bind(this);
+      document.addEventListener('mousemove', this.tempDrag);
+      document.addEventListener('touchmove', this.tempDrag);
+      document.addEventListener('touchend', this.tempRelease);
+      document.addEventListener('mouseup', this.tempRelease);
+    }
+
+    /**
+     * dragging motion
+     */
+
+  }, {
+    key: 'dragging',
+    value: function dragging(event) {
+      var _this2 = this;
+
+      event.preventDefault();
+      var stepValue = this.getStepValue(event);
+      if (!this.ticking) {
+        window.requestAnimationFrame(function () {
+          _this2.update(stepValue);
+          _this2.ticking = false;
+        });
+
+        this.ticking = true;
+      }
+    }
+
+    /**
+     * release handler
+     */
+
+  }, {
+    key: 'release',
+    value: function release() {
+      this.track.classList.remove('is-dragging');
+      document.removeEventListener('mousemove', this.tempDrag);
+      document.removeEventListener('touchmove', this.tempDrag);
+      document.removeEventListener('mouseup', this.tempRelease);
+      document.removeEventListener('touchend', this.tempRelease);
+    }
+  }, {
+    key: 'getStepValue',
+    value: function getStepValue(event) {
+      var eventX = event.type.includes('mouse') ? event.clientX : event.type.includes('touch') ? event.touches[0].clientX : event;
+
+      var mouseValue = eventX - this.currentX;
+      var stepCount = parseInt(mouseValue / this.stepWidth + 0.5, 10);
+      var stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
+      return stepValue;
+    }
+  }, {
+    key: 'updateWidth',
+    value: function updateWidth() {
+      var trackRect = this.track.getBoundingClientRect();
+      this.currentX = trackRect.left;
+      this.width = trackRect.width;
+      this.stepWidth = this.width / (this.max - this.min);
+    }
+
+    /**
+     * get the filled area percentage
+     * @param  {Object} slider
+     * @param  {Number} value
+     * @return {Number}
+     */
+
+  }, {
+    key: 'getPositionPercentage',
+    value: function getPositionPercentage(value) {
+      return (value - this.min) / (this.max - this.min);
+    }
+  }, {
+    key: 'normalizeValue',
+    value: function normalizeValue(value) {
+      if (isNaN(Number(value))) {
+        return this.value;
+      }
+      if (this.multiple) {
+        var prevValue = this.values[this.activeHandle - 1] || this.min;
+        var nextValue = this.values[this.activeHandle + 1] || this.max;
+        value = Math.min(Math.max(Number(value), prevValue), nextValue);
+      }
+      return Math.min(Math.max(Number(value), this.min), this.max);
+    }
+  }, {
+    key: 'newGradient',
+    value: function newGradient(_newGradient) {
+      return;
+    }
+
+    /**
+     * update the slider fill, value and color
+     * @param {Number} value
+     */
+
+  }, {
+    key: 'update',
+    value: function update(value) {
+      var mute = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      if (Number(value) === this.value) return;
+
+      if (!this.width) {
+        this.updateWidth();
+      }
+      var normalized = this.normalizeValue(value);
+      var positionPercentage = this.getPositionPercentage(normalized);
+
+      if (this.fill) {
+        this.fill.style.transform = 'translate(' + positionPercentage * this.width + 'px, 0) scale(' + (1 - positionPercentage) + ', 1)';
+      }
+      this.handle.style.transform = 'translate(' + positionPercentage * this.width + 'px, 0)';
+      this.value = normalized;
+      this.el.value = this.value;
+      if (mute) return;
+      this.el.dispatchEvent(new Event('change')); // eslint-disable-line
+      this.el.dispatchEvent(new Event('input')); // eslint-disable-line
+      call(this.settings.updated);
+    }
+
+    // eslint-disable-next-line
+
+  }]);
+  return Slider;
+}();
+
+Slider.defaults = {
+  created: {},
+  updated: {},
+  gradient: null,
+  classes: null,
+  colorCode: false,
+  editable: false,
+  reverse: false,
+  label: true,
+  min: 0,
+  max: 10,
+  step: 1,
+  value: 0,
+  handles: [0],
+  trackSlide: true
+};
+
+var Dep = function () {
+  createClass(Dep, null, [{
+    key: "watcher",
+    value: function watcher(func) {
+      Dep.target = func;
+      Dep.target();
+      Dep.target = null;
+    }
+  }]);
+
+  function Dep() {
+    classCallCheck(this, Dep);
+
+    this.subscribers = [];
+  }
+
+  createClass(Dep, [{
+    key: "depend",
+    value: function depend() {
+      if (Dep.target && !this.subscribers.includes(Dep.target)) {
+        this.subscribers.push(Dep.target);
+      }
+    }
+  }, {
+    key: "notify",
+    value: function notify(oldVal) {
+      this.subscribers.forEach(function (sub) {
+        return sub(oldVal);
+      });
+    }
+  }]);
+  return Dep;
+}();
+
+Dep.target = null;
+
+/**
+  * color-fns v0.0.7
   * (c) 2018 Baianat
   * @license MIT
   */
@@ -234,28 +505,20 @@ var createClass$1 = function () {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
       descriptor.configurable = true;
-      if ("value" in descriptor) {
-        descriptor.writable = true;
-      }
+      if ("value" in descriptor) descriptor.writable = true;
       Object.defineProperty(target, descriptor.key, descriptor);
     }
   }
 
   return function (Constructor, protoProps, staticProps) {
-    if (protoProps) {
-      defineProperties(Constructor.prototype, protoProps);
-    }
-    if (staticProps) {
-      defineProperties(Constructor, staticProps);
-    }
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
     return Constructor;
   };
 }();
 
 var get$1 = function get$$1(object, property, receiver) {
-  if (object === null) {
-    object = Function.prototype;
-  }
+  if (object === null) object = Function.prototype;
   var desc = Object.getOwnPropertyDescriptor(object, property);
 
   if (desc === undefined) {
@@ -292,9 +555,7 @@ var inherits$1 = function inherits$$1(subClass, superClass) {
       configurable: true
     }
   });
-  if (superClass) {
-    Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 };
 
 var possibleConstructorReturn$1 = function possibleConstructorReturn$$1(self, call) {
@@ -337,30 +598,12 @@ function getColorModel(color) {
   return false;
 }
 
-/**
- * Checks if the given color string is valid (parsable).
- *
- * @param {String} color The color string to be checked.
- */
-function isAColor(color) {
-  return !!getColorModel(color);
-}
-
 function hexNumToDec(hexNum) {
   if (isNaN(parseInt(hexNum, 16))) {
     return 0;
   }
 
   return parseInt(hexNum, 16);
-}
-
-function decNumToHex(decNum) {
-  decNum = Math.floor(decNum);
-  if (isNaN(decNum)) {
-    return '00';
-  }
-
-  return ('0' + decNum.toString(16)).slice(-2);
 }
 
 function isBetween(lb, ub) {
@@ -422,7 +665,7 @@ var RgbColor = function (_Color) {
     key: 'init',
     value: function init() {
       this.model = 'rgb';
-      this.alpha = this.alpha || 1;
+      this.alpha = this.alpha === undefined ? 1 : this.alpha;
     }
   }, {
     key: 'toString',
@@ -518,7 +761,94 @@ var HexColor = function (_Color3) {
   return HexColor;
 }(Color);
 
+function parseRgb(rgb) {
+  if ((typeof rgb === 'undefined' ? 'undefined' : _typeof$1(rgb)) === 'object') {
+    return rgb;
+  }
+
+  // will consider rgb/rgba color prefix as a valid input color
+  // while the output will be a valid web colors
+  // valid input colors examples 'rgb(100, 0, 0, 0.5)', 'rgba(0, 0, 0)'
+  // the output for the inputted examples 'rgba(100, 0, 0, 0.5)', 'rgb(0, 0, 0)'
+  var match = rgb.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,*\s*(\d*(?:\.\d+)*)*\)/i);
+  if (!match || match.length < 4) {
+    return new RgbColor();
+  }
+  return new RgbColor({
+    red: Number(match[1]),
+    green: Number(match[2]),
+    blue: Number(match[3]),
+    alpha: Number(match[4])
+  });
+}
+
+function expandHexShorthand(hex) {
+  var regex = /^#([a-f\d])([a-f\d])([a-f\d])([a-f\d])*$/i;
+  if ((hex.length === 5 || hex.length === 4) && regex.test(hex)) {
+    hex = hex.replace(regex, function (m, r, g, b, a) {
+      return '#' + r + r + g + g + b + b + (a ? '' + a + a : '');
+    });
+  }
+
+  return hex;
+}
+
+function parseHex(hex) {
+  if ((typeof hex === 'undefined' ? 'undefined' : _typeof$1(hex)) === 'object') {
+    return hex;
+  }
+
+  var expanded = expandHexShorthand(hex);
+  var match = expanded.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})*/i);
+  if (!match || match.length < 4) {
+    return new HexColor();
+  }
+
+  return new HexColor({
+    hex: expanded,
+    red: match[1],
+    green: match[2],
+    blue: match[3],
+    alpha: match[4]
+  });
+}
+
+function parseHsl(hsl) {
+  if ((typeof hsl === 'undefined' ? 'undefined' : _typeof$1(hsl)) === 'object') {
+    return hsl;
+  }
+
+  // will consider hsl/hsla color prefix as a valid input color
+  // while the output will be a valid web colors
+  // valid input colors examples 'hsl(255, 100%, 50%, 0.5)', 'hsla(100, 100%, 50%)'
+  // the output for the inputted examples 'hsla(255, 100%, 50%, 0.5)', 'hsl(100, 100%, 50%)'
+  var match = hsl.match(/^hsla?\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,*\s*(\d*(?:\.\d+)*)*\)/i);
+  if (!match || match.length < 4) {
+    return new HslColor();
+  }
+
+  return new HslColor({
+    hue: Number(match[1]),
+    sat: Number(match[2]),
+    lum: Number(match[3]),
+    alpha: Number(match[4])
+  });
+}
+
+function decNumToHex(decNum) {
+  decNum = Math.floor(decNum);
+  if (isNaN(decNum)) {
+    return '00';
+  }
+
+  return ('0' + decNum.toString(16)).slice(-2);
+}
+
 function rgbToHex(rgb) {
+  if (!rgb) {
+    return new HexColor();
+  }
+  rgb = parseRgb(rgb);
   var _ref = [decNumToHex(rgb.red), decNumToHex(rgb.green), decNumToHex(rgb.blue), rgb.alpha ? decNumToHex(rgb.alpha * 255) : null],
       rr = _ref[0],
       gg = _ref[1],
@@ -529,7 +859,7 @@ function rgbToHex(rgb) {
     red: rr,
     green: gg,
     blue: bb,
-    alpha: aa || 1
+    alpha: aa || 'ff'
   });
 }
 
@@ -537,6 +867,8 @@ function rgb2Hsl(rgb) {
   if (!rgb) {
     return new HslColor();
   }
+
+  rgb = parseRgb(rgb);
 
   // Convert the RGB values to the range 0-1
   var _ref = [rgb.red / 255, rgb.green / 255, rgb.blue / 255, rgb.alpha],
@@ -586,16 +918,21 @@ function rgb2Hsl(rgb) {
 }
 
 function hexToRgb(hex) {
-  var red = hex.red,
-      green = hex.green,
-      blue = hex.blue,
-      alpha = hex.alpha;
+  if (!hex) {
+    return new RgbColor();
+  }
+
+  var _parseHex = parseHex(hex),
+      red = _parseHex.red,
+      green = _parseHex.green,
+      blue = _parseHex.blue,
+      alpha = _parseHex.alpha;
 
   return new RgbColor({
     red: hexNumToDec(red),
     green: hexNumToDec(green),
     blue: hexNumToDec(blue),
-    alpha: alpha ? Number((hexNumToDec(alpha) / 255).toFixed(2)) : 1
+    alpha: alpha === undefined ? 1 : Number((hexNumToDec(alpha) / 255).toFixed(2))
   });
 }
 
@@ -607,6 +944,8 @@ function hslToRgb(hsl) {
   if (!hsl) {
     return new RgbColor();
   }
+  hsl = parseHsl(hsl);
+
   var _ref = [hsl.hue / 360, hsl.sat / 100, hsl.lum / 100, hsl.alpha],
       hue = _ref[0],
       sat = _ref[1],
@@ -625,21 +964,11 @@ function hslToRgb(hsl) {
     var temp2 = 2 * lgh - temp1;
 
     var testHue = function testHue(test) {
-      if (test < 0) {
-        test += 1;
-      }
-      if (test > 1) {
-        test -= 1;
-      }
-      if (test < 1 / 6) {
-        return temp2 + (temp1 - temp2) * 6 * test;
-      }
-      if (test < 1 / 2) {
-        return temp1;
-      }
-      if (test < 2 / 3) {
-        return temp2 + (temp1 - temp2) * (2 / 3 - test) * 6;
-      }
+      if (test < 0) test += 1;
+      if (test > 1) test -= 1;
+      if (test < 1 / 6) return temp2 + (temp1 - temp2) * 6 * test;
+      if (test < 1 / 2) return temp1;
+      if (test < 2 / 3) return temp2 + (temp1 - temp2) * (2 / 3 - test) * 6;
       return temp2;
     };
 
@@ -657,29 +986,17 @@ function hslToRgb(hsl) {
 }
 
 function hexToHsl(hex) {
+  if (!hex) {
+    return new HslColor();
+  }
   return rgb2Hsl(hexToRgb(hex));
 }
 
 function hslToHex(hsl) {
-  return rgbToHex(hslToRgb(hsl));
-}
-
-function parseRgb(rgb) {
-  // will consider rgb/rgba color prefix as a valid input color
-  // while the output will be a valid web colors
-  // valid input colors examples 'rgb(100, 0, 0, 0.5)', 'rgba(0, 0, 0)'
-  // the output for the inputted examples 'rgba(100, 0, 0, 0.5)', 'rgb(0, 0, 0)'
-  var match = rgb.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,*\s*(\d*(?:\.\d+)*)*\)/i);
-  if (!match || match.length < 4) {
-    return new RgbColor();
+  if (!hsl) {
+    return new HexColor();
   }
-
-  return new RgbColor({
-    red: Number(match[1]),
-    green: Number(match[2]),
-    blue: Number(match[3]),
-    alpha: Number(match[4])
-  });
+  return rgbToHex(hslToRgb(hsl));
 }
 
 /**
@@ -702,29 +1019,11 @@ function toRgb(color) {
     return parseRgb(color);
   }
 
-  if (model === 'rgb' && (typeof color === "undefined" ? "undefined" : _typeof(color)) === 'object') {
+  if (model === 'rgb' && (typeof color === 'undefined' ? 'undefined' : _typeof$1(color)) === 'object') {
     return color;
   }
 
-  return new Color();
-}
-
-function parseHsl(hsl) {
-  // will consider hsl/hsla color prefix as a valid input color
-  // while the output will be a valid web colors
-  // valid input colors examples 'hsl(255, 100%, 50%, 0.5)', 'hsla(100, 100%, 50%)'
-  // the output for the inputted examples 'hsla(255, 100%, 50%, 0.5)', 'hsl(100, 100%, 50%)'
-  var match = hsl.match(/^hsla?\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,*\s*(\d*(?:\.\d+)*)*\)/i);
-  if (!match || match.length < 4) {
-    return new HslColor();
-  }
-
-  return new HslColor({
-    hue: Number(match[1]),
-    sat: Number(match[2]),
-    lum: Number(match[3]),
-    alpha: Number(match[4])
-  });
+  return new RgbColor();
 }
 
 /**
@@ -743,38 +1042,15 @@ function toHsl(color) {
     return rgb2Hsl(color);
   }
 
-  if (model === 'hsl') {
+  if (model === 'hsl' && typeof color === 'string') {
     return parseHsl(color);
   }
 
-  return new Color();
-}
-
-function expandHexShorthand(hex) {
-  var regex = /^#([a-f\d])([a-f\d])([a-f\d])([a-f\d])*$/i;
-  if ((hex.length === 5 || hex.length === 4) && regex.test(hex)) {
-    hex = hex.replace(regex, function (m, r, g, b, a) {
-      return '#' + r + r + g + g + b + b + (a ? '' + a + a : '');
-    });
+  if (model === 'hsl' && (typeof color === 'undefined' ? 'undefined' : _typeof$1(color)) === 'object') {
+    return color;
   }
 
-  return hex;
-}
-
-function parseHex(hex) {
-  var expanded = expandHexShorthand(hex);
-  var match = expanded.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})*/i);
-  if (!match || match.length < 4) {
-    return new HexColor();
-  }
-
-  return new HexColor({
-    hex: expanded,
-    red: match[1],
-    green: match[2],
-    blue: match[3],
-    alpha: match[4]
-  });
+  return new HslColor();
 }
 
 /**
@@ -797,120 +1073,404 @@ function toHex(color) {
     return parseHex(color);
   }
 
-  if (model === 'hex' && (typeof color === "undefined" ? "undefined" : _typeof(color)) === 'object') {
+  if (model === 'hex' && (typeof color === 'undefined' ? 'undefined' : _typeof$1(color)) === 'object') {
     return color;
   }
 
-  return new Color();
-}
-
-function parseColor(color) {
-  var model = getColorModel(color);
-  if (model === 'rgb') {
-    return parseRgb(color);
-  }
-
-  if (model === 'hex') {
-    return parseHex(color);
-  }
-
-  if (model === 'hsl') {
-    return parseHsl(color);
-  }
-
-  return new Color();
+  return new HexColor();
 }
 
 function getRandomColor() {
   return 'rgb(' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ')';
 }
 
-function mixValue(color1, color2, ratio) {
-  if (ratio === void 0) ratio = 0.5;
+var Colorpicker = function () {
+  function Colorpicker(selector, settings) {
+    classCallCheck(this, Colorpicker);
 
-  return Number((color1 * (1 - ratio) + color2 * ratio).toFixed(2));
-}
-
-function mixColors(color1, color2, ratio) {
-  color1 = toRgb(color1);
-  color2 = toRgb(color2);
-  var red = Math.floor(mixValue(color1.red, color2.red, ratio));
-  var green = Math.floor(mixValue(color1.green, color2.green, ratio));
-  var blue = Math.floor(mixValue(color1.blue, color2.blue, ratio));
-  var alpha = mixValue(color1.alpha, color2.alpha, ratio);
-  return new RgbColor({
-    red: red,
-    green: green,
-    blue: blue,
-    alpha: alpha
-  });
-}
-
-function getCartesianCoords(r, theta) {
-  return {
-    x: r * Math.cos(theta * Math.PI * 2),
-    y: r * Math.sin(theta * Math.PI * 2)
-  };
-}
-
-/**
- * Utilities
- */
-function select$1(element) {
-  if (typeof element === 'string') {
-    return document.querySelector(element);
+    this.el = select(selector);
+    this.settings = Object.assign({}, Colorpicker.defaults, settings);
+    this.init();
   }
-  return element;
-}
 
-function call(func, args) {
-  if (args === void 0) args = null;
-
-  if (typeof func === 'function') {
-    func(args);
-  }
-}
-
-function getArray$1(length, value) {
-  var array = [];
-  for (var i = 0; i < length; i++) {
-    var temp = typeof value === 'function' ? value() : value;
-    array.push(temp);
-  }
-  return array;
-}
-
-function wrap$1(el, wrapper) {
-  // insert wrapper before el in the DOM tree
-  el.parentNode.insertBefore(wrapper, el);
-
-  // move el into wrapper
-  wrapper.appendChild(el);
-}
-
-/**
- * Converts an array-like object to an array.
- */
-
-function isElementClosest$1(element, wrapper) {
-  while (element !== document && element !== null) {
-    if (element === wrapper) {
-      return true;
+  createClass(Colorpicker, [{
+    key: 'init',
+    value: function init() {
+      this.events = [new Event('input'), new Event('change')];
+      this.colors = {
+        current: this.settings.defaultColor,
+        model: this.settings.model,
+        rgb: '',
+        hsl: '',
+        hex: ''
+      };
+      this._initElements();
+      this._initWatchers();
+      this._initInputs();
+      this._initEvents();
+      this.selectColor(this.settings.defaultColor, true);
     }
-    element = element.parentNode;
-  }
-  return false;
-}
+  }, {
+    key: '_initWatchers',
+    value: function _initWatchers() {
+      var _this = this;
 
-function stringToDOM$1(string) {
-  return document.createRange().createContextualFragment(string).firstElementChild;
-}
+      Object.keys(this.colors).forEach(function (key) {
+        var internalValue = _this.colors[key];
+        var dep = new Dep();
 
-function getClosestValue(array, value) {
-  return array.reduce(function (prev, curr) {
-    return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-  });
-}
+        Object.defineProperty(_this.colors, key, {
+          get: function get$$1() {
+            dep.depend();
+            return internalValue;
+          },
+          set: function set$$1(newVal) {
+            var oldVal = internalValue;
+            internalValue = newVal;
+            dep.notify(oldVal);
+          }
+        });
+      });
+      Dep.watcher(function () {
+        _this.colors.rgb = toRgb(_this.colors.current);
+      });
+      Dep.watcher(function () {
+        _this.colors.hsl = toHsl(_this.colors.current);
+      });
+      Dep.watcher(function () {
+        _this.colors.hex = toHex(_this.colors.current);
+      });
+      Dep.watcher(function () {
+        _this.strip.update(_this.colors.hsl.hue, true);
+      });
+    }
+  }, {
+    key: '_initElements',
+    value: function _initElements() {
+      this.mouse = { x: 0, y: 0 };
+      this.lastMove = { x: 0, y: 0 };
+      this.isMenuActive = false;
+      // create colorpicker element
+      this.picker = document.createElement('div');
+      this.menu = stringToDOM('<div class="picker-menu is-hidden" tabindex="-1"></div>');
+      this.guide = stringToDOM('<button class="picker-guide">' + this.settings.guideIcon + '</button>');
+      this.controllers = stringToDOM('<div class="picker-controllers"></div>');
+
+      // append colorpicker elements
+      this.picker.appendChild(this.menu);
+      this.picker.appendChild(this.guide);
+      this._initPicker();
+      this.menu.appendChild(this.controllers);
+
+      this.el.parentNode.insertBefore(this.picker, this.el);
+      this.el.classList.add('picker-value');
+      this.picker.classList.add('picker');
+      this.picker.appendChild(this.el);
+      this.guide.style.color = this.settings.defaultColor;
+      this.guide.style.fill = this.settings.defaultColor;
+    }
+  }, {
+    key: '_initPicker',
+    value: function _initPicker() {
+      var _this2 = this;
+
+      this.square = stringToDOM('\n      <div class="picker-square">\n        <canvas class="picker-canvas"></canvas>\n        <div class="picker-cursor"></div>\n      </div>');
+
+      this.canvas = this.square.querySelector('.picker-canvas');
+      this.strip = this.square.querySelector('.picker-squareStrip');
+      this.cursor = this.square.querySelector('.picker-cursor');
+      this.ctx = this.canvas.getContext('2d');
+      this.strip = new Slider({ min: 0, max: 360, step: 1, classes: ['is-strip'] });
+
+      this.menu.appendChild(this.square);
+      this.controllers.appendChild(this.strip.wrapper);
+
+      // setup canvas
+      this.canvas.width = 250;
+      this.canvas.height = 150;
+
+      var updateColor = function updateColor(event) {
+        if (event.target !== _this2.canvas) {
+          return;
+        }
+
+        var _getMouseCords = _this2.getMouseCords(event),
+            x = _getMouseCords.x,
+            y = _getMouseCords.y;
+
+        _this2.mouse = { x: Math.min(x, _this2.canvas.width), y: Math.min(y, _this2.canvas.height) };
+        var color = _this2.getColorCanvas(_this2.mouse, _this2.ctx);
+        _this2.selectColor(color);
+        _this2.updateCursor(_this2.mouse);
+      };
+
+      var updateHue = function updateHue(event) {
+        _this2.colors.hsl.hue = event.target.value;
+        _this2.selectColor(_this2.colors.hsl);
+      };
+
+      this.updateSquareColors();
+
+      // add event listener
+      this.canvas.addEventListener('mousedown', function (event) {
+        return mouseDownHandler(event)(updateColor);
+      });
+      this.strip.el.addEventListener('input', updateHue);
+    }
+  }, {
+    key: '_initInputs',
+    value: function _initInputs() {
+      var _this3 = this;
+
+      this.inputsWrapper = stringToDOM('<div class="picker-inputs"></div>');
+      this.modelSwitcher = stringToDOM('<button class="picker-model"></button>');
+      this.submit = stringToDOM('\n    <button class="picker-submit">\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>\n      </svg>\n    </button>');
+
+      this.updateInputsModel();
+      this.controllers.appendChild(this.inputsWrapper);
+
+      this.modelSwitcher.addEventListener('click', function (event) {
+        var models = ['hex', 'rgb', 'hsl'];
+        var indx = models.indexOf(_this3.colors.model);
+        _this3.colors.model = models[indx + 1] || models[0];
+        _this3.updateInputsModel();
+      });
+      this.submit.addEventListener('click', function (event) {
+        call(_this3.settings.events.beforeSubmit);
+        _this3.selectColor(_this3.el.value);
+        if (_this3.settings.menu.hideWhenSubmit) {
+          _this3.closePicker();
+        }
+        call(_this3.settings.events.afterSubmit);
+      });
+    }
+  }, {
+    key: 'updateInputsModel',
+    value: function updateInputsModel() {
+      var _this4 = this;
+
+      this.inputsWrapper.innerHTML = '';
+      this.modelSwitcher.innerText = this.colors.model + ': ';
+      this.inputsWrapper.appendChild(this.modelSwitcher);
+      if (this.colors.model === 'hsl') {
+        this.inputs = {
+          hue: stringToDOM('<input type="number" min="0" max="360" class="picker-input"/>'),
+          sat: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>'),
+          lum: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>')
+        };
+        Object.keys(this.inputs).forEach(function (key) {
+          var current = _this4.inputs[key];
+          _this4.inputsWrapper.appendChild(current);
+          current.addEventListener('input', function () {
+            _this4.selectColor('hsl(\n            ' + _this4.inputs.hue.value + ',\n            ' + _this4.inputs.sat.value + '%,\n            ' + _this4.inputs.lum.value + '%)');
+            _this4.updateCursor();
+          });
+          Dep.watcher(function () {
+            current.value = _this4.colors.hsl[key];
+          });
+        });
+      }
+
+      if (this.colors.model === 'rgb') {
+        this.inputs = {
+          red: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
+          green: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
+          blue: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>')
+        };
+        Object.keys(this.inputs).forEach(function (key) {
+          var current = _this4.inputs[key];
+          _this4.inputsWrapper.appendChild(current);
+          current.addEventListener('input', function () {
+            _this4.selectColor('rgb(\n            ' + _this4.inputs.red.value + ',\n            ' + _this4.inputs.green.value + ',\n            ' + _this4.inputs.blue.value + ')');
+            _this4.updateCursor();
+          });
+          Dep.watcher(function () {
+            current.value = _this4.colors.rgb[key];
+          });
+        });
+      }
+
+      if (this.colors.model === 'hex') {
+        this.inputs = {
+          hex: stringToDOM('<input type="text" class="picker-input"/>')
+        };
+        var current = this.inputs['hex'];
+        this.inputsWrapper.appendChild(current);
+        current.addEventListener('input', function () {
+          _this4.selectColor(current.value);
+          _this4.updateCursor();
+        });
+        Dep.watcher(function () {
+          current.value = _this4.colors.hex.toString();
+        });
+      }
+
+      this.inputsWrapper.appendChild(this.submit);
+    }
+  }, {
+    key: '_initEvents',
+    value: function _initEvents() {
+      var _this5 = this;
+
+      // eslint-disable-next-line
+
+      this.guide.addEventListener('click', function () {
+        call(_this5.settings.events.beforeOpen);
+        _this5.togglePicker();
+      });
+
+      if (this.settings.menu.draggable) {
+        this.menu.addEventListener('mousedown', function (event) {
+          if (event.target !== _this5.menu || event.button !== 0) return;
+          var startPosition = {};
+          var endPosition = {};
+          var delta = {};
+
+          event.preventDefault();
+          startPosition.x = event.clientX;
+          startPosition.y = event.clientY;
+
+          var mousemoveHandler = function mousemoveHandler(evnt) {
+            window.requestAnimationFrame(function () {
+              endPosition.x = evnt.clientX;
+              endPosition.y = evnt.clientY;
+              delta.x = _this5.lastMove.x + endPosition.x - startPosition.x;
+              delta.y = _this5.lastMove.y + endPosition.y - startPosition.y;
+              _this5.menu.style.transform = 'translate(' + delta.x + 'px, ' + delta.y + 'px)';
+            });
+          };
+          var mouseupHandler = function mouseupHandler() {
+            _this5.lastMove = delta;
+            document.removeEventListener('mousemove', mousemoveHandler);
+            document.removeEventListener('mouseup', mouseupHandler);
+          };
+          document.addEventListener('mousemove', mousemoveHandler);
+          document.addEventListener('mouseup', mouseupHandler);
+        });
+      }
+    }
+  }, {
+    key: 'updateSquareColors',
+    value: function updateSquareColors() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      this.ctx.fillStyle = 'hsl(' + this.colors.hsl.hue + ', 100%, 50%)';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      var grdBlack = this.ctx.createLinearGradient(0, 0, this.canvas.width, 0);
+      grdBlack.addColorStop(0, 'hsl(0, 0%, 50%)');
+      grdBlack.addColorStop(1, 'hsla(0, 0%, 50%, 0)');
+      this.ctx.fillStyle = grdBlack;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      var grdWhite = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+      grdWhite.addColorStop(0, 'hsl(0, 0%, 100%)');
+      grdWhite.addColorStop(0.5, 'hsla(0, 0%, 100%, 0)');
+      grdWhite.addColorStop(0.5, 'hsla(0, 0%, 0%, 0)');
+      grdWhite.addColorStop(1, 'hsl(0, 0%, 0%) ');
+      this.ctx.fillStyle = grdWhite;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+  }, {
+    key: 'updateCursor',
+    value: function updateCursor(mouse) {
+      if (mouse) {
+        this.cursor.style.transform = 'translate3d(' + mouse.x + 'px, ' + mouse.y + 'px, 0)';
+        return;
+      }
+
+      var x = this.colors.hsl.sat / 100 * this.canvas.width;
+      var y = (100 - this.colors.hsl.lum) / 100 * this.canvas.height;
+      this.mouse = { x: x, y: y };
+      this.cursor.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
+    }
+  }, {
+    key: 'selectColor',
+    value: function selectColor(color) {
+      var _this6 = this;
+
+      var mute = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      if (!mute) call(this.settings.events.beforeSelect);
+      this.colors.current = color;
+      this.el.value = this.colors[this.colors.model];
+
+      this.guide.style.color = color;
+      this.guide.style.fill = color;
+
+      this.updateSquareColors();
+
+      if (mute) return;
+      call(this.settings.events.afterSelect);
+      this.events.forEach(function (event) {
+        return _this6.el.dispatchEvent(event);
+      });
+    }
+  }, {
+    key: 'getColorCanvas',
+    value: function getColorCanvas(mouse, ctx) {
+      var imageData = ctx.getImageData(mouse.x, mouse.y, 1, 1).data;
+      return 'rgb(' + imageData[0] + ', ' + imageData[1] + ', ' + imageData[2] + ')';
+    }
+  }, {
+    key: 'getMouseCords',
+    value: function getMouseCords(event) {
+      var mouse = {
+        x: event.offsetX,
+        y: event.offsetY
+      };
+      return mouse;
+    }
+  }, {
+    key: 'togglePicker',
+    value: function togglePicker() {
+      if (this.isMenuActive) {
+        this.closePicker();
+        return;
+      }
+      this.openPiker();
+    }
+  }, {
+    key: 'closePicker',
+    value: function closePicker() {
+      this.menu.classList.add('is-hidden');
+      this.isMenuActive = false;
+      document.removeEventListener('click', this.documentCallback);
+    }
+  }, {
+    key: 'openPiker',
+    value: function openPiker() {
+      var _this7 = this;
+
+      this.menu.classList.remove('is-hidden');
+      this.isMenuActive = true;
+      var documentCallback = function documentCallback(evnt) {
+        if (!isElementClosest(evnt.target, _this7.menu) && !isElementClosest(evnt.target, _this7.guide)) {
+          _this7.closePicker();
+          return;
+        }
+        call(_this7.settings.events.clicked);
+      };
+      this.documentCallback = documentCallback.bind(this);
+      document.addEventListener('click', this.documentCallback);
+      call(this.settings.events.afterOpen);
+    }
+  }]);
+  return Colorpicker;
+}();
+
+Colorpicker.defaults = {
+  defaultColor: getRandomColor(),
+  model: 'rgb',
+  events: {},
+  menu: {
+    draggable: true,
+    hideWhenSubmit: true
+  },
+  rgbSliders: false,
+  guideIcon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>'
+};
+
 
 function mouseDownHandler(event) {
   event.preventDefault();
@@ -929,892 +1489,6 @@ function mouseDownHandler(event) {
     document.addEventListener('mouseup', mouseupHandler);
   };
 }
-
-/**
- * Slider class
- */
-var Slider = function Slider(selector, ref) {
-  if (ref === void 0) ref = {};
-  var created = ref.created;if (created === void 0) created = {};
-  var updated = ref.updated;if (updated === void 0) updated = {};
-  var gradient = ref.gradient;if (gradient === void 0) gradient = null;
-  var classes = ref.classes;if (classes === void 0) classes = null;
-  var colorCode = ref.colorCode;if (colorCode === void 0) colorCode = false;
-  var editable = ref.editable;if (editable === void 0) editable = false;
-  var reverse = ref.reverse;if (reverse === void 0) reverse = false;
-  var label = ref.label;if (label === void 0) label = true;
-  var min = ref.min;if (min === void 0) min = 0;
-  var max = ref.max;if (max === void 0) max = 10;
-  var step = ref.step;if (step === void 0) step = 1;
-  var value = ref.value;if (value === void 0) value = 0;
-  var handles = ref.handles;if (handles === void 0) handles = [0];
-  var trackSlide = ref.trackSlide;if (trackSlide === void 0) trackSlide = true;
-
-  this.el = select$1(selector);
-  this.settings = {
-    created: created,
-    updated: updated,
-    gradient: gradient,
-    classes: classes,
-    colorCode: colorCode,
-    editable: editable,
-    reverse: reverse,
-    label: label,
-    min: min,
-    max: max,
-    step: step,
-    value: value,
-    handles: handles,
-    trackSlide: trackSlide
-  };
-  this._init();
-};
-
-/**
- * create new rang slider element
- * @param {String|HTMLElement} selector
- * @param {Object}           settings
- */
-Slider.create = function create(selector, settings) {
-  Slider(selector, settings);
-};
-
-Slider.prototype._init = function _init() {
-  var this$1 = this;
-
-  this.values = [];
-  this.percentages = [];
-  this.multiple = this.settings.handles.length > 1;
-  this.min = Number(this.el.min) || Number(this.settings.min);
-  this.max = Number(this.el.max) || Number(this.settings.max);
-  this.step = Number(this.el.step) || Number(this.settings.step);
-  if (this.settings.handles.length === 1) {
-    this.settings.handles[0] = Number(this.el.value) || Number(this.settings.value);
-  }
-  this.settings.handles.sort();
-  if (this.settings.colorCode) {
-    this.el.type = 'text';
-  }
-
-  this._initElements();
-  if (this.settings.gradient) {
-    this._initGradient();
-  }
-  this._initEvents();
-  this.settings.handles.forEach(function (handle, index) {
-    this$1.activeHandle = index;
-    this$1.update(handle);
-  });
-  this.update();
-};
-
-Slider.prototype._initElements = function _initElements() {
-  var this$1 = this;
-
-  this.handles = [];
-  this.labels = [];
-  this.wrapper = document.createElement('div');
-  this.track = document.createElement('div');
-
-  this.wrapper.classList.add('slider');
-  this.wrapper.classList.toggle('is-editable', this.settings.editable);
-  this.wrapper.classList.toggle('is-reverse', this.settings.reverse);
-  if (this.settings.classes) {
-    (ref = this.wrapper.classList).add.apply(ref, this.settings.classes);
-  }
-  this.track.classList.add('slider-track');
-  this.el.classList.add('slider-input');
-
-  if (this.settings.handles.length === 1) {
-    this.fill = document.createElement('div');
-    this.fill.classList.add('slider-fill');
-    this.track.appendChild(this.fill);
-  }
-
-  this.settings.handles.forEach(function (position, index) {
-    this$1.handles[index] = stringToDOM$1("<div class=\"slider-handle\"></div>");
-    if (this$1.settings.label) {
-      this$1.labels[index] = stringToDOM$1("<div class=\"slider-label\"></div>");
-      this$1.handles[index].appendChild(this$1.labels[index]);
-    }
-    this$1.handles[index].addEventListener('mousedown', this$1.select.bind(this$1), false);
-    this$1.handles[index].addEventListener('touchstart', this$1.select.bind(this$1), false);
-    this$1.track.appendChild(this$1.handles[index]);
-  });
-
-  wrap$1(this.el, this.wrapper);
-  this.wrapper.appendChild(this.track);
-  call(this.settings.created, this);
-  var ref;
-};
-
-Slider.prototype._initGradient = function _initGradient() {
-  var this$1 = this;
-
-  if (this.settings.gradient.length > 1) {
-    this.track.style.backgroundImage = "linear-gradient(90deg, " + this.settings.gradient + ")";
-    this.gradient = this.settings.gradient.map(function (color) {
-      return parseColor(color);
-    });
-    return;
-  }
-  this.track.style.backgroundImage = '';
-  this.track.style.backgroundColor = this.settings.gradient[0];
-  this.handles.forEach(function (handle) {
-    handle.style.color = this$1.settings.gradient[0];
-  });
-  this.gradient = null;
-};
-
-Slider.prototype._initEvents = function _initEvents() {
-  var this$1 = this;
-
-  window.addEventListener('resize', function () {
-    this$1.updateWidth();
-    this$1.update(undefined, true);
-  });
-  if (this.settings.trackSlide) {
-    this.track.addEventListener('mousedown', this.select.bind(this), false);
-    this.track.addEventListener('touchstart', this.select.bind(this), false);
-  }
-  if (this.settings.editable && !this.settings.colorCode) {
-    this.el.addEventListener('change', function (evt) {
-      this$1.update(this$1.el.value);
-    }, false);
-  }
-};
-
-/**
- * fire select events
- */
-Slider.prototype.select = function select$$1(event) {
-  event.preventDefault();
-  event.stopPropagation();
-  // check ifleft mouse is clicked
-  if (event.buttons !== 1) {
-    return;
-  }
-  this.track.classList.add('is-dragging');
-  this.ticking = false;
-
-  var stepValue = this.getStepValue(event);
-
-  if (this.multiple) {
-    var closest = getClosestValue(this.values, stepValue);
-    this.activeHandle = this.values.indexOf(closest);
-  }
-  this.update(stepValue);
-
-  this.tempDrag = this.dragging.bind(this);
-  this.tempRelease = this.release.bind(this);
-  document.addEventListener('mousemove', this.tempDrag);
-  document.addEventListener('touchmove', this.tempDrag);
-  document.addEventListener('touchend', this.tempRelease);
-  document.addEventListener('mouseup', this.tempRelease);
-};
-
-/**
- * dragging motion
- */
-Slider.prototype.dragging = function dragging(event) {
-  var this$1 = this;
-
-  event.preventDefault();
-  var stepValue = this.getStepValue(event);
-  if (!this.ticking) {
-    window.requestAnimationFrame(function () {
-      this$1.update(stepValue);
-      this$1.ticking = false;
-    });
-
-    this.ticking = true;
-  }
-};
-
-/**
- * release handler
- */
-Slider.prototype.release = function release() {
-  this.track.classList.remove('is-dragging');
-  document.removeEventListener('mousemove', this.tempDrag);
-  document.removeEventListener('touchmove', this.tempDrag);
-  document.removeEventListener('mouseup', this.tempRelease);
-  document.removeEventListener('touchend', this.tempRelease);
-};
-
-Slider.prototype.getStepValue = function getStepValue(event) {
-  var eventX = event.type.includes('mouse') ? event.clientX : event.type.includes('touch') ? event.touches[0].clientX : event;
-
-  var mouseValue = eventX - this.currentX;
-  var stepCount = parseInt(mouseValue / this.stepWidth + 0.5, 10);
-  var stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
-  return stepValue;
-};
-
-Slider.prototype.updateWidth = function updateWidth() {
-  var trackRect = this.track.getBoundingClientRect();
-  this.currentX = trackRect.left;
-  this.width = trackRect.width;
-  this.stepWidth = this.width / (this.max - this.min);
-};
-
-/**
- * get the filled area percentage
- * @param{Object} slider
- * @param{Number} value
- * @return {Number}
- */
-Slider.prototype.getPositionPercentage = function getPositionPercentage(value) {
-  return (value - this.min) / (this.max - this.min);
-};
-
-Slider.prototype.normalizeValue = function normalizeValue(value) {
-  if (isNaN(Number(value))) {
-    return this.value;
-  }
-  if (this.multiple) {
-    var prevValue = this.values[this.activeHandle - 1] || this.min;
-    var nextValue = this.values[this.activeHandle + 1] || this.max;
-    value = Math.min(Math.max(Number(value), prevValue), nextValue);
-  }
-  return Math.min(Math.max(Number(value), this.min), this.max);
-};
-
-Slider.prototype.newGradient = function newGradient(newGradient$1) {
-  this.settings.gradient = newGradient$1;
-  this._initGradient();
-  this.update(undefined, true);
-};
-
-Slider.prototype.addHandle = function addHandle(value) {
-  var closest = getClosestValue(this.values, value);
-  var closestIndex = this.values.indexOf(closest);
-  var closestValue = this.values[closestIndex];
-  var newIndex = closestValue <= value ? closestIndex + 1 : closestIndex;
-  this.values.splice(newIndex, 0, value);
-  this.percentages.splice(newIndex, 0, this.getPositionPercentage(value));
-  this.handles.splice(newIndex, 0, stringToDOM$1("<div class=\"slider-handle\"></div>"));
-  if (this.settings.label) {
-    this.labels.splice(newIndex, 0, stringToDOM$1("<div class=\"slider-label\"></div>"));
-    this.handles[newIndex].appendChild(this.labels[newIndex]);
-  }
-  this.handles[newIndex].addEventListener('mousedown', this.select.bind(this), false);
-  this.handles[newIndex].addEventListener('touchstart', this.select.bind(this), false);
-  this.track.appendChild(this.handles[newIndex]);
-  this.activeHandle = newIndex;
-  this.value = null;
-  this.update(value);
-  return this.handles[newIndex];
-};
-
-Slider.prototype.removeHandle = function removeHandle(index) {
-  this.handles[index].remove();
-  this.handles.splice(index, 1);
-  this.values.splice(index, 1);
-  this.percentages.splice(index, 1);
-  if (this.settings.label) {
-    this.labels.splice(index, 1);
-  }
-  this.activeHandle = index === 0 ? index + 1 : index - 1;
-};
-
-/**
- * get the handle color
- * @param{Number} positionPercentage
- * @return {Number}              handle hex color code
- */
-Slider.prototype.getHandleColor = function getHandleColor(positionPercentage) {
-  var this$1 = this;
-
-  var colorCount = this.gradient.length - 1;
-  var region = positionPercentage;
-  for (var i = 1; i <= colorCount; i++) {
-    // check the current zone
-    if (region >= (i - 1) / colorCount && region <= i / colorCount) {
-      // get the active color percentage
-      var colorPercentage = (region - (i - 1) / colorCount) / (1 / colorCount);
-      // return the mixed color based on the zone boundary colors
-      return mixColors(this$1.gradient[i - 1], this$1.gradient[i], colorPercentage);
-    }
-  }
-  return 'rgb(0, 0, 0)';
-};
-
-/**
- * update the slider fill, value and color
- * @param {Number} value
- */
-Slider.prototype.update = function update(value, mute) {
-  if (mute === void 0) mute = false;
-
-  if (Number(value) === this.value) {
-    return;
-  }
-
-  if (!this.width) {
-    this.updateWidth();
-  }
-  var normalized = this.normalizeValue(value);
-  var positionPercentage = this.getPositionPercentage(normalized);
-
-  if (this.fill) {
-    this.fill.style.transform = "translate(" + positionPercentage * this.width + "px, 0) scale(" + (1 - positionPercentage) + ", 1)";
-  }
-  this.handles[this.activeHandle].style.transform = "translate(" + positionPercentage * this.width + "px, 0)";
-  this.value = normalized;
-  this.values[this.activeHandle] = normalized;
-  this.percentages[this.activeHandle] = positionPercentage;
-  this.el.value = this.value;
-  if (this.settings.label) {
-    this.labels[this.activeHandle].innerHTML = this.value;
-  }
-  if (this.gradient) {
-    var color = toHex(this.getHandleColor(positionPercentage));
-    this.handles[this.activeHandle].style.color = color;
-    if (this.settings.colorCode) {
-      this.el.value = color;
-      this.labels[this.activeHandle].innerHTML = color;
-    }
-  }
-  if (mute) {
-    return;
-  }
-  this.el.dispatchEvent(new Event('change')); // eslint-disable-line
-  this.el.dispatchEvent(new Event('input')); // eslint-disable-line
-  call(this.settings.updated);
-};
-
-var Colorpicker = function Colorpicker(selector, ref) {
-  if (ref === void 0) ref = {};
-  var defaultColor = ref.defaultColor;if (defaultColor === void 0) defaultColor = getRandomColor();
-  var model = ref.model;if (model === void 0) model = 'rgb';
-  var events = ref.events;if (events === void 0) events = {};
-  var picker = ref.picker;if (picker === void 0) picker = {};
-  var recentColors = ref.recentColors;if (recentColors === void 0) recentColors = {};
-  var menu = ref.menu;if (menu === void 0) menu = {};
-  var rgbSliders = ref.rgbSliders;if (rgbSliders === void 0) rgbSliders = true;
-  var guideIcon = ref.guideIcon;if (guideIcon === void 0) guideIcon = "<svg viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"12\"/></svg>";
-
-  this.el = select$1(selector);
-
-  var pickerDefaults = {
-    mode: 'wheel',
-    radius: 200,
-    saturation: true,
-    edge: 190
-  };
-
-  var recentColorsDefaults = {
-    max: 6,
-    colors: getArray$1(6, getRandomColor)
-  };
-
-  var menuDefaults = {
-    draggable: true,
-    hideWhenSubmit: true
-  };
-
-  this.settings = {
-    defaultColor: defaultColor,
-    model: model,
-    events: events,
-    picker: picker ? Object.assign(pickerDefaults, picker) : false,
-    recentColors: recentColors ? Object.assign(recentColorsDefaults, recentColors) : false,
-    menu: Object.assign(menuDefaults, menu),
-    rgbSliders: rgbSliders,
-    guideIcon: guideIcon
-  };
-  this.init();
-};
-
-Colorpicker.prototype.init = function init() {
-  this.currentColor = this.settings.defaultColor;
-  this.lastMove = { x: 0, y: 0 };
-  this.isMenuActive = false;
-  this._initElements();
-  this._initEvents();
-  this.selectColor(this.settings.defaultColor, true);
-  this.updateCursor();
-};
-
-Colorpicker.prototype._initElements = function _initElements() {
-  this.sliders = {};
-  this.mouse = { x: 0, y: 0 };
-  // create colorpicker element
-  this.picker = document.createElement('div');
-  this.menu = stringToDOM$1('<div class="picker-menu" tabindex="-1"></div>');
-  this.guide = stringToDOM$1("<button class=\"picker-guide\">" + this.settings.guideIcon + "</button>");
-
-  this.submit = stringToDOM$1("\n    <button class=\"picker-submit\">\n      <svg class=\"icon\" viewBox=\"0 0 24 24\">\n        <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\"/>\n      </svg>\n    </button>");
-  this.menuInput = stringToDOM$1('<div class="picker-input"></div>');
-
-  // append colorpicker elements
-  this.picker.appendChild(this.menu);
-  this.picker.appendChild(this.guide);
-  if (this.settings.picker && this.settings.picker.mode === 'wheel') {
-    this._initWheel();
-  }
-  if (this.settings.picker && this.settings.picker.mode === 'square') {
-    this._initSquare();
-  }
-  if (this.settings.rgbSliders) {
-    this._initRGBSliders();
-  }
-  this.menu.appendChild(this.menuInput);
-  if (this.settings.recentColors) {
-    this._initRecentColors();
-  }
-
-  this.el.parentNode.insertBefore(this.picker, this.el);
-  this.el.classList.add('picker-value');
-  this.picker.classList.add('picker');
-  this.menuInput.appendChild(this.el);
-  this.menuInput.appendChild(this.submit);
-  this.guide.style.color = this.settings.defaultColor;
-  this.guide.style.fill = this.settings.defaultColor;
-  setTimeout(this.closePicker.bind(this), 1);
-};
-
-Colorpicker.prototype._initSquare = function _initSquare() {
-  var this$1 = this;
-
-  this.square = stringToDOM$1("\n      <div class=\"picker-square\">\n        <canvas class=\"picker-canvas\"></canvas>\n        <canvas class=\"picker-squareStrip\"></canvas>\n        <div class=\"picker-cursor\"></div>\n      </div>");
-
-  this.currentHue = 'hsl(0, 100%, 50%)';
-  this.canvas = this.square.querySelector('.picker-canvas');
-  this.strip = this.square.querySelector('.picker-squareStrip');
-  this.cursor = this.square.querySelector('.picker-cursor');
-  this.menu.appendChild(this.square);
-
-  // setup canvas
-  var edge = this.settings.picker.edge;
-  this.canvas.width = edge;
-  this.canvas.height = edge;
-  this.strip.width = this.settings.picker.edge / 10;
-  this.strip.height = edge;
-  this.ctx = this.canvas.getContext('2d');
-  this.stripCtx = this.strip.getContext('2d');
-
-  this.stripCtx.rect(0, 0, this.strip.width, this.strip.height);
-  var hue = this.stripCtx.createLinearGradient(0, 0, 0, this.strip.height);
-  for (var angle = 0; angle < 360; angle += 1) {
-    hue.addColorStop(angle / 359, "hsl(" + angle + ", 100%, 50%)");
-  }
-  this.stripCtx.fillStyle = hue;
-  this.stripCtx.fill();
-  var squareThreshold = this.settings.picker.edge - 1;
-  var updateColor = function updateColor(event) {
-    if (event.target !== this$1.canvas) {
-      return;
-    }
-    var ref = this$1.getMouseCords(event);
-    var x = ref.x;
-    var y = ref.y;
-    this$1.mouse = { x: Math.min(x, squareThreshold), y: Math.min(y, squareThreshold) };
-    var color = this$1.getColorCanvas(this$1.mouse, this$1.ctx);
-    this$1.selectColor(color);
-    this$1.updateCursor(this$1.mouse);
-  };
-
-  var updateHue = function updateHue(event) {
-    if (event.target !== this$1.strip) {
-      return;
-    }
-    var mouse = this$1.getMouseCords(event);
-    this$1.currentHue = this$1.getColorCanvas(mouse, this$1.stripCtx);
-    this$1.updateSquareColors();
-    var color = this$1.getColorCanvas(this$1.mouse, this$1.ctx);
-    this$1.selectColor(color);
-  };
-
-  this.updateSquareColors();
-
-  // add event listener
-  this.canvas.addEventListener('mousedown', function (event) {
-    return mouseDownHandler(event)(updateColor);
-  });
-  this.strip.addEventListener('mousedown', function (event) {
-    return mouseDownHandler(event)(updateHue);
-  });
-};
-
-Colorpicker.prototype._initWheel = function _initWheel() {
-  var this$1 = this;
-
-  this.wheel = stringToDOM$1("\n      <div class=\"picker-wheel\">\n        <canvas class=\"picker-canvas\"></canvas>\n        <div class=\"picker-cursor\"></div>\n      </div>");
-  this.saturation = stringToDOM$1('<input class="picker-saturation" type="number" min="0" max="100" value="0">');
-
-  this.canvas = this.wheel.querySelector('.picker-canvas');
-  this.cursor = this.wheel.querySelector('.picker-cursor');
-  this.menu.appendChild(this.wheel);
-
-  if (this.settings.picker.saturation) {
-    this.menu.appendChild(this.saturation);
-    this.sliders.saturation = new Slider(this.saturation, {
-      gradient: ['#FFFFFF', '#000000'],
-      label: false
-    });
-    this.saturation.addEventListener('change', function () {
-      window.requestAnimationFrame(function () {
-        this$1.updateWheelColors();
-      });
-    });
-  }
-
-  // setup canvas
-  this.canvas.width = this.settings.picker.radius;
-  this.canvas.height = this.settings.picker.radius;
-  this.ctx = this.canvas.getContext('2d');
-
-  // draw wheel circle path
-  this.circle = {
-    path: new Path2D(), // eslint-disable-line
-    xCords: this.canvas.width / 2,
-    yCords: this.canvas.height / 2,
-    radius: this.canvas.width / 2
-  };
-  this.circle.path.moveTo(this.circle.xCords, this.circle.yCords);
-  this.circle.path.arc(this.circle.xCords, this.circle.yCords, this.circle.radius, 0, 360);
-  this.circle.path.closePath();
-
-  var updateColor = function updateColor(event) {
-    // check if mouse outside the wheel
-    var mouse = this$1.getMouseCords(event);
-    if (this$1.ctx.isPointInPath(this$1.circle.path, mouse.x, mouse.y)) {
-      var color = this$1.getColorCanvas(mouse, this$1.ctx);
-      this$1.selectColor(color);
-      this$1.updateCursor(mouse);
-    }
-  };
-  // add event listener
-  this.wheel.addEventListener('mousedown', function (event) {
-    return mouseDownHandler(event)(updateColor);
-  });
-
-  this.updateWheelColors();
-  this.updateCursor();
-};
-
-Colorpicker.prototype._initRGBSliders = function _initRGBSliders() {
-  var this$1 = this;
-
-  this.rgbSliders = {
-    red: stringToDOM$1('<input id="red" type="number" min="0" max="255" value="0">'),
-    green: stringToDOM$1('<input id="green" type="number" min="0" max="255" value="0">'),
-    blue: stringToDOM$1('<input id="blue" type="number" min="0" max="255" value="0">')
-  };
-
-  this.menu.appendChild(this.rgbSliders.red);
-  this.menu.appendChild(this.rgbSliders.green);
-  this.menu.appendChild(this.rgbSliders.blue);
-
-  Object.keys(this.rgbSliders).forEach(function (key) {
-    this$1.sliders[key] = new Slider(this$1.rgbSliders[key], {
-      gradient: ['#000000', '#FFFFFF'],
-      label: false,
-      editable: true,
-      reverse: true
-    });
-  });
-
-  // add event listener
-  Object.keys(this.rgbSliders).forEach(function (key) {
-    this$1.rgbSliders[key].addEventListener('change', function () {
-      window.requestAnimationFrame(function () {
-        var color = this$1.getColorFromSliders();
-        this$1.selectColor(color);
-        this$1.updateCursor();
-      });
-    });
-  });
-};
-
-Colorpicker.prototype._initRecentColors = function _initRecentColors() {
-  var this$1 = this;
-
-  this.recentColors = this.settings.recentColors.colors;
-  this.recent = stringToDOM$1('<div class="picker-recent"></div>');
-
-  this.menu.appendChild(this.recent);
-
-  this.recentColors.forEach(function (color) {
-    var recentColor = document.createElement('a');
-    recentColor.classList.add('picker-color');
-    recentColor.style.backgroundColor = color;
-    this$1.recent.appendChild(recentColor);
-    recentColor.addEventListener('mousedown', function (event) {
-      return event.preventDefault();
-    });
-    recentColor.addEventListener('click', function (event) {
-      this$1.selectColor(color);
-      this$1.updateCursor();
-    });
-  });
-};
-
-Colorpicker.prototype._initEvents = function _initEvents() {
-  var this$1 = this;
-
-  // eslint-disable-next-line
-  this.events = [new Event('input'), new Event('change')];
-
-  this.guide.addEventListener('click', function () {
-    call(this$1.settings.events.beforeOpen);
-    this$1.togglePicker();
-  });
-
-  if (this.settings.menu.draggable) {
-    this.menu.addEventListener('mousedown', function (event) {
-      if (event.target !== this$1.menu || event.button !== 0) {
-        return;
-      }
-      var startPosition = {};
-      var endPosition = {};
-      var delta = {};
-
-      event.preventDefault();
-      startPosition.x = event.clientX;
-      startPosition.y = event.clientY;
-
-      var mousemoveHandler = function mousemoveHandler(evnt) {
-        window.requestAnimationFrame(function () {
-          endPosition.x = evnt.clientX;
-          endPosition.y = evnt.clientY;
-          delta.x = this$1.lastMove.x + endPosition.x - startPosition.x;
-          delta.y = this$1.lastMove.y + endPosition.y - startPosition.y;
-          this$1.menu.style.transform = "translate(" + delta.x + "px, " + delta.y + "px)";
-        });
-      };
-      var mouseupHandler = function mouseupHandler() {
-        this$1.lastMove = delta;
-        document.removeEventListener('mousemove', mousemoveHandler);
-        document.removeEventListener('mouseup', mouseupHandler);
-      };
-      document.addEventListener('mousemove', mousemoveHandler);
-      document.addEventListener('mouseup', mouseupHandler);
-    });
-  }
-
-  this.el.addEventListener('focus', function (event) {
-    var edit = function edit() {
-      this$1.selectColor(this$1.el.value, true);
-      this$1.updateCursor();
-    };
-    var release = function release() {
-      this$1.el.removeEventListener('change', edit);
-      this$1.el.removeEventListener('blur', release);
-    };
-    this$1.el.addEventListener('change', edit);
-    this$1.el.addEventListener('blur', release);
-  });
-
-  this.submit.addEventListener('click', function (event) {
-    call(this$1.settings.events.beforeSubmit);
-    this$1.selectColor(this$1.el.value);
-    this$1.updateCursor();
-    if (this$1.settings.menu.hideWhenSubmit) {
-      this$1.closePicker();
-    }
-    this$1.updateRecentColors(this$1.currentColor);
-    call(this$1.settings.events.afterSubmit);
-  });
-};
-
-Colorpicker.prototype.updateWheelColors = function updateWheelColors() {
-  var this$1 = this;
-
-  var x = this.circle.xCords;
-  var y = this.circle.yCords;
-  var radius = this.circle.radius;
-  var saturation = this.settings.picker.saturation ? this.saturation.value : 100;
-  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-  for (var angle = 0; angle < 360; angle += 1) {
-    var gradient = this$1.ctx.createRadialGradient(x, y, 0, x, y, radius);
-    var startAngle = (angle - 2) * Math.PI / 180;
-    var endAngle = (angle + 2) * Math.PI / 180;
-
-    this$1.ctx.beginPath();
-    this$1.ctx.moveTo(x, y);
-    this$1.ctx.arc(x, y, radius, startAngle, endAngle);
-    this$1.ctx.closePath();
-
-    gradient.addColorStop(0, "hsl(" + angle + ", " + saturation + "%, 100%)");
-    gradient.addColorStop(0.5, "hsl(" + angle + ", " + saturation + "%, 50%)");
-    gradient.addColorStop(1, "hsl(" + angle + ", " + saturation + "%, 0%)");
-    this$1.ctx.fillStyle = gradient;
-    this$1.ctx.fill();
-  }
-};
-
-Colorpicker.prototype.updateSquareColors = function updateSquareColors() {
-  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-  this.ctx.fillStyle = this.currentHue;
-  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-  var grdBlack = this.ctx.createLinearGradient(0, 0, this.canvas.width, 0);
-  grdBlack.addColorStop(0, "hsl(0, 0%, 50%)");
-  grdBlack.addColorStop(1, "hsla(0, 0%, 50%, 0)");
-  this.ctx.fillStyle = grdBlack;
-  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-  var grdWhite = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-  grdWhite.addColorStop(0, "hsl(0, 0%, 100%)");
-  grdWhite.addColorStop(0.5, "hsla(0, 0%, 100%, 0)");
-  grdWhite.addColorStop(0.5, "hsla(0, 0%, 0%, 0)");
-  grdWhite.addColorStop(1, "hsl(0, 0%, 0%) ");
-  this.ctx.fillStyle = grdWhite;
-  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-};
-
-Colorpicker.prototype.updateRecentColors = function updateRecentColors(newColor) {
-  var this$1 = this;
-
-  // update recent color array
-  if (!newColor) {
-    return;
-  }
-  if (this.recentColors.length >= this.settings.recentColors.max) {
-    this.recentColors.shift();
-    this.recent.removeChild(this.recent.firstChild);
-  }
-
-  this.recentColors.push(newColor);
-  var recentColor = document.createElement('a');
-  recentColor.classList.add('picker-color');
-  recentColor.style.backgroundColor = newColor;
-  this.recent.appendChild(recentColor);
-  recentColor.addEventListener('click', function (event) {
-    event.preventDefault();
-    this$1.selectColor(newColor);
-    this$1.updateCursor();
-  });
-};
-
-Colorpicker.prototype.updateSlidersInputs = function updateSlidersInputs(slider) {
-  var cl = this.currentColor;
-  this.sliders.red.newGradient(["rgb(0," + cl.green + "," + cl.blue + ")", "rgb(255," + cl.green + "," + cl.blue + ")"]);
-  this.sliders.green.newGradient(["rgb(" + cl.red + ",0," + cl.blue + ")", "rgb(" + cl.red + ",255," + cl.blue + ")"]);
-  this.sliders.blue.newGradient(["rgb(" + cl.red + "," + cl.green + ",0)", "rgb(" + cl.red + "," + cl.green + ",255)"]);
-};
-
-Colorpicker.prototype.updateCursor = function updateCursor(mouse) {
-  if (mouse) {
-    this.cursor.style.transform = "translate3d(" + mouse.x + "px, " + mouse.y + "px, 0)";
-    return;
-  }
-
-  var hslColor = toHsl(this.currentColor, true);
-  if (this.settings.picker.mode === 'wheel') {
-    var r = (100 - hslColor[3]) * (this.settings.picker.radius / 200);
-    var ratio = this.settings.picker.radius / 2;
-    this.mouse = getCartesianCoords(r, hslColor[1] / 360);
-    this.cursor.style.transform = "translate3d(" + (this.mouse.x + ratio) + "px, " + (this.mouse.y + ratio) + "px, 0)";
-  }
-  if (this.settings.picker.mode === 'square') {
-    var x = hslColor[2] / 100 * this.settings.picker.edge;
-    var y = (100 - hslColor[3]) / 100 * this.settings.picker.edge;
-    this.mouse = { x: x, y: y };
-    this.cursor.style.transform = "translate3d(" + x + "px, " + y + "px, 0)";
-  }
-};
-
-Colorpicker.prototype.selectColor = function selectColor(color, mute) {
-  var this$1 = this;
-  if (mute === void 0) mute = false;
-
-  if (!isAColor(color)) {
-    return;
-  }
-  if (!mute) {
-    call(this.settings.events.beforeSelect);
-  }
-
-  color = parseColor(color);
-  var rgbColor = toRgb(color);
-  var hexColor = toHex(color);
-  var hslColor = toHsl(color);
-  this.el.value = this.settings.model === 'hex' ? hexColor : this.settings.model === 'hsl' ? hslColor : this.settings.model === 'rgb' ? rgbColor : '';
-
-  this.currentColor = rgbColor;
-  this.guide.style.color = color;
-  this.guide.style.fill = color;
-  if (this.settings.rgbSliders) {
-    this.sliders.red.update(rgbColor.red, true);
-    this.sliders.green.update(rgbColor.green, true);
-    this.sliders.blue.update(rgbColor.blue, true);
-    this.updateSlidersInputs();
-  }
-  if (this.settings.picker.mode === 'wheel' && this.settings.picker.saturation) {
-    this.sliders.saturation.update(hslColor.sat);
-    this.sliders.saturation.newGradient(['#FFFFFF', hexColor[0]]);
-  }
-
-  if (this.settings.picker.mode === 'square') {
-    this.currentHue = "hsl(" + hslColor.hue + ", 100%, 50%)";
-    this.updateSquareColors();
-  }
-
-  if (mute) {
-    return;
-  }
-  call(this.settings.events.afterSelect);
-  this.events.forEach(function (event) {
-    return this$1.el.dispatchEvent(event);
-  });
-};
-
-Colorpicker.prototype.getColorFromSliders = function getColorFromSliders() {
-  var red = this.rgbSliders.red.value;
-  var green = this.rgbSliders.green.value;
-  var blue = this.rgbSliders.blue.value;
-  return "rgb(" + red + ", " + green + ", " + blue + ")";
-};
-
-Colorpicker.prototype.getColorCanvas = function getColorCanvas(mouse, ctx) {
-  var imageData = ctx.getImageData(mouse.x, mouse.y, 1, 1).data;
-  return "rgb(" + imageData[0] + ", " + imageData[1] + ", " + imageData[2] + ")";
-};
-
-Colorpicker.prototype.getMouseCords = function getMouseCords(event) {
-  var mouse = {
-    x: event.offsetX,
-    y: event.offsetY
-  };
-  return mouse;
-};
-
-Colorpicker.prototype.togglePicker = function togglePicker() {
-  if (this.isMenuActive) {
-    this.closePicker();
-    return;
-  }
-  this.openPiker();
-};
-
-Colorpicker.prototype.closePicker = function closePicker() {
-  this.menu.classList.add('is-hidden');
-  this.isMenuActive = false;
-  document.removeEventListener('click', this.documentCallback);
-};
-
-Colorpicker.prototype.openPiker = function openPiker() {
-  var this$1 = this;
-
-  this.menu.classList.remove('is-hidden');
-  this.isMenuActive = true;
-  var documentCallback = function documentCallback(evnt) {
-    if (!isElementClosest$1(evnt.target, this$1.menu) && !isElementClosest$1(evnt.target, this$1.guide)) {
-      this$1.closePicker();
-      return;
-    }
-    call(this$1.settings.events.clicked);
-  };
-  this.documentCallback = documentCallback.bind(this);
-  document.addEventListener('click', this.documentCallback);
-  call(this.settings.events.afterOpen);
-};
 
 var Selection = function () {
   function Selection() {
@@ -2380,7 +2054,6 @@ var cmdsSchema = {
     initConfig: {
       defaultColor: '#fff',
       mode: 'hex',
-      picker: { mode: 'square' },
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
@@ -2403,7 +2076,6 @@ var cmdsSchema = {
     initConfig: {
       defaultColor: '#fdfdfd',
       mode: 'hex',
-      picker: { mode: 'square' },
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path style="fill: currentColor" d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/>\n          <path d="M0 20h24v4H0z"/>\n        </svg>\n      ',
       events: {
         beforeSubmit: function beforeSubmit() {
@@ -2463,8 +2135,6 @@ var cmdsSchema = {
     init: Colorpicker,
     initConfig: {
       defaultColor: '#000000',
-      picker: { mode: 'square' },
-      mode: 'hex',
       guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>\n        </svg>\n      '
     }
   }
@@ -2753,7 +2423,7 @@ function button(name, icon, tooltip) {
  * @param {String} name
  * @param {Object} options
  */
-function select$2(name, options) {
+function select$1(name, options) {
   var wrapper = document.createElement('div');
   var select = document.createElement('select');
   var icon = '\n    <svg viewBox="0 0 24 24">\n      <polygon points="8,15 12,19 16,15 "/>\n      <polygon points="8,9 12,5 16,9 "/>\n    </svg>';
@@ -2898,8 +2568,6 @@ var Styler = function () {
       this.shortcuts = [];
       this.watchers = [];
 
-      console.log(this.$align);
-
       this.settings.commands.forEach(function (command) {
         _this._initCmdElement(command);
       });
@@ -3009,7 +2677,7 @@ var Styler = function () {
           break;
 
         case 'select':
-          var _select = select$2(cmd, command[cmd]),
+          var _select = select$1(cmd, command[cmd]),
               wrapper = _select.wrapper,
               el = _select.el;
 
@@ -3456,6 +3124,7 @@ var Gallery = function (_Component) {
 
     _this.el = document.createElement('div');
     _this.el.classList.add('align-gallery');
+    _this.images = images;
     _this._init();
     return _this;
   }
@@ -4177,42 +3846,6 @@ var components = {
   Vimeo: Vimeo,
   Youtube: Youtube
 };
-
-var Dep = function () {
-  createClass(Dep, null, [{
-    key: "watcher",
-    value: function watcher(func) {
-      Dep.target = func;
-      Dep.target();
-      Dep.target = null;
-    }
-  }]);
-
-  function Dep() {
-    classCallCheck(this, Dep);
-
-    this.subscribers = [];
-  }
-
-  createClass(Dep, [{
-    key: "depend",
-    value: function depend() {
-      if (Dep.target && !this.subscribers.includes(Dep.target)) {
-        this.subscribers.push(Dep.target);
-      }
-    }
-  }, {
-    key: "notify",
-    value: function notify(oldVal) {
-      this.subscribers.forEach(function (sub) {
-        return sub(oldVal);
-      });
-    }
-  }]);
-  return Dep;
-}();
-
-Dep.target = null;
 
 var Section = function () {
   function Section(align, content) {

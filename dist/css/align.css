@@ -10,6 +10,10 @@
   height: 100vh;
   overflow: hidden;
 }
+.align * {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
 .align-editor {
   padding: 60px 0;
   background-color: #fff;
@@ -963,4 +967,227 @@
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+}
+.picker {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+.picker-guide {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.picker-guide:focus {
+  outline: 0;
+}
+.picker-guide svg {
+  width: 100%;
+  height: 100%;
+  fill: inherit;
+}
+.picker-square {
+  position: relative;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  overflow: hidden;
+}
+.picker-square > canvas {
+  display: block;
+}
+.picker-controllers {
+  padding: 25px 20px;
+}
+.picker-menu {
+  position: absolute;
+  top: 50px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  width: 250px;
+  border-radius: 4px;
+  background-color: #fff;
+  -webkit-box-shadow: 0 0 25px rgba(0,0,0,0.05);
+          box-shadow: 0 0 25px rgba(0,0,0,0.05);
+  will-change: transform;
+  overflow: hidden;
+}
+.picker-menu.is-hidden {
+  display: none;
+}
+.picker-menu:focus {
+  outline: none;
+}
+.picker-recent {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+}
+.picker-color {
+  margin: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #000;
+}
+.picker-value {
+  display: none;
+}
+.picker-inputs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.picker-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: -6px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(255,255,255,0.9);
+  border-radius: 50%;
+  will-change: transform;
+  pointer-events: none;
+}
+.picker-input {
+  padding: 5px;
+  margin: 0 3px;
+  min-width: 0;
+  text-align: center;
+  border-width: 0 0 1px 0;
+}
+.picker-model,
+.picker-submit {
+  position: relative;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 0;
+  border: 0;
+  text-align: center;
+  cursor: pointer;
+  background-color: transparent;
+  font-weight: 700;
+  color: #aaa;
+  fill: #aaa;
+  outline: none;
+}
+.picker-model >.icon,
+.picker-submit >.icon {
+  width: 20px;
+  height: 20px;
+}
+.picker-model:hover,
+.picker-submit:hover {
+  fill: #1700ff;
+  color: #1700ff;
+}
+.picker .slider-fill {
+  display: none;
+}
+.slider {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  margin-bottom: 15px;
+}
+.slider-input {
+  display: none;
+  margin-bottom: 0;
+  padding: 0.6em;
+  max-width: 70px;
+  width: 20%;
+  border: 1px solid #000;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  -webkit-appearance: none;
+  -moz-appearance: text;
+}
+.slider-input:focus {
+  outline: none;
+  border-color: $secondry;
+}
+.slider-track {
+  position: relative;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  margin: 0;
+  width: auto;
+  height: 10px;
+  border-radius: 5px;
+  background: #aaa;
+  will-change: transfom;
+}
+.slider.is-strip .slider-track {
+  background-image: -webkit-gradient(linear, left top, right top, from(#f00), color-stop(17%, #ff0), color-stop(33%, #0f0), color-stop(50%, #0ff), color-stop(67%, #00f), color-stop(83%, #f0f), to(#f00));
+  background-image: -webkit-linear-gradient(left, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+  background-image: -o-linear-gradient(left, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+  background-image: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+}
+.slider-handle {
+  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  color: #000;
+  margin-left: -7px;
+  margin-top: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 10px;
+  background: transparent;
+  background-color: currentColor;
+}
+.slider-fill {
+  width: 100%;
+  height: 100%;
+  background-color: #aaa;
+  -webkit-transform-origin: left top;
+      -ms-transform-origin: left top;
+          transform-origin: left top;
 }
