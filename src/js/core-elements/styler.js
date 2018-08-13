@@ -4,7 +4,7 @@ import {
   updatePosition,
   userOS,
   generateKeysSymbols
-} from '../partial/util';
+} from '../partial/utils';
 import {
   setElementsPrefix,
   button,
@@ -44,8 +44,6 @@ export default class Styler {
     this.visible = false;
     this.shortcuts = [];
     this.watchers = [];
-
-    console.log(this.$align);
 
     this.settings.commands.forEach((command) => {
       this._initCmdElement(command);

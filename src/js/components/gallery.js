@@ -2,7 +2,7 @@ import Component from './component';
 import Selection from '../partial/selection';
 
 import { dropzone } from '../partial/elements';
-import { stringToDOM } from '../partial/util';
+import { stringToDOM } from '../partial/utils';
 
 export default class Gallery extends Component {
   constructor (align, images) {

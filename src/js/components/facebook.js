@@ -1,6 +1,6 @@
 import Component from './component';
 import Prompt from '../core-elements/prompt';
-import { stringToDOM } from '../partial/util';
+import { stringToDOM } from '../partial/utils';
 
 export default class Facebook extends Component {
   constructor (align, link) {

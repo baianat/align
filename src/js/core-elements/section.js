@@ -1,4 +1,4 @@
-import { stringToDOM, swapArrayItems } from '../partial/util'
+import { stringToDOM, swapArrayItems } from '../partial/utils'
 import {
   Figure,
   Grid,

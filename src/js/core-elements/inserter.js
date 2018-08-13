@@ -1,6 +1,6 @@
 import {
   updatePosition
-} from '../partial/util';
+} from '../partial/utils';
 import {
   setElementsPrefix,
   button

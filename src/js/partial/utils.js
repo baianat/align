@@ -200,3 +200,15 @@ export function swapArrayItems (array, index1, index2) {
   array[index2] = temp;
   return array;
 }
+
+export function call(func, args = null) {
+  if (typeof func === 'function') {
+    func(args);
+  }
+}
+
+export function getClosestValue (array, value) {
+  return array.reduce((prev, curr) => {
+    return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
+  });
+}

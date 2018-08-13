@@ -1,4 +1,4 @@
-import { isElementClosest, updatePosition } from '../partial/util';
+import { isElementClosest, updatePosition } from '../partial/utils';
 import Selection from '../partial/selection';
 
 export default class Prompt {

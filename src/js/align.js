@@ -1,4 +1,4 @@
-import { select, userOS, stringToDOM } from './partial/util';
+import { select, userOS, stringToDOM } from './partial/utils';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Selection from './partial/selection';
