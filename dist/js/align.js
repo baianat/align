@@ -1887,10 +1887,10 @@
   Selection.range = null;
 
   var Component = function () {
-    function Component(el) {
+    function Component(align, el) {
       classCallCheck(this, Component);
 
-      this.$align = Component.$align;
+      this.$align = align;
       this.mode = el ? el.nodeType === 1 ? 'edit' : 'create' : 'create';
     }
 
@@ -1905,11 +1905,6 @@
         }
       }
     }], [{
-      key: 'config',
-      value: function config(align) {
-        this.$align = align;
-      }
-    }, {
       key: 'add',
       value: function add() {
         return false;
@@ -2038,10 +2033,10 @@
   var Link = function (_Component) {
     inherits(Link, _Component);
 
-    function Link(link) {
+    function Link(align, link) {
       classCallCheck(this, Link);
 
-      var _this = possibleConstructorReturn(this, (Link.__proto__ || Object.getPrototypeOf(Link)).call(this, link));
+      var _this = possibleConstructorReturn(this, (Link.__proto__ || Object.getPrototypeOf(Link)).apply(this, arguments));
 
       if (_this.mode === 'create') {
         _this.el = document.createElement('a');
@@ -2052,7 +2047,7 @@
         _this.el = link;
       }
 
-      _this._init(link);
+      _this._init();
       return _this;
     }
 
@@ -2086,6 +2081,7 @@
       key: 'update',
       value: function update(link) {
         this.el.href = link;
+        this.$align.$bus.emit('changed');
       }
     }, {
       key: 'remove',
@@ -2096,9 +2092,9 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
+      value: function add(align) {
         return new Promise(function (resolve, reject) {
-          var link = new Link();
+          var link = new Link(align);
           link.edit();
           // to stop align from adding element to DOM
           resolve({});
@@ -2638,10 +2634,10 @@
   var Embed = function (_Component) {
     inherits(Embed, _Component);
 
-    function Embed(data) {
+    function Embed(align, data) {
       classCallCheck(this, Embed);
 
-      var _this = possibleConstructorReturn(this, (Embed.__proto__ || Object.getPrototypeOf(Embed)).call(this));
+      var _this = possibleConstructorReturn(this, (Embed.__proto__ || Object.getPrototypeOf(Embed)).apply(this, arguments));
 
       _this.el = document.createElement('div');
       _this.el.classList.add('align-embed');
@@ -2651,8 +2647,8 @@
 
     createClass(Embed, null, [{
       key: 'add',
-      value: function add() {
-        var prompt = new Prompt(this.$align, {
+      value: function add(align) {
+        var prompt = new Prompt(align, {
           message: 'Add an embedded:'
         });
         return new Promise(function (resolve, reject) {
@@ -2660,7 +2656,7 @@
             var data = prompt.inputs[0].value;
             if (!data) {
               reject('not a valid number');
-            }          resolve(new Embed(data));
+            }          resolve(new Embed(align, data));
           });
         });
       }
@@ -2676,10 +2672,10 @@
   var Facebook = function (_Component) {
     inherits(Facebook, _Component);
 
-    function Facebook(link) {
+    function Facebook(align, link) {
       classCallCheck(this, Facebook);
 
-      var _this = possibleConstructorReturn(this, (Facebook.__proto__ || Object.getPrototypeOf(Facebook)).call(this));
+      var _this = possibleConstructorReturn(this, (Facebook.__proto__ || Object.getPrototypeOf(Facebook)).apply(this, arguments));
 
       _this.el = document.createElement('div');
       _this.el.classList.add('align-post');
@@ -2715,8 +2711,8 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
-        var prompt = new Prompt(this.$align, {
+      value: function add(align) {
+        var prompt = new Prompt(align, {
           message: 'Enter post link:'
         });
         return new Promise(function (resolve, reject) {
@@ -2724,7 +2720,7 @@
             var postUrl = prompt.inputs[0].value;
             if (!postUrl) {
               reject('no link provided');
-            }          resolve(new Facebook(postUrl));
+            }          resolve(new Facebook(align, postUrl));
           });
         });
       }
@@ -2907,6 +2903,8 @@
         this.visible = false;
         this.shortcuts = [];
         this.watchers = [];
+
+        console.log(this.$align);
 
         this.settings.commands.forEach(function (command) {
           _this._initCmdElement(command);
@@ -3325,18 +3323,10 @@
   var Figure = function (_Component) {
     inherits(Figure, _Component);
 
-    function Figure(figure) {
+    function Figure(align, figure) {
       classCallCheck(this, Figure);
 
-      if (!figure) {
-        var _ret;
-
-        return _ret = {
-          el: null
-        }, possibleConstructorReturn(_this, _ret);
-      }
-
-      var _this = possibleConstructorReturn(this, (Figure.__proto__ || Object.getPrototypeOf(Figure)).call(this, figure));
+      var _this = possibleConstructorReturn(this, (Figure.__proto__ || Object.getPrototypeOf(Figure)).apply(this, arguments));
 
       if (_this.mode === 'create') {
         _this.el = document.createElement('figure');
@@ -3387,6 +3377,7 @@
 
         var update = function update(src) {
           _this3.img.src = src;
+          _this3.$align.$bus.emit('changed');
         };
 
         this.$align.$bus.emit('imageAdded', {
@@ -3412,8 +3403,8 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
-        var prompt = new Prompt(this.$align, {
+      value: function add(align) {
+        var prompt = new Prompt(align, {
           message: 'Chose image figure:',
           inputsTypes: ['file']
         });
@@ -3422,7 +3413,7 @@
             var file = prompt.inputs[0].files[0];
             if (!file) {
               reject('no file provided');
-            }          resolve(new Figure(file));
+            }          resolve(new Figure(align, file));
           });
         });
       }
@@ -3464,32 +3455,40 @@
   var Gallery = function (_Component) {
     inherits(Gallery, _Component);
 
-    function Gallery(images) {
+    function Gallery(align, images) {
       classCallCheck(this, Gallery);
 
-      var _this = possibleConstructorReturn(this, (Gallery.__proto__ || Object.getPrototypeOf(Gallery)).call(this));
+      var _this = possibleConstructorReturn(this, (Gallery.__proto__ || Object.getPrototypeOf(Gallery)).apply(this, arguments));
 
       _this.el = document.createElement('div');
       _this.el.classList.add('align-gallery');
-      Array.from(images).forEach(function (img) {
-        var url = URL.createObjectURL(img);
-        var imgElm = stringToDOM('<img class="align-gallery-image"/>');
-        var update = function update(newSrc) {
-          imgElm.src = newSrc;
-        };
-        imgElm.src = url;
-        _this.el.appendChild(imgElm);
-        _this.$align.$bus.emit('imageAdded', {
-          file: img,
-          update: update
-        });
-      });
+      _this._init();
       return _this;
     }
 
-    createClass(Gallery, null, [{
+    createClass(Gallery, [{
+      key: '_init',
+      value: function _init() {
+        var _this2 = this;
+
+        Array.from(this.images).forEach(function (img) {
+          var url = URL.createObjectURL(img);
+          var imgElm = stringToDOM('<img class="align-gallery-image"/>');
+          var update = function update(newSrc) {
+            imgElm.src = newSrc;
+            _this2.$align.$bus.emit('changed');
+          };
+          imgElm.src = url;
+          _this2.el.appendChild(imgElm);
+          _this2.$align.$bus.emit('imageAdded', {
+            file: img,
+            update: update
+          });
+        });
+      }
+    }], [{
       key: 'add',
-      value: function add() {
+      value: function add(align) {
         var position = Selection.range.startContainer;
 
         var _dropzone = dropzone('gallery'),
@@ -3500,7 +3499,7 @@
         return new Promise(function (resolve, reject) {
           input$$1.addEventListener('change', function () {
             el.remove();
-            resolve(new Gallery(input$$1.files));
+            resolve(new Gallery(align, input$$1.files));
           });
         });
       }
@@ -3516,10 +3515,10 @@
   var Grid = function (_Component) {
     inherits(Grid, _Component);
 
-    function Grid(grid) {
+    function Grid(align, grid) {
       classCallCheck(this, Grid);
 
-      var _this = possibleConstructorReturn(this, (Grid.__proto__ || Object.getPrototypeOf(Grid)).call(this, grid));
+      var _this = possibleConstructorReturn(this, (Grid.__proto__ || Object.getPrototypeOf(Grid)).apply(this, arguments));
 
       if (_this.mode === 'create') {
         _this.el = document.createElement('div');
@@ -3574,8 +3573,8 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
-        var prompt = new Prompt(this.$align, {
+      value: function add(align) {
+        var prompt = new Prompt(align, {
           message: 'Enter columns count:',
           inputsCount: 1
         });
@@ -3584,7 +3583,7 @@
             var count = prompt.inputs[0].value;
             if (isNaN(count)) {
               reject('not a valid number');
-            }          resolve(new Grid(count));
+            }          resolve(new Grid(align, count));
           });
         });
       }
@@ -3617,10 +3616,10 @@
   var Paragraph = function (_Component) {
     inherits(Paragraph, _Component);
 
-    function Paragraph(line) {
+    function Paragraph(align, line) {
       classCallCheck(this, Paragraph);
 
-      var _this = possibleConstructorReturn(this, (Paragraph.__proto__ || Object.getPrototypeOf(Paragraph)).call(this, line));
+      var _this = possibleConstructorReturn(this, (Paragraph.__proto__ || Object.getPrototypeOf(Paragraph)).apply(this, arguments));
 
       _this.el = document.createElement('p');
       return _this;
@@ -3628,9 +3627,9 @@
 
     createClass(Paragraph, null, [{
       key: 'add',
-      value: function add() {
+      value: function add(align) {
         return new Promise(function (resolve, reject) {
-          resolve(new Paragraph());
+          resolve(new Paragraph(align));
         });
       }
     }]);
@@ -3645,10 +3644,10 @@
   var Line = function (_Component) {
     inherits(Line, _Component);
 
-    function Line(line) {
+    function Line(align, line) {
       classCallCheck(this, Line);
 
-      var _this = possibleConstructorReturn(this, (Line.__proto__ || Object.getPrototypeOf(Line)).call(this, line));
+      var _this = possibleConstructorReturn(this, (Line.__proto__ || Object.getPrototypeOf(Line)).apply(this, arguments));
 
       if (_this.mode === 'create') {
         _this.el = document.createElement('hr');
@@ -3673,9 +3672,9 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
+      value: function add(align) {
         return new Promise(function (resolve, reject) {
-          resolve(new Line());
+          resolve(new Line(align));
         });
       }
     }]);
@@ -3717,10 +3716,10 @@
   var Quote = function (_Component) {
     inherits(Quote, _Component);
 
-    function Quote() {
+    function Quote(align) {
       classCallCheck(this, Quote);
 
-      var _this = possibleConstructorReturn(this, (Quote.__proto__ || Object.getPrototypeOf(Quote)).call(this));
+      var _this = possibleConstructorReturn(this, (Quote.__proto__ || Object.getPrototypeOf(Quote)).apply(this, arguments));
 
       _this.el = document.createElement('blockquote');
       _this.quote = document.createElement('p');
@@ -3741,9 +3740,9 @@
 
     createClass(Quote, null, [{
       key: 'add',
-      value: function add() {
+      value: function add(align) {
         return new Promise(function (resolve, reject) {
-          resolve(new Quote());
+          resolve(new Quote(align));
         });
       }
     }]);
@@ -3758,10 +3757,10 @@
   var Separator = function (_Component) {
     inherits(Separator, _Component);
 
-    function Separator(separator) {
+    function Separator(align, separator) {
       classCallCheck(this, Separator);
 
-      var _this = possibleConstructorReturn(this, (Separator.__proto__ || Object.getPrototypeOf(Separator)).call(this, separator));
+      var _this = possibleConstructorReturn(this, (Separator.__proto__ || Object.getPrototypeOf(Separator)).apply(this, arguments));
 
       if (_this.mode === 'create') {
         _this.el = document.createElement('div');
@@ -3787,6 +3786,7 @@
       key: 'updateHeight',
       value: function updateHeight(height) {
         this.el.style.height = height + 'px';
+        this.$align.$bus.emit('changed');
       }
     }, {
       key: 'handleClick',
@@ -3812,9 +3812,9 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
+      value: function add(align) {
         return new Promise(function (resolve, reject) {
-          resolve(new Separator());
+          resolve(new Separator(align));
         });
       }
     }]);
@@ -3829,41 +3829,37 @@
   var Table = function (_Component) {
     inherits(Table, _Component);
 
-    function Table(table) {
+    function Table(align, table) {
       classCallCheck(this, Table);
 
-      var _this = possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).call(this));
+      var _this = possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).apply(this, arguments));
 
-      if (!table) return possibleConstructorReturn(_this);
-      _this._init(table);
-      _this._initEvents();
-      _this.activeCell = _this.el.rows[0].cells[0];
+      if (_this.mode === 'create') {
+        var rows = Number(table.rows);
+        var columns = Number(table.columns);
+        if (isNaN(rows) || isNaN(columns)) {
+          return possibleConstructorReturn(_this);
+        }
+        _this.el = document.createElement('table');
+        _this.el.classList.add('align-table');
+        _this.el.insertAdjacentHTML('afterbegin', ('<tr>\n          ' + '<td><br></td>'.repeat(columns) + '\n        </tr>').repeat(rows));
+      }
+
+      if (_this.mode === 'edit') {
+        _this.el = table;
+      }
+
+      _this._init();
       return _this;
     }
 
     createClass(Table, [{
       key: '_init',
-      value: function _init(table) {
-        this.toolbar = new Styler(this.$align, Table.toolbar);
-        if (table.nodeName === 'TABLE') {
-          this.el = table;
-          this.el.classList.add('align-table');
-          return;
-        }
-        var rows = Number(table.rows);
-        var columns = Number(table.columns);
-        if (isNaN(rows) || isNaN(columns)) {
-          return;
-        }
-        this.el = document.createElement('table');
-        this.el.classList.add('align-table');
-        this.el.insertAdjacentHTML('afterbegin', ('\n        <tr>\n          ' + '<td><br></td>'.repeat(columns) + '\n        </tr>\n      ').repeat(rows));
-      }
-    }, {
-      key: '_initEvents',
-      value: function _initEvents() {
+      value: function _init() {
         var _this2 = this;
 
+        this.toolbar = new Styler(this.$align, Table.toolbar);
+        this.activeCell = this.el.rows[0].cells[0];
         this.el.addEventListener('click', function (event) {
           _this2.activeCell = event.target;
           _this2.toolbar.update(_this2);
@@ -3906,16 +3902,10 @@
           this.el.rows[i].deleteCell(columnIndex);
         }
       }
-    }, {
-      key: 'remove',
-      value: function remove() {
-        this.toolbar.remove();
-        this.el.remove();
-      }
     }], [{
       key: 'add',
-      value: function add() {
-        var prompt = new Prompt(this.$align, {
+      value: function add(align) {
+        var prompt = new Prompt(align, {
           message: 'Enter post link:',
           inputsCount: 2,
           inputsPlaceholders: ['rows', 'columns']
@@ -3923,7 +3913,7 @@
 
         return new Promise(function (resolve, reject) {
           prompt.onSubmit(function () {
-            var table = new Table({
+            var table = new Table(align, {
               rows: prompt.inputs[0].value,
               columns: prompt.inputs[1].value
             });
@@ -3978,10 +3968,10 @@
   var Button = function (_Component) {
     inherits(Button, _Component);
 
-    function Button(button) {
+    function Button(align, button) {
       classCallCheck(this, Button);
 
-      var _this = possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, button));
+      var _this = possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).apply(this, arguments));
 
       if (_this.mode === 'create') {
         _this.el = document.createElement('a');
@@ -4033,9 +4023,9 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
+      value: function add(align) {
         return new Promise(function (resolve, reject) {
-          resolve(new Button());
+          resolve(new Button(align));
         });
       }
     }]);
@@ -4066,10 +4056,10 @@
   var Vimeo = function (_Component) {
     inherits(Vimeo, _Component);
 
-    function Vimeo(link) {
+    function Vimeo(align, link) {
       classCallCheck(this, Vimeo);
 
-      var _this = possibleConstructorReturn(this, (Vimeo.__proto__ || Object.getPrototypeOf(Vimeo)).call(this));
+      var _this = possibleConstructorReturn(this, (Vimeo.__proto__ || Object.getPrototypeOf(Vimeo)).apply(this, arguments));
 
       _this.el = document.createElement('div');
       _this.el.classList.add('align-video');
@@ -4098,8 +4088,8 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
-        var prompt = new Prompt(this.$align, {
+      value: function add(align) {
+        var prompt = new Prompt(align, {
           message: 'Enter video link:'
         });
         return new Promise(function (resolve, reject) {
@@ -4107,7 +4097,7 @@
             var link = prompt.inputs[0].value;
             if (!link) {
               reject('no link provided');
-            }          resolve(new Vimeo(link));
+            }          resolve(new Vimeo(align, link));
           });
         });
       }
@@ -4123,10 +4113,10 @@
   var Youtube = function (_Component) {
     inherits(Youtube, _Component);
 
-    function Youtube(link) {
+    function Youtube(align, link) {
       classCallCheck(this, Youtube);
 
-      var _this = possibleConstructorReturn(this, (Youtube.__proto__ || Object.getPrototypeOf(Youtube)).call(this));
+      var _this = possibleConstructorReturn(this, (Youtube.__proto__ || Object.getPrototypeOf(Youtube)).apply(this, arguments));
 
       _this.el = document.createElement('div');
       _this.el.classList.add('align-video');
@@ -4155,8 +4145,8 @@
       }
     }], [{
       key: 'add',
-      value: function add() {
-        var prompt = new Prompt(this.$align, {
+      value: function add(align) {
+        var prompt = new Prompt(align, {
           message: 'Enter video link:'
         });
         return new Promise(function (resolve, reject) {
@@ -4164,7 +4154,7 @@
             var link = prompt.inputs[0].value;
             if (!link) {
               reject('no link provided');
-            }          resolve(new Youtube(link));
+            }          resolve(new Youtube(align, link));
           });
         });
       }
@@ -4359,6 +4349,8 @@
     }, {
       key: '_initComponents',
       value: function _initComponents() {
+        var _this4 = this;
+
         var separators = Array.from(this.contentDiv.querySelectorAll('.align-separator'));
         var buttons = Array.from(this.contentDiv.querySelectorAll('.align-button'));
         var grids = Array.from(this.contentDiv.querySelectorAll('.align-grid'));
@@ -4368,31 +4360,31 @@
         var links = Array.from(this.contentDiv.querySelectorAll('a'));
 
         separators.forEach(function (separator) {
-          return new Separator(separator);
+          return new Separator(_this4.$align, separator);
         });
         buttons.forEach(function (button) {
-          return new Button(button);
+          return new Button(_this4.$align, button);
         });
         grids.forEach(function (grid) {
-          return new Grid(grid);
+          return new Grid(_this4.$align, grid);
         });
         lines.forEach(function (line) {
-          return new Line(line);
+          return new Line(_this4.$align, line);
         });
         figures.forEach(function (figure) {
-          return new Figure(figure);
+          return new Figure(_this4.$align, figure);
         });
         tables.forEach(function (table) {
-          return new Table(table);
+          return new Table(_this4.$align, table);
         });
         links.forEach(function (link) {
-          return new Link(link);
+          return new Link(_this4.$align, link);
         });
       }
     }, {
       key: '_initControllers',
       value: function _initControllers() {
-        var _this4 = this;
+        var _this5 = this;
 
         this.controllers = document.createElement('div');
         this.addButton = document.createElement('button');
@@ -4400,7 +4392,7 @@
         this.addButton.classList.add('align-sectionAdd');
 
         this.addButton.addEventListener('click', function () {
-          var newSection = new Section(_this4.$align, '', { position: _this4.getIndex() });
+          var newSection = new Section(_this5.$align, '', { position: _this5.getIndex() });
           setTimeout(function () {
             newSection.active();
             Selection.selectElement(newSection.contentDiv.querySelector('p'));
@@ -4435,13 +4427,13 @@
     }, {
       key: '_initProps',
       value: function _initProps() {
-        var _this5 = this;
+        var _this6 = this;
 
         Object.keys(this.props).forEach(function (key) {
-          var internalValue = _this5.props[key];
+          var internalValue = _this6.props[key];
           var dep = new Dep();
 
-          Object.defineProperty(_this5.props, key, {
+          Object.defineProperty(_this6.props, key, {
             get: function get$$1() {
               dep.depend();
               return internalValue;
@@ -4457,7 +4449,7 @@
     }, {
       key: '_initWatchers',
       value: function _initWatchers() {
-        var _this6 = this;
+        var _this7 = this;
 
         Dep.watcher(function (oldVal) {
           var _el$classList3;
@@ -4465,65 +4457,65 @@
           if (oldVal && oldVal.length > 0) {
             var _el$classList2;
 
-            (_el$classList2 = _this6.el.classList).remove.apply(_el$classList2, toConsumableArray(oldVal));
+            (_el$classList2 = _this7.el.classList).remove.apply(_el$classList2, toConsumableArray(oldVal));
           }
-          if (_this6.props.customClass.length === 0) {
+          if (_this7.props.customClass.length === 0) {
             return;
           }
-          (_el$classList3 = _this6.el.classList).add.apply(_el$classList3, toConsumableArray(_this6.props.customClass));
+          (_el$classList3 = _this7.el.classList).add.apply(_el$classList3, toConsumableArray(_this7.props.customClass));
 
           // emit events
-          var index = _this6.getIndex();
-          _this6.$align.$bus.emit('changed');
-          _this6.$align.$bus.emit('sectionChanged', {
+          var index = _this7.getIndex();
+          _this7.$align.$bus.emit('changed');
+          _this7.$align.$bus.emit('sectionChanged', {
             from: index,
             to: index,
-            props: _this6.props
+            props: _this7.props
           });
         });
         Dep.watcher(function () {
-          _this6.backgroundColor(_this6.props.backgroundColor);
+          _this7.backgroundColor(_this7.props.backgroundColor);
         });
         Dep.watcher(function () {
-          _this6.backgroundImage(_this6.props.backgroundImage);
+          _this7.backgroundImage(_this7.props.backgroundImage);
         });
         Dep.watcher(function () {
-          _this6.backgroundVideo(_this6.props.backgroundVideo);
+          _this7.backgroundVideo(_this7.props.backgroundVideo);
         });
         Dep.watcher(function () {
-          _this6.updateLayout(_this6.props.layout);
+          _this7.updateLayout(_this7.props.layout);
         });
         Dep.watcher(function () {
-          var parallax = _this6.props.parallax;
-          if (!_this6.bgImage) {
+          var parallax = _this7.props.parallax;
+          if (!_this7.bgImage) {
             return;
           }
-          _this6.bgImage.classList.toggle('is-parallax', parallax);
+          _this7.bgImage.classList.toggle('is-parallax', parallax);
         });
       }
     }, {
       key: 'getIndex',
       value: function getIndex() {
-        var _this7 = this;
+        var _this8 = this;
 
         return this.$align.sections.findIndex(function (el) {
-          return el === _this7;
+          return el === _this8;
         });
       }
     }, {
       key: 'updateLayout',
       value: function updateLayout() {
-        var _this8 = this;
+        var _this9 = this;
 
         Object.keys(this.props.layout).forEach(function (styl) {
-          var value = _this8.props.layout[styl];
+          var value = _this9.props.layout[styl];
           if (value) {
-            _this8.props.layout[styl] = value;
-            _this8.el.style[styl] = value;
+            _this9.props.layout[styl] = value;
+            _this9.el.style[styl] = value;
             return;
           }
-          delete _this8.props.layout[styl];
-          _this8.el.style[styl] = '';
+          delete _this9.props.layout[styl];
+          _this9.el.style[styl] = '';
         });
 
         // emit events
@@ -4579,7 +4571,7 @@
     }, {
       key: 'backgroundImage',
       value: function backgroundImage(file) {
-        var _this9 = this;
+        var _this10 = this;
 
         if (!file) {
           if (this.bgImage) {
@@ -4600,7 +4592,7 @@
           this.el.insertAdjacentElement('afterBegin', this.bgImage);
         }
         var update = function update(src) {
-          _this9.bgImage.style.backgroundImage = 'url(' + src + ')';
+          _this10.bgImage.style.backgroundImage = 'url(' + src + ')';
         };
         this.bgImage.style.backgroundImage = 'url(' + url + ')';
         this.el.classList.add('has-bgImage');
@@ -5187,7 +5179,6 @@
        * Create all editor elements
        */
       value: function _init() {
-        Component.config(this);
         this.$bus = new EventBus();
         this.startContent = Array.from(this.el.children);
         this.el.innerText = '';
@@ -5374,7 +5365,7 @@
         if (typeof args === 'function') {
           elClass = args;
         }
-        elClass.add().then(function (newElement) {
+        elClass.add(this).then(function (newElement) {
           if (!newElement.el) return;
           var el = Selection.range.startContainer;
           el = el.closest('p');
