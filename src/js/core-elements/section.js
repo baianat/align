@@ -170,13 +170,13 @@ export default class Section {
     const tables = Array.from(this.contentDiv.querySelectorAll('table'));
     const links = Array.from(this.contentDiv.querySelectorAll('a'));
 
-    separators.forEach(separator => new Separator(separator));
-    buttons.forEach(button => new Button(button));
-    grids.forEach(grid => new Grid(grid));
-    lines.forEach(line => new Line(line));
-    figures.forEach(figure => new Figure(figure));
-    tables.forEach(table => new Table(table));
-    links.forEach(link => new Link(link));
+    separators.forEach(separator => new Separator(this.$align, separator));
+    buttons.forEach(button => new Button(this.$align, button));
+    grids.forEach(grid => new Grid(this.$align, grid));
+    lines.forEach(line => new Line(this.$align, line));
+    figures.forEach(figure => new Figure(this.$align, figure));
+    tables.forEach(table => new Table(this.$align, table));
+    links.forEach(link => new Link(this.$align, link));
   }
 
   _initControllers () {

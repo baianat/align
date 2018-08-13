@@ -3,17 +3,32 @@ import Prompt from '../core-elements/prompt';
 import Styler from '../core-elements/styler';
 
 export default class Table extends Component {
-  constructor (table) {
-    super();
+  constructor (align, table) {
+    super(...arguments);
 
-    if (!table) return;
-    this._init(table);
-    this._initEvents();
-    this.activeCell = this.el.rows[0].cells[0];
+    if (this.mode === 'create') {
+      const rows = Number(table.rows);
+      const columns = Number(table.columns);
+      if (isNaN(rows) || isNaN(columns)) {
+        return;
+      }
+      this.el = document.createElement('table');
+      this.el.classList.add('align-table');
+      this.el.insertAdjacentHTML('afterbegin', 
+        `<tr>
+          ${'<td><br></td>'.repeat(columns)}
+        </tr>`.repeat(rows));
+    }
+
+    if (this.mode === 'edit') {
+      this.el = table;
+    }
+
+    this._init();
   }
 
-  static add () {
-    const prompt = new Prompt(this.$align, {
+  static add (align) {
+    const prompt = new Prompt(align, {
       message: 'Enter post link:',
       inputsCount: 2,
       inputsPlaceholders: ['rows', 'columns']
@@ -21,7 +36,8 @@ export default class Table extends Component {
 
     return new Promise((resolve, reject) => {
       prompt.onSubmit(() => {
-        const table = new Table({
+        const table = new Table(align,
+        {
           rows: prompt.inputs[0].value,
           columns: prompt.inputs[1].value
         });
@@ -30,28 +46,9 @@ export default class Table extends Component {
     });
   }
 
-  _init (table) {
+  _init () {
     this.toolbar = new Styler(this.$align, Table.toolbar);
-    if (table.nodeName === 'TABLE') {
-      this.el = table;
-      this.el.classList.add('align-table');
-      return;
-    }
-    const rows = Number(table.rows);
-    const columns = Number(table.columns);
-    if (isNaN(rows) || isNaN(columns)) {
-      return;
-    }
-    this.el = document.createElement('table');
-    this.el.classList.add('align-table');
-    this.el.insertAdjacentHTML('afterbegin', `
-        <tr>
-          ${'<td><br></td>'.repeat(columns)}
-        </tr>
-      `.repeat(rows));
-  }
-
-  _initEvents () {
+    this.activeCell = this.el.rows[0].cells[0];
     this.el.addEventListener('click', event => {
       this.activeCell = event.target;
       this.toolbar.update(this);
@@ -89,11 +86,6 @@ export default class Table extends Component {
     for (let i = 0; i < rowsLength; i++) {
       this.el.rows[i].deleteCell(columnIndex);
     }
-  }
-
-  remove () {
-    this.toolbar.remove();
-    this.el.remove();
   }
 
   static toolbar = {

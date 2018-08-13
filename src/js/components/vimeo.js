@@ -2,8 +2,8 @@ import Component from './component';
 import Prompt from '../core-elements/prompt';
 
 export default class Vimeo extends Component {
-  constructor (link) {
-    super();
+  constructor (align, link) {
+    super(...arguments);
 
     this.el = document.createElement('div');
     this.el.classList.add('align-video');
@@ -11,8 +11,8 @@ export default class Vimeo extends Component {
     this._init(link);
   }
 
-  static add () {
-    const prompt = new Prompt(this.$align, {
+  static add (align) {
+    const prompt = new Prompt(align, {
       message: 'Enter video link:'
     });
     return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ export default class Vimeo extends Component {
         if (!link) {
           reject('no link provided');
         };
-        resolve(new Vimeo(link));
+        resolve(new Vimeo(align, link));
       });
     });
   }

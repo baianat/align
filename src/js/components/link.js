@@ -3,8 +3,8 @@ import Prompt from '../core-elements/prompt';
 import Selection from '../partial/selection';
 
 export default class Link extends Component {
-  constructor (link) {
-    super(link);
+  constructor (align, link) {
+    super(...arguments);
     if (this.mode === 'create') {
       this.el = document.createElement('a');
       this.el.appendChild(Selection.range.extractContents());
@@ -14,12 +14,12 @@ export default class Link extends Component {
       this.el = link;
     }
 
-    this._init(link);
+    this._init();
   }
 
-  static add () {
+  static add (align) {
     return new Promise((resolve, reject) => {
-      const link = new Link();
+      const link = new Link(align);
       link.edit();
       // to stop align from adding element to DOM
       resolve({});

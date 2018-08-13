@@ -1,15 +1,15 @@
 import Component from './component';
 
 export default class Paragraph extends Component {
-  constructor (line) {
-    super(line);
+  constructor (align, line) {
+    super(...arguments);
 
     this.el = document.createElement('p');
   }
 
-  static add () {
+  static add (align) {
     return new Promise((resolve, reject) => {
-      resolve(new Paragraph());
+      resolve(new Paragraph(align));
     });
   }
 

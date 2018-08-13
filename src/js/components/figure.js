@@ -3,13 +3,8 @@ import Styler from '../core-elements/styler';
 import Prompt from '../core-elements/prompt';
 
 export default class Figure extends Component {
-  constructor (figure) {
-    if (!figure) {
-      return {
-        el: null
-      };
-    }
-    super(figure);
+  constructor (align, figure) {
+    super(...arguments);
 
     if (this.mode === 'create') {
       this.el = document.createElement('figure');
@@ -27,8 +22,8 @@ export default class Figure extends Component {
     this._init();
   }
 
-  static add () {
-    const prompt = new Prompt(this.$align, {
+  static add (align) {
+    const prompt = new Prompt(align, {
       message: 'Chose image figure:',
       inputsTypes: ['file']
     });
@@ -38,7 +33,7 @@ export default class Figure extends Component {
         if (!file) {
           reject('no file provided');
         };
-        resolve(new Figure(file));
+        resolve(new Figure(align, file));
       });
     });
   }

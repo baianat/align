@@ -2,8 +2,8 @@ import Component from './component';
 import Styler from '../core-elements/styler';
 
 export default class Line extends Component {
-  constructor (line) {
-    super(line);
+  constructor (align, line) {
+    super(...arguments);
 
     if (this.mode === 'create') {
       this.el = document.createElement('hr');
@@ -15,9 +15,9 @@ export default class Line extends Component {
     this._init();
   }
 
-  static add () {
+  static add (align) {
     return new Promise((resolve, reject) => {
-      resolve(new Line());
+      resolve(new Line(align));
     });
   }
 

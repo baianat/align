@@ -45,6 +45,8 @@ export default class Styler {
     this.shortcuts = [];
     this.watchers = [];
 
+    console.log(this.$align);
+
     this.settings.commands.forEach((command) => {
       this._initCmdElement(command);
     });

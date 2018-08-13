@@ -3,15 +3,16 @@ import Prompt from '../core-elements/prompt';
 import { stringToDOM } from '../partial/util';
 
 export default class Facebook extends Component {
-  constructor (link) {
-    super();
+  constructor (align, link) {
+    super(...arguments);
+
     this.el = document.createElement('div');
     this.el.classList.add('align-post');
     this._init(link);
   }
 
-  static add () {
-    const prompt = new Prompt(this.$align, {
+  static add (align) {
+    const prompt = new Prompt(align, {
       message: 'Enter post link:'
     });
     return new Promise((resolve, reject) => {
@@ -20,7 +21,7 @@ export default class Facebook extends Component {
         if (!postUrl) {
           reject('no link provided');
         };
-        resolve(new Facebook(postUrl));
+        resolve(new Facebook(align, postUrl));
       });
     });
   }

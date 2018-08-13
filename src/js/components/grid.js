@@ -3,8 +3,8 @@ import Prompt from '../core-elements/prompt';
 import Styler from '../core-elements/styler';
 
 export default class Grid extends Component {
-  constructor (grid) {
-    super(grid);
+  constructor (align, grid) {
+    super(...arguments);
 
     if (this.mode === 'create') {
       this.el = document.createElement('div');
@@ -21,8 +21,8 @@ export default class Grid extends Component {
     this._init();
   }
 
-  static add () {
-    const prompt = new Prompt(this.$align, {
+  static add (align) {
+    const prompt = new Prompt(align, {
       message: 'Enter columns count:',
       inputsCount: 1
     });
@@ -32,7 +32,7 @@ export default class Grid extends Component {
         if (isNaN(count)) {
           reject('not a valid number');
         };
-        resolve(new Grid(count));
+        resolve(new Grid(align, count));
       });
     });
   }

@@ -1,8 +1,8 @@
 import Component from './component';
 
 export default class Separator extends Component {
-  constructor (separator) {
-    super(separator);
+  constructor (align, separator) {
+    super(...arguments);
 
     if (this.mode === 'create') {
       this.el = document.createElement('div');
@@ -18,9 +18,9 @@ export default class Separator extends Component {
     this._init();
   }
 
-  static add () {;
+  static add (align) {;
     return new Promise((resolve, reject) => {
-      resolve(new Separator());
+      resolve(new Separator(align));
     });
   }
 

@@ -1,7 +1,6 @@
 import { select, userOS, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
-import Component from './components/component';
 import Selection from './partial/selection';
 import Section from './core-elements/section';
 import EventBus from './partial/events';
@@ -50,7 +49,6 @@ export default class Align {
    * Create all editor elements
    */
   _init () {
-    Component.config(this);
     this.$bus = new EventBus();
     this.startContent = Array.from(this.el.children);
     this.el.innerText = '';
@@ -211,7 +209,7 @@ export default class Align {
       elClass = args;
     }
     elClass
-      .add()
+      .add(this)
       .then((newElement) => {
         if (!newElement.el) return;
         let el = Selection.range.startContainer;

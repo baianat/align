@@ -2,15 +2,16 @@ import Component from './component';
 import Prompt from '../core-elements/prompt';
 
 export default class Embed extends Component {
-  constructor (data) {
-    super();
+  constructor (align, data) {
+    super(...arguments);
+
     this.el = document.createElement('div');
     this.el.classList.add('align-embed');
     this.el.insertAdjacentHTML('afterbegin', data);
   }
 
-  static add () {
-    const prompt = new Prompt(this.$align, {
+  static add (align) {
+    const prompt = new Prompt(align, {
       message: 'Add an embedded:'
     });
     return new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ export default class Embed extends Component {
         if (!data) {
           reject('not a valid number');
         };
-        resolve(new Embed(data));
+        resolve(new Embed(align, data));
       });
     });
   }

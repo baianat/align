@@ -3,8 +3,8 @@ import Styler from '../core-elements/styler';
 import Prompt from '../core-elements/prompt';
 
 export default class Button extends Component {
-  constructor (button) {
-    super(button);
+  constructor (align, button) {
+    super(...arguments);
 
     if (this.mode === 'create') {
       this.el = document.createElement('a');
@@ -21,9 +21,9 @@ export default class Button extends Component {
     this._init();
   }
 
-  static add () {
+  static add (align) {
     return new Promise((resolve, reject) => {
-      resolve(new Button());
+      resolve(new Button(align));
     });
   }
 
