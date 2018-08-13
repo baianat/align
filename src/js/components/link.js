@@ -50,6 +50,7 @@ export default class Link extends Component {
 
   update (link) {
     this.el.href = link;
+    this.$align.$bus.emit('changed');    
   };
 
   remove () {

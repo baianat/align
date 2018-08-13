@@ -82,6 +82,7 @@ export default class Figure extends Component {
 
     const update = (src) => {
       this.img.src = src;
+      this.$align.$bus.emit('changed');
     };
 
     this.$align.$bus.emit('imageAdded', {

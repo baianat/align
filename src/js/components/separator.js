@@ -31,6 +31,7 @@ export default class Separator extends Component {
 
   updateHeight (height) {
     this.el.style.height = `${height}px`;
+    this.$align.$bus.emit('changed');
   }
 
   handleClick (event) {

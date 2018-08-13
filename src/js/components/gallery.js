@@ -14,6 +14,7 @@ export default class Gallery extends Component {
       const imgElm = stringToDOM('<img class="align-gallery-image"/>');
       const update = (newSrc) => {
         imgElm.src = newSrc;
+        this.$align.$bus.emit('changed');
       }
       imgElm.src = url;
       this.el.appendChild(imgElm);
