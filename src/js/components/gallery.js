@@ -10,6 +10,7 @@ export default class Gallery extends Component {
 
     this.el = document.createElement('div');
     this.el.classList.add('align-gallery');
+    this.images = images;
     this._init();
   }
 
