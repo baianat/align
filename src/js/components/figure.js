@@ -1,6 +1,6 @@
 import Component from './component';
-import Styler from '../styler';
-import Prompt from '../prompt';
+import Styler from '../core-elements/styler';
+import Prompt from '../core-elements/prompt';
 
 export default class Figure extends Component {
   constructor (figure) {

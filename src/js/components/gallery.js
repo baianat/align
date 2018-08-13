@@ -1,5 +1,5 @@
 import Component from './component';
-import Selection from '../selection';
+import Selection from '../partial/selection';
 
 import { dropzone } from '../partial/elements';
 import { stringToDOM } from '../partial/util';

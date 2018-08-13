@@ -1,8 +1,8 @@
-import { setElementsPrefix } from './partial/elements';
-import { stringToDOM } from './partial/util';
+import { setElementsPrefix } from '../partial/elements';
+import { stringToDOM } from '../partial/util';
 import Colorpicker from '@baianat/colorpicker';
 import Section from './section';
-import icons from './partial/icons';
+import icons from '../partial/icons';
 
 export default class Sidebar {
   constructor (align) {

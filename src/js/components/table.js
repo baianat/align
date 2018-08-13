@@ -1,6 +1,6 @@
 import Component from './component';
-import Prompt from '../prompt';
-import Styler from '../styler';
+import Prompt from '../core-elements/prompt';
+import Styler from '../core-elements/styler';
 
 export default class Table extends Component {
   constructor (table) {

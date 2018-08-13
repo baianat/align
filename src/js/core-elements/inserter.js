@@ -1,12 +1,12 @@
 import {
   updatePosition
-} from './partial/util';
+} from '../partial/util';
 import {
   setElementsPrefix,
   button
-} from './partial/elements';
-import components from './components/_index';
-import Selection from './selection';
+} from '../partial/elements';
+import components from '../components/_index';
+import Selection from '../partial/selection';
 
 export default class Inserter {
   constructor (align, settings) {

@@ -1,6 +1,6 @@
 import Component from './component';
-import Prompt from '../prompt';
-import Selection from '../selection';
+import Prompt from '../core-elements/prompt';
+import Selection from '../partial/selection';
 
 export default class Link extends Component {
   constructor (link) {

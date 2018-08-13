@@ -1,5 +1,5 @@
 import Component from './component';
-import Prompt from '../prompt';
+import Prompt from '../core-elements/prompt';
 
 export default class Vimeo extends Component {
   constructor (link) {

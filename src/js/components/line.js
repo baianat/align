@@ -1,5 +1,5 @@
 import Component from './component';
-import Styler from '../styler';
+import Styler from '../core-elements/styler';
 
 export default class Line extends Component {
   constructor (line) {

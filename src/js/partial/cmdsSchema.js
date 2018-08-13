@@ -1,5 +1,5 @@
 import Colorpicker from '@baianat/colorpicker';
-import Selection from '../selection';
+import Selection from './selection';
 import Link from '../components/link';
 
 const cmdsSchema = {

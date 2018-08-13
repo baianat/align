@@ -2,12 +2,12 @@ import { select, userOS, stringToDOM } from './partial/util';
 import cmdsSchema from './partial/cmdsSchema';
 import icons from './partial/icons';
 import Component from './components/component';
-import Selection from './selection';
-import Section from './section';
-import EventBus from './events';
-import Styler from './styler';
-import Inserter from './inserter';
-import Sidebar from './sidebar';
+import Selection from './partial/selection';
+import Section from './core-elements/section';
+import EventBus from './partial/events';
+import Styler from './core-elements/styler';
+import Inserter from './core-elements/inserter';
+import Sidebar from './core-elements/sidebar';
 
 export default class Align {
   constructor (selector, settings) {
