@@ -5,7 +5,8 @@ import {
   select,
   getArray,
   stringToDOM,
-  isElementClosest
+  isElementClosest,
+  updatePosition
 } from '../partial/utils';
 import {
   getRandomColor,
@@ -114,13 +115,16 @@ export default class Colorpicker {
     // setup canvas
     this.canvas.width = 250;
     this.canvas.height = 150;
+    this.pickerRect = this.canvas.getBoundingClientRect();
 
     const updateColor = (event) => {
-      if (event.target !== this.canvas) {
-        return;
+      const { x, y } = event;
+      const { left, top } = this.pickerRect;
+      const normalized = {
+        x: Math.min(Math.max(x - left, 0), this.canvas.width - 1),
+        y: Math.min(Math.max(y - top, 0), this.canvas.height)
       }
-      let { x, y } = this.getMouseCords(event);
-      this.mouse = { x: Math.min(x, this.canvas.width), y: Math.min(y, this.canvas.height) };
+      this.mouse = { x: normalized.x, y: normalized.y };
       const color = this.getColorCanvas(this.mouse, this.ctx);
       this.selectColor(color);
       this.updateCursor(this.mouse);
@@ -131,6 +135,23 @@ export default class Colorpicker {
       this.selectColor(this.colors.hsl);
     }
 
+    
+    const mouseDownHandler = (event) => {
+      event.preventDefault();
+      this.pickerRect = this.canvas.getBoundingClientRect();
+      return function (func) {
+        func(event);
+        let tempFunc = (event) => {
+          window.requestAnimationFrame(() => func(event));
+        }
+        const mouseupHandler = () => {
+          document.removeEventListener('mousemove', tempFunc);
+          document.removeEventListener('mouseup', mouseupHandler);
+        }
+        document.addEventListener('mousemove', tempFunc);
+        document.addEventListener('mouseup', mouseupHandler);
+      }
+}
     this.updateSquareColors();
 
     // add event listener
@@ -326,17 +347,11 @@ export default class Colorpicker {
 
 
   getColorCanvas (mouse, ctx) {
+    console.log(mouse, this.canvas.width, this.canvas.height);
     const imageData = ctx.getImageData(mouse.x, mouse.y, 1, 1).data;
     return `rgb(${imageData[0]}, ${imageData[1]}, ${imageData[2]})`;
   }
 
-  getMouseCords (event) {
-    const mouse = {
-      x: event.offsetX,
-      y: event.offsetY
-    };
-    return mouse;
-  }
 
   togglePicker () {
     if (this.isMenuActive) {
@@ -349,12 +364,13 @@ export default class Colorpicker {
   closePicker () {
     this.menu.classList.add('is-hidden');
     this.isMenuActive = false;
-    document.removeEventListener('click', this.documentCallback)
+    document.removeEventListener('mousedown', this.documentCallback)
   }
 
   openPiker () {
     this.menu.classList.remove('is-hidden');
     this.isMenuActive = true;
+    
     const documentCallback = (evnt) => {
       if (!isElementClosest(evnt.target, this.menu) && !isElementClosest(evnt.target, this.guide)) {
         this.closePicker();
@@ -363,7 +379,7 @@ export default class Colorpicker {
       call(this.settings.events.clicked);
     };
     this.documentCallback = documentCallback.bind(this);
-    document.addEventListener('click', this.documentCallback);
+    document.addEventListener('mousedown', this.documentCallback);
     call(this.settings.events.afterOpen);
   }
   static defaults = {
@@ -378,21 +394,3 @@ export default class Colorpicker {
     guideIcon: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>`
   }
 }
-
-function mouseDownHandler(event) {
-  event.preventDefault();
-  return function (func) {
-    func(event);
-    let tempFunc = (event) => {
-      window.requestAnimationFrame(() => func(event));
-    }
-    const mouseupHandler = () => {
-      document.removeEventListener('mousemove', tempFunc);
-      document.removeEventListener('mouseup', mouseupHandler);
-    }
-    document.addEventListener('mousemove', tempFunc);
-    document.addEventListener('mouseup', mouseupHandler);
-  }
-}
-
-
