@@ -3,16 +3,15 @@ import Dep from '../partial/dep';
 import {
   call,
   select,
-  getArray,
   stringToDOM,
-  isElementClosest,
-  updatePosition
+  isElementClosest
 } from '../partial/utils';
 import {
-  getRandomColor,
+  isValidColor,
   toHex,
   toRgb,
-  toHsl
+  toHsl,
+  alpha
 } from 'color-fns';
 
 export default class Colorpicker {
@@ -30,6 +29,7 @@ export default class Colorpicker {
     this.colors = {
       current: this.settings.defaultColor,
       model: this.settings.model,
+      alpha: 1,
       rgb: '',
       hsl: '',
       hex: ''
@@ -38,7 +38,9 @@ export default class Colorpicker {
     this._initWatchers();
     this._initInputs();
     this._initEvents();
+
     this.selectColor(this.settings.defaultColor, true);
+    this.colors.alpha = this.colors[this.colors.model].alpha;
   }
 
   _initWatchers () {
@@ -59,41 +61,68 @@ export default class Colorpicker {
       });
     });
     Dep.watcher(() => {
-      this.colors.rgb = toRgb(this.colors.current);
-    });
-    Dep.watcher(() => {
-      this.colors.hsl = toHsl(this.colors.current);
-    });
-    Dep.watcher(() => {
-      this.colors.hex = toHex(this.colors.current);
+      this.colors.alpha = this.alphaSlider.el.value;
     });
     Dep.watcher(() => {
       this.strip.update(this.colors.hsl.hue, true);
     });
-
+    Dep.watcher(() => {
+      this.alphaSlider.update(this.colors.alpha, true);
+    });
+    Dep.watcher(() => {
+      this.el.value = this.colors[this.colors.model].toString();
+      this.guide.style.color = this.colors.current;
+      this.guide.style.fill = this.colors.current;
+    });
   }
   _initElements () {
     this.mouse = { x: 0, y: 0 };
     this.lastMove = { x: 0, y: 0 };
     this.isMenuActive = false;
     // create colorpicker element
-    this.picker = document.createElement('div');
-    this.menu = stringToDOM('<div class="picker-menu is-hidden" tabindex="-1"></div>');
+    this.menu = stringToDOM('<div class="picker-menu" tabindex="-1"></div>');
     this.guide = stringToDOM(`<button class="picker-guide">${this.settings.guideIcon}</button>`);
-    this.controllers = stringToDOM(`<div class="picker-controllers"></div>`);
-
+    this.menu.style.opacity = 0;
+    
     // append colorpicker elements
-    this.picker.appendChild(this.menu);
-    this.picker.appendChild(this.guide);
     this._initPicker();
-    this.menu.appendChild(this.controllers);
+    this._initControllers();
 
-    this.el.parentNode.insertBefore(this.picker, this.el);
     this.el.classList.add('picker-value');
     this.picker.classList.add('picker');
+    this.el.parentNode.insertBefore(this.picker, this.el);
+
+    this.menu.appendChild(this.controllers);
     this.picker.appendChild(this.el);
-    this.guide.style.color = this.settings.defaultColor;
-    this.guide.style.fill = this.settings.defaultColor;
+    this.picker.appendChild(this.menu);
+    this.picker.appendChild(this.guide);
+
+    setTimeout(() => {
+      this.strip.update();
+      this.alphaSlider.update();
+      this.menu.style.opacity = 1;
+      this.closePicker();
+    }, 1);
+  }
+
+  _initControllers () {
+    this.controllers = stringToDOM(`<div class="picker-controllers"></div>`);
+    this.strip = new Slider({ min: 0, max: 360, step: 1, classes: ['is-strip'] });
+    this.alphaSlider = new Slider({ min: 0, max: 1, step: 0.1, value: 1, classes: ['is-alpha'] });
+    this.controllers.appendChild(this.strip.wrapper);
+    this.controllers.appendChild(this.alphaSlider.wrapper);
+
+    const updateHue = (event) => {
+      this.colors.hsl.hue = event.target.value;
+      this.selectColor(this.colors.hsl);
+    }
+    const updateAlpha = (event) => {
+      this.colors.alpha = event.target.value;
+      this.selectColor(this.colors.current);
+    }
+
+    this.strip.el.addEventListener('input', updateHue);
+    this.alphaSlider.el.addEventListener('input', updateAlpha);
   }
 
   _initPicker () {
@@ -103,14 +132,12 @@ export default class Colorpicker {
         <div class="picker-cursor"></div>
       </div>`);
 
+    this.picker = document.createElement('div');
     this.canvas = this.square.querySelector('.picker-canvas');
-    this.strip = this.square.querySelector('.picker-squareStrip');
     this.cursor = this.square.querySelector('.picker-cursor');
     this.ctx = this.canvas.getContext('2d');
-    this.strip = new Slider({ min: 0, max: 360, step: 1, classes: ['is-strip'] });
 
     this.menu.appendChild(this.square);
-    this.controllers.appendChild(this.strip.wrapper);
 
     // setup canvas
     this.canvas.width = 250;
@@ -128,11 +155,6 @@ export default class Colorpicker {
       const color = this.getColorCanvas(this.mouse, this.ctx);
       this.selectColor(color);
       this.updateCursor(this.mouse);
-    }
-
-    const updateHue = (event) => {
-      this.colors.hsl.hue = event.target.value;
-      this.selectColor(this.colors.hsl);
     }
 
     
@@ -156,7 +178,6 @@ export default class Colorpicker {
 
     // add event listener
     this.canvas.addEventListener('mousedown', (event) => mouseDownHandler(event)(updateColor));
-    this.strip.el.addEventListener('input', updateHue);
   }
 
   _initInputs () {
@@ -332,13 +353,15 @@ export default class Colorpicker {
 
   selectColor (color, mute = false) {
     if (!mute) call(this.settings.events.beforeSelect);
-    this.colors.current = color;
-    this.el.value = this.colors[this.colors.model];
+    if (!isValidColor(color)) return;
 
-    this.guide.style.color = color;
-    this.guide.style.fill = color;
+    this.colors.rgb = toRgb(color);
+    this.colors.hsl = toHsl(color);
+    this.colors.hex = toHex(color);
+
+    this.colors.current = alpha(this.colors[this.colors.model], this.colors.alpha);
    
-    this.updateSquareColors()
+    this.updateSquareColors();
 
     if (mute) return;
     call(this.settings.events.afterSelect);
@@ -347,7 +370,6 @@ export default class Colorpicker {
 
 
   getColorCanvas (mouse, ctx) {
-    console.log(mouse, this.canvas.width, this.canvas.height);
     const imageData = ctx.getImageData(mouse.x, mouse.y, 1, 1).data;
     return `rgb(${imageData[0]}, ${imageData[1]}, ${imageData[2]})`;
   }
@@ -382,15 +404,15 @@ export default class Colorpicker {
     document.addEventListener('mousedown', this.documentCallback);
     call(this.settings.events.afterOpen);
   }
+
   static defaults = {
-    defaultColor: getRandomColor(),
+    defaultColor: '#fff',
     model: 'rgb',
     events: {},
     menu: {
       draggable: true,
       hideWhenSubmit: true
     },
-    rgbSliders: false,
     guideIcon: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>`
   }
 }

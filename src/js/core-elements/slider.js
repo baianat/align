@@ -1,4 +1,4 @@
-import { select, wrap, call, getClosestValue, stringToDOM } from '../partial/utils';
+import { call, stringToDOM } from '../partial/utils';
 
 /**
  * Slider class
@@ -18,10 +18,12 @@ export default class Slider {
     this.min = this.el.min = Number(this.settings.min);
     this.max = this.el.max = Number(this.settings.max);
     this.step = this.el.step = Number(this.settings.step);
+    this.value = this.el.value = Number(this.settings.value);
+    const stepSplitted = this.step.toString().split('.')[1]; 
+    this.decimalsCount = stepSplitted ? stepSplitted.length : 0;
 
     this._initElements();
     this._initEvents();
-    this.update();
   }
 
   _initElements () {
@@ -113,15 +115,18 @@ export default class Slider {
 
     const mouseValue = (eventX - this.currentX);
     const stepCount = parseInt((mouseValue / this.stepWidth) + 0.5, 10);
-    const stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
-    return stepValue;
+    const stepValue = (stepCount * this.step) + this.min;
+    if (!this.decimalsCount) {
+      return stepValue;
+    }
+    return Number(stepValue.toFixed(this.decimalsCount));
   }
 
   updateWidth () {
     const trackRect = this.track.getBoundingClientRect();
     this.currentX = trackRect.left;
     this.width = trackRect.width;
-    this.stepWidth = (this.width / (this.max - this.min));
+    this.stepWidth = (this.width / (this.max - this.min)) * this.step;
   }
 
   /**
@@ -138,16 +143,7 @@ export default class Slider {
     if (isNaN(Number(value))) {
       return this.value;
     }
-    if (this.multiple) {
-      const prevValue = this.values[this.activeHandle - 1] || this.min;
-      const nextValue = this.values[this.activeHandle + 1] || this.max;
-      value = Math.min(Math.max(Number(value), prevValue), nextValue);
-    }
     return Math.min(Math.max(Number(value), this.min), this.max);
-  }
-
-  newGradient (newGradient) {
-    return;
   }
 
 
@@ -156,20 +152,17 @@ export default class Slider {
    * @param {Number} value
    */
   update (value, mute = false) {
-    if (Number(value) === this.value) return;
-
     if (!this.width) {
       this.updateWidth();
     }
     const normalized = this.normalizeValue(value);
     const positionPercentage = this.getPositionPercentage(normalized);
 
-    if (this.fill) {
-      this.fill.style.transform = `translate(${positionPercentage * this.width}px, 0) scale(${1 - positionPercentage}, 1)`;
-    }
+    this.fill.style.transform = `translate(${positionPercentage * this.width}px, 0) scale(${1 - positionPercentage}, 1)`;
     this.handle.style.transform = `translate(${positionPercentage * this.width}px, 0)`;
     this.value = normalized;
     this.el.value = this.value;
+
     if (mute) return;
     this.el.dispatchEvent(new Event('change')); // eslint-disable-line
     this.el.dispatchEvent(new Event('input'));  // eslint-disable-line
@@ -189,8 +182,7 @@ export default class Slider {
     min: 0,
     max: 10,
     step: 1,
-    value: 0,
-    handles: [0],
+    value: 1,
     trackSlide: true
   }
 }
