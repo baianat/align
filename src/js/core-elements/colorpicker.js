@@ -27,50 +27,50 @@ export default class Colorpicker {
   init () {
     this.events = [new Event('input'), new Event('change')];
     this.colors = {
-      current: this.settings.defaultColor,
+      current: {},
       model: this.settings.model,
       alpha: 1,
-      rgb: '',
-      hsl: '',
-      hex: ''
+      rgb: {},
+      hsl: {},
+      hex: {}
     }
     this._initElements();
-    this._initWatchers();
     this._initInputs();
+    this._initWatchers();
     this._initEvents();
 
     this.selectColor(this.settings.defaultColor, true);
-    this.colors.alpha = this.colors[this.colors.model].alpha;
   }
 
   _initWatchers () {
     Object.keys(this.colors).forEach(key => {
-      let internalValue = this.colors[key]
+      let internalValue = this.colors[key];
       const dep = new Dep();
       
       Object.defineProperty(this.colors, key, {
-        get() {
+        get () {
           dep.depend();
           return internalValue;
         },
-        set(newVal) {
+        set (newVal) {
           const oldVal = internalValue;
           internalValue = newVal;
           dep.notify(oldVal);
         }
       });
     });
-    Dep.watcher(() => {
-      this.colors.alpha = this.alphaSlider.el.value;
-    });
+
     Dep.watcher(() => {
       this.strip.update(this.colors.hsl.hue, true);
     });
     Dep.watcher(() => {
-      this.alphaSlider.update(this.colors.alpha, true);
+      this.alphaSlider.update(this.colors.rgb.alpha, true);
     });
     Dep.watcher(() => {
-      this.el.value = this.colors[this.colors.model].toString();
+      this.updateInputsModel(this.colors.model);
+    })
+    Dep.watcher(() => {
+      this.el.value = this.colors.current;
       this.guide.style.color = this.colors.current;
       this.guide.style.fill = this.colors.current;
     });
@@ -82,7 +82,6 @@ export default class Colorpicker {
     // create colorpicker element
     this.menu = stringToDOM('<div class="picker-menu" tabindex="-1"></div>');
     this.guide = stringToDOM(`<button class="picker-guide">${this.settings.guideIcon}</button>`);
-    this.menu.style.opacity = 0;
     
     // append colorpicker elements
     this._initPicker();
@@ -96,13 +95,8 @@ export default class Colorpicker {
     this.picker.appendChild(this.el);
     this.picker.appendChild(this.menu);
     this.picker.appendChild(this.guide);
-
-    setTimeout(() => {
-      this.strip.update();
-      this.alphaSlider.update();
-      this.menu.style.opacity = 1;
-      this.closePicker();
-    }, 1);
+    
+    this.closePicker();
   }
 
   _initControllers () {
@@ -113,12 +107,12 @@ export default class Colorpicker {
     this.controllers.appendChild(this.alphaSlider.wrapper);
 
     const updateHue = (event) => {
-      this.colors.hsl.hue = event.target.value;
+      this.colors.hsl.hue = event.target.value || 0;
       this.selectColor(this.colors.hsl);
     }
     const updateAlpha = (event) => {
-      this.colors.alpha = event.target.value;
-      this.selectColor(this.colors.current);
+      const color = alpha(this.colors.current, event.target.value || 1);
+      this.selectColor(color);
     }
 
     this.strip.el.addEventListener('input', updateHue);
@@ -152,12 +146,14 @@ export default class Colorpicker {
         y: Math.min(Math.max(y - top, 0), this.canvas.height)
       }
       this.mouse = { x: normalized.x, y: normalized.y };
-      const color = this.getColorCanvas(this.mouse, this.ctx);
-      this.selectColor(color);
+      const { red, green, blue } = this.getColorCanvas(this.mouse, this.ctx);
+      this.colors.rgb.red = red;
+      this.colors.rgb.green = green;
+      this.colors.rgb.blue = blue;
+      this.selectColor(this.colors.rgb);
       this.updateCursor(this.mouse);
     }
 
-    
     const mouseDownHandler = (event) => {
       event.preventDefault();
       this.pickerRect = this.canvas.getBoundingClientRect();
@@ -191,30 +187,27 @@ export default class Colorpicker {
     </button>`);
     
 
-    this.updateInputsModel();
     this.controllers.appendChild(this.inputsWrapper);
 
     this.modelSwitcher.addEventListener('click', (event) => {
       const models = ['hex', 'rgb', 'hsl'];
       const indx = models.indexOf(this.colors.model);
       this.colors.model = models[indx + 1] || models[0];
-      this.updateInputsModel();
+      this.selectColor(this.colors.current);
     });
     this.submit.addEventListener('click', (event) => {
       call(this.settings.events.beforeSubmit);
-      this.selectColor(this.el.value);
-      if (this.settings.menu.hideWhenSubmit) {
-        this.closePicker();
-      }
+      this.selectColor(this.colors[this.colors.model]);
+      this.closePicker();
       call(this.settings.events.afterSubmit);
     });
   }
 
-  updateInputsModel () {
+  updateInputsModel (model) {
     this.inputsWrapper.innerHTML = '';
-    this.modelSwitcher.innerText = this.colors.model + ': ';
+    this.modelSwitcher.innerText = model + ': ';
     this.inputsWrapper.appendChild(this.modelSwitcher);
-    if (this.colors.model === 'hsl') {
+    if (model === 'hsl') {
       this.inputs = {
         hue: stringToDOM('<input type="number" min="0" max="360" class="picker-input"/>'),
         sat: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>'),
@@ -223,21 +216,16 @@ export default class Colorpicker {
       Object.keys(this.inputs).forEach(key => {
         const current = this.inputs[key];
         this.inputsWrapper.appendChild(current);
-        current.addEventListener('input', () => {
-          this.selectColor(`hsl(
-            ${this.inputs.hue.value},
-            ${this.inputs.sat.value}%,
-            ${this.inputs.lum.value}%)`
-          );
+        current.value = this.colors.hsl[key];
+        current.addEventListener('change', () => {
+          this.colors.hsl[key] = current.value;
+          this.selectColor(this.colors.hsl);
           this.updateCursor();
         });
-        Dep.watcher(() => {
-          current.value = this.colors.hsl[key];
-        })
       });
     }
 
-    if (this.colors.model === 'rgb') {
+    if (model === 'rgb') {
       this.inputs = {
         red: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
         green: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
@@ -246,33 +234,27 @@ export default class Colorpicker {
       Object.keys(this.inputs).forEach(key => {
         const current = this.inputs[key];
         this.inputsWrapper.appendChild(current);
-        current.addEventListener('input', () => {
-          this.selectColor(`rgb(
-            ${this.inputs.red.value},
-            ${this.inputs.green.value},
-            ${this.inputs.blue.value})`
-          );
+        current.value = this.colors.rgb[key];
+        current.addEventListener('change', () => {
+          this.colors.rgb[key] = current.value;
+          this.selectColor(this.colors.rgb);
           this.updateCursor();
         });
-        Dep.watcher(() => {
-          current.value = this.colors.rgb[key];
-        })
       });
     }
 
-    if (this.colors.model === 'hex') {
+    if (model === 'hex') {
       this.inputs = {
         hex: stringToDOM('<input type="text" class="picker-input"/>'),
       };
       const current = this.inputs['hex'];
       this.inputsWrapper.appendChild(current);
-      current.addEventListener('input', () => {
-        this.selectColor(current.value);
+      current.addEventListener('change', () => {
+        this.colors.hex = current.value;
+        this.selectColor(this.colors.hex);
         this.updateCursor();
       });
-      Dep.watcher(() => {
-        current.value = this.colors.hex.toString();
-      });
+      current.value = this.colors.hex.toString();
     }
 
     this.inputsWrapper.appendChild(this.submit);
@@ -352,18 +334,24 @@ export default class Colorpicker {
   }
 
   selectColor (color, mute = false) {
-    if (!mute) call(this.settings.events.beforeSelect);
+    this.muted = mute;
+    call(this.settings.events.beforeSelect);
     if (!isValidColor(color)) return;
 
+    console.log(color);
     this.colors.rgb = toRgb(color);
     this.colors.hsl = toHsl(color);
     this.colors.hex = toHex(color);
+    this.colors.current = this.colors[this.colors.model];
 
-    this.colors.current = alpha(this.colors[this.colors.model], this.colors.alpha);
-   
     this.updateSquareColors();
 
-    if (mute) return;
+    if (mute) {
+      // setTimeout(() => {
+      //   this.muted = false;
+      // }, 1);
+      return;
+    }
     call(this.settings.events.afterSelect);
     this.events.forEach((event) => this.el.dispatchEvent(event));
   }
@@ -371,7 +359,11 @@ export default class Colorpicker {
 
   getColorCanvas (mouse, ctx) {
     const imageData = ctx.getImageData(mouse.x, mouse.y, 1, 1).data;
-    return `rgb(${imageData[0]}, ${imageData[1]}, ${imageData[2]})`;
+    return {
+      red: imageData[0],
+      green: imageData[1],
+      blue: imageData[2]
+    };
   }
 
 

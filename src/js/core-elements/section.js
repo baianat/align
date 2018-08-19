@@ -324,7 +324,7 @@ export default class Section {
 
 
   backgroundColor (color) {
-    if (!color) {
+    if (!color || color === 'rgb(255,255,255)') {
       this.bgColor = null;
       this.el.style.backgroundColor = '';
       this.el.classList.remove('has-bgColor');
@@ -463,10 +463,7 @@ export default class Section {
   }
 
   active () {
-    if (Section.activeSection === this) {
-      this.$align.$sectionToolbar.update(this);
-      return;
-    }
+    console.log(this.props);
     if (Section.activeSection) {
       Section.activeSection.inactive();
     }

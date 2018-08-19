@@ -1,4 +1,4 @@
-import { call, stringToDOM } from '../partial/utils';
+import { stringToDOM } from '../partial/utils';
 
 /**
  * Slider class
@@ -47,7 +47,6 @@ export default class Slider {
 
     this.wrapper.appendChild(this.el);
     this.wrapper.appendChild(this.track);
-    call(this.settings.created, this);
   }
 
   _initEvents () {
@@ -67,6 +66,7 @@ export default class Slider {
     event.stopPropagation();
     // check if  left mouse is clicked
     if (event.buttons !== 1) return;
+    this.updateWidth();
     this.track.classList.add('is-dragging');
     this.ticking = false;
 
@@ -152,9 +152,6 @@ export default class Slider {
    * @param {Number} value
    */
   update (value, mute = false) {
-    if (!this.width) {
-      this.updateWidth();
-    }
     const normalized = this.normalizeValue(value);
     const positionPercentage = this.getPositionPercentage(normalized);
 
@@ -166,7 +163,6 @@ export default class Slider {
     if (mute) return;
     this.el.dispatchEvent(new Event('change')); // eslint-disable-line
     this.el.dispatchEvent(new Event('input'));  // eslint-disable-line
-    call(this.settings.updated);
   }
 
   // eslint-disable-next-line

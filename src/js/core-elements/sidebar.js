@@ -126,9 +126,6 @@ export default class Sidebar {
       })
       elm.appendChild(input);
       const colorpikcer = new Colorpicker(input, {
-        defaultColor: '#fff',
-        mode: 'hex',
-        picker: { mode: 'square' },
         guideIcon: `
           <svg viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="11"></circle>
@@ -205,7 +202,7 @@ export default class Sidebar {
               }
             });
           });
-          this.backgroundColor.colorpikcer.selectColor(this.currentProps.backgroundColor || '#fff', true);
+          this.backgroundColor.colorpikcer.selectColor(this.currentProps.backgroundColor, true);
           break;
 
         case 'customClass':
