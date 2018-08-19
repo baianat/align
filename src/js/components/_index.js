@@ -8,6 +8,7 @@ import Line from './line';
 import Link from './link';
 import Quote from './quote';
 import Separator from './separator';
+import Script from './script';
 import Table from './table';
 import Button from './button';
 import Vimeo from './vimeo';
@@ -24,6 +25,7 @@ export default {
   Link,
   Quote,
   Separator,
+  Script,
   Table,
   Button,
   Vimeo,
@@ -41,6 +43,7 @@ export {
   Link,
   Quote,
   Separator,
+  Script,
   Table,
   Button,
   Vimeo,

@@ -5,7 +5,8 @@
   "main": "dist/js/align.js",
   "module": "dist/js/align.esm.js",
   "dependencies": {
-    "color-fns": "^0.0.7"
+    "color-fns": "^0.0.7",
+    "prismjs": "^1.15.0"
   },
   "files": [
     "dist/js/*.js",
@@ -39,6 +40,7 @@
     "gzip-size": "^4.1.0",
     "rollup": "^0.57.1",
     "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^9.1.5",
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-replace": "^2.0.0",
