@@ -128,7 +128,6 @@ export default class Align {
    * Add all events listeners
    */
   _initEvents () {
-    this.editor.addEventListener('focus', this.highlight.bind(this));
     this.editor.addEventListener('mouseup', this.update.bind(this), true);
     this.editor.addEventListener('input', () => {
       this.$bus.emit('changed');
@@ -141,19 +140,6 @@ export default class Align {
     this.editor.innerHTML = '';
   }
 
-  /**
-   * Hight light code text
-   */
-  /* eslint-disable */
-  highlight () {
-    if (typeof hljs === 'undefined') {
-      return;
-    }
-    const code = Array.from(this.editor.querySelectorAll('pre'));
-    code.forEach((block) => {
-      hljs.highlightBlock(block);
-    });
-  }
   /* eslint-enable */
 
   /**
