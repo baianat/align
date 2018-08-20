@@ -5,6 +5,7 @@ const gzipSize = require('gzip-size');
 const babel = require('rollup-plugin-babel');
 const resolve = require('rollup-plugin-node-resolve');
 const replace = require('rollup-plugin-replace');
+const commonjs = require('rollup-plugin-commonjs');
 
 const { version } = require('../package.json');
 
@@ -30,10 +31,11 @@ module.exports = {
     inputOptions: {
       plugins: [
         replace({ __VERSION__: version }),
-        resolve(),
         babel({
           plugins: ['external-helpers']
-        })
+        }),
+        resolve(),
+        commonjs()
       ]
     }
   },

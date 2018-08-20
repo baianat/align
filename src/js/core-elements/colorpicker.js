@@ -338,7 +338,6 @@ export default class Colorpicker {
     call(this.settings.events.beforeSelect);
     if (!isValidColor(color)) return;
 
-    console.log(color);
     this.colors.rgb = toRgb(color);
     this.colors.hsl = toHsl(color);
     this.colors.hex = toHex(color);

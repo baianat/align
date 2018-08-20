@@ -212,3 +212,10 @@ export function getClosestValue (array, value) {
     return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
   });
 }
+
+export function removeClassByPrefix (el, prefix) {
+  const regx = new RegExp('\\b' + prefix + '.*?\\b', 'g');
+  [...el.classList].map(className => {
+    regx.test(className) && el.classList.remove(className);
+  });
+}

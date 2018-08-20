@@ -7,6 +7,7 @@ import {
   Separator,
   Table,
   Button,
+  Script,
 } from '../components/_index';
 import Selection from '../partial/selection';
 import Dep from '../partial/dep';
@@ -72,10 +73,12 @@ export default class Section {
       const controllers = output.querySelector('.align-sectionControllers');
       const contentDiv = output.querySelector('.align-content');
       const figures = Array.from(contentDiv.querySelectorAll('figure'));
+      const scripts = Array.from(contentDiv.querySelectorAll('.align-codeEditor'));
       if (this.props.isHTMLView) {
         contentDiv.innerHTML = contentDiv.innerText;
       }
       figures.forEach(fig => Figure.render(fig));
+      scripts.forEach(script => Script.render(script));
       output.classList.remove('is-active');
       output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
       contentDiv.remove();
@@ -166,6 +169,7 @@ export default class Section {
     const buttons = Array.from(this.contentDiv.querySelectorAll('.align-button'));
     const grids = Array.from(this.contentDiv.querySelectorAll('.align-grid'));
     const lines = Array.from(this.contentDiv.querySelectorAll('.align-line'));
+    const scripts = Array.from(this.contentDiv.querySelectorAll('.align-codeEditor'));
     const figures = Array.from(this.contentDiv.querySelectorAll('figure'));
     const tables = Array.from(this.contentDiv.querySelectorAll('table'));
     const links = Array.from(this.contentDiv.querySelectorAll('a'));
@@ -174,6 +178,7 @@ export default class Section {
     buttons.forEach(button => new Button(this.$align, button));
     grids.forEach(grid => new Grid(this.$align, grid));
     lines.forEach(line => new Line(this.$align, line));
+    scripts.forEach(script => new Script(this.$align, script));
     figures.forEach(figure => new Figure(this.$align, figure));
     tables.forEach(table => new Table(this.$align, table));
     links.forEach(link => new Link(this.$align, link));
@@ -315,7 +320,6 @@ export default class Section {
       pre.dataset.alignHtml = true;
       pre.appendChild(content);
       this.contentDiv.appendChild(pre);
-      this.$align.highlight();
       return;
     }
     this._initContent(this.contentDiv);
@@ -463,7 +467,9 @@ export default class Section {
   }
 
   active () {
-    console.log(this.props);
+    if (Section.activeSection !== this) {
+      this.contentDiv.focus();
+    }
     if (Section.activeSection) {
       Section.activeSection.inactive();
     }
@@ -472,7 +478,6 @@ export default class Section {
     this.$align.$sectionToolbar.update(this);
     this.$align.sidebar.update();
     this.$align.update();
-    this.contentDiv.focus();
   }
 
   inactive () {

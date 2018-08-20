@@ -1,6 +1,6 @@
 import icons from './icons';
 
-let NAMING_PREFIX = '';
+let NAMING_PREFIX = 'align-';
 
 export function setElementsPrefix (prefix) {
   NAMING_PREFIX = prefix;
@@ -35,7 +35,7 @@ export function select (name, options) {
       <polygon points="8,9 12,5 16,9 "/>
     </svg>`;
 
-  wrapper.classList.add(`${NAMING_PREFIX}select`);
+  wrapper.classList.add('align-select', name);
   select.id = name;
   options.forEach((option) => {
     const optionElement = document.createElement('option');
