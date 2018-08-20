@@ -1,5 +1,5 @@
 /**
-    * v0.0.37
+    * v0.0.38
     * (c) 2018 Baianat
     * @license MIT
     */
@@ -225,6 +225,13 @@
     }
   }
 
+  function removeClassByPrefix(el, prefix) {
+    var regx = new RegExp('\\b' + prefix + '.*?\\b', 'g');
+    [].concat(toConsumableArray(el.classList)).map(function (className) {
+      regx.test(className) && el.classList.remove(className);
+    });
+  }
+
   /**
    * Slider class
    */
@@ -245,10 +252,12 @@
         this.min = this.el.min = Number(this.settings.min);
         this.max = this.el.max = Number(this.settings.max);
         this.step = this.el.step = Number(this.settings.step);
+        this.value = this.el.value = Number(this.settings.value);
+        var stepSplitted = this.step.toString().split('.')[1];
+        this.decimalsCount = stepSplitted ? stepSplitted.length : 0;
 
         this._initElements();
         this._initEvents();
-        this.update();
       }
     }, {
       key: '_initElements',
@@ -275,7 +284,6 @@
 
         this.wrapper.appendChild(this.el);
         this.wrapper.appendChild(this.track);
-        call(this.settings.created, this);
       }
     }, {
       key: '_initEvents',
@@ -301,6 +309,7 @@
         event.stopPropagation();
         // check if  left mouse is clicked
         if (event.buttons !== 1) return;
+        this.updateWidth();
         this.track.classList.add('is-dragging');
         this.ticking = false;
 
@@ -356,8 +365,11 @@
 
         var mouseValue = eventX - this.currentX;
         var stepCount = parseInt(mouseValue / this.stepWidth + 0.5, 10);
-        var stepValue = parseInt((stepCount + this.min) / this.step, 10) * this.step;
-        return stepValue;
+        var stepValue = stepCount * this.step + this.min;
+        if (!this.decimalsCount) {
+          return stepValue;
+        }
+        return Number(stepValue.toFixed(this.decimalsCount));
       }
     }, {
       key: 'updateWidth',
@@ -365,7 +377,7 @@
         var trackRect = this.track.getBoundingClientRect();
         this.currentX = trackRect.left;
         this.width = trackRect.width;
-        this.stepWidth = this.width / (this.max - this.min);
+        this.stepWidth = this.width / (this.max - this.min) * this.step;
       }
 
       /**
@@ -386,17 +398,7 @@
         if (isNaN(Number(value))) {
           return this.value;
         }
-        if (this.multiple) {
-          var prevValue = this.values[this.activeHandle - 1] || this.min;
-          var nextValue = this.values[this.activeHandle + 1] || this.max;
-          value = Math.min(Math.max(Number(value), prevValue), nextValue);
-        }
         return Math.min(Math.max(Number(value), this.min), this.max);
-      }
-    }, {
-      key: 'newGradient',
-      value: function newGradient(_newGradient) {
-        return;
       }
 
       /**
@@ -409,24 +411,17 @@
       value: function update(value) {
         var mute = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-        if (Number(value) === this.value) return;
-
-        if (!this.width) {
-          this.updateWidth();
-        }
         var normalized = this.normalizeValue(value);
         var positionPercentage = this.getPositionPercentage(normalized);
 
-        if (this.fill) {
-          this.fill.style.transform = 'translate(' + positionPercentage * this.width + 'px, 0) scale(' + (1 - positionPercentage) + ', 1)';
-        }
+        this.fill.style.transform = 'translate(' + positionPercentage * this.width + 'px, 0) scale(' + (1 - positionPercentage) + ', 1)';
         this.handle.style.transform = 'translate(' + positionPercentage * this.width + 'px, 0)';
         this.value = normalized;
         this.el.value = this.value;
+
         if (mute) return;
         this.el.dispatchEvent(new Event('change')); // eslint-disable-line
         this.el.dispatchEvent(new Event('input')); // eslint-disable-line
-        call(this.settings.updated);
       }
 
       // eslint-disable-next-line
@@ -447,8 +442,7 @@
     min: 0,
     max: 10,
     step: 1,
-    value: 0,
-    handles: [0],
+    value: 1,
     trackSlide: true
   };
 
@@ -616,9 +610,6 @@
     return function (value) {
       return value >= lb && value <= ub;
     };
-  }
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
   var Color = function () {
@@ -839,6 +830,26 @@
       lum: Number(match[3]),
       alpha: Number(match[4])
     });
+  }
+
+  /**
+   * Checks if the given color string is valid (parsable).
+   *
+   * @param {String} color The color string to be checked.
+   */
+  function isValidColor(color) {
+    var model = getColorModel(color);
+
+    if (model === 'rgb') {
+      return !parseRgb(color).invalid;
+    }
+    if (model === 'hex') {
+      return !parseHex(color).invalid;
+    }
+    if (model === 'hsl') {
+      return !parseHsl(color).invalid;
+    }
+    return false;
   }
 
   function decNumToHex(decNum) {
@@ -1086,8 +1097,36 @@
     return new HexColor();
   }
 
-  function getRandomColor() {
-    return 'rgb(' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ')';
+  function alpha(color, alpha) {
+    alpha = Number(alpha);
+    if (isNaN(alpha) || alpha > 1 || alpha < 0) {
+      return 'Invalid alpha';
+    }
+
+    var model = getColorModel(color);
+
+    if (model === 'rgb') {
+      var red = color.red,
+          green = color.green,
+          blue = color.blue;
+
+      return new RgbColor({ red: red, green: green, blue: blue, alpha: alpha });
+    }
+    if (model === 'hex') {
+      var _red = color.red,
+          _green = color.green,
+          _blue = color.blue;
+
+      return new HexColor({ red: _red, green: _green, blue: _blue, alpha: decNumToHex(alpha * 255) });
+    }
+    if (model === 'hsl') {
+      var hue = color.hue,
+          sat = color.sat,
+          lum = color.lum;
+
+      return new HslColor({ hue: hue, sat: sat, lum: lum, alpha: alpha });
+    }
+    return 'Invalid color';
   }
 
   var Colorpicker = function () {
@@ -1104,16 +1143,18 @@
       value: function init() {
         this.events = [new Event('input'), new Event('change')];
         this.colors = {
-          current: this.settings.defaultColor,
+          current: {},
           model: this.settings.model,
-          rgb: '',
-          hsl: '',
-          hex: ''
+          alpha: 1,
+          rgb: {},
+          hsl: {},
+          hex: {}
         };
         this._initElements();
-        this._initWatchers();
         this._initInputs();
+        this._initWatchers();
         this._initEvents();
+
         this.selectColor(this.settings.defaultColor, true);
       }
     }, {
@@ -1137,17 +1178,20 @@
             }
           });
         });
-        Dep.watcher(function () {
-          _this.colors.rgb = toRgb(_this.colors.current);
-        });
-        Dep.watcher(function () {
-          _this.colors.hsl = toHsl(_this.colors.current);
-        });
-        Dep.watcher(function () {
-          _this.colors.hex = toHex(_this.colors.current);
-        });
+
         Dep.watcher(function () {
           _this.strip.update(_this.colors.hsl.hue, true);
+        });
+        Dep.watcher(function () {
+          _this.alphaSlider.update(_this.colors.rgb.alpha, true);
+        });
+        Dep.watcher(function () {
+          _this.updateInputsModel(_this.colors.model);
+        });
+        Dep.watcher(function () {
+          _this.el.value = _this.colors.current;
+          _this.guide.style.color = _this.colors.current;
+          _this.guide.style.fill = _this.colors.current;
         });
       }
     }, {
@@ -1157,158 +1201,196 @@
         this.lastMove = { x: 0, y: 0 };
         this.isMenuActive = false;
         // create colorpicker element
-        this.picker = document.createElement('div');
-        this.menu = stringToDOM('<div class="picker-menu is-hidden" tabindex="-1"></div>');
+        this.menu = stringToDOM('<div class="picker-menu" tabindex="-1"></div>');
         this.guide = stringToDOM('<button class="picker-guide">' + this.settings.guideIcon + '</button>');
-        this.controllers = stringToDOM('<div class="picker-controllers"></div>');
 
         // append colorpicker elements
-        this.picker.appendChild(this.menu);
-        this.picker.appendChild(this.guide);
         this._initPicker();
-        this.menu.appendChild(this.controllers);
+        this._initControllers();
 
-        this.el.parentNode.insertBefore(this.picker, this.el);
         this.el.classList.add('picker-value');
         this.picker.classList.add('picker');
+        this.el.parentNode.insertBefore(this.picker, this.el);
+
+        this.menu.appendChild(this.controllers);
         this.picker.appendChild(this.el);
-        this.guide.style.color = this.settings.defaultColor;
-        this.guide.style.fill = this.settings.defaultColor;
+        this.picker.appendChild(this.menu);
+        this.picker.appendChild(this.guide);
+
+        this.closePicker();
+      }
+    }, {
+      key: '_initControllers',
+      value: function _initControllers() {
+        var _this2 = this;
+
+        this.controllers = stringToDOM('<div class="picker-controllers"></div>');
+        this.strip = new Slider({ min: 0, max: 360, step: 1, classes: ['is-strip'] });
+        this.alphaSlider = new Slider({ min: 0, max: 1, step: 0.1, value: 1, classes: ['is-alpha'] });
+        this.controllers.appendChild(this.strip.wrapper);
+        this.controllers.appendChild(this.alphaSlider.wrapper);
+
+        var updateHue = function updateHue(event) {
+          _this2.colors.hsl.hue = event.target.value || 0;
+          _this2.selectColor(_this2.colors.hsl);
+        };
+        var updateAlpha = function updateAlpha(event) {
+          var color = alpha(_this2.colors.current, event.target.value || 1);
+          _this2.selectColor(color);
+        };
+
+        this.strip.el.addEventListener('input', updateHue);
+        this.alphaSlider.el.addEventListener('input', updateAlpha);
       }
     }, {
       key: '_initPicker',
       value: function _initPicker() {
-        var _this2 = this;
+        var _this3 = this;
 
         this.square = stringToDOM('\n      <div class="picker-square">\n        <canvas class="picker-canvas"></canvas>\n        <div class="picker-cursor"></div>\n      </div>');
 
+        this.picker = document.createElement('div');
         this.canvas = this.square.querySelector('.picker-canvas');
-        this.strip = this.square.querySelector('.picker-squareStrip');
         this.cursor = this.square.querySelector('.picker-cursor');
         this.ctx = this.canvas.getContext('2d');
-        this.strip = new Slider({ min: 0, max: 360, step: 1, classes: ['is-strip'] });
 
         this.menu.appendChild(this.square);
-        this.controllers.appendChild(this.strip.wrapper);
 
         // setup canvas
         this.canvas.width = 250;
         this.canvas.height = 150;
+        this.pickerRect = this.canvas.getBoundingClientRect();
 
         var updateColor = function updateColor(event) {
-          if (event.target !== _this2.canvas) {
-            return;
-          }
+          var x = event.x,
+              y = event.y;
+          var _pickerRect = _this3.pickerRect,
+              left = _pickerRect.left,
+              top = _pickerRect.top;
 
-          var _getMouseCords = _this2.getMouseCords(event),
-              x = _getMouseCords.x,
-              y = _getMouseCords.y;
+          var normalized = {
+            x: Math.min(Math.max(x - left, 0), _this3.canvas.width - 1),
+            y: Math.min(Math.max(y - top, 0), _this3.canvas.height)
+          };
+          _this3.mouse = { x: normalized.x, y: normalized.y };
 
-          _this2.mouse = { x: Math.min(x, _this2.canvas.width), y: Math.min(y, _this2.canvas.height) };
-          var color = _this2.getColorCanvas(_this2.mouse, _this2.ctx);
-          _this2.selectColor(color);
-          _this2.updateCursor(_this2.mouse);
+          var _getColorCanvas = _this3.getColorCanvas(_this3.mouse, _this3.ctx),
+              red = _getColorCanvas.red,
+              green = _getColorCanvas.green,
+              blue = _getColorCanvas.blue;
+
+          _this3.colors.rgb.red = red;
+          _this3.colors.rgb.green = green;
+          _this3.colors.rgb.blue = blue;
+          _this3.selectColor(_this3.colors.rgb);
+          _this3.updateCursor(_this3.mouse);
         };
 
-        var updateHue = function updateHue(event) {
-          _this2.colors.hsl.hue = event.target.value;
-          _this2.selectColor(_this2.colors.hsl);
+        var mouseDownHandler = function mouseDownHandler(event) {
+          event.preventDefault();
+          _this3.pickerRect = _this3.canvas.getBoundingClientRect();
+          return function (func) {
+            func(event);
+            var tempFunc = function tempFunc(event) {
+              window.requestAnimationFrame(function () {
+                return func(event);
+              });
+            };
+            var mouseupHandler = function mouseupHandler() {
+              document.removeEventListener('mousemove', tempFunc);
+              document.removeEventListener('mouseup', mouseupHandler);
+            };
+            document.addEventListener('mousemove', tempFunc);
+            document.addEventListener('mouseup', mouseupHandler);
+          };
         };
-
         this.updateSquareColors();
 
         // add event listener
         this.canvas.addEventListener('mousedown', function (event) {
           return mouseDownHandler(event)(updateColor);
         });
-        this.strip.el.addEventListener('input', updateHue);
       }
     }, {
       key: '_initInputs',
       value: function _initInputs() {
-        var _this3 = this;
+        var _this4 = this;
 
         this.inputsWrapper = stringToDOM('<div class="picker-inputs"></div>');
         this.modelSwitcher = stringToDOM('<button class="picker-model"></button>');
         this.submit = stringToDOM('\n    <button class="picker-submit">\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>\n      </svg>\n    </button>');
 
-        this.updateInputsModel();
         this.controllers.appendChild(this.inputsWrapper);
 
         this.modelSwitcher.addEventListener('click', function (event) {
           var models = ['hex', 'rgb', 'hsl'];
-          var indx = models.indexOf(_this3.colors.model);
-          _this3.colors.model = models[indx + 1] || models[0];
-          _this3.updateInputsModel();
+          var indx = models.indexOf(_this4.colors.model);
+          _this4.colors.model = models[indx + 1] || models[0];
+          _this4.selectColor(_this4.colors.current);
         });
         this.submit.addEventListener('click', function (event) {
-          call(_this3.settings.events.beforeSubmit);
-          _this3.selectColor(_this3.el.value);
-          if (_this3.settings.menu.hideWhenSubmit) {
-            _this3.closePicker();
-          }
-          call(_this3.settings.events.afterSubmit);
+          call(_this4.settings.events.beforeSubmit);
+          _this4.selectColor(_this4.colors[_this4.colors.model]);
+          _this4.closePicker();
+          call(_this4.settings.events.afterSubmit);
         });
       }
     }, {
       key: 'updateInputsModel',
-      value: function updateInputsModel() {
-        var _this4 = this;
+      value: function updateInputsModel(model) {
+        var _this5 = this;
 
         this.inputsWrapper.innerHTML = '';
-        this.modelSwitcher.innerText = this.colors.model + ': ';
+        this.modelSwitcher.innerText = model + ': ';
         this.inputsWrapper.appendChild(this.modelSwitcher);
-        if (this.colors.model === 'hsl') {
+        if (model === 'hsl') {
           this.inputs = {
             hue: stringToDOM('<input type="number" min="0" max="360" class="picker-input"/>'),
             sat: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>'),
             lum: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>')
           };
           Object.keys(this.inputs).forEach(function (key) {
-            var current = _this4.inputs[key];
-            _this4.inputsWrapper.appendChild(current);
-            current.addEventListener('input', function () {
-              _this4.selectColor('hsl(\n            ' + _this4.inputs.hue.value + ',\n            ' + _this4.inputs.sat.value + '%,\n            ' + _this4.inputs.lum.value + '%)');
-              _this4.updateCursor();
-            });
-            Dep.watcher(function () {
-              current.value = _this4.colors.hsl[key];
+            var current = _this5.inputs[key];
+            _this5.inputsWrapper.appendChild(current);
+            current.value = _this5.colors.hsl[key];
+            current.addEventListener('change', function () {
+              _this5.colors.hsl[key] = current.value;
+              _this5.selectColor(_this5.colors.hsl);
+              _this5.updateCursor();
             });
           });
         }
 
-        if (this.colors.model === 'rgb') {
+        if (model === 'rgb') {
           this.inputs = {
             red: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
             green: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
             blue: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>')
           };
           Object.keys(this.inputs).forEach(function (key) {
-            var current = _this4.inputs[key];
-            _this4.inputsWrapper.appendChild(current);
-            current.addEventListener('input', function () {
-              _this4.selectColor('rgb(\n            ' + _this4.inputs.red.value + ',\n            ' + _this4.inputs.green.value + ',\n            ' + _this4.inputs.blue.value + ')');
-              _this4.updateCursor();
-            });
-            Dep.watcher(function () {
-              current.value = _this4.colors.rgb[key];
+            var current = _this5.inputs[key];
+            _this5.inputsWrapper.appendChild(current);
+            current.value = _this5.colors.rgb[key];
+            current.addEventListener('change', function () {
+              _this5.colors.rgb[key] = current.value;
+              _this5.selectColor(_this5.colors.rgb);
+              _this5.updateCursor();
             });
           });
         }
 
-        if (this.colors.model === 'hex') {
+        if (model === 'hex') {
           this.inputs = {
             hex: stringToDOM('<input type="text" class="picker-input"/>')
           };
           var current = this.inputs['hex'];
           this.inputsWrapper.appendChild(current);
-          current.addEventListener('input', function () {
-            _this4.selectColor(current.value);
-            _this4.updateCursor();
+          current.addEventListener('change', function () {
+            _this5.colors.hex = current.value;
+            _this5.selectColor(_this5.colors.hex);
+            _this5.updateCursor();
           });
-          Dep.watcher(function () {
-            current.value = _this4.colors.hex.toString();
-          });
+          current.value = this.colors.hex.toString();
         }
 
         this.inputsWrapper.appendChild(this.submit);
@@ -1316,18 +1398,18 @@
     }, {
       key: '_initEvents',
       value: function _initEvents() {
-        var _this5 = this;
+        var _this6 = this;
 
         // eslint-disable-next-line
 
         this.guide.addEventListener('click', function () {
-          call(_this5.settings.events.beforeOpen);
-          _this5.togglePicker();
+          call(_this6.settings.events.beforeOpen);
+          _this6.togglePicker();
         });
 
         if (this.settings.menu.draggable) {
           this.menu.addEventListener('mousedown', function (event) {
-            if (event.target !== _this5.menu || event.button !== 0) return;
+            if (event.target !== _this6.menu || event.button !== 0) return;
             var startPosition = {};
             var endPosition = {};
             var delta = {};
@@ -1340,13 +1422,13 @@
               window.requestAnimationFrame(function () {
                 endPosition.x = evnt.clientX;
                 endPosition.y = evnt.clientY;
-                delta.x = _this5.lastMove.x + endPosition.x - startPosition.x;
-                delta.y = _this5.lastMove.y + endPosition.y - startPosition.y;
-                _this5.menu.style.transform = 'translate(' + delta.x + 'px, ' + delta.y + 'px)';
+                delta.x = _this6.lastMove.x + endPosition.x - startPosition.x;
+                delta.y = _this6.lastMove.y + endPosition.y - startPosition.y;
+                _this6.menu.style.transform = 'translate(' + delta.x + 'px, ' + delta.y + 'px)';
               });
             };
             var mouseupHandler = function mouseupHandler() {
-              _this5.lastMove = delta;
+              _this6.lastMove = delta;
               document.removeEventListener('mousemove', mousemoveHandler);
               document.removeEventListener('mouseup', mouseupHandler);
             };
@@ -1393,39 +1475,41 @@
     }, {
       key: 'selectColor',
       value: function selectColor(color) {
-        var _this6 = this;
+        var _this7 = this;
 
         var mute = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-        if (!mute) call(this.settings.events.beforeSelect);
-        this.colors.current = color;
-        this.el.value = this.colors[this.colors.model];
+        this.muted = mute;
+        call(this.settings.events.beforeSelect);
+        if (!isValidColor(color)) return;
 
-        this.guide.style.color = color;
-        this.guide.style.fill = color;
+        this.colors.rgb = toRgb(color);
+        this.colors.hsl = toHsl(color);
+        this.colors.hex = toHex(color);
+        this.colors.current = this.colors[this.colors.model];
 
         this.updateSquareColors();
 
-        if (mute) return;
+        if (mute) {
+          // setTimeout(() => {
+          //   this.muted = false;
+          // }, 1);
+          return;
+        }
         call(this.settings.events.afterSelect);
         this.events.forEach(function (event) {
-          return _this6.el.dispatchEvent(event);
+          return _this7.el.dispatchEvent(event);
         });
       }
     }, {
       key: 'getColorCanvas',
       value: function getColorCanvas(mouse, ctx) {
         var imageData = ctx.getImageData(mouse.x, mouse.y, 1, 1).data;
-        return 'rgb(' + imageData[0] + ', ' + imageData[1] + ', ' + imageData[2] + ')';
-      }
-    }, {
-      key: 'getMouseCords',
-      value: function getMouseCords(event) {
-        var mouse = {
-          x: event.offsetX,
-          y: event.offsetY
+        return {
+          red: imageData[0],
+          green: imageData[1],
+          blue: imageData[2]
         };
-        return mouse;
       }
     }, {
       key: 'togglePicker',
@@ -1441,24 +1525,25 @@
       value: function closePicker() {
         this.menu.classList.add('is-hidden');
         this.isMenuActive = false;
-        document.removeEventListener('click', this.documentCallback);
+        document.removeEventListener('mousedown', this.documentCallback);
       }
     }, {
       key: 'openPiker',
       value: function openPiker() {
-        var _this7 = this;
+        var _this8 = this;
 
         this.menu.classList.remove('is-hidden');
         this.isMenuActive = true;
+
         var documentCallback = function documentCallback(evnt) {
-          if (!isElementClosest(evnt.target, _this7.menu) && !isElementClosest(evnt.target, _this7.guide)) {
-            _this7.closePicker();
+          if (!isElementClosest(evnt.target, _this8.menu) && !isElementClosest(evnt.target, _this8.guide)) {
+            _this8.closePicker();
             return;
           }
-          call(_this7.settings.events.clicked);
+          call(_this8.settings.events.clicked);
         };
         this.documentCallback = documentCallback.bind(this);
-        document.addEventListener('click', this.documentCallback);
+        document.addEventListener('mousedown', this.documentCallback);
         call(this.settings.events.afterOpen);
       }
     }]);
@@ -1466,35 +1551,15 @@
   }();
 
   Colorpicker.defaults = {
-    defaultColor: getRandomColor(),
+    defaultColor: '#fff',
     model: 'rgb',
     events: {},
     menu: {
       draggable: true,
       hideWhenSubmit: true
     },
-    rgbSliders: false,
     guideIcon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>'
   };
-
-
-  function mouseDownHandler(event) {
-    event.preventDefault();
-    return function (func) {
-      func(event);
-      var tempFunc = function tempFunc(event) {
-        window.requestAnimationFrame(function () {
-          return func(event);
-        });
-      };
-      var mouseupHandler = function mouseupHandler() {
-        document.removeEventListener('mousemove', tempFunc);
-        document.removeEventListener('mouseup', mouseupHandler);
-      };
-      document.addEventListener('mousemove', tempFunc);
-      document.addEventListener('mouseup', mouseupHandler);
-    };
-  }
 
   var Selection = function () {
     function Selection() {
@@ -2058,8 +2123,6 @@
       useCSS: true,
       init: Colorpicker,
       initConfig: {
-        defaultColor: '#fff',
-        mode: 'hex',
         guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path d="M0 20h24v4H0z"/>\n          <path style="fill: currentColor" d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/>\n        </svg>\n      ',
         events: {
           beforeSubmit: function beforeSubmit() {
@@ -2080,8 +2143,6 @@
       useCSS: true,
       init: Colorpicker,
       initConfig: {
-        defaultColor: '#fdfdfd',
-        mode: 'hex',
         guideIcon: '\n        <svg viewBox="0 0 24 24">\n          <path style="fill: currentColor" d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/>\n          <path d="M0 20h24v4H0z"/>\n        </svg>\n      ',
         events: {
           beforeSubmit: function beforeSubmit() {
@@ -2403,7 +2464,7 @@
     tooltip: 'Facebook post'
   };
 
-  var NAMING_PREFIX = '';
+  var NAMING_PREFIX = 'align-';
 
   function setElementsPrefix(prefix) {
     NAMING_PREFIX = prefix;
@@ -2434,7 +2495,7 @@
     var select = document.createElement('select');
     var icon = '\n    <svg viewBox="0 0 24 24">\n      <polygon points="8,15 12,19 16,15 "/>\n      <polygon points="8,9 12,5 16,9 "/>\n    </svg>';
 
-    wrapper.classList.add(NAMING_PREFIX + 'select');
+    wrapper.classList.add('align-select', name);
     select.id = name;
     options.forEach(function (option) {
       var optionElement = document.createElement('option');
@@ -3495,6 +3556,1017 @@
     icon: 'split'
   };
 
+  var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+  function createCommonjsModule(fn, module) {
+  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
+
+  var prism = createCommonjsModule(function (module) {
+  /* **********************************************
+       Begin prism-core.js
+  ********************************************** */
+
+  var _self = typeof window !== 'undefined' ? window // if in browser
+  : typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope ? self // if in worker
+  : {} // if in node js
+  ;
+
+  /**
+   * Prism: Lightweight, robust, elegant syntax highlighting
+   * MIT license http://www.opensource.org/licenses/mit-license.php/
+   * @author Lea Verou http://lea.verou.me
+   */
+
+  var Prism = function () {
+
+  	// Private helper vars
+  	var lang = /\blang(?:uage)?-([\w-]+)\b/i;
+  	var uniqueId = 0;
+
+  	var _ = _self.Prism = {
+  		manual: _self.Prism && _self.Prism.manual,
+  		disableWorkerMessageHandler: _self.Prism && _self.Prism.disableWorkerMessageHandler,
+  		util: {
+  			encode: function encode(tokens) {
+  				if (tokens instanceof Token) {
+  					return new Token(tokens.type, _.util.encode(tokens.content), tokens.alias);
+  				} else if (_.util.type(tokens) === 'Array') {
+  					return tokens.map(_.util.encode);
+  				} else {
+  					return tokens.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\u00a0/g, ' ');
+  				}
+  			},
+
+  			type: function type(o) {
+  				return Object.prototype.toString.call(o).match(/\[object (\w+)\]/)[1];
+  			},
+
+  			objId: function objId(obj) {
+  				if (!obj['__id']) {
+  					Object.defineProperty(obj, '__id', { value: ++uniqueId });
+  				}
+  				return obj['__id'];
+  			},
+
+  			// Deep clone a language definition (e.g. to extend it)
+  			clone: function clone(o, visited) {
+  				var type = _.util.type(o);
+  				visited = visited || {};
+
+  				switch (type) {
+  					case 'Object':
+  						if (visited[_.util.objId(o)]) {
+  							return visited[_.util.objId(o)];
+  						}
+  						var clone = {};
+  						visited[_.util.objId(o)] = clone;
+
+  						for (var key in o) {
+  							if (o.hasOwnProperty(key)) {
+  								clone[key] = _.util.clone(o[key], visited);
+  							}
+  						}
+
+  						return clone;
+
+  					case 'Array':
+  						if (visited[_.util.objId(o)]) {
+  							return visited[_.util.objId(o)];
+  						}
+  						var clone = [];
+  						visited[_.util.objId(o)] = clone;
+
+  						o.forEach(function (v, i) {
+  							clone[i] = _.util.clone(v, visited);
+  						});
+
+  						return clone;
+  				}
+
+  				return o;
+  			}
+  		},
+
+  		languages: {
+  			extend: function extend(id, redef) {
+  				var lang = _.util.clone(_.languages[id]);
+
+  				for (var key in redef) {
+  					lang[key] = redef[key];
+  				}
+
+  				return lang;
+  			},
+
+  			/**
+      * Insert a token before another token in a language literal
+      * As this needs to recreate the object (we cannot actually insert before keys in object literals),
+      * we cannot just provide an object, we need anobject and a key.
+      * @param inside The key (or language id) of the parent
+      * @param before The key to insert before. If not provided, the function appends instead.
+      * @param insert Object with the key/value pairs to insert
+      * @param root The object that contains `inside`. If equal to Prism.languages, it can be omitted.
+      */
+  			insertBefore: function insertBefore(inside, before, insert, root) {
+  				root = root || _.languages;
+  				var grammar = root[inside];
+
+  				if (arguments.length == 2) {
+  					insert = arguments[1];
+
+  					for (var newToken in insert) {
+  						if (insert.hasOwnProperty(newToken)) {
+  							grammar[newToken] = insert[newToken];
+  						}
+  					}
+
+  					return grammar;
+  				}
+
+  				var ret = {};
+
+  				for (var token in grammar) {
+
+  					if (grammar.hasOwnProperty(token)) {
+
+  						if (token == before) {
+
+  							for (var newToken in insert) {
+
+  								if (insert.hasOwnProperty(newToken)) {
+  									ret[newToken] = insert[newToken];
+  								}
+  							}
+  						}
+
+  						ret[token] = grammar[token];
+  					}
+  				}
+
+  				// Update references in other language definitions
+  				_.languages.DFS(_.languages, function (key, value) {
+  					if (value === root[inside] && key != inside) {
+  						this[key] = ret;
+  					}
+  				});
+
+  				return root[inside] = ret;
+  			},
+
+  			// Traverse a language definition with Depth First Search
+  			DFS: function DFS(o, callback, type, visited) {
+  				visited = visited || {};
+  				for (var i in o) {
+  					if (o.hasOwnProperty(i)) {
+  						callback.call(o, i, o[i], type || i);
+
+  						if (_.util.type(o[i]) === 'Object' && !visited[_.util.objId(o[i])]) {
+  							visited[_.util.objId(o[i])] = true;
+  							_.languages.DFS(o[i], callback, null, visited);
+  						} else if (_.util.type(o[i]) === 'Array' && !visited[_.util.objId(o[i])]) {
+  							visited[_.util.objId(o[i])] = true;
+  							_.languages.DFS(o[i], callback, i, visited);
+  						}
+  					}
+  				}
+  			}
+  		},
+  		plugins: {},
+
+  		highlightAll: function highlightAll(async, callback) {
+  			_.highlightAllUnder(document, async, callback);
+  		},
+
+  		highlightAllUnder: function highlightAllUnder(container, async, callback) {
+  			var env = {
+  				callback: callback,
+  				selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
+  			};
+
+  			_.hooks.run("before-highlightall", env);
+
+  			var elements = env.elements || container.querySelectorAll(env.selector);
+
+  			for (var i = 0, element; element = elements[i++];) {
+  				_.highlightElement(element, async === true, env.callback);
+  			}
+  		},
+
+  		highlightElement: function highlightElement(element, async, callback) {
+  			// Find language
+  			var language,
+  			    grammar,
+  			    parent = element;
+
+  			while (parent && !lang.test(parent.className)) {
+  				parent = parent.parentNode;
+  			}
+
+  			if (parent) {
+  				language = (parent.className.match(lang) || [, ''])[1].toLowerCase();
+  				grammar = _.languages[language];
+  			}
+
+  			// Set language on the element, if not present
+  			element.className = element.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language;
+
+  			if (element.parentNode) {
+  				// Set language on the parent, for styling
+  				parent = element.parentNode;
+
+  				if (/pre/i.test(parent.nodeName)) {
+  					parent.className = parent.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language;
+  				}
+  			}
+
+  			var code = element.textContent;
+
+  			var env = {
+  				element: element,
+  				language: language,
+  				grammar: grammar,
+  				code: code
+  			};
+
+  			_.hooks.run('before-sanity-check', env);
+
+  			if (!env.code || !env.grammar) {
+  				if (env.code) {
+  					_.hooks.run('before-highlight', env);
+  					env.element.textContent = env.code;
+  					_.hooks.run('after-highlight', env);
+  				}
+  				_.hooks.run('complete', env);
+  				return;
+  			}
+
+  			_.hooks.run('before-highlight', env);
+
+  			if (async && _self.Worker) {
+  				var worker = new Worker(_.filename);
+
+  				worker.onmessage = function (evt) {
+  					env.highlightedCode = evt.data;
+
+  					_.hooks.run('before-insert', env);
+
+  					env.element.innerHTML = env.highlightedCode;
+
+  					callback && callback.call(env.element);
+  					_.hooks.run('after-highlight', env);
+  					_.hooks.run('complete', env);
+  				};
+
+  				worker.postMessage(JSON.stringify({
+  					language: env.language,
+  					code: env.code,
+  					immediateClose: true
+  				}));
+  			} else {
+  				env.highlightedCode = _.highlight(env.code, env.grammar, env.language);
+
+  				_.hooks.run('before-insert', env);
+
+  				env.element.innerHTML = env.highlightedCode;
+
+  				callback && callback.call(element);
+
+  				_.hooks.run('after-highlight', env);
+  				_.hooks.run('complete', env);
+  			}
+  		},
+
+  		highlight: function highlight(text, grammar, language) {
+  			var env = {
+  				code: text,
+  				grammar: grammar,
+  				language: language
+  			};
+  			_.hooks.run('before-tokenize', env);
+  			env.tokens = _.tokenize(env.code, env.grammar);
+  			_.hooks.run('after-tokenize', env);
+  			return Token.stringify(_.util.encode(env.tokens), env.language);
+  		},
+
+  		matchGrammar: function matchGrammar(text, strarr, grammar, index, startPos, oneshot, target) {
+  			var Token = _.Token;
+
+  			for (var token in grammar) {
+  				if (!grammar.hasOwnProperty(token) || !grammar[token]) {
+  					continue;
+  				}
+
+  				if (token == target) {
+  					return;
+  				}
+
+  				var patterns = grammar[token];
+  				patterns = _.util.type(patterns) === "Array" ? patterns : [patterns];
+
+  				for (var j = 0; j < patterns.length; ++j) {
+  					var pattern = patterns[j],
+  					    inside = pattern.inside,
+  					    lookbehind = !!pattern.lookbehind,
+  					    greedy = !!pattern.greedy,
+  					    lookbehindLength = 0,
+  					    alias = pattern.alias;
+
+  					if (greedy && !pattern.pattern.global) {
+  						// Without the global flag, lastIndex won't work
+  						var flags = pattern.pattern.toString().match(/[imuy]*$/)[0];
+  						pattern.pattern = RegExp(pattern.pattern.source, flags + "g");
+  					}
+
+  					pattern = pattern.pattern || pattern;
+
+  					// Don’t cache length as it changes during the loop
+  					for (var i = index, pos = startPos; i < strarr.length; pos += strarr[i].length, ++i) {
+
+  						var str = strarr[i];
+
+  						if (strarr.length > text.length) {
+  							// Something went terribly wrong, ABORT, ABORT!
+  							return;
+  						}
+
+  						if (str instanceof Token) {
+  							continue;
+  						}
+
+  						if (greedy && i != strarr.length - 1) {
+  							pattern.lastIndex = pos;
+  							var match = pattern.exec(text);
+  							if (!match) {
+  								break;
+  							}
+
+  							var from = match.index + (lookbehind ? match[1].length : 0),
+  							    to = match.index + match[0].length,
+  							    k = i,
+  							    p = pos;
+
+  							for (var len = strarr.length; k < len && (p < to || !strarr[k].type && !strarr[k - 1].greedy); ++k) {
+  								p += strarr[k].length;
+  								// Move the index i to the element in strarr that is closest to from
+  								if (from >= p) {
+  									++i;
+  									pos = p;
+  								}
+  							}
+
+  							// If strarr[i] is a Token, then the match starts inside another Token, which is invalid
+  							if (strarr[i] instanceof Token) {
+  								continue;
+  							}
+
+  							// Number of tokens to delete and replace with the new match
+  							delNum = k - i;
+  							str = text.slice(pos, p);
+  							match.index -= pos;
+  						} else {
+  							pattern.lastIndex = 0;
+
+  							var match = pattern.exec(str),
+  							    delNum = 1;
+  						}
+
+  						if (!match) {
+  							if (oneshot) {
+  								break;
+  							}
+
+  							continue;
+  						}
+
+  						if (lookbehind) {
+  							lookbehindLength = match[1] ? match[1].length : 0;
+  						}
+
+  						var from = match.index + lookbehindLength,
+  						    match = match[0].slice(lookbehindLength),
+  						    to = from + match.length,
+  						    before = str.slice(0, from),
+  						    after = str.slice(to);
+
+  						var args = [i, delNum];
+
+  						if (before) {
+  							++i;
+  							pos += before.length;
+  							args.push(before);
+  						}
+
+  						var wrapped = new Token(token, inside ? _.tokenize(match, inside) : match, alias, match, greedy);
+
+  						args.push(wrapped);
+
+  						if (after) {
+  							args.push(after);
+  						}
+
+  						Array.prototype.splice.apply(strarr, args);
+
+  						if (delNum != 1) _.matchGrammar(text, strarr, grammar, i, pos, true, token);
+
+  						if (oneshot) break;
+  					}
+  				}
+  			}
+  		},
+
+  		tokenize: function tokenize(text, grammar, language) {
+  			var strarr = [text];
+
+  			var rest = grammar.rest;
+
+  			if (rest) {
+  				for (var token in rest) {
+  					grammar[token] = rest[token];
+  				}
+
+  				delete grammar.rest;
+  			}
+
+  			_.matchGrammar(text, strarr, grammar, 0, 0, false);
+
+  			return strarr;
+  		},
+
+  		hooks: {
+  			all: {},
+
+  			add: function add(name, callback) {
+  				var hooks = _.hooks.all;
+
+  				hooks[name] = hooks[name] || [];
+
+  				hooks[name].push(callback);
+  			},
+
+  			run: function run(name, env) {
+  				var callbacks = _.hooks.all[name];
+
+  				if (!callbacks || !callbacks.length) {
+  					return;
+  				}
+
+  				for (var i = 0, callback; callback = callbacks[i++];) {
+  					callback(env);
+  				}
+  			}
+  		}
+  	};
+
+  	var Token = _.Token = function (type, content, alias, matchedStr, greedy) {
+  		this.type = type;
+  		this.content = content;
+  		this.alias = alias;
+  		// Copy of the full string this token was created from
+  		this.length = (matchedStr || "").length | 0;
+  		this.greedy = !!greedy;
+  	};
+
+  	Token.stringify = function (o, language, parent) {
+  		if (typeof o == 'string') {
+  			return o;
+  		}
+
+  		if (_.util.type(o) === 'Array') {
+  			return o.map(function (element) {
+  				return Token.stringify(element, language, o);
+  			}).join('');
+  		}
+
+  		var env = {
+  			type: o.type,
+  			content: Token.stringify(o.content, language, parent),
+  			tag: 'span',
+  			classes: ['token', o.type],
+  			attributes: {},
+  			language: language,
+  			parent: parent
+  		};
+
+  		if (o.alias) {
+  			var aliases = _.util.type(o.alias) === 'Array' ? o.alias : [o.alias];
+  			Array.prototype.push.apply(env.classes, aliases);
+  		}
+
+  		_.hooks.run('wrap', env);
+
+  		var attributes = Object.keys(env.attributes).map(function (name) {
+  			return name + '="' + (env.attributes[name] || '').replace(/"/g, '&quot;') + '"';
+  		}).join(' ');
+
+  		return '<' + env.tag + ' class="' + env.classes.join(' ') + '"' + (attributes ? ' ' + attributes : '') + '>' + env.content + '</' + env.tag + '>';
+  	};
+
+  	if (!_self.document) {
+  		if (!_self.addEventListener) {
+  			// in Node.js
+  			return _self.Prism;
+  		}
+
+  		if (!_.disableWorkerMessageHandler) {
+  			// In worker
+  			_self.addEventListener('message', function (evt) {
+  				var message = JSON.parse(evt.data),
+  				    lang = message.language,
+  				    code = message.code,
+  				    immediateClose = message.immediateClose;
+
+  				_self.postMessage(_.highlight(code, _.languages[lang], lang));
+  				if (immediateClose) {
+  					_self.close();
+  				}
+  			}, false);
+  		}
+
+  		return _self.Prism;
+  	}
+
+  	//Get current script and highlight
+  	var script = document.currentScript || [].slice.call(document.getElementsByTagName("script")).pop();
+
+  	if (script) {
+  		_.filename = script.src;
+
+  		if (!_.manual && !script.hasAttribute('data-manual')) {
+  			if (document.readyState !== "loading") {
+  				if (window.requestAnimationFrame) {
+  					window.requestAnimationFrame(_.highlightAll);
+  				} else {
+  					window.setTimeout(_.highlightAll, 16);
+  				}
+  			} else {
+  				document.addEventListener('DOMContentLoaded', _.highlightAll);
+  			}
+  		}
+  	}
+
+  	return _self.Prism;
+  }();
+
+  if ('object' !== 'undefined' && module.exports) {
+  	module.exports = Prism;
+  }
+
+  // hack for components to work correctly in node.js
+  if (typeof commonjsGlobal !== 'undefined') {
+  	commonjsGlobal.Prism = Prism;
+  }
+
+  /* **********************************************
+       Begin prism-markup.js
+  ********************************************** */
+
+  Prism.languages.markup = {
+  	'comment': /<!--[\s\S]*?-->/,
+  	'prolog': /<\?[\s\S]+?\?>/,
+  	'doctype': /<!DOCTYPE[\s\S]+?>/i,
+  	'cdata': /<!\[CDATA\[[\s\S]*?]]>/i,
+  	'tag': {
+  		pattern: /<\/?(?!\d)[^\s>\/=$<%]+(?:\s+[^\s>\/=]+(?:=(?:("|')(?:\\[\s\S]|(?!\1)[^\\])*\1|[^\s'">=]+))?)*\s*\/?>/i,
+  		greedy: true,
+  		inside: {
+  			'tag': {
+  				pattern: /^<\/?[^\s>\/]+/i,
+  				inside: {
+  					'punctuation': /^<\/?/,
+  					'namespace': /^[^\s>\/:]+:/
+  				}
+  			},
+  			'attr-value': {
+  				pattern: /=(?:("|')(?:\\[\s\S]|(?!\1)[^\\])*\1|[^\s'">=]+)/i,
+  				inside: {
+  					'punctuation': [/^=/, {
+  						pattern: /(^|[^\\])["']/,
+  						lookbehind: true
+  					}]
+  				}
+  			},
+  			'punctuation': /\/?>/,
+  			'attr-name': {
+  				pattern: /[^\s>\/]+/,
+  				inside: {
+  					'namespace': /^[^\s>\/:]+:/
+  				}
+  			}
+
+  		}
+  	},
+  	'entity': /&#?[\da-z]{1,8};/i
+  };
+
+  Prism.languages.markup['tag'].inside['attr-value'].inside['entity'] = Prism.languages.markup['entity'];
+
+  // Plugin to make entity title show the real entity, idea by Roman Komarov
+  Prism.hooks.add('wrap', function (env) {
+
+  	if (env.type === 'entity') {
+  		env.attributes['title'] = env.content.replace(/&amp;/, '&');
+  	}
+  });
+
+  Prism.languages.xml = Prism.languages.markup;
+  Prism.languages.html = Prism.languages.markup;
+  Prism.languages.mathml = Prism.languages.markup;
+  Prism.languages.svg = Prism.languages.markup;
+
+  /* **********************************************
+       Begin prism-css.js
+  ********************************************** */
+
+  Prism.languages.css = {
+  	'comment': /\/\*[\s\S]*?\*\//,
+  	'atrule': {
+  		pattern: /@[\w-]+?.*?(?:;|(?=\s*\{))/i,
+  		inside: {
+  			'rule': /@[\w-]+/
+  			// See rest below
+  		}
+  	},
+  	'url': /url\((?:(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1|.*?)\)/i,
+  	'selector': /[^{}\s][^{};]*?(?=\s*\{)/,
+  	'string': {
+  		pattern: /("|')(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+  		greedy: true
+  	},
+  	'property': /[-_a-z\xA0-\uFFFF][-\w\xA0-\uFFFF]*(?=\s*:)/i,
+  	'important': /\B!important\b/i,
+  	'function': /[-a-z0-9]+(?=\()/i,
+  	'punctuation': /[(){};:]/
+  };
+
+  Prism.languages.css['atrule'].inside.rest = Prism.languages.css;
+
+  if (Prism.languages.markup) {
+  	Prism.languages.insertBefore('markup', 'tag', {
+  		'style': {
+  			pattern: /(<style[\s\S]*?>)[\s\S]*?(?=<\/style>)/i,
+  			lookbehind: true,
+  			inside: Prism.languages.css,
+  			alias: 'language-css',
+  			greedy: true
+  		}
+  	});
+
+  	Prism.languages.insertBefore('inside', 'attr-value', {
+  		'style-attr': {
+  			pattern: /\s*style=("|')(?:\\[\s\S]|(?!\1)[^\\])*\1/i,
+  			inside: {
+  				'attr-name': {
+  					pattern: /^\s*style/i,
+  					inside: Prism.languages.markup.tag.inside
+  				},
+  				'punctuation': /^\s*=\s*['"]|['"]\s*$/,
+  				'attr-value': {
+  					pattern: /.+/i,
+  					inside: Prism.languages.css
+  				}
+  			},
+  			alias: 'language-css'
+  		}
+  	}, Prism.languages.markup.tag);
+  }
+
+  /* **********************************************
+       Begin prism-clike.js
+  ********************************************** */
+
+  Prism.languages.clike = {
+  	'comment': [{
+  		pattern: /(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,
+  		lookbehind: true
+  	}, {
+  		pattern: /(^|[^\\:])\/\/.*/,
+  		lookbehind: true,
+  		greedy: true
+  	}],
+  	'string': {
+  		pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+  		greedy: true
+  	},
+  	'class-name': {
+  		pattern: /((?:\b(?:class|interface|extends|implements|trait|instanceof|new)\s+)|(?:catch\s+\())[\w.\\]+/i,
+  		lookbehind: true,
+  		inside: {
+  			punctuation: /[.\\]/
+  		}
+  	},
+  	'keyword': /\b(?:if|else|while|do|for|return|in|instanceof|function|new|try|throw|catch|finally|null|break|continue)\b/,
+  	'boolean': /\b(?:true|false)\b/,
+  	'function': /[a-z0-9_]+(?=\()/i,
+  	'number': /\b0x[\da-f]+\b|(?:\b\d+\.?\d*|\B\.\d+)(?:e[+-]?\d+)?/i,
+  	'operator': /--?|\+\+?|!=?=?|<=?|>=?|==?=?|&&?|\|\|?|\?|\*|\/|~|\^|%/,
+  	'punctuation': /[{}[\];(),.:]/
+  };
+
+  /* **********************************************
+       Begin prism-javascript.js
+  ********************************************** */
+
+  Prism.languages.javascript = Prism.languages.extend('clike', {
+  	'keyword': /\b(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|var|void|while|with|yield)\b/,
+  	'number': /\b(?:0[xX][\dA-Fa-f]+|0[bB][01]+|0[oO][0-7]+|NaN|Infinity)\b|(?:\b\d+\.?\d*|\B\.\d+)(?:[Ee][+-]?\d+)?/,
+  	// Allow for all non-ASCII characters (See http://stackoverflow.com/a/2008444)
+  	'function': /[_$a-z\xA0-\uFFFF][$\w\xA0-\uFFFF]*(?=\s*\()/i,
+  	'operator': /-[-=]?|\+[+=]?|!=?=?|<<?=?|>>?>?=?|=(?:==?|>)?|&[&=]?|\|[|=]?|\*\*?=?|\/=?|~|\^=?|%=?|\?|\.{3}/
+  });
+
+  Prism.languages.insertBefore('javascript', 'keyword', {
+  	'regex': {
+  		pattern: /((?:^|[^$\w\xA0-\uFFFF."'\])\s])\s*)\/(\[[^\]\r\n]+]|\\.|[^/\\\[\r\n])+\/[gimyu]{0,5}(?=\s*($|[\r\n,.;})\]]))/,
+  		lookbehind: true,
+  		greedy: true
+  	},
+  	// This must be declared before keyword because we use "function" inside the look-forward
+  	'function-variable': {
+  		pattern: /[_$a-z\xA0-\uFFFF][$\w\xA0-\uFFFF]*(?=\s*=\s*(?:function\b|(?:\([^()]*\)|[_$a-z\xA0-\uFFFF][$\w\xA0-\uFFFF]*)\s*=>))/i,
+  		alias: 'function'
+  	},
+  	'constant': /\b[A-Z][A-Z\d_]*\b/
+  });
+
+  Prism.languages.insertBefore('javascript', 'string', {
+  	'template-string': {
+  		pattern: /`(?:\\[\s\S]|\${[^}]+}|[^\\`])*`/,
+  		greedy: true,
+  		inside: {
+  			'interpolation': {
+  				pattern: /\${[^}]+}/,
+  				inside: {
+  					'interpolation-punctuation': {
+  						pattern: /^\${|}$/,
+  						alias: 'punctuation'
+  					},
+  					rest: null // See below
+  				}
+  			},
+  			'string': /[\s\S]+/
+  		}
+  	}
+  });
+  Prism.languages.javascript['template-string'].inside['interpolation'].inside.rest = Prism.languages.javascript;
+
+  if (Prism.languages.markup) {
+  	Prism.languages.insertBefore('markup', 'tag', {
+  		'script': {
+  			pattern: /(<script[\s\S]*?>)[\s\S]*?(?=<\/script>)/i,
+  			lookbehind: true,
+  			inside: Prism.languages.javascript,
+  			alias: 'language-javascript',
+  			greedy: true
+  		}
+  	});
+  }
+
+  Prism.languages.js = Prism.languages.javascript;
+
+  /* **********************************************
+       Begin prism-file-highlight.js
+  ********************************************** */
+
+  (function () {
+  	if (typeof self === 'undefined' || !self.Prism || !self.document || !document.querySelector) {
+  		return;
+  	}
+
+  	self.Prism.fileHighlight = function () {
+
+  		var Extensions = {
+  			'js': 'javascript',
+  			'py': 'python',
+  			'rb': 'ruby',
+  			'ps1': 'powershell',
+  			'psm1': 'powershell',
+  			'sh': 'bash',
+  			'bat': 'batch',
+  			'h': 'c',
+  			'tex': 'latex'
+  		};
+
+  		Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+  			var src = pre.getAttribute('data-src');
+
+  			var language,
+  			    parent = pre;
+  			var lang = /\blang(?:uage)?-([\w-]+)\b/i;
+  			while (parent && !lang.test(parent.className)) {
+  				parent = parent.parentNode;
+  			}
+
+  			if (parent) {
+  				language = (pre.className.match(lang) || [, ''])[1];
+  			}
+
+  			if (!language) {
+  				var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+  				language = Extensions[extension] || extension;
+  			}
+
+  			var code = document.createElement('code');
+  			code.className = 'language-' + language;
+
+  			pre.textContent = '';
+
+  			code.textContent = 'Loading…';
+
+  			pre.appendChild(code);
+
+  			var xhr = new XMLHttpRequest();
+
+  			xhr.open('GET', src, true);
+
+  			xhr.onreadystatechange = function () {
+  				if (xhr.readyState == 4) {
+
+  					if (xhr.status < 400 && xhr.responseText) {
+  						code.textContent = xhr.responseText;
+
+  						Prism.highlightElement(code);
+  					} else if (xhr.status >= 400) {
+  						code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+  					} else {
+  						code.textContent = '✖ Error: File does not exist or is empty';
+  					}
+  				}
+  			};
+
+  			xhr.send(null);
+  		});
+
+  		if (Prism.plugins.toolbar) {
+  			Prism.plugins.toolbar.registerButton('download-file', function (env) {
+  				var pre = env.element.parentNode;
+  				if (!pre || !/pre/i.test(pre.nodeName) || !pre.hasAttribute('data-src') || !pre.hasAttribute('data-download-link')) {
+  					return;
+  				}
+  				var src = pre.getAttribute('data-src');
+  				var a = document.createElement('a');
+  				a.textContent = pre.getAttribute('data-download-link-label') || 'Download';
+  				a.setAttribute('download', '');
+  				a.href = src;
+  				return a;
+  			});
+  		}
+  	};
+
+  	document.addEventListener('DOMContentLoaded', self.Prism.fileHighlight);
+  })();
+  });
+
+  var CodeEditor = function () {
+    function CodeEditor(el, content, settings) {
+      classCallCheck(this, CodeEditor);
+
+      this.settings = Object.assign({}, CodeEditor.defaults, settings);
+      this.el = el;
+      this.el.contentEditable = false;
+      this.el.classList.add('align-codeEditor');
+      this._init();
+
+      this.textarea.value = content;
+      this.changeLanguage(this.settings.language);
+    }
+
+    createClass(CodeEditor, [{
+      key: '_init',
+      value: function _init() {
+        this.textarea = document.createElement('textarea');
+        this.wrapper = document.createElement('div');
+        this.pre = document.createElement('pre');
+        this.code = document.createElement('code');
+
+        this.textarea.classList.add('align-codeEditor-textarea');
+        this.wrapper.classList.add('align-codeEditor-wrapper');
+        this.pre.classList.add('align-codeEditor-pre');
+        this.code.classList.add('align-codeEditor-code');
+
+        this.textarea.spellcheck = false;
+        this.textarea.autocapitalize = false;
+        this.textarea.autocomplete = false;
+        this.textarea.autocorrect = false;
+
+        this.wrapper.appendChild(this.textarea);
+        this.wrapper.appendChild(this.pre);
+        this.el.appendChild(this.wrapper);
+        this.pre.appendChild(this.code);
+
+        this.textarea.addEventListener('input', this.highlight.bind(this));
+        this.textarea.addEventListener('scroll', this.handleScroll.bind(this));
+
+        this._initLangSelector();
+      }
+    }, {
+      key: '_initLangSelector',
+      value: function _initLangSelector() {
+        var _this = this;
+
+        var _select = select$1('langSelector', ['javascript', 'html', 'css']),
+            wrapper = _select.wrapper,
+            el = _select.el;
+
+        this.el.appendChild(wrapper);
+        el.addEventListener('change', function () {
+          _this.changeLanguage(el[el.selectedIndex].value);
+        });
+      }
+    }, {
+      key: 'changeLanguage',
+      value: function changeLanguage(newLang) {
+        this.settings.language = newLang;
+        removeClassByPrefix(this.pre, 'language');
+        this.pre.classList.add('language-' + this.settings.language);
+        this.highlight();
+      }
+    }, {
+      key: 'highlight',
+      value: function highlight() {
+        var highlighted = prism.highlight(this.textarea.value, prism.languages[this.settings.language]);
+        this.code.innerHTML = highlighted;
+      }
+    }, {
+      key: 'handleScroll',
+      value: function handleScroll() {
+        var scrolledY = this.textarea.scrollTop;
+        var scrolledX = this.textarea.scrollLeft;
+        this.pre.style.transform = 'translate(' + -1 * scrolledX + 'px, ' + -1 * scrolledY + 'px)';
+      }
+    }]);
+    return CodeEditor;
+  }();
+
+  CodeEditor.defaults = {
+    language: 'javascript'
+  };
+
+  var Script = function (_Component) {
+    inherits(Script, _Component);
+
+    function Script(align, script) {
+      classCallCheck(this, Script);
+
+      var _this = possibleConstructorReturn(this, (Script.__proto__ || Object.getPrototypeOf(Script)).apply(this, arguments));
+
+      if (_this.mode === 'create') {
+        _this.el = document.createElement('div');
+        _this.content = 'hello world,';
+        _this.language = 'javascript';
+      }
+
+      if (_this.mode === 'edit') {
+        _this.el = script;
+        _this.content = _this.el.querySelector('pre').innerText;
+        _this.el.innerHTML = '';
+      }
+
+      _this._init();
+      return _this;
+    }
+
+    createClass(Script, [{
+      key: '_init',
+      value: function _init() {
+        this.codeEditor = new CodeEditor(this.el, this.content, {
+          language: 'javascript'
+        });
+      }
+    }], [{
+      key: 'add',
+      value: function add(align) {
+        return new Promise(function (resolve, reject) {
+          resolve(new Script(align));
+        });
+      }
+    }, {
+      key: 'render',
+      value: function render(script) {
+        var elPre = script.querySelector('pre');
+        var elCode = script.querySelector('code');
+        script.innerText = '';
+        script.contentEditable = 'inherit';
+        elCode.innerHTML = elCode.innerText;
+        script.appendChild(elPre);
+      }
+    }]);
+    return Script;
+  }(Component);
+
+  Script.toolbar = {
+    mode: 'bubble',
+    hideWhenClickOut: true,
+    commands: [{
+      element: 'classes',
+      values: ['js', 'css', 'html']
+    }, 'remove']
+  };
+  Script.schema = {
+    icon: 'script',
+    tooltip: 'Add Table'
+  };
+
   var Table = function (_Component) {
     inherits(Table, _Component);
 
@@ -3847,6 +4919,7 @@
     Link: Link,
     Quote: Quote,
     Separator: Separator,
+    Script: Script,
     Table: Table,
     Button: Button,
     Vimeo: Vimeo,
@@ -3988,6 +5061,7 @@
         var buttons = Array.from(this.contentDiv.querySelectorAll('.align-button'));
         var grids = Array.from(this.contentDiv.querySelectorAll('.align-grid'));
         var lines = Array.from(this.contentDiv.querySelectorAll('.align-line'));
+        var scripts = Array.from(this.contentDiv.querySelectorAll('.align-codeEditor'));
         var figures = Array.from(this.contentDiv.querySelectorAll('figure'));
         var tables = Array.from(this.contentDiv.querySelectorAll('table'));
         var links = Array.from(this.contentDiv.querySelectorAll('a'));
@@ -4003,6 +5077,9 @@
         });
         lines.forEach(function (line) {
           return new Line(_this4.$align, line);
+        });
+        scripts.forEach(function (script) {
+          return new Script(_this4.$align, script);
         });
         figures.forEach(function (figure) {
           return new Figure(_this4.$align, figure);
@@ -4172,7 +5249,6 @@
           pre.dataset.alignHtml = true;
           pre.appendChild(content);
           this.contentDiv.appendChild(pre);
-          this.$align.highlight();
           return;
         }
         this._initContent(this.contentDiv);
@@ -4181,7 +5257,7 @@
     }, {
       key: 'backgroundColor',
       value: function backgroundColor(color) {
-        if (!color) {
+        if (!color || color === 'rgb(255,255,255)') {
           this.bgColor = null;
           this.el.style.backgroundColor = '';
           this.el.classList.remove('has-bgColor');
@@ -4321,9 +5397,8 @@
     }, {
       key: 'active',
       value: function active() {
-        if (Section.activeSection === this) {
-          this.$align.$sectionToolbar.update(this);
-          return;
+        if (Section.activeSection !== this) {
+          this.contentDiv.focus();
         }
         if (Section.activeSection) {
           Section.activeSection.inactive();
@@ -4333,7 +5408,6 @@
         this.$align.$sectionToolbar.update(this);
         this.$align.sidebar.update();
         this.$align.update();
-        this.contentDiv.focus();
       }
     }, {
       key: 'inactive',
@@ -4378,11 +5452,15 @@
           var controllers = output.querySelector('.align-sectionControllers');
           var contentDiv = output.querySelector('.align-content');
           var figures = Array.from(contentDiv.querySelectorAll('figure'));
+          var scripts = Array.from(contentDiv.querySelectorAll('.align-codeEditor'));
           if (this.props.isHTMLView) {
             contentDiv.innerHTML = contentDiv.innerText;
           }
           figures.forEach(function (fig) {
             return Figure.render(fig);
+          });
+          scripts.forEach(function (script) {
+            return Script.render(script);
           });
           output.classList.remove('is-active');
           output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
@@ -4680,9 +5758,6 @@
           });
           _elm.appendChild(_input);
           var colorpikcer = new Colorpicker(_input, {
-            defaultColor: '#fff',
-            mode: 'hex',
-            picker: { mode: 'square' },
             guideIcon: '\n          <svg viewBox="0 0 24 24">\n            <circle cx="12" cy="12" r="11"></circle>\n          </svg>\n        '
           });
           el.appendChild(_elm);
@@ -4753,7 +5828,7 @@
                   }
                 });
               });
-              _this2.backgroundColor.colorpikcer.selectColor(_this2.currentProps.backgroundColor || '#fff', true);
+              _this2.backgroundColor.colorpikcer.selectColor(_this2.currentProps.backgroundColor, true);
               break;
 
             case 'customClass':
@@ -4902,7 +5977,6 @@
       value: function _initEvents() {
         var _this2 = this;
 
-        this.editor.addEventListener('focus', this.highlight.bind(this));
         this.editor.addEventListener('mouseup', this.update.bind(this), true);
         this.editor.addEventListener('input', function () {
           _this2.$bus.emit('changed');
@@ -4916,22 +5990,6 @@
         this.editor.innerHTML = '';
       }
 
-      /**
-       * Hight light code text
-       */
-      /* eslint-disable */
-
-    }, {
-      key: 'highlight',
-      value: function highlight() {
-        if (typeof hljs === 'undefined') {
-          return;
-        }
-        var code = Array.from(this.editor.querySelectorAll('pre'));
-        code.forEach(function (block) {
-          hljs.highlightBlock(block);
-        });
-      }
       /* eslint-enable */
 
       /**

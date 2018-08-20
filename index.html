@@ -82,7 +82,32 @@
       </table>
     </div>
     <div class="align-section">
-      <h3>Where does it come from?</h3>
+      <h3>Integrated Code Editor</h3>
+      <div class="align-codeEditor">
+        <pre class="align-codeEditor-pre language-javascript">
+<code class="align-codeEditor-code">
+let myEditor = new Align('#align1', {
+  postTitle: 'Hello there, I\'m Align',
+  toolbar: {
+    tooltip: true,
+    theme: 'light',
+    shortcuts: true,
+    commands: [
+      {'fontSize': [false, 1, 2, 3, 4, 5, 6, 7]},
+      {'fontName': ['Poppins', 'Raleway', 'Roboto']},
+      'separator', 
+      'bold', 'italic', 'underline', 'strikeThrough', 
+      'separator',
+      'orderedList', 'unorderedList', 'indent', 'outdent',
+      'superscript', 'subscript',
+      'separator',
+      'color', 'backColor',
+    ]
+  }
+});
+</code>
+        </pre>
+      </div>
     </div>
     <div class="align-section is-full has-bgImage has-bgColor" style="background-color: black; padding-top: 100px; padding-bottom: 100px;">
       

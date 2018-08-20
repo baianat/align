@@ -35,6 +35,38 @@
   z-index: 99999;
   overflow: auto;
 }
+.align-select {
+  position: relative;
+  margin: 0 7px;
+  background: #fff;
+}
+.align-select svg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  margin: 6px 0;
+  fill: currentColor;
+  pointer-events: none;
+}
+.align-select select {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  height: 30px;
+  border-radius: 0;
+  padding: 2px 23px 2px 5px;
+  line-height: 26px;
+  background: transparent;
+  text-align: center;
+  border-width: 0;
+  font-size: 14px;
+  color: currentColor;
+}
+.align-select select:focus {
+  outline: none;
+}
 .align-wrapper {
   position: relative;
   height: calc(100% - 50px);
@@ -220,10 +252,6 @@
 .align-sidebar .picker-guide {
   stroke: #000;
   stroke-width: 2px;
-}
-.align-sidebar .picker-menu {
-  right: 0;
-  z-index: 99999;
 }
 .align-sidebar-field {
   background: #fff;
@@ -547,37 +575,6 @@
   right: 0;
   bottom: 0;
   left: 0;
-}
-.styler-select {
-  position: relative;
-  margin: 0 7px;
-}
-.styler-select svg {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 18px;
-  height: 18px;
-  margin: 6px 0;
-  z-index: -1;
-  fill: currentColor;
-}
-.styler-select select {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  height: 30px;
-  border-radius: 0;
-  padding: 2px 23px 2px 5px;
-  line-height: 26px;
-  background: transparent;
-  text-align: center;
-  border-width: 0;
-  font-size: 14px;
-  color: currentColor;
-}
-.styler-select select:focus {
-  outline: none;
 }
 .styler.is-visible {
   display: -webkit-box;
@@ -1011,6 +1008,7 @@
 .picker-menu {
   position: absolute;
   top: 50px;
+  right: 0;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1031,6 +1029,7 @@
           box-shadow: 0 0 25px rgba(0,0,0,0.05);
   will-change: transform;
   overflow: hidden;
+  z-index: 1000;
 }
 .picker-menu.is-hidden {
   display: none;
@@ -1085,6 +1084,14 @@
   min-width: 0;
   text-align: center;
   border-width: 0 0 1px 0;
+  -webkit-appearance: none;
+          appearance: none;
+  -moz-appearance: textfield;
+}
+.picker-input::-webkit-inner-spin-button,
+.picker-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 .picker-model,
 .picker-submit {
@@ -1117,9 +1124,6 @@
 .picker-submit:hover {
   fill: #1700ff;
   color: #1700ff;
-}
-.picker .slider-fill {
-  display: none;
 }
 .slider {
   position: relative;
@@ -1159,7 +1163,7 @@
   width: auto;
   height: 10px;
   border-radius: 5px;
-  background: #aaa;
+  background: #fff;
   will-change: transfom;
 }
 .slider.is-strip .slider-track {
@@ -1167,6 +1171,13 @@
   background-image: -webkit-linear-gradient(left, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
   background-image: -o-linear-gradient(left, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
   background-image: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+}
+.slider.is-alpha .slider-track {
+  background-image: -webkit-linear-gradient(45deg, #aaa 25%, transparent 25%), -webkit-linear-gradient(45deg, transparent 75%, #aaa 75%), -webkit-linear-gradient(135deg, #aaa 25%, transparent 25%), -webkit-linear-gradient(135deg, transparent 75%, #aaa 75%), -webkit-linear-gradient(left, transparent, #aaa);
+  background-image: -o-linear-gradient(45deg, #aaa 25%, transparent 25%), -o-linear-gradient(45deg, transparent 75%, #aaa 75%), -o-linear-gradient(135deg, #aaa 25%, transparent 25%), -o-linear-gradient(135deg, transparent 75%, #aaa 75%), -o-linear-gradient(left, transparent, #aaa);
+  background-image: linear-gradient(45deg, #aaa 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #aaa 75%), linear-gradient(-45deg, #aaa 25%, transparent 25%), linear-gradient(-45deg, transparent 75%, #aaa 75%), linear-gradient(90deg, transparent, #aaa);
+  background-size: 12px 12px, 12px 12px, 12px 12px, 12px 12px, 100% 100%;
+  background-position: 0 0, 6px -6px, 0 6px, -6px 0px, center center;
 }
 .slider-handle {
   position: relative;
@@ -1186,8 +1197,70 @@
 .slider-fill {
   width: 100%;
   height: 100%;
-  background-color: #aaa;
+  border-radius: 12px;
+  background-color: #1700ff;
+  display: none;
   -webkit-transform-origin: left top;
       -ms-transform-origin: left top;
           transform-origin: left top;
+}
+.align-codeEditor {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background-color: #0a1829;
+  overflow: hidden;
+  resize: vertical;
+}
+.align-codeEditor,
+.align-codeEditor * {
+  font-family: monospace !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+}
+.align-codeEditor-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.align-codeEditor-textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  margin: 0;
+  padding: 20px;
+  caret-color: #fff;
+  white-space: pre;
+  color: transparent;
+  background-color: transparent;
+  resize: none;
+  outline: none;
+}
+.align-codeEditor .langSelector {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #0a1829;
+  background: #fff;
+  margin-right: 0;
+}
+.align-codeEditor-pre {
+  color: #fff;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 100%;
+  border: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  pointer-events: none;
+  will-change: transform function;
 }
