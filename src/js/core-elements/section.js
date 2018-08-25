@@ -45,9 +45,9 @@ export default class Section {
     }
     this._initWrapper(content);
     if (this.props.type === 'text') {
+      this._initProps();
       this._initBackground(content);
       this._initContent(content);
-      this._initProps();
       this._initControllers();
       this.el.addEventListener('click', () => {
         this.active();
@@ -205,21 +205,23 @@ export default class Section {
     if (!content) {
       return;
     }
-    this.bgImage = content.querySelector('.align-bgImage');
-    this.bgVideo = content.querySelector('.align-bgVideo');
-    this.bgColor = content.style.backgroundColor;
+    const bgImage = content.querySelector('.align-bgImage');
+    const bgVideo = content.querySelector('.align-bgVideo');
+    const bgColor = content.querySelector('.align-bgColor');
 
-    if (this.bgImage) {
-      this.el.insertAdjacentElement('afterBegin', this.bgImage);
-      this.props.backgroundImage = this.bgImage.style.backgroundImage;
-      this.props.parallax = this.bgImage.classList.contains('is-parallax');
+    if (bgImage) {
+      this.props.backgroundImage = bgImage.style.backgroundImage;
+      this.props.parallax = bgImage.classList.contains('is-parallax');
+      console.log(this.props.backgroundImage);
+      bgImage.remove();
     }
-    if (this.bgVideo) {
-      this.el.insertAdjacentElement('afterBegin', this.bgVideo);
-      this.props.backgroundVideo = this.bgVideo.querySelector('source').src;
+    if (bgVideo) {
+      this.props.backgroundVideo = bgVideo.querySelector('source').src;
+      bgVideo.remove();
     }
-    if (this.bgColor) {
-      this.props.backgroundColor = this.bgColor;
+    if (bgColor) {
+      this.props.backgroundColor = bgColor.style.backgroundColor;
+      bgColor.remove();
     }
   }
 
@@ -329,15 +331,22 @@ export default class Section {
 
   backgroundColor (color) {
     if (!color || color === 'rgb(255,255,255)') {
-      this.bgColor = null;
-      this.el.style.backgroundColor = '';
-      this.el.classList.remove('has-bgColor');
+      if (this.bgColor) {
+        this.bgColor.remove();
+        this.bgColor = null;
+        this.el.classList.remove('has-bgColor');
+      }
       return;
     }
-    this.el.style.backgroundColor = color;
+    if (!this.bgColor) {
+      this.bgColor = document.createElement('div');
+      this.bgColor.classList.add('align-bgColor');
+      this.el.insertBefore(this.bgColor, this.contentDiv);
+    }
 
-    this.bgColor = color;
+    this.bgColor.style.backgroundColor = color;
     this.el.classList.add('has-bgColor');
+    this.$align.update();
 
     // emit events
     const index = this.getIndex();
@@ -354,6 +363,7 @@ export default class Section {
       if (this.bgImage) {
         this.bgImage.remove();
         this.bgImage = null;
+        this.el.classList.remove('has-bgImage');
       }
       return;
     };
@@ -361,7 +371,7 @@ export default class Section {
     if (file instanceof File) {
       url = URL.createObjectURL(file);
     } else { 
-      url = file;
+      url = file.match(/url\("(.+)"\)/)[1] || file;
     }
 
     if (!this.bgImage) {
@@ -392,6 +402,7 @@ export default class Section {
       if (this.bgVideo) {
         this.bgVideo.remove();
         this.bgVideo = null;
+        this.el.classList.remove('has-bgVideo');
       }
       return;
     }

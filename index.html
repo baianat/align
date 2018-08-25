@@ -17,11 +17,6 @@
     body {
       margin: 0;
     }
-    .sidebar {
-      width: 300px;
-      height: 100vh;
-      float: left;
-    }
   </style>
   <div class="align" id="align1">
     <div class="align-section custom">
@@ -32,12 +27,14 @@
         </span>.
       </h2>
     </div>
-    <div class="align-section has-bgImage is-full has-bgVideo" style="background-color: rgb(1, 0, 0); padding-top: 100px;  padding-bottom: 100px;">
+    <div class="align-section has-bgImage is-full has-bgVideo" style="padding-top: 100px;  padding-bottom: 100px;">
       <div class="align-bgVideo">
         <video autoplay="" muted="" loop="">
           <source src="https://media.giphy.com/media/BHNfhgU63qrks/giphy.mp4">
         </video>
       </div>
+      <div class="align-bgColor" style="background-color: rgba(0, 0, 0, 0.4);"></div>
+
       <p>
         <span style="color: rgb(255, 255, 255);">
           <font size="5">Our innovative solutions transcend business excellency to influence societies, through authentic, culture-changing
@@ -109,9 +106,9 @@ let myEditor = new Align('#align1', {
         </pre>
       </div>
     </div>
-    <div class="align-section is-full has-bgImage has-bgColor" style="background-color: black; padding-top: 100px; padding-bottom: 100px;">
-      
+    <div class="align-section is-full has-bgImage has-bgColor" style="padding-top: 100px; padding-bottom: 100px;">      
       <div class="align-bgImage is-parallax" style="background-image: url(https://source.unsplash.com/2000x1000);"></div>
+      <div class="align-bgColor" style="background-color: rgba(0, 0, 0, 0.8);"></div>
 
       <p style="text-align: justify;"><span style="color: rgb(255, 255, 255);">Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature
         from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia,
