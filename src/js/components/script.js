@@ -28,11 +28,27 @@ export default class Script extends Component {
   }
 
   static render (script) {
+    function escapeHtml (string) {
+      const entityMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '/': '&#x2F;',
+        '`': '&#x60;',
+        '=': '&#x3D;'
+      };
+      return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+        return entityMap[s];
+      });
+    }
+  
     const elPre = script.querySelector('pre');
     const elCode = script.querySelector('code');
     script.innerText = '';
     script.contentEditable = 'inherit';
-    elCode.innerHTML = elCode.innerText;
+    elCode.innerHTML = escapeHtml(elCode.innerText);
     script.appendChild(elPre);
   }
 
