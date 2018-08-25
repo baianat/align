@@ -80,15 +80,15 @@ export default class Colorpicker {
     this.lastMove = { x: 0, y: 0 };
     this.isMenuActive = false;
     // create colorpicker element
-    this.menu = stringToDOM('<div class="picker-menu" tabindex="-1"></div>');
-    this.guide = stringToDOM(`<button class="picker-guide">${this.settings.guideIcon}</button>`);
+    this.menu = stringToDOM('<div class="align-colorpicker-menu" tabindex="-1"></div>');
+    this.guide = stringToDOM(`<button class="align-colorpicker-guide">${this.settings.guideIcon}</button>`);
     
     // append colorpicker elements
     this._initPicker();
     this._initControllers();
 
-    this.el.classList.add('picker-value');
-    this.picker.classList.add('picker');
+    this.el.classList.add('align-colorpicker-value');
+    this.picker.classList.add('align-colorpicker');
     this.el.parentNode.insertBefore(this.picker, this.el);
 
     this.menu.appendChild(this.controllers);
@@ -100,7 +100,7 @@ export default class Colorpicker {
   }
 
   _initControllers () {
-    this.controllers = stringToDOM(`<div class="picker-controllers"></div>`);
+    this.controllers = stringToDOM(`<div class="align-colorpicker-controllers"></div>`);
     this.strip = new Slider({ min: 0, max: 360, step: 1, classes: ['is-strip'] });
     this.alphaSlider = new Slider({ min: 0, max: 1, step: 0.1, value: 1, classes: ['is-alpha'] });
     this.controllers.appendChild(this.strip.wrapper);
@@ -121,14 +121,14 @@ export default class Colorpicker {
 
   _initPicker () {
     this.square = stringToDOM(`
-      <div class="picker-square">
-        <canvas class="picker-canvas"></canvas>
-        <div class="picker-cursor"></div>
+      <div class="align-colorpicker-square">
+        <canvas class="align-colorpicker-canvas"></canvas>
+        <div class="align-colorpicker-cursor"></div>
       </div>`);
 
     this.picker = document.createElement('div');
-    this.canvas = this.square.querySelector('.picker-canvas');
-    this.cursor = this.square.querySelector('.picker-cursor');
+    this.canvas = this.square.querySelector('.align-colorpicker-canvas');
+    this.cursor = this.square.querySelector('.align-colorpicker-cursor');
     this.ctx = this.canvas.getContext('2d');
 
     this.menu.appendChild(this.square);
@@ -177,10 +177,10 @@ export default class Colorpicker {
   }
 
   _initInputs () {
-    this.inputsWrapper = stringToDOM('<div class="picker-inputs"></div>');
-    this.modelSwitcher = stringToDOM('<button class="picker-model"></button>');
+    this.inputsWrapper = stringToDOM('<div class="align-colorpicker-inputs"></div>');
+    this.modelSwitcher = stringToDOM('<button class="align-colorpicker-model"></button>');
     this.submit = stringToDOM(`
-    <button class="picker-submit">
+    <button class="align-colorpicker-submit">
       <svg class="icon" viewBox="0 0 24 24">
         <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
       </svg>
@@ -209,9 +209,9 @@ export default class Colorpicker {
     this.inputsWrapper.appendChild(this.modelSwitcher);
     if (model === 'hsl') {
       this.inputs = {
-        hue: stringToDOM('<input type="number" min="0" max="360" class="picker-input"/>'),
-        sat: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>'),
-        lum: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>')
+        hue: stringToDOM('<input type="number" min="0" max="360" class="align-colorpicker-input"/>'),
+        sat: stringToDOM('<input type="number" min="0" max="100" class="align-colorpicker-input"/>'),
+        lum: stringToDOM('<input type="number" min="0" max="100" class="align-colorpicker-input"/>')
       };
       Object.keys(this.inputs).forEach(key => {
         const current = this.inputs[key];
@@ -227,9 +227,9 @@ export default class Colorpicker {
 
     if (model === 'rgb') {
       this.inputs = {
-        red: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
-        green: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
-        blue: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>')
+        red: stringToDOM('<input type="number" min="0" max="255" class="align-colorpicker-input"/>'),
+        green: stringToDOM('<input type="number" min="0" max="255" class="align-colorpicker-input"/>'),
+        blue: stringToDOM('<input type="number" min="0" max="255" class="align-colorpicker-input"/>')
       };
       Object.keys(this.inputs).forEach(key => {
         const current = this.inputs[key];
@@ -245,7 +245,7 @@ export default class Colorpicker {
 
     if (model === 'hex') {
       this.inputs = {
-        hex: stringToDOM('<input type="text" class="picker-input"/>'),
+        hex: stringToDOM('<input type="text" class="align-colorpicker-input"/>'),
       };
       const current = this.inputs['hex'];
       this.inputsWrapper.appendChild(current);
