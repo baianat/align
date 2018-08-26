@@ -45,13 +45,13 @@
     overflow: auto
   &-menu
     position: absolute
-    top: -10px
+    top: 0
     left: 0
     border-radius: 4px
     display: none
     background: white
     border: 1px solid $gray
-    transform: translate(0, -100%)
+    transform: translateY(calc(-100% - 10px))
     user-select: none
     &:before
       position: absolute
@@ -79,6 +79,21 @@
       content: ''
       transform: translate(-50%, 100%)
       user-select: none
+    &.is-down
+      transform:translateY(42px)
+      &:before
+        bottom: initial
+        top: 0
+        border-width: 0 8px 8px 8px
+        border-color: transparent transparent $gray transparent
+        transform: translate(-50%, -100%)
+      &:after
+        bottom: initial
+        top: 1px
+        left: 16px
+        border-width: 0 7px 7px 7px
+        border-color: transparent transparent $white transparent
+        transform: translate(-50%, -100%)
     ~/.is-active &
       display: block
     ~/.is-inactive &

@@ -75,6 +75,7 @@ export default class Inserter {
         this.el,
         newPosition || this.settings.position);
       this.show();
+      this.updateDirection();
       return;
     }
     this.hide();
@@ -82,6 +83,7 @@ export default class Inserter {
 
   active () {
     this.el.classList.toggle('is-active');
+    this.updateDirection();
   }
 
   toggleVisibility () {
@@ -90,6 +92,14 @@ export default class Inserter {
       return;
     }
     this.show();
+  }
+
+  updateDirection () {
+    this.menu.classList.remove('is-down');
+    const top = this.menu.getBoundingClientRect().top;
+    if (top <= 0) {
+      this.menu.classList.add('is-down');
+    }
   }
 
   show () {
