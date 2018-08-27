@@ -13,11 +13,8 @@ import Selection from '../partial/selection';
 import Dep from '../partial/dep';
 
 export default class Section {
-  constructor (align, content, {
-    position,
-    type = 'text'
-  } = {}) {
-    if (content && content.nodeName === 'BR') {
+  constructor (align, content, { position } = {}) {
+    if (!content || content.nodeName === 'BR') {
       return;
     }
     this.id = Section.id++
@@ -37,24 +34,22 @@ export default class Section {
       backgroundImage: '',
       parallax: false,
       isHTMLView: false,
-      layout: {},
-      type
+      layout: {}
     }
     if (typeof content === 'string') {
       content = stringToDOM(content);
     }
+  
     this._initWrapper(content);
-    if (this.props.type === 'text') {
-      this._initProps();
-      this._initBackground(content);
-      this._initContent(content);
-      this._initControllers();
-      this.el.addEventListener('click', () => {
-        this.active();
-      });
-    }
+    this._initProps();
+    this._initBackground(content);
     this._initContent(content);
-    this._initWatchers();
+    this._initControllers();
+    this._initWatchers(); 
+    this._initContent(content);
+    this.el.addEventListener('click', () => {
+      this.active();
+    });
 
     if (typeof position === 'number') {
       const before = this.$align.sections[position];
@@ -67,26 +62,21 @@ export default class Section {
   }
 
   get content () {
-    let output;
-    if (this.props.type === 'text') {
-      output = this.el.cloneNode(true);
-      const controllers = output.querySelector('.align-sectionControllers');
-      const contentDiv = output.querySelector('.align-content');
-      const figures = Array.from(contentDiv.querySelectorAll('figure'));
-      const scripts = Array.from(contentDiv.querySelectorAll('.align-codeEditor'));
-      if (this.props.isHTMLView) {
-        contentDiv.innerHTML = contentDiv.innerText;
-      }
-      figures.forEach(fig => Figure.render(fig));
-      scripts.forEach(script => Script.render(script));
-      output.classList.remove('is-active');
-      output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
-      contentDiv.remove();
-      controllers.remove();
+    const output = this.el.cloneNode(true);
+    const controllers = output.querySelector('.align-sectionControllers');
+    const contentDiv = output.querySelector('.align-content');
+    const figures = Array.from(contentDiv.querySelectorAll('figure'));
+    const scripts = Array.from(contentDiv.querySelectorAll('.align-codeEditor'));
+    if (this.props.isHTMLView) {
+      contentDiv.innerHTML = contentDiv.innerText;
     }
-    if (this.props.type === 'title') {
-      return this.title.innerText;
-    }
+    figures.forEach(fig => Figure.render(fig));
+    scripts.forEach(script => Script.render(script));
+    output.classList.remove('is-active');
+    output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
+    contentDiv.remove();
+    controllers.remove();
+
     return output.outerHTML;
   }
 
@@ -130,38 +120,20 @@ export default class Section {
   }
 
   _initContent (content) {
-    switch (this.props.type) {
-    case 'text':
-      if (!this.contentDiv) {
-        this.contentDiv = document.createElement('div');
-        this.contentDiv.classList.add('align-content');
-        this.contentDiv.contentEditable = true;
-      }
-      if (this.props.isHTMLView) {
-        content = content.innerText;
-      }
-      if (!this.props.isHTMLView) {
-        content = content ? content.innerHTML : '<p></p>';
-      }
-      this.contentDiv.innerHTML = content;
-      this.el.appendChild(this.contentDiv);
-      this._initComponents();
-      break;
-
-    case 'title':
-      this.title = this.el.querySelector('.align-title') || document.createElement('h1');
-      this.title.classList.add('align-title');
-      this.title.contentEditable = true;
-      this.title.innerText = content;
-      this.el.appendChild(this.title);
-      this.title.addEventListener('blur', () => {
-        this.title.innerHTML = this.title.innerText
-      })
-      break;
-
-    default:
-      break;
+    if (!this.contentDiv) {
+      this.contentDiv = document.createElement('div');
+      this.contentDiv.classList.add('align-content');
+      this.contentDiv.contentEditable = true;
     }
+    if (this.props.isHTMLView) {
+      content = content.innerText;
+    }
+    if (!this.props.isHTMLView) {
+      content = content ? content.innerHTML : '<p></p>';
+    }
+    this.contentDiv.innerHTML = content;
+    this.el.appendChild(this.contentDiv);
+    this._initComponents();
   }
 
   _initComponents () {
@@ -212,7 +184,6 @@ export default class Section {
     if (bgImage) {
       this.props.backgroundImage = bgImage.style.backgroundImage;
       this.props.parallax = bgImage.classList.contains('is-parallax');
-      console.log(this.props.backgroundImage);
       bgImage.remove();
     }
     if (bgVideo) {
@@ -446,8 +417,7 @@ export default class Section {
   moveUp () {
     const oldIndx = this.getIndex();
     if (
-      !this.$align.sections[oldIndx - 1] ||
-      this.$align.sections[oldIndx - 1].type === 'title'
+      !this.$align.sections[oldIndx - 1]
     ) return;
 
     this.$align.editor.insertBefore(this.el, this.$align.sections[oldIndx - 1].el);

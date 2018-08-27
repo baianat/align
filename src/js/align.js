@@ -23,19 +23,9 @@ export default class Align {
    */
   get content () {
     return this.sections.reduce((acc, section) => {
-      if (section.props.type !== 'text') {
-        return acc;
-      }
       acc += section.content;
       return acc;
     }, '');
-  }
-
-  get title () {
-    if (this.postTitle) {
-      const title = this.sections.find((sec) => sec.props.type === 'title');
-      return title.content;
-    }
   }
 
   static extend (name, extension) {
@@ -106,11 +96,6 @@ export default class Align {
   _initSections () {
     this.sections = [];
 
-    if (this.settings.postTitle !== false) {
-      this.postTitle = new Section(this, this.settings.postTitle, {
-        type: 'title'
-      });
-    }
     this.startContent.forEach((content) => new Section(this, content));
     const addSection = document.createElement('button');
     addSection.classList.add('align-sectionAdd', 'is-main');
