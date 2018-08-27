@@ -1,5 +1,5 @@
 /**
-    * v0.0.39
+    * v0.0.40
     * (c) 2018 Baianat
     * @license MIT
     */
@@ -1201,15 +1201,15 @@
         this.lastMove = { x: 0, y: 0 };
         this.isMenuActive = false;
         // create colorpicker element
-        this.menu = stringToDOM('<div class="picker-menu" tabindex="-1"></div>');
-        this.guide = stringToDOM('<button class="picker-guide">' + this.settings.guideIcon + '</button>');
+        this.menu = stringToDOM('<div class="align-colorpicker-menu" tabindex="-1"></div>');
+        this.guide = stringToDOM('<button class="align-colorpicker-guide">' + this.settings.guideIcon + '</button>');
 
         // append colorpicker elements
         this._initPicker();
         this._initControllers();
 
-        this.el.classList.add('picker-value');
-        this.picker.classList.add('picker');
+        this.el.classList.add('align-colorpicker-value');
+        this.picker.classList.add('align-colorpicker');
         this.el.parentNode.insertBefore(this.picker, this.el);
 
         this.menu.appendChild(this.controllers);
@@ -1224,7 +1224,7 @@
       value: function _initControllers() {
         var _this2 = this;
 
-        this.controllers = stringToDOM('<div class="picker-controllers"></div>');
+        this.controllers = stringToDOM('<div class="align-colorpicker-controllers"></div>');
         this.strip = new Slider({ min: 0, max: 360, step: 1, classes: ['is-strip'] });
         this.alphaSlider = new Slider({ min: 0, max: 1, step: 0.1, value: 1, classes: ['is-alpha'] });
         this.controllers.appendChild(this.strip.wrapper);
@@ -1247,11 +1247,11 @@
       value: function _initPicker() {
         var _this3 = this;
 
-        this.square = stringToDOM('\n      <div class="picker-square">\n        <canvas class="picker-canvas"></canvas>\n        <div class="picker-cursor"></div>\n      </div>');
+        this.square = stringToDOM('\n      <div class="align-colorpicker-square">\n        <canvas class="align-colorpicker-canvas"></canvas>\n        <div class="align-colorpicker-cursor"></div>\n      </div>');
 
         this.picker = document.createElement('div');
-        this.canvas = this.square.querySelector('.picker-canvas');
-        this.cursor = this.square.querySelector('.picker-cursor');
+        this.canvas = this.square.querySelector('.align-colorpicker-canvas');
+        this.cursor = this.square.querySelector('.align-colorpicker-cursor');
         this.ctx = this.canvas.getContext('2d');
 
         this.menu.appendChild(this.square);
@@ -1316,9 +1316,9 @@
       value: function _initInputs() {
         var _this4 = this;
 
-        this.inputsWrapper = stringToDOM('<div class="picker-inputs"></div>');
-        this.modelSwitcher = stringToDOM('<button class="picker-model"></button>');
-        this.submit = stringToDOM('\n    <button class="picker-submit">\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>\n      </svg>\n    </button>');
+        this.inputsWrapper = stringToDOM('<div class="align-colorpicker-inputs"></div>');
+        this.modelSwitcher = stringToDOM('<button class="align-colorpicker-model"></button>');
+        this.submit = stringToDOM('\n    <button class="align-colorpicker-submit">\n      <svg class="icon" viewBox="0 0 24 24">\n        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>\n      </svg>\n    </button>');
 
         this.controllers.appendChild(this.inputsWrapper);
 
@@ -1345,9 +1345,9 @@
         this.inputsWrapper.appendChild(this.modelSwitcher);
         if (model === 'hsl') {
           this.inputs = {
-            hue: stringToDOM('<input type="number" min="0" max="360" class="picker-input"/>'),
-            sat: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>'),
-            lum: stringToDOM('<input type="number" min="0" max="100" class="picker-input"/>')
+            hue: stringToDOM('<input type="number" min="0" max="360" class="align-colorpicker-input"/>'),
+            sat: stringToDOM('<input type="number" min="0" max="100" class="align-colorpicker-input"/>'),
+            lum: stringToDOM('<input type="number" min="0" max="100" class="align-colorpicker-input"/>')
           };
           Object.keys(this.inputs).forEach(function (key) {
             var current = _this5.inputs[key];
@@ -1363,9 +1363,9 @@
 
         if (model === 'rgb') {
           this.inputs = {
-            red: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
-            green: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>'),
-            blue: stringToDOM('<input type="number" min="0" max="255" class="picker-input"/>')
+            red: stringToDOM('<input type="number" min="0" max="255" class="align-colorpicker-input"/>'),
+            green: stringToDOM('<input type="number" min="0" max="255" class="align-colorpicker-input"/>'),
+            blue: stringToDOM('<input type="number" min="0" max="255" class="align-colorpicker-input"/>')
           };
           Object.keys(this.inputs).forEach(function (key) {
             var current = _this5.inputs[key];
@@ -1381,7 +1381,7 @@
 
         if (model === 'hex') {
           this.inputs = {
-            hex: stringToDOM('<input type="text" class="picker-input"/>')
+            hex: stringToDOM('<input type="text" class="align-colorpicker-input"/>')
           };
           var current = this.inputs['hex'];
           this.inputsWrapper.appendChild(current);
@@ -4543,11 +4543,27 @@
     }, {
       key: 'render',
       value: function render(script) {
+        function escapeHtml(string) {
+          var entityMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+            '/': '&#x2F;',
+            '`': '&#x60;',
+            '=': '&#x3D;'
+          };
+          return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+            return entityMap[s];
+          });
+        }
+
         var elPre = script.querySelector('pre');
         var elCode = script.querySelector('code');
         script.innerText = '';
         script.contentEditable = 'inherit';
-        elCode.innerHTML = elCode.innerText;
+        elCode.innerHTML = escapeHtml(elCode.innerText);
         script.appendChild(elPre);
       }
     }]);
@@ -4931,13 +4947,11 @@
       var _this = this;
 
       var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
-          position = _ref.position,
-          _ref$type = _ref.type,
-          type = _ref$type === undefined ? 'text' : _ref$type;
+          position = _ref.position;
 
       classCallCheck(this, Section);
 
-      if (content && content.nodeName === 'BR') {
+      if (!content || content.nodeName === 'BR') {
         return;
       }
       this.id = Section.id++;
@@ -4951,24 +4965,22 @@
         backgroundImage: '',
         parallax: false,
         isHTMLView: false,
-        layout: {},
-        type: type
+        layout: {}
       };
       if (typeof content === 'string') {
         content = stringToDOM(content);
       }
+
       this._initWrapper(content);
-      if (this.props.type === 'text') {
-        this._initProps();
-        this._initBackground(content);
-        this._initContent(content);
-        this._initControllers();
-        this.el.addEventListener('click', function () {
-          _this.active();
-        });
-      }
+      this._initProps();
+      this._initBackground(content);
       this._initContent(content);
+      this._initControllers();
       this._initWatchers();
+      this._initContent(content);
+      this.el.addEventListener('click', function () {
+        _this.active();
+      });
 
       if (typeof position === 'number') {
         var before = this.$align.sections[position];
@@ -5017,45 +5029,25 @@
     }, {
       key: '_initContent',
       value: function _initContent(content) {
-        var _this3 = this;
-
-        switch (this.props.type) {
-          case 'text':
-            if (!this.contentDiv) {
-              this.contentDiv = document.createElement('div');
-              this.contentDiv.classList.add('align-content');
-              this.contentDiv.contentEditable = true;
-            }
-            if (this.props.isHTMLView) {
-              content = content.innerText;
-            }
-            if (!this.props.isHTMLView) {
-              content = content ? content.innerHTML : '<p></p>';
-            }
-            this.contentDiv.innerHTML = content;
-            this.el.appendChild(this.contentDiv);
-            this._initComponents();
-            break;
-
-          case 'title':
-            this.title = this.el.querySelector('.align-title') || document.createElement('h1');
-            this.title.classList.add('align-title');
-            this.title.contentEditable = true;
-            this.title.innerText = content;
-            this.el.appendChild(this.title);
-            this.title.addEventListener('blur', function () {
-              _this3.title.innerHTML = _this3.title.innerText;
-            });
-            break;
-
-          default:
-            break;
+        if (!this.contentDiv) {
+          this.contentDiv = document.createElement('div');
+          this.contentDiv.classList.add('align-content');
+          this.contentDiv.contentEditable = true;
         }
+        if (this.props.isHTMLView) {
+          content = content.innerText;
+        }
+        if (!this.props.isHTMLView) {
+          content = content ? content.innerHTML : '<p></p>';
+        }
+        this.contentDiv.innerHTML = content;
+        this.el.appendChild(this.contentDiv);
+        this._initComponents();
       }
     }, {
       key: '_initComponents',
       value: function _initComponents() {
-        var _this4 = this;
+        var _this3 = this;
 
         var separators = Array.from(this.contentDiv.querySelectorAll('.align-separator'));
         var buttons = Array.from(this.contentDiv.querySelectorAll('.align-button'));
@@ -5067,34 +5059,34 @@
         var links = Array.from(this.contentDiv.querySelectorAll('a'));
 
         separators.forEach(function (separator) {
-          return new Separator(_this4.$align, separator);
+          return new Separator(_this3.$align, separator);
         });
         buttons.forEach(function (button) {
-          return new Button(_this4.$align, button);
+          return new Button(_this3.$align, button);
         });
         grids.forEach(function (grid) {
-          return new Grid(_this4.$align, grid);
+          return new Grid(_this3.$align, grid);
         });
         lines.forEach(function (line) {
-          return new Line(_this4.$align, line);
+          return new Line(_this3.$align, line);
         });
         scripts.forEach(function (script) {
-          return new Script(_this4.$align, script);
+          return new Script(_this3.$align, script);
         });
         figures.forEach(function (figure) {
-          return new Figure(_this4.$align, figure);
+          return new Figure(_this3.$align, figure);
         });
         tables.forEach(function (table) {
-          return new Table(_this4.$align, table);
+          return new Table(_this3.$align, table);
         });
         links.forEach(function (link) {
-          return new Link(_this4.$align, link);
+          return new Link(_this3.$align, link);
         });
       }
     }, {
       key: '_initControllers',
       value: function _initControllers() {
-        var _this5 = this;
+        var _this4 = this;
 
         this.controllers = document.createElement('div');
         this.addButton = document.createElement('button');
@@ -5102,7 +5094,7 @@
         this.addButton.classList.add('align-sectionAdd');
 
         this.addButton.addEventListener('click', function () {
-          var newSection = new Section(_this5.$align, '', { position: _this5.getIndex() });
+          var newSection = new Section(_this4.$align, '', { position: _this4.getIndex() });
           setTimeout(function () {
             newSection.active();
             Selection.selectElement(newSection.contentDiv.querySelector('p'));
@@ -5124,7 +5116,6 @@
         if (bgImage) {
           this.props.backgroundImage = bgImage.style.backgroundImage;
           this.props.parallax = bgImage.classList.contains('is-parallax');
-          console.log(this.props.backgroundImage);
           bgImage.remove();
         }
         if (bgVideo) {
@@ -5139,13 +5130,13 @@
     }, {
       key: '_initProps',
       value: function _initProps() {
-        var _this6 = this;
+        var _this5 = this;
 
         Object.keys(this.props).forEach(function (key) {
-          var internalValue = _this6.props[key];
+          var internalValue = _this5.props[key];
           var dep = new Dep();
 
-          Object.defineProperty(_this6.props, key, {
+          Object.defineProperty(_this5.props, key, {
             get: function get$$1() {
               dep.depend();
               return internalValue;
@@ -5161,7 +5152,7 @@
     }, {
       key: '_initWatchers',
       value: function _initWatchers() {
-        var _this7 = this;
+        var _this6 = this;
 
         Dep.watcher(function (oldVal) {
           var _el$classList3;
@@ -5169,65 +5160,65 @@
           if (oldVal && oldVal.length > 0) {
             var _el$classList2;
 
-            (_el$classList2 = _this7.el.classList).remove.apply(_el$classList2, toConsumableArray(oldVal));
+            (_el$classList2 = _this6.el.classList).remove.apply(_el$classList2, toConsumableArray(oldVal));
           }
-          if (_this7.props.customClass.length === 0) {
+          if (_this6.props.customClass.length === 0) {
             return;
           }
-          (_el$classList3 = _this7.el.classList).add.apply(_el$classList3, toConsumableArray(_this7.props.customClass));
+          (_el$classList3 = _this6.el.classList).add.apply(_el$classList3, toConsumableArray(_this6.props.customClass));
 
           // emit events
-          var index = _this7.getIndex();
-          _this7.$align.$bus.emit('changed');
-          _this7.$align.$bus.emit('sectionChanged', {
+          var index = _this6.getIndex();
+          _this6.$align.$bus.emit('changed');
+          _this6.$align.$bus.emit('sectionChanged', {
             from: index,
             to: index,
-            props: _this7.props
+            props: _this6.props
           });
         });
         Dep.watcher(function () {
-          _this7.backgroundColor(_this7.props.backgroundColor);
+          _this6.backgroundColor(_this6.props.backgroundColor);
         });
         Dep.watcher(function () {
-          _this7.backgroundImage(_this7.props.backgroundImage);
+          _this6.backgroundImage(_this6.props.backgroundImage);
         });
         Dep.watcher(function () {
-          _this7.backgroundVideo(_this7.props.backgroundVideo);
+          _this6.backgroundVideo(_this6.props.backgroundVideo);
         });
         Dep.watcher(function () {
-          _this7.updateLayout(_this7.props.layout);
+          _this6.updateLayout(_this6.props.layout);
         });
         Dep.watcher(function () {
-          var parallax = _this7.props.parallax;
-          if (!_this7.bgImage) {
+          var parallax = _this6.props.parallax;
+          if (!_this6.bgImage) {
             return;
           }
-          _this7.bgImage.classList.toggle('is-parallax', parallax);
+          _this6.bgImage.classList.toggle('is-parallax', parallax);
         });
       }
     }, {
       key: 'getIndex',
       value: function getIndex() {
-        var _this8 = this;
+        var _this7 = this;
 
         return this.$align.sections.findIndex(function (el) {
-          return el === _this8;
+          return el === _this7;
         });
       }
     }, {
       key: 'updateLayout',
       value: function updateLayout() {
-        var _this9 = this;
+        var _this8 = this;
 
         Object.keys(this.props.layout).forEach(function (styl) {
-          var value = _this9.props.layout[styl];
+          var value = _this8.props.layout[styl];
           if (value) {
-            _this9.props.layout[styl] = value;
-            _this9.el.style[styl] = value;
+            _this8.props.layout[styl] = value;
+            _this8.el.style[styl] = value;
             return;
           }
-          delete _this9.props.layout[styl];
-          _this9.el.style[styl] = '';
+          delete _this8.props.layout[styl];
+          _this8.el.style[styl] = '';
         });
 
         // emit events
@@ -5289,7 +5280,7 @@
     }, {
       key: 'backgroundImage',
       value: function backgroundImage(file) {
-        var _this10 = this;
+        var _this9 = this;
 
         if (!file) {
           if (this.bgImage) {
@@ -5311,7 +5302,7 @@
           this.el.insertAdjacentElement('afterBegin', this.bgImage);
         }
         var update = function update(src) {
-          _this10.bgImage.style.backgroundImage = 'url(' + src + ')';
+          _this9.bgImage.style.backgroundImage = 'url(' + src + ')';
         };
         this.bgImage.style.backgroundImage = 'url(' + url + ')';
         this.el.classList.add('has-bgImage');
@@ -5376,7 +5367,7 @@
       key: 'moveUp',
       value: function moveUp() {
         var oldIndx = this.getIndex();
-        if (!this.$align.sections[oldIndx - 1] || this.$align.sections[oldIndx - 1].type === 'title') return;
+        if (!this.$align.sections[oldIndx - 1]) return;
 
         this.$align.editor.insertBefore(this.el, this.$align.sections[oldIndx - 1].el);
         swapArrayItems(this.$align.sections, oldIndx, oldIndx - 1);
@@ -5457,30 +5448,25 @@
     }, {
       key: 'content',
       get: function get$$1() {
-        var output = void 0;
-        if (this.props.type === 'text') {
-          output = this.el.cloneNode(true);
-          var controllers = output.querySelector('.align-sectionControllers');
-          var contentDiv = output.querySelector('.align-content');
-          var figures = Array.from(contentDiv.querySelectorAll('figure'));
-          var scripts = Array.from(contentDiv.querySelectorAll('.align-codeEditor'));
-          if (this.props.isHTMLView) {
-            contentDiv.innerHTML = contentDiv.innerText;
-          }
-          figures.forEach(function (fig) {
-            return Figure.render(fig);
-          });
-          scripts.forEach(function (script) {
-            return Script.render(script);
-          });
-          output.classList.remove('is-active');
-          output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
-          contentDiv.remove();
-          controllers.remove();
+        var output = this.el.cloneNode(true);
+        var controllers = output.querySelector('.align-sectionControllers');
+        var contentDiv = output.querySelector('.align-content');
+        var figures = Array.from(contentDiv.querySelectorAll('figure'));
+        var scripts = Array.from(contentDiv.querySelectorAll('.align-codeEditor'));
+        if (this.props.isHTMLView) {
+          contentDiv.innerHTML = contentDiv.innerText;
         }
-        if (this.props.type === 'title') {
-          return this.title.innerText;
-        }
+        figures.forEach(function (fig) {
+          return Figure.render(fig);
+        });
+        scripts.forEach(function (script) {
+          return Script.render(script);
+        });
+        output.classList.remove('is-active');
+        output.insertAdjacentHTML('beforeend', contentDiv.innerHTML);
+        contentDiv.remove();
+        controllers.remove();
+
         return output.outerHTML;
       }
     }]);
@@ -5622,6 +5608,7 @@
         if (Selection.range && Selection.range.collapsed && Selection.range.startContainer.nodeType === 1 && Selection.range.startContainer.childNodes.length <= 1 && Selection.range.startContainer.closest('p')) {
           this.position = updatePosition(Selection.range.startContainer, this.el, newPosition || this.settings.position);
           this.show();
+          this.updateDirection();
           return;
         }
         this.hide();
@@ -5630,6 +5617,7 @@
       key: 'active',
       value: function active() {
         this.el.classList.toggle('is-active');
+        this.updateDirection();
       }
     }, {
       key: 'toggleVisibility',
@@ -5639,6 +5627,15 @@
           return;
         }
         this.show();
+      }
+    }, {
+      key: 'updateDirection',
+      value: function updateDirection() {
+        this.menu.classList.remove('is-down');
+        var top = this.menu.getBoundingClientRect().top;
+        if (top <= 0) {
+          this.menu.classList.add('is-down');
+        }
       }
     }, {
       key: 'show',
@@ -5959,11 +5956,6 @@
 
         this.sections = [];
 
-        if (this.settings.postTitle !== false) {
-          this.postTitle = new Section(this, this.settings.postTitle, {
-            type: 'title'
-          });
-        }
         this.startContent.forEach(function (content) {
           return new Section(_this, content);
         });
@@ -6088,22 +6080,9 @@
       key: 'content',
       get: function get$$1() {
         return this.sections.reduce(function (acc, section) {
-          if (section.props.type !== 'text') {
-            return acc;
-          }
           acc += section.content;
           return acc;
         }, '');
-      }
-    }, {
-      key: 'title',
-      get: function get$$1() {
-        if (this.postTitle) {
-          var title = this.sections.find(function (sec) {
-            return sec.props.type === 'title';
-          });
-          return title.content;
-        }
       }
     }], [{
       key: 'extend',

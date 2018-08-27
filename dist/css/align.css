@@ -540,14 +540,6 @@
 .styler-button.is-active {
   fill: #eb008b;
 }
-.styler .picker-guide {
-  width: 30px;
-  height: 30px;
-  padding: 5px;
-}
-.styler .picker-guide svg {
-  color: #000;
-}
 .styler-counter {
   max-width: 40px;
   margin: 0 5px;
@@ -712,15 +704,15 @@
 }
 .inserter-menu {
   position: absolute;
-  top: -10px;
+  top: 0;
   left: 0;
   border-radius: 4px;
   display: none;
   background: #fff;
   border: 1px solid #aaa;
-  -webkit-transform: translate(0, -100%);
-      -ms-transform: translate(0, -100%);
-          transform: translate(0, -100%);
+  -webkit-transform: translateY(calc(-100% - 10px));
+      -ms-transform: translateY(calc(-100% - 10px));
+          transform: translateY(calc(-100% - 10px));
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -763,6 +755,30 @@
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+}
+.inserter-menu.is-down {
+  -webkit-transform: translateY(42px);
+      -ms-transform: translateY(42px);
+          transform: translateY(42px);
+}
+.inserter-menu.is-down:before {
+  bottom: initial;
+  top: 0;
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent #aaa transparent;
+  -webkit-transform: translate(-50%, -100%);
+      -ms-transform: translate(-50%, -100%);
+          transform: translate(-50%, -100%);
+}
+.inserter-menu.is-down:after {
+  bottom: initial;
+  top: 1px;
+  left: 16px;
+  border-width: 0 7px 7px 7px;
+  border-color: transparent transparent #fff transparent;
+  -webkit-transform: translate(-50%, -100%);
+      -ms-transform: translate(-50%, -100%);
+          transform: translate(-50%, -100%);
 }
 .inserter.is-active .inserter-menu {
   display: block;
@@ -965,7 +981,7 @@
       -ms-user-select: none;
           user-select: none;
 }
-.picker {
+.align-colorpicker {
   position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -976,22 +992,23 @@
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
 }
-.picker-guide {
-  width: 24px;
-  height: 24px;
-  padding: 0;
+.align-colorpicker-guide {
+  width: 30px;
+  height: 30px;
+  padding: 5px;
   border: 0;
   background: transparent;
 }
-.picker-guide:focus {
+.align-colorpicker-guide:focus {
   outline: 0;
 }
-.picker-guide svg {
+.align-colorpicker-guide svg {
   width: 100%;
   height: 100%;
   fill: inherit;
+  color: #000;
 }
-.picker-square {
+.align-colorpicker-square {
   position: relative;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -999,13 +1016,13 @@
           user-select: none;
   overflow: hidden;
 }
-.picker-square > canvas {
+.align-colorpicker-square > canvas {
   display: block;
 }
-.picker-controllers {
+.align-colorpicker-controllers {
   padding: 25px 20px;
 }
-.picker-menu {
+.align-colorpicker-menu {
   position: absolute;
   top: 50px;
   right: 0;
@@ -1031,13 +1048,13 @@
   overflow: hidden;
   z-index: 1000;
 }
-.picker-menu.is-hidden {
+.align-colorpicker-menu.is-hidden {
   display: none;
 }
-.picker-menu:focus {
+.align-colorpicker-menu:focus {
   outline: none;
 }
-.picker-recent {
+.align-colorpicker-recent {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1051,22 +1068,23 @@
           align-items: center;
   width: 100%;
 }
-.picker-color {
+.align-colorpicker-color {
   margin: 4px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
   background-color: #000;
 }
-.picker-value {
+.align-colorpicker-value {
   display: none;
 }
-.picker-inputs {
+.align-colorpicker-inputs {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  font-size: 16px;
 }
-.picker-cursor {
+.align-colorpicker-cursor {
   position: absolute;
   top: 0;
   left: 0;
@@ -1078,7 +1096,7 @@
   will-change: transform;
   pointer-events: none;
 }
-.picker-input {
+.align-colorpicker-input {
   padding: 5px;
   margin: 0 3px;
   min-width: 0;
@@ -1088,13 +1106,13 @@
           appearance: none;
   -moz-appearance: textfield;
 }
-.picker-input::-webkit-inner-spin-button,
-.picker-input::-webkit-outer-spin-button {
+.align-colorpicker-input::-webkit-inner-spin-button,
+.align-colorpicker-input::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-.picker-model,
-.picker-submit {
+.align-colorpicker-model,
+.align-colorpicker-submit {
   position: relative;
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
@@ -1115,13 +1133,13 @@
   fill: #aaa;
   outline: none;
 }
-.picker-model >.icon,
-.picker-submit >.icon {
+.align-colorpicker-model >.icon,
+.align-colorpicker-submit >.icon {
   width: 20px;
   height: 20px;
 }
-.picker-model:hover,
-.picker-submit:hover {
+.align-colorpicker-model:hover,
+.align-colorpicker-submit:hover {
   fill: #1700ff;
   color: #1700ff;
 }
