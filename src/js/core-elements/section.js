@@ -14,9 +14,6 @@ import Dep from '../partial/dep';
 
 export default class Section {
   constructor (align, content, { position } = {}) {
-    if (!content || content.nodeName === 'BR') {
-      return;
-    }
     this.id = Section.id++
     this.$align = align;
     this.fields = [
@@ -163,7 +160,7 @@ export default class Section {
     this.addButton.classList.add('align-sectionAdd');
 
     this.addButton.addEventListener('click', () => {
-      const newSection = new Section(this.$align, '', { position: this.getIndex() });
+      const newSection = new Section(this.$align, ' ', { position: this.getIndex() });
       setTimeout(() => {
         newSection.active();
         Selection.selectElement(newSection.contentDiv.querySelector('p'));
