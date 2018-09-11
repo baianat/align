@@ -1,5 +1,5 @@
 /**
-    * v0.0.40
+    * v0.0.41
     * (c) 2018 Baianat
     * @license MIT
     */
@@ -4945,9 +4945,6 @@ var Section = function () {
 
     classCallCheck(this, Section);
 
-    if (!content || content.nodeName === 'BR') {
-      return;
-    }
     this.id = Section.id++;
     this.$align = align;
     this.fields = ['backgroundImage', 'backgroundVideo', 'backgroundColor', 'customClass', 'layout'];
@@ -5088,7 +5085,7 @@ var Section = function () {
       this.addButton.classList.add('align-sectionAdd');
 
       this.addButton.addEventListener('click', function () {
-        var newSection = new Section(_this4.$align, '', { position: _this4.getIndex() });
+        var newSection = new Section(_this4.$align, ' ', { position: _this4.getIndex() });
         setTimeout(function () {
           newSection.active();
           Selection.selectElement(newSection.contentDiv.querySelector('p'));
