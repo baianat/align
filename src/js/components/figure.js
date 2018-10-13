@@ -92,7 +92,7 @@ export default class Figure extends Component {
 
     switch (ext.toLowerCase()) {
       case 'jpg':
-      case 'jpge':
+      case 'jpeg':
       case 'gif':
       case 'bmp':
       case 'png':
