@@ -121,6 +121,7 @@ export default class Section {
       this.contentDiv = document.createElement('div');
       this.contentDiv.classList.add('align-content');
       this.contentDiv.contentEditable = true;
+      this.contentDiv.dataset.gramm = false;
     }
     if (this.props.isHTMLView) {
       content = content.innerText;
