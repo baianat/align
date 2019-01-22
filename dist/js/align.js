@@ -1,6 +1,6 @@
 /**
-    * v0.0.41
-    * (c) 2018 Baianat
+    * v0.0.43
+    * (c) 2019 Baianat
     * @license MIT
     */
 (function (global, factory) {
@@ -3122,7 +3122,7 @@
 
         switch (ext.toLowerCase()) {
           case 'jpg':
-          case 'jpge':
+          case 'jpeg':
           case 'gif':
           case 'bmp':
           case 'png':
@@ -3509,8 +3509,14 @@
     createClass(Separator, [{
       key: '_init',
       value: function _init() {
+        var _this2 = this;
+
         this.updateHeight(this.currentHeigh);
         this.el.addEventListener('mousedown', this.handleClick.bind(this));
+        this.toolbar = new Styler(this.$align, Separator.toolbar);
+        this.el.addEventListener('mousedown', function () {
+          _this2.toolbar.update(_this2);
+        });
       }
     }, {
       key: 'updateHeight',
@@ -3521,21 +3527,21 @@
     }, {
       key: 'handleClick',
       value: function handleClick(event) {
-        var _this2 = this;
+        var _this3 = this;
 
         event.preventDefault();
         var startPosition = event.y;
         var handleDrag = function handleDrag(evnt) {
           var endPosition = evnt.y;
-          _this2.delta = endPosition - startPosition;
-          _this2.updateHeight(_this2.currentHeigh + _this2.delta);
+          _this3.delta = endPosition - startPosition;
+          _this3.updateHeight(_this3.currentHeigh + _this3.delta);
         };
         var handleRelease = function handleRelease(evnt) {
           evnt.preventDefault();
           evnt.stopPropagation();
           window.removeEventListener('mousemove', handleDrag);
           window.removeEventListener('mouseup', handleRelease);
-          _this2.currentHeigh += _this2.delta;
+          _this3.currentHeigh += _this3.delta;
         };
         window.addEventListener('mousemove', handleDrag);
         window.addEventListener('mouseup', handleRelease);
@@ -3551,8 +3557,13 @@
     return Separator;
   }(Component);
 
+  Separator.toolbar = {
+    mode: 'bubble',
+    hideWhenClickOut: true,
+    commands: ['remove']
+  };
   Separator.schema = {
-    tooltip: 'Vimeo',
+    tooltip: 'separator',
     icon: 'split'
   };
 
@@ -5030,6 +5041,7 @@
           this.contentDiv = document.createElement('div');
           this.contentDiv.classList.add('align-content');
           this.contentDiv.contentEditable = true;
+          this.contentDiv.dataset.gramm = false;
         }
         if (this.props.isHTMLView) {
           content = content.innerText;
