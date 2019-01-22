@@ -1,4 +1,5 @@
 import Component from './component';
+import Styler from '../core-elements/styler';
 
 export default class Separator extends Component {
   constructor (align, separator) {
@@ -27,6 +28,10 @@ export default class Separator extends Component {
   _init () {
     this.updateHeight(this.currentHeigh);
     this.el.addEventListener('mousedown', this.handleClick.bind(this));
+    this.toolbar = new Styler(this.$align, Separator.toolbar);
+    this.el.addEventListener('mousedown', () => {
+      this.toolbar.update(this);
+    });
   }
 
   updateHeight (height) {
@@ -53,8 +58,17 @@ export default class Separator extends Component {
     window.addEventListener('mouseup', handleRelease);
   }
 
+  
+  static toolbar = {
+    mode: 'bubble',
+    hideWhenClickOut: true,
+    commands: [
+      'remove'
+    ]
+  }
+
   static schema = {
-    tooltip: 'Vimeo',
+    tooltip: 'separator',
     icon: 'split'
   }
 }
