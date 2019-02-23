@@ -41,8 +41,7 @@ export default class Slider {
     this.fill.classList.add('slider-fill');
     this.track.appendChild(this.fill);
     this.handle = stringToDOM(`<div class="slider-handle"></div>`);
-    this.handle.addEventListener('mousedown', this.select.bind(this), false);
-    this.handle.addEventListener('touchstart', this.select.bind(this), { passive: true });
+    this.handle.addEventListener('mousedown', this.select.bind(this), false);    this.handle.addEventListener('touchstart', this.select.bind(this), { passive: true });
     this.track.appendChild(this.handle);
 
     this.wrapper.appendChild(this.el);
