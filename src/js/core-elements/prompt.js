@@ -8,11 +8,15 @@ export default class Prompt {
       ...settings
     };
     this.$align = align;
-    this._init(this.settings.message, this.settings.data);
+    this._init();
   }
 
-  _init (message, data) {
+  _init () {
     const position = this.settings.position;
+    const message = this.settings.message;
+    const data = this.settings.data;
+
+
     this.el = document.createElement('div');
     this.message = document.createElement('label');
     this.inputs = [];
