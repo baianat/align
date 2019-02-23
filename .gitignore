@@ -62,3 +62,6 @@ typings/
 
 # folder icon
 Icon/r
+
+# dist folder
+dist
