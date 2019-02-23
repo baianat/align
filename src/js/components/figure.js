@@ -1,6 +1,7 @@
 import Component from './component';
 import Styler from '../core-elements/styler';
 import Prompt from '../core-elements/prompt';
+import { updatePosition } from '../partial/utils';
 
 export default class Figure extends Component {
   constructor (align, figure) {
@@ -66,6 +67,25 @@ export default class Figure extends Component {
     });
   }
 
+  altText() {
+     
+    const prompt = new Prompt(this.$align, {
+      message: 'Alt Text:',
+      data: this.img.alt,
+      inputsTypes: ['text'],
+      inputsPlaceholders: ['Alt text'],
+      position: {}
+    });
+    updatePosition(
+      this.el,
+      prompt.el,
+      'middle-center'
+    )
+    prompt.onSubmit(() => { 
+      this.img.alt = prompt.inputs[0].value;
+    })
+  }
+
   readFileContent (file) {
     if (!this.isImage(file.name)) {
       return {
@@ -98,7 +118,6 @@ export default class Figure extends Component {
       case 'png':
         return true;
     }
-    return false;
   }
 
   static toolbar = {
@@ -111,6 +130,12 @@ export default class Figure extends Component {
         element: 'classes',
         values: ['floatLeft', 'center', 'floatRight', 'full'],
         icons: ['figureLeft', 'figureCenter', 'figureRight', 'figureFull'],
+      },
+      'separator',
+      {
+        element: 'button',
+        func: 'altText',
+        icon: 'pencil'
       },
       'remove'
     ]
