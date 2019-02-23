@@ -44,9 +44,7 @@ export default class Section {
     this._initControllers();
     this._initWatchers(); 
     this._initContent(content);
-    this.el.addEventListener('click', () => {
-      this.active();
-    });
+    this.el.addEventListener('click', (e) => this.active(e));
 
     if (typeof position === 'number') {
       const before = this.$align.sections[position];

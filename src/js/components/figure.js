@@ -62,7 +62,7 @@ export default class Figure extends Component {
     this.el.classList.add('align-figure', 'is-center');
     this.el.appendChild(this.img);
     this.el.appendChild(this.caption);
-    this.el.addEventListener('click', () => {
+    this.el.addEventListener('click', (event) => {
       this.toolbar.update(this);
     });
   }
@@ -76,14 +76,14 @@ export default class Figure extends Component {
       inputsPlaceholders: ['Alt text'],
       position: {}
     });
-    updatePosition(
-      this.el,
-      prompt.el,
-      'middle-center'
-    )
     prompt.onSubmit(() => { 
       this.img.alt = prompt.inputs[0].value;
     })
+    updatePosition(
+      this.el,
+      prompt.el,
+      'top-center'
+    )
   }
 
   readFileContent (file) {
