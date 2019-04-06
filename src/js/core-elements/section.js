@@ -46,7 +46,7 @@ export default class Section {
     this._initContent(content);
     this.el.addEventListener('click', (e) => this.active(e));
     // remove extra span element
-    this.el.addEventListener('paste', (event) => {
+    this.el.addEventListener('DOMNodeInserted', (event) => {
       const target = event.target;
       if (target.tagName === 'SPAN') {
         target.outerHTML = target.innerHTML;
