@@ -45,7 +45,13 @@ export default class Section {
     this._initWatchers(); 
     this._initContent(content);
     this.el.addEventListener('click', (e) => this.active(e));
-
+    // remove extra span element
+    this.el.addEventListener('paste', (event) => {
+      const target = event.target;
+      if (target.tagName === 'SPAN') {
+        target.outerHTML = target.innerHTML;
+      }
+    });
     if (typeof position === 'number') {
       const before = this.$align.sections[position];
       this.$align.editor.insertBefore(this.el, before.el);
