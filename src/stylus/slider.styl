@@ -1,0 +1,65 @@
+.slider
+  position: relative
+  display: flex
+  align-items: center
+  box-sizing: border-box
+  margin-bottom: 15px
+
+  &-input
+    display: none
+    margin-bottom: 0
+    padding: 0.6em
+    max-width: 70px
+    width: 20%
+    border: $border solid $black
+    border-radius: $borderRadius
+    text-align: center
+    font-size: 14px
+    -webkit-appearance: none
+    -moz-appearance: text
+
+    &:focus
+      outline: none
+      border-color: $secondry
+
+  &-track
+    position: relative
+    flex: 1
+    margin: 0
+    width: auto
+    height: 10px
+    border-radius: 5px
+    background: $white
+    will-change: transfom
+    ~/.is-strip &
+      background-image: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)
+    ~/.is-alpha &
+      background-image: linear-gradient(45deg, $gray 25%, transparent 25%), linear-gradient(45deg, transparent 75%, $gray 75%), linear-gradient(-45deg, $gray 25%, transparent 25%), linear-gradient(-45deg, transparent 75%, $gray 75%), linear-gradient(90deg, transparent, $gray)
+      background-size: 12px 12px, 12px 12px, 12px 12px, 12px 12px, 100% 100%
+      background-position: 0 0, 6px -6px, 0 6px, -6px 0px, center center
+
+  &-handle
+    position: relative
+    position: absolute
+    top: 0
+    left: 0
+    will-change: transform
+    color: $black
+    margin-left: -7px
+    margin-top: -2px
+    width: 14px
+    height: 14px
+    border-radius: 10px
+    background: transparent
+    background-color: currentColor
+  
+  &-fill
+    width: 100%
+    height: 100%
+    border-radius: 12px
+    background-color: $blue
+    display: none
+    transform-origin: left top
+
+
+    

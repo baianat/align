@@ -1,0 +1,41 @@
+[data-tooltip]
+  position: relative
+
+  &:focus
+    outline: none
+
+  &:hover
+    &:before,
+    &:after
+      display: block
+
+  &:before
+    position: absolute
+    bottom: -5px
+    left: 50%
+    z-index: 99999
+    display: none
+    width: 0
+    height: 0
+    border-width: 0 4px 4px 4px
+    border-style: solid
+    border-color: transparent transparent $black transparent
+    content: ''
+    transform: translate(-50%, 0)
+    user-select: none
+
+  &:after
+    position: absolute
+    bottom: -5px
+    left: 50%
+    z-index: 99999
+    display: none
+    padding: 4px 8px
+    border-radius: 4px
+    background-color: $black
+    color: $white
+    content: attr(data-tooltip)
+    white-space: nowrap
+    font-size: 12px
+    transform: translate(-50%, 100%)
+    user-select: none

@@ -1,0 +1,52 @@
+_button-color(accent, text)
+  border-color: accent
+  background-color:  accent
+  color: text
+  &.is-outline
+    background-color: transparent
+    color: accent
+  &:hover
+  &:active
+  &.is-active
+    border-color: darken(accent, 15%)
+    background-color: darken(accent, 15%)
+    color: text
+  &:focus
+    box-shadow: 0 0 0 2px alpha(accent, 10%)
+
+.align-button
+  position: relative
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  margin-bottom: $margin
+  padding: $padding ($padding * 1.5)
+  outline: none
+  border-width: $border
+  border-style: solid
+  border-radius: $borderRadius
+  background-clip: border-box
+  vertical-align: top
+  text-align: center
+  text-decoration: none
+  line-height: 1.5em
+  cursor: pointer
+  transition: 0.3s ease-in-out
+
+  &.is-small
+    font-size: 12px
+  &,
+  &.is-normal
+    font-size: 16px
+  &.is-large
+    font-size: 24px
+
+  &,
+  &.is-primary
+    _button-color: $blue $white
+  &.is-secondary
+    _button-color: $dark $white
+  &.is-danger
+    _button-color: $red $white
+  &.is-success
+    _button-color: $green $white

@@ -1,0 +1,64 @@
+.align-switcher
+  position: relative
+  display: inline-flex
+  width: 100%
+  margin: 5px 0
+  vertical-align: middle
+
+  &-info
+    flex: 1
+    font-size: 14px
+    color: $gray
+  &-input
+    display: none
+
+    &:checked
+      + .align-switcher-body
+        background-color: $green
+        padding-left: 0.5em
+        padding-right: 1.3em
+
+        .align-switcher-handle
+          left: calc(100% - 1.3em)
+
+
+  &-body
+    position: relative
+    display: inline-flex
+    padding: 0
+    padding-left: 1.3em
+    padding-rigt: 0.5em
+    border-radius: 1.3em
+    min-width: 2.6em
+    height: 1.3em
+    background-color: $gray
+    cursor: pointer
+    transition: 0.3s
+    justify-content: center
+    align-items: center
+    color: $white
+    user-select: none
+
+    p
+      font-size: 0.8em
+
+  &-true
+    max-width: 0em
+    opacity: 0
+
+  &-false
+    max-width: 40em
+    opacity: 1
+
+  &-handle
+    position: absolute
+    left: 0
+    margin: 0.25em
+    top: 0
+    display: block
+    border-radius: 0.8em
+    width: 0.8em
+    height: 0.8em
+    background-color: $white
+    content: ''
+    transition: 0.3s

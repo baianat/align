@@ -1,0 +1,187 @@
+.align
+  position: relative
+  width: 100%
+  transition: 0.5s
+  height: 100vh
+  overflow: hidden
+  *
+    box-sizing: border-box
+  &-editor
+    padding: 60px 0
+    background-color: $white
+    &:focus
+      outline: none
+
+  &-line
+    cursor: pointer
+
+  &.is-fullscreen
+    height: 100vh
+    width: 100%
+    position: fixed
+    top: 0
+    right: 0
+    left: 0
+    bottom: 0
+    z-index: 99999
+    overflow: auto
+
+  &-select
+    position: relative
+    margin: 0 7px
+    background: $white
+    svg
+      position: absolute
+      top: 0
+      right: 0
+      width: 18px
+      height: 18px
+      margin: 6px 0
+      fill: currentColor
+      pointer-events: none
+    select
+      appearance: none
+      height: 30px
+      border-radius: 0
+      padding: 2px 23px 2px 5px
+      line-height: 26px
+      background: transparent
+      text-align: center
+      border-width: 0
+      font-size: 14px
+      color: currentColor
+      &:focus
+        outline: none
+
+  &-wrapper
+    position: relative
+    height: calc(100% - 50px)
+    overflow: auto
+    transition: 0.2s
+
+  &-separator
+    position: relative
+    background: alpha($gray, 10%)
+    user-select: none
+    cursor: row-resize
+
+  &-sectionSettings
+  &-sectionUp
+  &-sectionDown
+    position: absolute
+    fill: $gray
+    border: none
+    display: none
+    background: transparent
+    padding: 10px
+    cursor: pointer
+    &:hover
+      fill: darken($gray, 40%)
+    ~/-section.is-active &
+      display: block
+
+  &-sectionSettings
+    top: 0
+    right: 0
+  &-sectionUp
+    top: 0
+    left: 0
+  &-sectionDown
+    left: 0
+    bottom: 0
+
+  &-sectionAdd
+    position: absolute
+    z-index: 30
+    top: 0
+    left: 50%
+    transform: translate(-50%, -50%)
+    width: 300px
+    max-width: 70%
+    height: 4px
+    padding: 0
+    background-color: alpha($gray, 80%)
+    border: 0
+    opacity: 0
+    transition: 0.5s 0.1s
+    cursor: pointer
+    outline: none
+    color: $gray
+    &:hover
+      opacity: 1
+      color: darken($gray, 40%)
+    &.is-main
+      position: static
+      transform: none
+      opacity: 1
+      margin: 0 auto 50px
+      display: block
+      height: 25px
+      width: 25px
+      border-radius: 20px
+      border: 2px solid $gray
+      background: $white
+      background: transparent
+      color: $gray
+      line-height: 23px
+      font-size: 15px
+      text-align: center
+      &:after
+        content: '+'
+
+  &-content
+    display: flow-root
+    width: 100%
+    height: 100%
+    p
+      word-wrap: break-word
+
+  &-figure
+    transition: 0.2s
+
+  &-section
+    position: relative
+    transition: 0.2s
+    *:focus
+      outline: none
+    &.is-active
+      box-shadow: 0 0 25px alpha($black, 5%)
+      border-radius: 4px
+      .align-column:not(:last-child)
+        border-right: 1px solid alpha($black, 5%)
+
+  &-icon
+    width: 20px
+    height: 20px
+
+  p:empty
+    &::after
+      font-style: italic
+      color: alpha($gray, 50%)
+      display: inline-block
+      content: 'Content here...'
+      font-size: 20px
+      z-index: -1
+      user-select: none
+
+  [data-align-html]
+    white-space: pre-wrap
+
+  &-title
+    margin: 10px 0
+    &:empty::after
+      font-style: italic
+      color: $gray
+      content: 'Post Title Here'
+
+  [data-default-value]:empty
+    &::after
+      font-style: italic
+      color: $gray
+      content: attr(data-default-value)
+      user-select: none
+
+  &-figure:not(.is-active)
+    figcaption:empty
+      display: none
+

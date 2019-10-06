@@ -1,0 +1,64 @@
+{
+  "name": "@baianat/align",
+  "version": "0.0.44",
+  "description": "ES6 text editor",
+  "main": "dist/js/align.js",
+  "module": "dist/js/align.esm.js",
+  "dependencies": {
+    "color-fns": "^0.0.7",
+    "prismjs": "^1.15.0"
+  },
+  "files": [
+    "dist/js/*.js",
+    "dist/css/*.css"
+  ],
+  "scripts": {
+    "lint": "eslint ./src --fix",
+    "build:scripts": "MODE=production node scripts/scripts",
+    "build:styles": "MODE=production node scripts/styles",
+    "build": "npm run build:styles && npm run build:scripts",
+    "dev": "MODE=dev node scripts/watcher"
+  },
+  "devDependencies": {
+    "autoprefixer-stylus": "^0.14.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "browser-sync": "^2.23.6",
+    "chalk": "^2.3.2",
+    "eslint": "^4.19.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "filesize": "^3.6.1",
+    "fs": "0.0.1-security",
+    "gzip-size": "^4.1.0",
+    "rollup": "^0.57.1",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^9.1.5",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "stylus": "^0.54.5",
+    "uglify-js": "^3.3.21",
+    "uglifycss": "0.0.29"
+  },
+  "license": "MIT",
+  "keywords": [],
+  "maintainers": [
+    {
+      "name": "baianat",
+      "email": "mobher@gmail.com"
+    },
+    {
+      "name": "Abdelrahman3D",
+      "email": "abdelrahman3d@gmail.com"
+    }
+  ],
+  "optionalDependencies": {}
+}

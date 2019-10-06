@@ -1,0 +1,163 @@
+@import 'variables'
+@import 'lines'
+@import 'gallery'
+@import 'button'
+@import 'grid'
+
+.align
+  &-editor
+    white-space: normal
+    line-height: 2em
+    font-size: 18px
+
+  &-grid
+    display: flex
+    margin: 0 -20px
+  &-column
+    padding: 20px
+    flex: 1
+
+  &-image
+    width: 100%
+    max-width: 400px
+  &-post
+    display: flex
+    align-content: center
+    justify-content: center
+  &-video
+    position: relative
+    width: 100%
+    height: 0
+    padding-bottom: ((9/16)*100)%
+    >*
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      
+  &-table
+    user-select: auto
+    width: 100%
+    max-width: 900px
+    border: 1px solid $black
+    border-spacing: 0
+    border-collapse: separate
+    border-radius: 2px
+    color: $black
+    text-align: left
+
+    tr
+      &:not(:first-child)
+        td
+          border-top: 1px solid $black
+
+    th, td
+      padding: 5px 10px
+      background-color: $white
+      &:not(:last-child)
+        border-right: 1px solid $black
+
+  iframe
+    border: 0
+
+  blockquote
+    border-left: 5px solid #AAAAAA
+    padding: 10px 0 10px 20px
+
+  &-quote
+    font-size: 32px
+    cite
+      float: right
+      font-size: 0.6em
+      margin-right: 10%
+      color: $gray
+
+
+  &-figure
+    margin: 10px auto
+    text-align: center
+    font-size: 12px
+    figcaption
+      &:focus
+        outline: none
+    img
+      width: 100%
+      max-width: 100%
+    &.is-active
+      img
+        box-shadow: 0 0 25px alpha($black, 5%)
+    &.is-center
+      max-width: 500px
+    &.is-floatLeft
+      float: left
+      margin-right: 40px
+      max-width: 500px
+      width: 50vw
+      &:after
+        display: block
+        clear: both
+        content: ''
+    &.is-floatRight
+      float: right
+      margin-left: 40px
+      max-width: 500px
+      width: 50vw
+      &:after
+        display: block
+        clear: both
+        content: ''
+    &.is-full
+      width: 100%
+      max-width: 100%
+      
+
+  &-content
+    position: relative
+    padding: 0
+
+  &-title
+    text-align: center
+
+  &-section
+    display: flow-root
+    margin: auto
+    width: 70%
+    padding: 20px
+    &.is-full
+      width: 100%
+      max-width: 100%
+      padding: 20px calc(15% + 20px)
+    &.is-image
+      background-position: center center
+      background-size: cover
+      background-attachment: fixed
+      min-height: 300px
+      margin: 20px 0
+      padding: 20px
+    &.has-bgImage
+    &.has-bgVideo
+    &.has-bgColor
+      text-shadow: 1px 1px 3px alpha($black, 50%)
+  &-bgVideo
+  &-bgImage
+  &-bgColor
+    position: absolute
+    overflow: hidden
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-repeat: no-repeat
+    background-size: cover
+    background-position: center center
+    width: 100%
+    height: 100%
+    object-fit: cover
+    &.is-parallax
+      background-attachment: fixed
+  &-bgVideo
+    video
+      width: 100%
+      height: 100%
+      object-fit: cover

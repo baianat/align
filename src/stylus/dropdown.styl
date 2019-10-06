@@ -1,0 +1,42 @@
+.align .dropdown
+  position: relative
+
+  &-button
+    background-color: #fff
+    fill: #000
+    position: relative
+    height: 30px
+    padding: 5px
+    margin: 0
+    border: 0
+    outline: none
+    display: block
+    z-index: 1
+    display: flex
+  &-caret
+    width: 12px
+    margin: 4px 0
+    fill: currentColor
+  &-menu
+    position: absolute
+    display: none
+    min-width: 300%
+    top: calc(100% - 1px)
+    left: 0
+    border: 1px solid $gray
+    background-color: $white
+  &-item
+    display: block
+    margin: 5px 10px
+    padding: 5px
+    >*
+      margin-top: 0
+      margin-bottom: 0
+
+  &.is-active
+    .dropdown-button
+      border-width: 1px 1px 0 1px
+      border-color: $gray
+      border-style: solid
+    .dropdown-menu
+      display: block
