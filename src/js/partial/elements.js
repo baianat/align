@@ -143,15 +143,15 @@ export function field (name, description, type = 'text') {
 export function dropzone (name) {
   const wrapper = document.createElement('div');
   const input = document.createElement('input');
-  const span = document.createElement('span');
+  const label = document.createElement('label');
 
   wrapper.classList.add('align-dropzone');
   wrapper.appendChild(input);
-  wrapper.appendChild(span);
+  wrapper.appendChild(label);
   input.classList.add('align-dropzone-input');
   input.type = 'file';
   input.multiple = true;
-  span.classList.add('align-dropzone-description');
-  span.innerHTML = 'Click here to upload your image';
+  label.classList.add('align-dropzone-description');
+  label.innerHTML = 'Click here to upload your image';
   return { input, el: wrapper };
 }
